@@ -1,4 +1,5 @@
 import { defineRouting } from "next-intl/routing";
+import { SHOP } from "@/config/shop";
 
 /**
  * Three locales, Greek default — mirrors HDCtool exactly (MTRAN,
@@ -21,7 +22,7 @@ export const routing = defineRouting({
    */
   localeDetection: false,
   localeCookie: {
-    name: "KOLLERIS_LOCALE",
+    name: `${SHOP.cookiePrefix}LOCALE`,
     maxAge: 60 * 60 * 24 * 365,
   },
 });

@@ -70,7 +70,7 @@ export function ClaimAccountForm() {
           type="text"
           name="orderNumber"
           required
-          placeholder="KOL-20260806-0002"
+          placeholder="HDC-20260806-0002"
           className={`${INPUT} numeral`}
         />
         <span className="mt-1.5 block text-[12px] leading-[1.5] text-k-text-3">

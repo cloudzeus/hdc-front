@@ -20,6 +20,7 @@
 import { prisma } from "../src/lib/prisma";
 import { createPaymentOrder, isVivaConfigured } from "../src/lib/payment/viva";
 import { sendOrderEmail } from "../src/lib/mail/order-email";
+import { SHOP } from "../src/config/shop";
 
 const AMOUNT = 0.5;
 const VAT_RATE = 24;
@@ -39,7 +40,7 @@ async function main() {
   if (!to) throw new Error("Usage: send-test-deposit-email.ts <email>");
 
   const day = new Date().toISOString().slice(0, 10).replace(/-/g, "");
-  const prefix = `KOL-TEST-${day}-`;
+  const prefix = `${SHOP.orderPrefix}TEST-${day}-`;
   const last = await prisma.order.findFirst({
     where: { orderNumber: { startsWith: prefix } },
     orderBy: { orderNumber: "desc" },

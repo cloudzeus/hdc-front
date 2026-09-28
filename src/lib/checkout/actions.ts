@@ -14,6 +14,7 @@ import { quoteLivePostage } from "@/lib/shipping/acs-live";
 import { createPaymentOrder, isVivaConfigured } from "@/lib/payment/viva";
 import { routing, type Locale } from "@/i18n/routing";
 import { getCurrentUser } from "@/lib/account/session";
+import { SHOP } from "@/config/shop";
 
 /**
  * Order placement.
@@ -85,13 +86,13 @@ export type CheckoutState = {
   fieldErrors?: Record<string, string>;
 };
 
-/** KOL-YYYYMMDD-NNNN, sequential within the day. */
+/** HDC-YYYYMMDD-NNNN, sequential within the day. */
 async function nextOrderNumber(): Promise<string> {
   const now = new Date();
   const day = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(
     now.getDate(),
   ).padStart(2, "0")}`;
-  const prefix = `KOL-${day}-`;
+  const prefix = `${SHOP.orderPrefix}${day}-`;
 
   const last = await prisma.order.findFirst({
     where: { orderNumber: { startsWith: prefix } },

@@ -297,7 +297,7 @@
       "etaireia": "Company",
       "afm": "VAT number",
       "arithmos_paraggelias": "Order number",
-      "p_ch_kol_20260731_0007": "e.g. KOL-20260731-0007",
+      "p_ch_kol_20260731_0007": "e.g. HDC-20260731-0007",
       "thema_minymatos": "Message subject",
       "minyma": "Message",
       "apostoli": "Send",
@@ -1048,7 +1048,7 @@
       "arithmos_paraggelias_kai_to_email": "Order number and the email you provided. No account, no password.",
       "an_kati_den_vgainei": "If something doesn't work",
       "den_vriskete_ton_arithmo": "Can't find the number?",
-      "einai_sto_email_epivevaiosis_sti": "It's in the confirmation email, in the form KOL-DDMMYY-0000. If the email was lost, call us with your full name and date — we'll find it.",
+      "einai_sto_email_epivevaiosis_sti": "It's in the confirmation email, in the form HDC-DDMMYY-0000. If the email was lost, call us with your full name and date — we'll find it.",
       "erotiseis_apostolis": "Shipping questions",
       "titlos_entopismos_paraggelias": "Track order",
       "perigrafi_deite_poy_vrisketai_i": "See where your order is with your number and email. No account needed."

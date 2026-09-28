@@ -37,7 +37,7 @@ export function OrderTracker({ initialOrderNumber }: { initialOrderNumber?: stri
             name="orderNumber"
             required
             defaultValue={initialOrderNumber}
-            placeholder="KOL-20260731-0007"
+            placeholder="HDC-20260731-0007"
             autoComplete="off"
             className="t-input h-12 w-full border border-k-line-2 px-3.5 font-mono text-k-ink outline-none focus:border-k-ink"
           />

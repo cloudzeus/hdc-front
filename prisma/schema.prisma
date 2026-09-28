@@ -578,7 +578,7 @@ model WebhookDelivery {
 model Cart {
   id String @id @default(cuid())
 
-  /// Opaque token in the `KOLLERIS_CART` cookie. Separate from the primary key
+  /// Opaque token in the `HDC_CART` cookie. Separate from the primary key
   /// so a leaked id cannot be replayed as a session.
   token String @unique @db.VarChar(64)
 
@@ -659,7 +659,7 @@ enum PaymentStatus {
 model Order {
   id String @id @default(cuid())
 
-  /// Human-facing reference, e.g. KOL-20260726-0007. Shown to the customer and
+  /// Human-facing reference, e.g. HDC-20260726-0007. Shown to the customer and
   /// sent to SoftOne as the external reference.
   orderNumber String @unique @db.VarChar(32)
 
@@ -1068,7 +1068,7 @@ model Company {
   @@map("companies")
 }
 
-/// Opaque session token, held in the `KOLLERIS_SESSION` cookie.
+/// Opaque session token, held in the `HDC_SESSION` cookie.
 ///
 /// A table rather than a JWT: an owner who removes a colleague expects them to
 /// be out immediately, and a self-contained token cannot be revoked before it

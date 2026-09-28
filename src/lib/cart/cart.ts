@@ -8,6 +8,7 @@ import { grossAmount, netAmount } from "@/lib/format";
 import { discountedNet, offerBadgeFor } from "@/lib/offers/badges";
 import { type ParcelItem } from "@/lib/shipping/acs-tariff";
 import { quoteLivePostage } from "@/lib/shipping/acs-live";
+import { SHOP } from "@/config/shop";
 import {
   FREE_SHIPPING_THRESHOLD_NET,
   PAYMENT_METHODS,
@@ -31,7 +32,7 @@ export * from "@/lib/cart/options";
  * total on screen can be trusted to match what checkout will charge.
  */
 
-export const CART_COOKIE = "KOLLERIS_CART";
+export const CART_COOKIE = `${SHOP.cookiePrefix}CART`;
 const CART_COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
 function newToken() {

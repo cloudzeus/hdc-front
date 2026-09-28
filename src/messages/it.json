@@ -297,7 +297,7 @@
       "etaireia": "Azienda",
       "afm": "Partita IVA",
       "arithmos_paraggelias": "Numero d'ordine",
-      "p_ch_kol_20260731_0007": "es. KOL-20260731-0007",
+      "p_ch_kol_20260731_0007": "es. HDC-20260731-0007",
       "thema_minymatos": "Oggetto del messaggio",
       "minyma": "Messaggio",
       "apostoli": "Invia",
@@ -1048,7 +1048,7 @@
       "arithmos_paraggelias_kai_to_email": "Numero d'ordine e email fornita. Senza account, senza password.",
       "an_kati_den_vgainei": "Se qualcosa non torna",
       "den_vriskete_ton_arithmo": "Non trovi il numero?",
-      "einai_sto_email_epivevaiosis_sti": "È nell'email di conferma, nel formato KOL-GGMMAA-0000. Se l'email è andata persa, chiamaci con nome e data — lo troviamo noi.",
+      "einai_sto_email_epivevaiosis_sti": "È nell'email di conferma, nel formato HDC-GGMMAA-0000. Se l'email è andata persa, chiamaci con nome e data — lo troviamo noi.",
       "erotiseis_apostolis": "Domande sulla spedizione",
       "titlos_entopismos_paraggelias": "Traccia ordine",
       "perigrafi_deite_poy_vrisketai_i": "Scopri dove si trova il tuo ordine con numero ed email. Non serve un account."

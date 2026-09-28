@@ -55,7 +55,7 @@ export default async function TrackOrderPage({
   setRequestLocale(locale);
 
   const raw = await searchParams;
-  // Deep-linkable from the confirmation email: `?order=KOL-…` prefills the field.
+  // Deep-linkable from the confirmation email: `?order=HDC-…` prefills the field.
   const initial = (Array.isArray(raw.order) ? raw.order[0] : raw.order)?.trim();
 
   const [menuTree, brands, stats, rootCategories, miniCart] = await Promise.all(

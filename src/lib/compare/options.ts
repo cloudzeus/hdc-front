@@ -7,7 +7,9 @@
  * `cart/options.ts` and `catalog/plp-options.ts`.
  */
 
-export const COMPARE_COOKIE = "KOLLERIS_COMPARE";
+import { SHOP } from "@/config/shop";
+
+export const COMPARE_COOKIE = `${SHOP.cookiePrefix}COMPARE`;
 
 /**
  * Four columns.

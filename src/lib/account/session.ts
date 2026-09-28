@@ -4,6 +4,7 @@ import { cache } from "react";
 import { accountStore } from "@/lib/account/account-store";
 import type { AccountUser, CompanyRole } from "@/lib/account/contract";
 import { companyCan, type CompanyCapability } from "@/lib/account/contract";
+import { SHOP } from "@/config/shop";
 
 /**
  * The customer session.
@@ -23,7 +24,7 @@ import { companyCan, type CompanyCapability } from "@/lib/account/contract";
  * load rather than whenever a JWT happens to expire.
  */
 
-export const CUSTOMER_COOKIE = "KOLLERIS_SESSION";
+export const CUSTOMER_COOKIE = `${SHOP.cookiePrefix}SESSION`;
 const MAX_AGE = 60 * 60 * 24 * 30;
 
 export async function setCustomerSession(token: string) {
