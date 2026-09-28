@@ -375,15 +375,6 @@
     "HeaderShell": {
       "metavasi_sto_periechomeno": "Μετάβαση στο περιεχόμενο"
     },
-    "MainNav": {
-      "katalogos": "Κατάλογος",
-      "nees_afixeis": "Νέες αφίξεις",
-      "i_etaireia": "Η εταιρεία",
-      "epikoinonia": "Επικοινωνία",
-      "kyria_ploigisi": "Κύρια πλοήγηση",
-      "prosfores": "Προσφορές",
-      "brands": "Brands"
-    },
     "MegaMenu": {
       "katigories": "Κατηγορίες",
       "proteinomeno": "Προτεινόμενο",
@@ -396,26 +387,24 @@
       "ola_ta": "Όλα τα {totalBrands}"
     },
     "MobileMenu": {
-      "prosfores": "Προσφορές",
-      "nees_afixeis": "Νέες αφίξεις",
-      "i_etaireia": "Η εταιρεία",
-      "epikoinonia": "Επικοινωνία",
       "menoy": "Μενού",
       "kleisimo_menoy": "Κλείσιμο μενού",
       "ploigisi": "Πλοήγηση",
       "kleisimo": "Κλείσιμο",
       "katigories": "Κατηγορίες",
-      "apokrypsi": "Απόκρυψη",
-      "emfanisi": "Εμφάνιση",
-      "katigories_2": "κατηγορίες ·",
-      "ypokatigories": "υποκατηγορίες ·",
-      "kodikoi": "κωδικοί",
-      "kod": "κωδ.",
-      "syndesi_b2b": "Σύνδεση B2B",
-      "oles_oi_ypokatigories": "Όλες οι {childCount} υποκατηγορίες",
       "show_subcategories": "Εμφάνιση υποκατηγοριών {name}",
       "hide_subcategories": "Απόκρυψη υποκατηγοριών {name}",
-      "syndesi_logariasmoy": "Σύνδεση"
+      "oles_oi_ypokatigories": "Όλες οι {childCount} υποκατηγορίες",
+      "nees_afixeis": "Νέες αφίξεις",
+      "epikoinonia": "Επικοινωνία",
+      "agapimena": "Αγαπημένα",
+      "logariasmos": "Λογαριασμός",
+      "glossa": "Γλώσσα",
+      "nav_battery": "ΕΡΓΑΛΕΙΑ ΜΠΑΤΑΡΙΑΣ",
+      "nav_accessories": "ΑΞΕΣΟΥΑΡ",
+      "nav_packout": "PACKOUT",
+      "nav_hand": "ΧΕΙΡΟΣ",
+      "nav_offers": "ΠΡΟΣΦΟΡΕΣ"
     },
     "SearchSuggest": {
       "anazitisi_proionton": "Αναζήτηση προϊόντων",
@@ -435,44 +424,57 @@
       "ola_ta_apotelesmata": "Όλα τα {totalProducts} αποτελέσματα",
       "apotelesmata_gia": "{totalProducts} αποτελέσματα για {query}",
       "ola_ta_apotelesmata_2": "Όλα τα {totalProducts} αποτελέσματα",
-      "diathesimo": "Διαθέσιμο"
+      "diathesimo": "Διαθέσιμο",
+      "hdc_placeholder": "Κωδικός ή εργαλείο — π.χ. FPD3 ή 4933479859"
     },
     "SiteFooter": {
-      "katigories": "Κατηγορίες",
-      "exypiretisi": "Εξυπηρέτηση",
-      "i_etaireia": "Η εταιρεία",
-      "k_mayromichali_4_18545_peiraias": "Κ. Μαυρομιχάλη 4, 18545 Πειραιάς",
+      "katastima": "ΚΑΤΑΣΤΗΜΑ",
+      "exypiretisi": "ΕΞΥΠΗΡΕΤΗΣΗ",
+      "platformes": "ΠΛΑΤΦΟΡΜΕΣ",
+      "ergaleia_mpatarias": "Εργαλεία μπαταρίας",
+      "axesouar": "Αξεσουάρ",
+      "ergaleia_cheiros": "Εργαλεία χειρός",
+      "prosfores": "Προσφορές",
+      "nees_afixeis": "Νέες αφίξεις",
       "entopismos_paraggelias": "Εντοπισμός παραγγελίας",
+      "apostoli_paradosi": "Αποστολή & παράδοση",
+      "tropoi_pliromis": "Τρόποι πληρωμής",
       "epistrofes": "Επιστροφές",
       "eggyiseis": "Εγγυήσεις",
       "sychnes_erotiseis": "Συχνές ερωτήσεις",
       "epikoinonia": "Επικοινωνία",
-      "poioi_eimaste": "Ποιοι είμαστε",
-      "prosfores": "Προσφορές",
-      "logariasmos_b2b": "Λογαριασμός B2B",
-      "oroi_chrisis": "Όροι Χρήσης",
-      "aporrito": "Πολιτική Απορρήτου",
-      "tropoi_pliromis": "Τρόποι Πληρωμής",
-      "apostoli_paradosi": "Αποστολή & Παράδοση",
+      "orario": "Δευ–Παρ {open}–{close}",
+      "pliromes": "Τρόποι πληρωμής",
+      "trapeza": "ΤΡΑΠΕΖΑ",
+      "operator": "Το Milwaukee Heavy Duty Centre Πειραιά λειτουργεί από την <b>{company}</b> · ΑΦΜ {vat} · ΓΕΜΗ {gemi}.",
+      "trademarks": "Τα Milwaukee®, M12™, M18™, MX FUEL™, PACKOUT™, ONE-KEY™ και REDLITHIUM™ είναι εμπορικά σήματα της Milwaukee Tool.",
+      "oroi_chrisis": "Όροι χρήσης",
+      "aporrito": "Απόρρητο",
+      "cookies": "Cookies",
       "nomika": "Νομικά"
     },
     "SiteHeader": {
+      "kyria_ploigisi": "Κύρια πλοήγηση",
+      "nav_battery": "ΕΡΓΑΛΕΙΑ ΜΠΑΤΑΡΙΑΣ",
+      "nav_accessories": "ΑΞΕΣΟΥΑΡ",
+      "nav_packout": "PACKOUT",
+      "nav_hand": "ΧΕΙΡΟΣ",
+      "nav_offers": "ΠΡΟΣΦΟΡΕΣ",
+      "archiki": "Milwaukee Heavy Duty Centre — αρχική σελίδα",
+      "agapimena": "Αγαπημένα",
       "logariasmos": "Λογαριασμός",
-      "glossa": "Γλώσσα",
-      "syndesi_b2b": "Σύνδεση B2B",
-      "syndesi_logariasmoy": "Σύνδεση",
-      "kodikoi": "κωδικοί"
+      "anazitisi": "Αναζήτηση",
+      "kleisimo_anazitisis": "Κλείσιμο αναζήτησης"
     },
-    "UtilityBar": {
-      "kodikoi": "κωδικοί",
-      "paradosi_24_48o_dorean_ano": "Παράδοση 24-48ω · Δωρεάν άνω 150€",
-      "paradosi_24_48o_se_oli": "Παράδοση 24-48ω σε όλη την Ελλάδα",
-      "dorean_apostoli_ano_ton_150": "Δωρεάν αποστολή άνω των 150€",
-      "t_30_210_411_1355": "Τ. [+30] 210 411 1355",
-      "k_mavromichali_4_peiraias": "Κ. Μαυρομιχάλη 4, Πειραιάς",
-      "times_synergati_b2b_aitisi_logariasmoy": "Τιμές συνεργάτη B2B — αίτηση λογαριασμού",
-      "syndesi": "Σύνδεση",
-      "b2b": "B2B"
+    "AnnouncementBar": {
+      "claim": "ΤΟ ΠΡΩΤΟ MILWAUKEE HEAVY DUTY CENTRE ΣΤΗΝ ΕΛΛΑΔΑ",
+      "free_shipping": "ΔΩΡΕΑΝ ΑΠΟΣΤΟΛΗ ΑΝΩ ΤΩΝ {amount}",
+      "store_pickup": "ΠΑΡΑΛΑΒΗ ΑΠΟ ΤΟ ΚΑΤΑΣΤΗΜΑ",
+      "card_payment": "ΠΛΗΡΩΜΗ ΜΕ ΚΑΡΤΑ · IRIS",
+      "promises": "Πλεονεκτήματα αγοράς"
+    },
+    "LocaleSwitch": {
+      "glossa": "Γλώσσα"
     }
   },
   "checkout": {

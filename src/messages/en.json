@@ -375,15 +375,6 @@
     "HeaderShell": {
       "metavasi_sto_periechomeno": "Skip to content"
     },
-    "MainNav": {
-      "katalogos": "Catalog",
-      "nees_afixeis": "New arrivals",
-      "i_etaireia": "The company",
-      "epikoinonia": "Contact",
-      "kyria_ploigisi": "Main navigation",
-      "prosfores": "Offers",
-      "brands": "Brands"
-    },
     "MegaMenu": {
       "katigories": "Categories",
       "proteinomeno": "Featured",
@@ -396,26 +387,24 @@
       "ola_ta": "All {totalBrands}"
     },
     "MobileMenu": {
-      "prosfores": "Offers",
-      "nees_afixeis": "New arrivals",
-      "i_etaireia": "The company",
-      "epikoinonia": "Contact",
       "menoy": "Menu",
       "kleisimo_menoy": "Close menu",
       "ploigisi": "Navigation",
       "kleisimo": "Close",
       "katigories": "Categories",
-      "apokrypsi": "Hide",
-      "emfanisi": "Show",
-      "katigories_2": "categories ·",
-      "ypokatigories": "subcategories ·",
-      "kodikoi": "codes",
-      "kod": "code",
-      "syndesi_b2b": "B2B login",
-      "oles_oi_ypokatigories": "All {childCount} subcategories",
       "show_subcategories": "Show subcategories {name}",
       "hide_subcategories": "Hide subcategories {name}",
-      "syndesi_logariasmoy": "Sign in"
+      "oles_oi_ypokatigories": "All {childCount} subcategories",
+      "nees_afixeis": "New arrivals",
+      "epikoinonia": "Contact",
+      "agapimena": "Favourites",
+      "logariasmos": "Account",
+      "glossa": "Language",
+      "nav_battery": "CORDLESS TOOLS",
+      "nav_accessories": "ACCESSORIES",
+      "nav_packout": "PACKOUT",
+      "nav_hand": "HAND TOOLS",
+      "nav_offers": "OFFERS"
     },
     "SearchSuggest": {
       "anazitisi_proionton": "Search products",
@@ -435,44 +424,57 @@
       "ola_ta_apotelesmata": "All {totalProducts} results",
       "apotelesmata_gia": "{totalProducts} results for {query}",
       "ola_ta_apotelesmata_2": "All {totalProducts} results",
-      "diathesimo": "In stock"
+      "diathesimo": "In stock",
+      "hdc_placeholder": "Code or tool — e.g. FPD3 or 4933479859"
     },
     "SiteFooter": {
-      "katigories": "Categories",
-      "exypiretisi": "Support",
-      "i_etaireia": "The company",
-      "k_mayromichali_4_18545_peiraias": "K. Mavromichali 4, 18545 Piraeus",
-      "entopismos_paraggelias": "Track order",
+      "katastima": "SHOP",
+      "exypiretisi": "CUSTOMER SERVICE",
+      "platformes": "PLATFORMS",
+      "ergaleia_mpatarias": "Cordless tools",
+      "axesouar": "Accessories",
+      "ergaleia_cheiros": "Hand tools",
+      "prosfores": "Offers",
+      "nees_afixeis": "New arrivals",
+      "entopismos_paraggelias": "Track your order",
+      "apostoli_paradosi": "Shipping & delivery",
+      "tropoi_pliromis": "Payment methods",
       "epistrofes": "Returns",
       "eggyiseis": "Warranties",
       "sychnes_erotiseis": "FAQ",
       "epikoinonia": "Contact",
-      "poioi_eimaste": "About us",
-      "prosfores": "Offers",
-      "logariasmos_b2b": "B2B account",
-      "oroi_chrisis": "Terms and Conditions",
-      "aporrito": "Privacy Policy",
-      "tropoi_pliromis": "Payment Methods",
-      "apostoli_paradosi": "Shipping & Delivery",
+      "orario": "Mon–Fri {open}–{close}",
+      "pliromes": "Payment methods",
+      "trapeza": "BANK",
+      "operator": "The Milwaukee Heavy Duty Centre Piraeus is operated by <b>{company}</b> · VAT {vat} · GEMI {gemi}.",
+      "trademarks": "Milwaukee®, M12™, M18™, MX FUEL™, PACKOUT™, ONE-KEY™ and REDLITHIUM™ are trademarks of Milwaukee Tool.",
+      "oroi_chrisis": "Terms of use",
+      "aporrito": "Privacy",
+      "cookies": "Cookies",
       "nomika": "Legal"
     },
     "SiteHeader": {
+      "kyria_ploigisi": "Main navigation",
+      "nav_battery": "CORDLESS TOOLS",
+      "nav_accessories": "ACCESSORIES",
+      "nav_packout": "PACKOUT",
+      "nav_hand": "HAND TOOLS",
+      "nav_offers": "OFFERS",
+      "archiki": "Milwaukee Heavy Duty Centre — home page",
+      "agapimena": "Favourites",
       "logariasmos": "Account",
-      "glossa": "Language",
-      "syndesi_b2b": "B2B Login",
-      "syndesi_logariasmoy": "Sign in",
-      "kodikoi": "codes"
+      "anazitisi": "Search",
+      "kleisimo_anazitisis": "Close search"
     },
-    "UtilityBar": {
-      "kodikoi": "codes",
-      "paradosi_24_48o_dorean_ano": "Delivery 24-48h · Free over €150",
-      "paradosi_24_48o_se_oli": "Delivery 24-48h across Greece",
-      "dorean_apostoli_ano_ton_150": "Free shipping over €150",
-      "t_30_210_411_1355": "Tel. [+30] 210 411 1355",
-      "k_mavromichali_4_peiraias": "4 K. Mavromichali St, Piraeus",
-      "times_synergati_b2b_aitisi_logariasmoy": "B2B partner pricing — apply for an account",
-      "syndesi": "Sign in",
-      "b2b": "B2B"
+    "AnnouncementBar": {
+      "claim": "THE FIRST MILWAUKEE HEAVY DUTY CENTRE IN GREECE",
+      "free_shipping": "FREE SHIPPING OVER {amount}",
+      "store_pickup": "IN-STORE PICKUP",
+      "card_payment": "PAY BY CARD · IRIS",
+      "promises": "Why buy here"
+    },
+    "LocaleSwitch": {
+      "glossa": "Language"
     }
   },
   "checkout": {

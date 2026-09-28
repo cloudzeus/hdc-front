@@ -375,15 +375,6 @@
     "HeaderShell": {
       "metavasi_sto_periechomeno": "Vai al contenuto"
     },
-    "MainNav": {
-      "katalogos": "Catalogo",
-      "nees_afixeis": "Nuovi arrivi",
-      "i_etaireia": "L'azienda",
-      "epikoinonia": "Contatti",
-      "kyria_ploigisi": "Navigazione principale",
-      "prosfores": "Offerte",
-      "brands": "Brand"
-    },
     "MegaMenu": {
       "katigories": "Categorie",
       "proteinomeno": "Consigliato",
@@ -396,26 +387,24 @@
       "ola_ta": "Tutti i {totalBrands}"
     },
     "MobileMenu": {
-      "prosfores": "Offerte",
-      "nees_afixeis": "Nuovi arrivi",
-      "i_etaireia": "L'azienda",
-      "epikoinonia": "Contatti",
       "menoy": "Menu",
       "kleisimo_menoy": "Chiudi menu",
       "ploigisi": "Navigazione",
       "kleisimo": "Chiudi",
       "katigories": "Categorie",
-      "apokrypsi": "Nascondi",
-      "emfanisi": "Mostra",
-      "katigories_2": "categorie ·",
-      "ypokatigories": "sottocategorie ·",
-      "kodikoi": "codici",
-      "kod": "cod.",
-      "syndesi_b2b": "Accesso B2B",
-      "oles_oi_ypokatigories": "Tutte le {childCount} sottocategorie",
       "show_subcategories": "Mostra sottocategorie di {name}",
       "hide_subcategories": "Nascondi sottocategorie di {name}",
-      "syndesi_logariasmoy": "Accedi"
+      "oles_oi_ypokatigories": "Tutte le {childCount} sottocategorie",
+      "nees_afixeis": "Nuovi arrivi",
+      "epikoinonia": "Contatti",
+      "agapimena": "Preferiti",
+      "logariasmos": "Account",
+      "glossa": "Lingua",
+      "nav_battery": "UTENSILI A BATTERIA",
+      "nav_accessories": "ACCESSORI",
+      "nav_packout": "PACKOUT",
+      "nav_hand": "MANUALI",
+      "nav_offers": "OFFERTE"
     },
     "SearchSuggest": {
       "anazitisi_proionton": "Cerca prodotti",
@@ -435,44 +424,57 @@
       "ola_ta_apotelesmata": "Tutti i {totalProducts} risultati",
       "apotelesmata_gia": "{totalProducts} risultati per {query}",
       "ola_ta_apotelesmata_2": "Tutti i {totalProducts} risultati",
-      "diathesimo": "Disponibile"
+      "diathesimo": "Disponibile",
+      "hdc_placeholder": "Codice o utensile — es. FPD3 o 4933479859"
     },
     "SiteFooter": {
-      "katigories": "Categorie",
-      "exypiretisi": "Assistenza",
-      "i_etaireia": "L'azienda",
-      "k_mayromichali_4_18545_peiraias": "K. Mavromichali 4, 18545 Pireo",
-      "entopismos_paraggelias": "Traccia ordine",
+      "katastima": "NEGOZIO",
+      "exypiretisi": "ASSISTENZA",
+      "platformes": "PIATTAFORME",
+      "ergaleia_mpatarias": "Utensili a batteria",
+      "axesouar": "Accessori",
+      "ergaleia_cheiros": "Utensili manuali",
+      "prosfores": "Offerte",
+      "nees_afixeis": "Nuovi arrivi",
+      "entopismos_paraggelias": "Traccia l'ordine",
+      "apostoli_paradosi": "Spedizione e consegna",
+      "tropoi_pliromis": "Metodi di pagamento",
       "epistrofes": "Resi",
       "eggyiseis": "Garanzie",
       "sychnes_erotiseis": "Domande frequenti",
       "epikoinonia": "Contatti",
-      "poioi_eimaste": "Chi siamo",
-      "prosfores": "Offerte",
-      "logariasmos_b2b": "Account B2B",
-      "oroi_chrisis": "Termini e Condizioni",
-      "aporrito": "Informativa sulla Privacy",
-      "tropoi_pliromis": "Metodi di Pagamento",
-      "apostoli_paradosi": "Spedizione e Consegna",
+      "orario": "Lun–Ven {open}–{close}",
+      "pliromes": "Metodi di pagamento",
+      "trapeza": "BONIFICO",
+      "operator": "Il Milwaukee Heavy Duty Centre Pireo è gestito da <b>{company}</b> · P. IVA {vat} · GEMI {gemi}.",
+      "trademarks": "Milwaukee®, M12™, M18™, MX FUEL™, PACKOUT™, ONE-KEY™ e REDLITHIUM™ sono marchi di Milwaukee Tool.",
+      "oroi_chrisis": "Termini d'uso",
+      "aporrito": "Privacy",
+      "cookies": "Cookie",
       "nomika": "Legale"
     },
     "SiteHeader": {
+      "kyria_ploigisi": "Navigazione principale",
+      "nav_battery": "UTENSILI A BATTERIA",
+      "nav_accessories": "ACCESSORI",
+      "nav_packout": "PACKOUT",
+      "nav_hand": "MANUALI",
+      "nav_offers": "OFFERTE",
+      "archiki": "Milwaukee Heavy Duty Centre — home page",
+      "agapimena": "Preferiti",
       "logariasmos": "Account",
-      "glossa": "Lingua",
-      "syndesi_b2b": "Accesso B2B",
-      "syndesi_logariasmoy": "Accedi",
-      "kodikoi": "codici"
+      "anazitisi": "Cerca",
+      "kleisimo_anazitisis": "Chiudi ricerca"
     },
-    "UtilityBar": {
-      "kodikoi": "codici",
-      "paradosi_24_48o_dorean_ano": "Consegna 24-48h · Gratuita oltre 150€",
-      "paradosi_24_48o_se_oli": "Consegna 24-48h in tutta la Grecia",
-      "dorean_apostoli_ano_ton_150": "Spedizione gratuita oltre 150€",
-      "t_30_210_411_1355": "Tel. [+30] 210 411 1355",
-      "k_mavromichali_4_peiraias": "K. Mavromichali 4, Pireo",
-      "times_synergati_b2b_aitisi_logariasmoy": "Prezzi partner B2B — richiedi un account",
-      "syndesi": "Accedi",
-      "b2b": "B2B"
+    "AnnouncementBar": {
+      "claim": "IL PRIMO MILWAUKEE HEAVY DUTY CENTRE IN GRECIA",
+      "free_shipping": "SPEDIZIONE GRATUITA SOPRA {amount}",
+      "store_pickup": "RITIRO IN NEGOZIO",
+      "card_payment": "PAGAMENTO CON CARTA · IRIS",
+      "promises": "Perché acquistare qui"
+    },
+    "LocaleSwitch": {
+      "glossa": "Lingua"
     }
   },
   "checkout": {

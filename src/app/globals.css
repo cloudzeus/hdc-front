@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "../styles/hdc/tokens.css";
+@import "../styles/hdc/chrome.css";
 @import "./typography.css";
 
 /*
@@ -280,7 +281,7 @@
   html {
     /* Read by CategoryRail / sticky offsets — SiteHeader updates it on scroll.
        Never hardcode the header height. */
-    --header-h: 88px;
+    --header-h: 118px;
 
     /* Height of the sticky compare toolbar — the product row pins beneath it. */
     --compare-toolbar-h: 52px;
@@ -459,64 +460,35 @@
  * ─── Sticky header ─────────────────────────────────────────────────────────
  *
  * `HeaderShell` flips `data-condensed`; everything below is the reaction. All
- * of it is CSS so scrolling costs no React render — see the component for why
- * that matters with a 24-category mega-menu inside.
+ * of it is CSS so scrolling costs no React render.
  *
- * The utility bar collapses by max-height rather than `display:none` so it can
- * animate, and the search row loses 32px of height, not its contents: a header
- * that reflows its own children while you scroll past it reads as broken.
+ * The HDC header itself never changes size — the red bar stays put, as in the
+ * mockup. What goes is the black announcement bar above it, collapsed by
+ * max-height rather than `display:none` so it can animate.
  */
 @layer components {
   .site-header {
-    background: #ffffff;
     transition: box-shadow 220ms ease;
   }
   .site-header[data-condensed="true"] {
-    box-shadow: 0 6px 20px rgba(16, 16, 18, 0.09);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
   }
 
-  .site-header .header-utility {
+  .site-header .hdc-ann {
     overflow: hidden;
-    max-height: 40px;
+    max-height: 34px;
     transition:
       max-height 240ms ease,
       opacity 180ms ease;
   }
-  .site-header[data-condensed="true"] .header-utility {
+  .site-header[data-condensed="true"] .hdc-ann {
     max-height: 0;
     opacity: 0;
   }
 
-  .site-header .header-main {
-    transition: height 240ms ease;
-  }
-  .site-header .header-logo {
-    transition: width 240ms ease;
-  }
-
-  @media (min-width: 1024px) {
-    .site-header[data-condensed="true"] .header-main {
-      height: 64px;
-    }
-    .site-header[data-condensed="true"] .header-logo {
-      width: 118px;
-    }
-  }
-
-  /*
-   * The search field is the primary tool on a 5.305-code catalogue, so it gets
-   * a real focus treatment rather than the browser default outline the rest of
-   * the border-heavy design would swallow.
-   */
-  .search-shell:focus-within {
-    box-shadow: 0 0 0 3px rgba(255, 51, 51, 0.16);
-  }
-
   @media (prefers-reduced-motion: reduce) {
     .site-header,
-    .site-header .header-utility,
-    .site-header .header-main,
-    .site-header .header-logo {
+    .site-header .hdc-ann {
       transition: none;
     }
   }

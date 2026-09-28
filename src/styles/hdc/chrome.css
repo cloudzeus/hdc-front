@@ -1,0 +1,655 @@
+/*
+ * HDC chrome: announcement bar, header, mobile header, mobile menu, footer.
+ *
+ * Ported from docs/design/mockups/home.html (.ann, .hdr, footer) and the phone
+ * frames of plp.html (.phone .ph). Class names carry the hdc- prefix; every
+ * font size is a fluid --fs-* token from tokens.css.
+ *
+ * Breakpoint: the desktop header from 1024px, the phone header below it.
+ */
+
+@layer components {
+  .hdc-wrap {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* One focus treatment for the whole chrome: 2px, high contrast, never lost
+     against red or black. Light surfaces override the colour below. */
+  .hdc-ann a:focus-visible,
+  .hdc-hdr a:focus-visible,
+  .hdc-hdr button:focus-visible,
+  .hdc-mhdr a:focus-visible,
+  .hdc-mhdr button:focus-visible,
+  .hdc-mmenu a:focus-visible,
+  .hdc-mmenu button:focus-visible,
+  .hdc-foot a:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: -2px;
+  }
+
+  /* ── Announcement bar (.ann) ─────────────────────────────────────────── */
+  .hdc-ann {
+    background: var(--hdc-ink);
+    color: #fff;
+    font-family: var(--hdc-font);
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-12);
+    letter-spacing: 0.06em;
+  }
+  .hdc-ann .hdc-wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    height: 34px;
+    white-space: nowrap;
+  }
+  .hdc-ann-mid {
+    display: flex;
+    gap: 26px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .hdc-ann-mid li::before {
+    content: "▸ ";
+    color: var(--hdc-red);
+  }
+  @media (max-width: 1279px) {
+    .hdc-ann-mid li:nth-child(3) {
+      display: none;
+    }
+  }
+  @media (max-width: 1119px) {
+    .hdc-ann-mid li:nth-child(2) {
+      display: none;
+    }
+  }
+
+  /* Locale switcher: EL (bold, white) EN IT (grey). */
+  .hdc-lang {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hdc-lang a {
+    color: #8a8a8a;
+    transition: color 0.15s;
+  }
+  .hdc-lang a:hover {
+    color: #fff;
+  }
+  .hdc-lang a[aria-current="true"] {
+    color: #fff;
+    font-weight: 900;
+  }
+
+  /* ── Header (.hdr) ───────────────────────────────────────────────────── */
+  .hdc-hdr {
+    background: var(--hdc-red);
+    color: #fff;
+  }
+  .hdc-hdr > .hdc-wrap {
+    display: flex;
+    align-items: stretch;
+    height: 84px;
+    padding-left: 0;
+  }
+  .hdc-plinth {
+    background: var(--hdc-ink);
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 0 22px 0 24px;
+    margin-right: 26px;
+  }
+  .hdc-plinth img {
+    display: block;
+    height: 58px;
+    width: auto;
+  }
+
+  .hdc-nav {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    font-family: var(--hdc-font);
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-15);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+  .hdc-nav a {
+    padding: 31px 0 27px;
+    border-bottom: 4px solid transparent;
+    line-height: 1.4;
+    transition: border-color 0.15s;
+  }
+  .hdc-nav a:hover {
+    border-bottom-color: rgba(255, 255, 255, 0.5);
+  }
+  .hdc-nav a[aria-current="page"] {
+    border-bottom-color: #fff;
+  }
+
+  .hdc-hdr-search {
+    margin-left: auto;
+    align-self: center;
+    width: 340px;
+    flex-shrink: 1;
+    min-width: 200px;
+  }
+
+  .hdc-acts {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 18px;
+  }
+  .hdc-act {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    transition: background-color 0.15s;
+  }
+  .hdc-act:hover {
+    background: var(--hdc-red-d);
+  }
+  .hdc-act svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* The count: a black square, never a pill. */
+  .hdc-badge {
+    position: absolute;
+    top: 5px;
+    right: 4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--hdc-ink);
+    color: #fff;
+    font-family: var(--hdc-font);
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-11);
+    line-height: 1;
+  }
+
+  /* Narrower desktops (1024–1279): the nav keeps its type size; the lockup,
+     the gaps, the search box and the icon squares give way. */
+  @media (max-width: 1279px) {
+    .hdc-hdr .hdc-plinth {
+      padding: 0 16px;
+      margin-right: 16px;
+    }
+    .hdc-hdr .hdc-plinth img {
+      height: 48px;
+    }
+    .hdc-nav {
+      gap: 12px;
+      margin-right: 10px;
+      letter-spacing: 0.03em;
+    }
+    .hdc-hdr-search {
+      min-width: 160px;
+    }
+    .hdc-acts {
+      margin-left: 8px;
+      gap: 0;
+    }
+    .hdc-acts .hdc-act {
+      width: 44px;
+    }
+  }
+
+  /* ── Search box inside the header ────────────────────────────────────── */
+  .hdc-search {
+    display: flex;
+    height: 44px;
+    background: #fff;
+  }
+  .hdc-search input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    padding: 0 14px;
+    background: transparent;
+    font-family: var(--hdc-font);
+    font-size: var(--fs-15);
+    color: var(--hdc-ink);
+    outline: none;
+  }
+  .hdc-search input::placeholder {
+    color: var(--hdc-g5);
+  }
+  .hdc-search:focus-within {
+    outline: 2px solid var(--hdc-ink);
+    outline-offset: 2px;
+  }
+  .hdc-search button {
+    width: 48px;
+    flex-shrink: 0;
+    border: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--hdc-ink);
+    color: #fff;
+    cursor: pointer;
+  }
+  .hdc-search button:hover {
+    background: var(--hdc-graph);
+  }
+  .hdc-search button:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: -4px;
+  }
+  /* The phone version sits on white, so it needs its own edge. */
+  .hdc-search-mobile {
+    border: 2px solid var(--hdc-ink);
+  }
+  .hdc-search-mobile:focus-within {
+    outline-color: var(--hdc-red);
+  }
+
+  /* ── Phone header (.phone .ph) ───────────────────────────────────────── */
+  .hdc-mhdr {
+    background: var(--hdc-red);
+    color: #fff;
+    height: 56px;
+    display: flex;
+    align-items: stretch;
+  }
+  .hdc-mhdr .hdc-plinth {
+    padding: 0 10px;
+    margin-right: 0;
+  }
+  .hdc-mhdr .hdc-plinth img {
+    height: 34px;
+  }
+  .hdc-mhdr-icons {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    padding-right: 4px;
+  }
+  .hdc-mhdr .hdc-act {
+    width: 44px;
+    height: 44px;
+  }
+  .hdc-mhdr .hdc-act svg {
+    width: 21px;
+    height: 21px;
+  }
+  .hdc-mhdr .hdc-badge {
+    top: 3px;
+    right: 2px;
+  }
+  .hdc-msearch {
+    background: #fff;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--hdc-g3);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .hdc-msearch-close {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: transparent;
+    color: var(--hdc-ink);
+    cursor: pointer;
+  }
+  .hdc-msearch-close:focus-visible {
+    outline: 2px solid var(--hdc-ink);
+    outline-offset: -2px;
+  }
+
+  /* ── Mobile menu: a black drawer ─────────────────────────────────────── */
+  .hdc-mmenu {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: min(88vw, 360px);
+    display: flex;
+    flex-direction: column;
+    background: var(--hdc-ink);
+    color: #fff;
+    font-family: var(--hdc-font);
+  }
+  .hdc-mmenu-top {
+    height: 56px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 16px;
+    border-bottom: 3px solid var(--hdc-red);
+    font-weight: 800;
+    font-stretch: 120%;
+    font-size: var(--fs-14);
+    letter-spacing: 0.04em;
+  }
+  .hdc-mmenu-close {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 0;
+    color: #fff;
+    cursor: pointer;
+  }
+  .hdc-mmenu-body {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .hdc-mmenu-main a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 52px;
+    padding: 0 16px;
+    border-bottom: 1px solid #262626;
+    font-weight: 800;
+    font-stretch: 115%;
+    font-size: var(--fs-15);
+    letter-spacing: 0.02em;
+  }
+  .hdc-mmenu-main a::after {
+    content: "›";
+    color: var(--hdc-red);
+    font-size: var(--fs-20);
+  }
+  .hdc-mmenu-main a[aria-current="page"] {
+    box-shadow: inset 4px 0 0 var(--hdc-red);
+  }
+  .hdc-mmenu-label {
+    padding: 18px 16px 8px;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-12);
+    letter-spacing: 0.06em;
+    color: #8a8a8a;
+  }
+  .hdc-mmenu-cat {
+    border-bottom: 1px solid #262626;
+  }
+  .hdc-mmenu-cat-row {
+    display: flex;
+    align-items: stretch;
+  }
+  .hdc-mmenu-cat-row > a {
+    flex: 1;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 16px;
+    font-weight: 600;
+    font-size: var(--fs-13);
+    line-height: 1.35;
+  }
+  .hdc-mmenu-count {
+    margin-left: auto;
+    font-stretch: 87.5%;
+    font-size: var(--fs-12);
+    color: #8a8a8a;
+  }
+  .hdc-mmenu-toggle {
+    width: 48px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 0;
+    border-left: 1px solid #262626;
+    color: #bbb;
+    cursor: pointer;
+    font-size: var(--fs-18);
+  }
+  .hdc-mmenu-toggle[aria-expanded="true"] {
+    color: var(--hdc-red);
+  }
+  .hdc-mmenu-toggle[aria-expanded="true"] span {
+    transform: rotate(90deg);
+  }
+  .hdc-mmenu-toggle span {
+    display: block;
+    transition: transform 0.15s;
+  }
+  .hdc-mmenu-subs {
+    background: var(--hdc-graph);
+    padding: 4px 0 10px;
+  }
+  .hdc-mmenu-subs a {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 16px 4px 30px;
+    font-size: var(--fs-13);
+    color: #cfcfcf;
+  }
+  .hdc-mmenu-subs a.hdc-mmenu-all {
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-12);
+    letter-spacing: 0.06em;
+    color: var(--hdc-red);
+  }
+  .hdc-mmenu-links a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 16px;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-13);
+    letter-spacing: 0.05em;
+    color: #cfcfcf;
+  }
+  .hdc-mmenu-foot {
+    flex-shrink: 0;
+    border-top: 1px solid #262626;
+    display: flex;
+    flex-direction: column;
+  }
+  .hdc-mmenu-foot .hdc-lang {
+    padding: 0 8px;
+    gap: 0;
+  }
+  .hdc-mmenu-foot .hdc-lang {
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-13);
+    letter-spacing: 0.06em;
+  }
+  .hdc-mmenu-foot .hdc-lang a {
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .hdc-mmenu-account {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 52px;
+    padding: 0 20px;
+    background: var(--hdc-red);
+    color: #fff;
+    font-weight: 800;
+    font-stretch: 110%;
+    font-size: var(--fs-13);
+    letter-spacing: 0.04em;
+  }
+  .hdc-mmenu-account:hover {
+    background: var(--hdc-red-d);
+  }
+
+  /* ── Footer ──────────────────────────────────────────────────────────── */
+  .hdc-foot {
+    background: var(--hdc-ink);
+    color: #cfcfcf;
+    padding: 56px 0 26px;
+    font-family: var(--hdc-font);
+  }
+  .hdc-foot-top {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr 1fr;
+    gap: 30px;
+    padding-bottom: 36px;
+    border-bottom: 1px solid #2a2a2a;
+  }
+  .hdc-foot-logo {
+    display: block;
+    height: 66px;
+    width: auto;
+    margin-bottom: 16px;
+  }
+  .hdc-foot h2 {
+    font-weight: 800;
+    font-stretch: 120%;
+    font-size: var(--fs-14);
+    color: #fff;
+    margin: 0 0 14px;
+    letter-spacing: 0.02em;
+  }
+  .hdc-foot ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .hdc-foot li {
+    font-stretch: 87.5%;
+    font-size: var(--fs-14);
+    margin-bottom: 9px;
+  }
+  .hdc-foot li a,
+  .hdc-foot-contact a,
+  .hdc-foot-legal a {
+    transition: color 0.15s;
+  }
+  .hdc-foot li a:hover,
+  .hdc-foot-contact a:hover,
+  .hdc-foot-legal a:hover {
+    color: #fff;
+  }
+  .hdc-foot-contact {
+    font-style: normal;
+    font-size: var(--fs-14);
+    line-height: 1.7;
+  }
+  .hdc-foot-contact strong {
+    color: #fff;
+    font-weight: 700;
+  }
+  .hdc-foot-pay {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .hdc-foot-pay li {
+    margin: 0;
+    border: 1px solid #3a3a3a;
+    padding: 6px 10px;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-11);
+    letter-spacing: 0.05em;
+    color: #bbb;
+  }
+  .hdc-foot-legal {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding-top: 22px;
+    font-stretch: 87.5%;
+    font-size: var(--fs-12);
+    color: #8a8a8a;
+    line-height: 1.6;
+  }
+  .hdc-foot-legal b {
+    color: #cfcfcf;
+    font-weight: 700;
+  }
+  .hdc-foot-legal nav {
+    white-space: nowrap;
+  }
+  .hdc-foot-legal p {
+    margin: 0;
+  }
+
+  @media (max-width: 1023px) {
+    .hdc-foot-top {
+      grid-template-columns: 1fr 1fr;
+    }
+    .hdc-foot-top > :first-child {
+      grid-column: 1 / -1;
+    }
+    .hdc-foot-legal {
+      flex-direction: column;
+    }
+  }
+  @media (max-width: 767px) {
+    .hdc-wrap {
+      padding: 0 16px;
+    }
+    .hdc-foot {
+      padding-top: 40px;
+    }
+    .hdc-foot-top {
+      column-gap: 16px;
+      row-gap: 24px;
+    }
+    .hdc-foot-logo {
+      height: 54px;
+    }
+    /* Thumb-sized rows on phones. */
+    .hdc-foot li {
+      margin-bottom: 0;
+    }
+    .hdc-foot li a,
+    .hdc-foot-legal nav a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+    .hdc-foot-contact a {
+      display: inline-block;
+      padding: 10px 0;
+    }
+    .hdc-foot-legal nav {
+      white-space: normal;
+    }
+  }
+}

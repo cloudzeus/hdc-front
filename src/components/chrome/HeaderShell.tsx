@@ -6,15 +6,16 @@ import { useEffect, useRef } from "react";
 /**
  * Sticky, condensing header shell — a client SHELL and nothing more.
  *
- * The entire header, nav and utility bar arrive as server-rendered `children`;
+ * The entire header and announcement bar arrive as server-rendered `children`;
  * this component never re-renders them. It only watches scroll and toggles one
  * attribute on its own root, which CSS reacts to. That is why a header carrying
  * a 24-category mega-menu costs no client render on every scroll frame.
  *
  * What it does:
- *  - past 140px, drops the utility bar and shrinks the search row 96 → 64px
- *  - keeps `--header-h` accurate, because the mega-menu, the PLP sidebar and
- *    `scroll-padding-top` all measure themselves against it
+ *  - past 140px, folds away the black announcement bar; the red header itself
+ *    keeps its height, as in the mockup
+ *  - keeps `--header-h` accurate, because the PLP sidebar, the mini-cart on
+ *    phones and `scroll-padding-top` all measure themselves against it
  *  - focuses the search on `/` or `⌘K`, the two shortcuts anyone who searches
  *    a 5.305-code catalogue for a living will already have in their fingers
  *
@@ -111,9 +112,9 @@ export function HeaderShell({ children }: { children: React.ReactNode }) {
       className="site-header sticky top-0 z-40"
     >
       {/*
-        Keyboard users landed on 24 mega-menu categories, a search field, a
-        locale switcher and a mini-cart before reaching a single product. The
-        skip link is invisible until focused, which is the whole point.
+        Keyboard users meet a locale switcher, five links, a search field and
+        three icons before reaching a single product. The skip link is
+        invisible until focused, which is the whole point.
       */}
       <a
         href="#main"

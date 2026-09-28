@@ -1,55 +1,40 @@
 "use client";
 
-import { useLocale } from "next-intl";
-import { useTranslations } from "next-intl";
+import { Menu, User, X } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useId, useState } from "react";
-import { Link } from "@/i18n/navigation";
-import type { BrandTile, MenuCategory } from "@/lib/catalog/queries";
+import { LocaleSwitch } from "@/components/chrome/LocaleSwitch";
+import { Link, usePathname } from "@/i18n/navigation";
+import type { MenuCategory } from "@/lib/catalog/queries";
 import { upGreek } from "@/lib/greek";
+import { isHdcNavActive } from "@/lib/hdc-nav";
 
 /*
- * `prefetch={false}` σε κάθε σύνδεσμο αυτού του αρχείου.
- * ─────────────────────────────────────────────────────────────────────────────
- * Μετρημένο στην παραγωγή: μία επίσκεψη στο `/katalogos` έβγαζε **34** αιτήματα
- * RSC — 18 για κατηγορίες, 14 για την πλοήγηση και το υποσέλιδο, καθένα 450-780ms.
- * Κάθε ένα από αυτά είναι ΠΛΗΡΗΣ απόδοση στον διακομιστή, γιατί οι σελίδες
- * απαντούν `cache-control: no-store` (διαβάζουν καλάθι και γλώσσα από cookies).
- *
- * Δηλαδή ένας επισκέπτης παρήγαγε 34 renders, και με μερικούς ταυτόχρονους ο
- * διακομιστής κορεννύεται — γι' αυτό «αργεί σε ΟΛΕΣ τις σελίδες» και όχι σε μία.
- *
- * Η πλοήγηση και το υποσέλιδο είναι σε κάθε σελίδα και δείχνουν παντού· κανείς
- * δεν πρόκειται να πατήσει και τα δεκατέσσερα. Το prefetch έχει νόημα για τον
- * έναν σύνδεσμο που ΘΑ πατηθεί, όχι για τον κατάλογο των πάντων.
+ * `prefetch={false}` on every link here: the drawer is on every page and
+ * nobody follows all of them, while every prefetch is a full server render
+ * (the pages answer `no-store`, they read the cart and locale from cookies).
  */
 
 /**
- * Mobile navigation drawer, owning its own burger trigger.
+ * The phone drawer, owning its own menu button.
  *
- * Follows the handoff's mobile catalogue pattern: one accordion row per
- * category (index · name · count · caret), expanding to a #FAFAFB panel of
- * subcategories with a "ΟΛΕΣ ΟΙ N ΥΠΟΚΑΤΗΓΟΡΙΕΣ" link.
- *
- * Every touch target is at least 44px, per the handoff's own row heights.
+ * A black panel (HDC): the five header destinations first, in the header's
+ * order, then the synced categories as an accordion, then the language and the
+ * account. Every touch target is at least 44px.
  */
 export function MobileMenu({
   categories,
-  brands,
-  totalCategories,
-  totalSubcategories,
-  totalProducts,
+  nav,
 }: {
   categories: MenuCategory[];
-  brands: BrandTile[];
-  totalCategories: number;
-  totalSubcategories: number;
-  totalProducts: number;
+  /** The header's five links, already resolved and translated. */
+  nav: Array<{ href: string; label: string }>;
 }) {
   const locale = useLocale();
   const t = useTranslations("chrome.MobileMenu");
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
-  const [tab, setTab] = useState<"categories" | "brands">("categories");
   const panelId = useId();
 
   // Lock body scroll while the drawer is open, and restore on close so the
@@ -72,27 +57,19 @@ export function MobileMenu({
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  const secondary = [
-    { href: "/prosfores", label: upGreek(t("prosfores")), accent: true },
-    { href: "/nees-afixeis", label: upGreek(t("nees_afixeis")) },
-    { href: "/etaireia", label: upGreek(t("i_etaireia")) },
-    { href: "/epikoinonia", label: upGreek(t("epikoinonia")) },
-    { href: "/blog", label: "BLOG" },
-  ];
+  const close = () => setOpen(false);
 
   return (
     <>
       <button
         type="button"
+        className="hdc-act"
         aria-label={t("menoy")}
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen(true)}
-        className="flex h-11 w-6 flex-col justify-center gap-1"
       >
-        <span className="block h-0.5 w-5 bg-k-ink" />
-        <span className="block h-0.5 w-5 bg-k-ink" />
-        <span className="block h-0.5 w-3.5 bg-k-red" />
+        <Menu aria-hidden strokeWidth={2.2} />
       </button>
 
       {open && (
@@ -101,8 +78,8 @@ export function MobileMenu({
             type="button"
             aria-label={t("kleisimo_menoy")}
             tabIndex={-1}
-            onClick={() => setOpen(false)}
-            className="absolute inset-0 bg-black/50"
+            onClick={close}
+            className="absolute inset-0 bg-black/60"
           />
 
           <div
@@ -110,68 +87,51 @@ export function MobileMenu({
             role="dialog"
             aria-modal="true"
             aria-label={t("ploigisi")}
-            className="absolute inset-y-0 left-0 flex w-[min(88vw,340px)] flex-col bg-white"
+            className="hdc-mmenu"
           >
-            <div className="flex h-14 shrink-0 items-center justify-between border-b border-k-line px-4">
-              <span className="t-footer-col text-k-ink">
-                {upGreek(t("menoy"))}
-              </span>
+            <div className="hdc-mmenu-top">
+              <span>{upGreek(t("menoy"))}</span>
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={close}
                 aria-label={t("kleisimo")}
-                className="flex h-11 w-11 items-center justify-center text-2xl leading-none text-k-ink"
+                className="hdc-mmenu-close"
+                autoFocus
               >
-                ×
+                <X aria-hidden size={24} />
               </button>
             </div>
 
-            <div className="flex shrink-0 border-b border-k-line">
-              {(
-                [
-                  ["categories", upGreek(t("katigories"))],
-                  ["brands", "BRANDS"],
-                ] as const
-              ).map(([key, label]) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => setTab(key)}
-                  aria-current={tab === key ? "true" : undefined}
-                  className={`t-nav h-11 flex-1 border-b-2 transition-colors ${
-                    tab === key
-                      ? "border-k-red text-k-ink"
-                      : "border-transparent text-k-text-4"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
+            <div className="hdc-mmenu-body">
+              <nav aria-label={t("ploigisi")} className="hdc-mmenu-main">
+                {nav.map((item) => (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    onClick={close}
+                    aria-current={isHdcNavActive(item.href, pathname) ? "page" : undefined}
+                    prefetch={false}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
 
-            <div className="flex-1 overflow-y-auto overscroll-contain">
-              {tab === "categories" ? (
+              {categories.length > 0 && (
                 <>
-                  {categories.map((category, index) => {
+                  <p className="hdc-mmenu-label">{upGreek(t("katigories"))}</p>
+                  {categories.map((category) => {
                     const isOpen = expanded === category.id;
                     return (
-                      <div key={category.id} className="border-b border-k-line">
-                        <div className="flex items-stretch">
+                      <div key={category.id} className="hdc-mmenu-cat">
+                        <div className="hdc-mmenu-cat-row">
                           <Link
                             href={`/katalogos/${category.slug}`}
-                            onClick={() => setOpen(false)}
-                            className={`flex min-h-[52px] flex-1 items-center gap-2.5 py-2 pl-4 ${
-                              category.children.length > 0 ? "" : "pr-4"
-                            }`}
+                            onClick={close}
                             prefetch={false}
                           >
-                            <span className="t-cat-num shrink-0 text-k-red">
-                              {String(index + 1).padStart(2, "0")}
-                            </span>
-                            <span className="min-w-0 flex-1 text-[13px] leading-[1.4] font-semibold text-k-ink">
-                              {upGreek(category.name)}
-                            </span>
-                            <span className="t-card-was shrink-0 text-k-text-5">
+                            <span>{upGreek(category.name)}</span>
+                            <span className="hdc-mmenu-count">
                               {category.productCount.toLocaleString(locale)}
                             </span>
                           </Link>
@@ -179,52 +139,38 @@ export function MobileMenu({
                           {category.children.length > 0 && (
                             <button
                               type="button"
+                              className="hdc-mmenu-toggle"
                               aria-expanded={isOpen}
                               aria-label={t(
-                                isOpen
-                                  ? "hide_subcategories"
-                                  : "show_subcategories",
+                                isOpen ? "hide_subcategories" : "show_subcategories",
                                 { name: category.name },
                               )}
-                              onClick={() =>
-                                setExpanded(isOpen ? null : category.id)
-                              }
-                              className="flex w-11 shrink-0 items-center justify-center text-k-text-4"
+                              onClick={() => setExpanded(isOpen ? null : category.id)}
                             >
-                              <span
-                                className={`block text-lg transition-transform ${
-                                  isOpen ? "rotate-90 text-k-red" : ""
-                                }`}
-                              >
-                                ›
-                              </span>
+                              <span aria-hidden>›</span>
                             </button>
                           )}
                         </div>
 
                         {isOpen && (
-                          <div className="bg-k-surface-2 pt-1.5 pb-3">
+                          <div className="hdc-mmenu-subs">
                             {category.children.map((child) => (
                               <Link
                                 key={child.id}
                                 href={`/katalogos/${category.slug}?sub=${child.slug}`}
-                                onClick={() => setOpen(false)}
-                                className="flex min-h-11 items-center gap-2.5 py-2 pr-4 pl-[34px] text-[12.5px] text-k-text-2"
+                                onClick={close}
                                 prefetch={false}
                               >
-                                <span className="block h-px w-3 shrink-0 bg-k-line-2" />
-                                <span className="min-w-0 flex-1">
-                                  {child.name}
-                                </span>
-                                <span className="t-brand-count text-k-text-5">
+                                <span className="min-w-0 flex-1">{child.name}</span>
+                                <span className="hdc-mmenu-count">
                                   {child.productCount.toLocaleString(locale)}
                                 </span>
                               </Link>
                             ))}
                             <Link
                               href={`/katalogos/${category.slug}`}
-                              onClick={() => setOpen(false)}
-                              className="block pt-2 pr-4 pl-[34px] text-[10px] font-semibold tracking-[0.07em] text-k-red"
+                              onClick={close}
+                              className="hdc-mmenu-all"
                               prefetch={false}
                             >
                               {upGreek(
@@ -239,60 +185,32 @@ export function MobileMenu({
                       </div>
                     );
                   })}
-
-                  <p className="px-4 py-4 text-[12px] text-k-text-3">
-                    {totalCategories} {t("katigories_2")} {totalSubcategories}{" "}
-                    {t("ypokatigories")} {totalProducts.toLocaleString(locale)}{" "}
-                    {t("kodikoi")}
-                  </p>
                 </>
-              ) : (
-                <div className="grid grid-cols-2 gap-px bg-k-line">
-                  {brands.map((brand) => (
-                    <Link
-                      key={brand.id}
-                      href={`/brands/${brand.slug}`}
-                      onClick={() => setOpen(false)}
-                      className="flex min-h-[68px] flex-col items-center justify-center gap-1 bg-white px-3 py-3"
-                      prefetch={false}
-                    >
-                      <span className="t-brand-name text-k-ink">
-                        {brand.name}
-                      </span>
-                      <span className="t-brand-count text-k-text-5">
-                        {brand.productCount.toLocaleString(locale)}{" "}
-                        {upGreek(t("kod"))}
-                      </span>
-                    </Link>
-                  ))}
-                </div>
               )}
+
+              <div className="hdc-mmenu-links">
+                <Link href="/nees-afixeis" onClick={close} prefetch={false}>
+                  {upGreek(t("nees_afixeis"))}
+                </Link>
+                <Link href="/logariasmos/agapimena" onClick={close} prefetch={false}>
+                  {upGreek(t("agapimena"))}
+                </Link>
+                <Link href="/epikoinonia" onClick={close} prefetch={false}>
+                  {upGreek(t("epikoinonia"))}
+                </Link>
+              </div>
             </div>
 
-            <div className="shrink-0 border-t border-k-line">
-              {secondary.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setOpen(false)}
-                  className={`t-nav flex min-h-11 items-center gap-2 px-4 ${
-                    link.accent ? "text-k-red" : "text-k-ink"
-                  }`}
-                  prefetch={false}
-                >
-                  {link.accent && (
-                    <span className="block h-[5px] w-[5px] bg-k-red" />
-                  )}
-                  {link.label}
-                </Link>
-              ))}
+            {/* A click anywhere in the switcher is a navigation: close first. */}
+            <div className="hdc-mmenu-foot" onClickCapture={close}>
+              <LocaleSwitch />
               <Link
-                href="/eisodos"
-                onClick={() => setOpen(false)}
-                className="t-btn-sm flex min-h-12 items-center justify-center bg-k-ink text-white"
+                href="/logariasmos"
+                className="hdc-mmenu-account"
                 prefetch={false}
               >
-                {upGreek(t("syndesi_logariasmoy"))}
+                <User aria-hidden size={18} strokeWidth={2.4} />
+                {upGreek(t("logariasmos"))}
               </Link>
             </div>
           </div>

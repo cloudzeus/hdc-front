@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
+import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "@/i18n/navigation";
@@ -74,39 +75,27 @@ export function MiniCart({
       className="relative"
       onMouseEnter={() => {
         cancelClose();
-        setOpen(true);
+        // A tap fires a synthetic mouseenter right before its click, and the
+        // click then toggled the panel shut again. Hover-to-open is for mice.
+        if (window.matchMedia("(hover: hover)").matches) setOpen(true);
       }}
       onMouseLeave={scheduleClose}
     >
+      {/* HDC: a 48px (44px on phones) icon square on the red bar, with the
+          count in a black square — the mockup's `.acts` cart. */}
       <button
         type="button"
         aria-expanded={open}
         aria-haspopup="dialog"
         aria-label={t("kalathi_temachia", { count: count })}
+        title={cart ? formatMoney(cart.subtotalGross, locale) : upGreek(t("adeio"))}
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2.5"
+        className="hdc-act"
       >
-        <span className="relative block">
-          <Image
-            src="/icons/cart.png"
-            alt=""
-            width={variant === "mobile" ? 21 : 23}
-            height={variant === "mobile" ? 21 : 23}
-            className="block"
-          />
-          {count > 0 && (
-            <span className="rounded-pill absolute -top-1.5 -right-2 flex h-4 min-w-4 items-center justify-center bg-k-red px-[3px] font-mono text-[9.5px] leading-4 font-semibold text-white">
-              {count}
-            </span>
-          )}
-        </span>
-
-        {variant === "desktop" && (
-          <span className="block text-left">
-            <span className="t-account-label block text-k-text-4">{upGreek(t("kalathi"))}</span>
-            <span className="t-account-value mt-0.5 block text-k-ink">
-              {cart ? formatMoney(cart.subtotalGross, locale) : upGreek(t("adeio"))}
-            </span>
+        <ShoppingCart aria-hidden strokeWidth={2.2} />
+        {count > 0 && (
+          <span aria-hidden className="hdc-badge">
+            {count}
           </span>
         )}
       </button>
@@ -116,7 +105,14 @@ export function MiniCart({
           role="dialog"
           aria-label={t("to_kalathi_sas")}
           onMouseEnter={cancelClose}
-          className="absolute top-full right-0 z-40 mt-2 w-[min(92vw,360px)] border border-k-line bg-white shadow-[0_18px_40px_rgba(0,0,0,.12)]"
+          className={`z-40 border-2 border-k-ink bg-white text-k-ink shadow-[0_18px_40px_rgba(0,0,0,.18)] ${
+            // Desktop: the 48px square sits 18px above the bar's bottom edge.
+            // Phone: pinned under the 56px bar, edge to edge with a gutter,
+            // because the button is not at the screen's edge.
+            variant === "mobile"
+              ? "fixed inset-x-2 top-[calc(var(--header-h)+6px)]"
+              : "absolute top-[calc(100%+18px)] right-0 w-[360px]"
+          }`}
         >
           <div className="flex items-baseline justify-between border-b border-k-line px-[18px] py-3.5">
             <span className="text-[11px] font-bold tracking-[0.07em] text-k-ink">

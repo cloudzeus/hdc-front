@@ -32,23 +32,15 @@ import { showsExactQty } from "@/lib/stock-display";
  */
 export function SearchSuggest({
   locale,
-  categories,
   variant = "desktop",
-  tone = "light",
-  hint,
 }: {
   locale: string;
-  categories: Array<{ slug: string; name: string }>;
-  variant?: "desktop" | "mobile";
   /**
-   * `dark` = βυθισμένο πεδίο μέσα στο σκούρο header (redesign Αυγ 2026).
-   *
-   * Δεν είναι θέμα γούστου ποιο μπαίνει πού: το ίδιο πεδίο εμφανίζεται και στη
-   * σελίδα αναζήτησης πάνω σε ανοιχτό φόντο, όπου το σκούρο θα ήταν τρύπα.
+   * `desktop` = the white 340px box inside the red header; `mobile` = the full
+   * width field under the phone header, which sits on white and so carries its
+   * own black edge.
    */
-  tone?: "light" | "dark";
-  /** Μικρό μετρημένο στοιχείο στη δεξιά άκρη, π.χ. «9.400+ ΚΩΔΙΚΟΙ». */
-  hint?: string;
+  variant?: "desktop" | "mobile";
 }) {
   const t = useTranslations("chrome.SearchSuggest");
   const router = useRouter();
@@ -195,7 +187,6 @@ export function SearchSuggest({
   const showPanel = open && trimmed.length >= SUGGEST_MIN_LENGTH;
   const isEmpty = data != null && rows.length === 0 && !loading;
   const desktop = variant === "desktop";
-  const dark = tone === "dark";
 
   return (
     <div ref={root} className="relative min-w-0 flex-1">
@@ -219,46 +210,12 @@ export function SearchSuggest({
           const form = new FormData(event.currentTarget);
           const query = String(form.get("q") ?? "").trim();
           if (!query) return;
-          const scope = String(form.get("cat") ?? "").trim();
           const params = new URLSearchParams({ q: query });
-          if (scope) params.set("cat", scope);
           setOpen(false);
           router.push(`/anazitisi?${params.toString()}`);
         }}
-        className={
-          desktop
-            ? `search-shell flex h-12 min-w-0 transition-shadow ${
-                dark
-                  ? "border border-k-header-well-line bg-k-header-well"
-                  : "border-[1.5px] border-k-ink"
-              }`
-            : "flex min-w-0"
-        }
+        className={desktop ? "hdc-search" : "hdc-search hdc-search-mobile"}
       >
-        {desktop && (
-          <>
-            <label htmlFor="scope-desktop" className="sr-only">
-              {t("katigoria_anazitisis")}
-            </label>
-            <select
-              id="scope-desktop"
-              name="cat"
-              className={`t-search-cat h-full w-[168px] shrink-0 cursor-pointer truncate border-0 border-r pr-7 pl-4 outline-none xl:w-[196px] ${
-                dark
-                  ? "border-k-header-well-line bg-k-header-well text-k-on-dark-2"
-                  : "border-[#E4E4E6] bg-white text-k-ink"
-              }`}
-            >
-              <option value="">{upGreek(t("oles_oi_katigories"))}</option>
-              {categories.map((category) => (
-                <option key={category.slug} value={category.slug}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </>
-        )}
-
         <label htmlFor={`q-${variant}`} className="sr-only">
           {t("anazitisi")}
         </label>
@@ -280,43 +237,14 @@ export function SearchSuggest({
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={onKeyDown}
-          placeholder={
-            desktop
-              ? t("anazitisi_me_kodiko_proion_i")
-              : t("anazitisi_kodikoy_i_proiontos")
-          }
-          className={
-            desktop
-              ? `t-input min-w-0 flex-1 border-0 bg-transparent px-4 outline-none ${
-                dark
-                  ? "text-k-on-dark placeholder:text-k-on-dark-3"
-                  : "text-k-ink placeholder:text-k-text-4"
-              }`
-              : "t-input h-[46px] min-w-0 flex-1 border-[1.5px] border-r-0 border-k-ink px-3.5 text-k-ink outline-none placeholder:text-k-text-4"
-          }
+          placeholder={t("hdc_placeholder")}
         />
 
-        {desktop && hint && (
-          <span className="t-util my-auto mr-3 hidden shrink-0 text-k-on-dark-4 xl:block">
-            {hint}
-          </span>
-        )}
-        {desktop && !hint && (
-          <kbd className="t-brand-count my-auto mr-3 hidden shrink-0 border border-k-line-2 px-1.5 py-1 font-mono text-k-text-5 xl:block">
-            /
-          </kbd>
-        )}
-
-        <button
-          type="submit"
-          aria-label={t("anazitisi")}
-          className={`flex shrink-0 cursor-pointer items-center justify-center border-0 bg-k-red transition-colors hover:bg-k-red-hover ${
-            desktop ? "w-[58px]" : "h-[46px] w-[52px]"
-          }`}
-        >
+        <button type="submit" aria-label={t("anazitisi")}>
           <svg
-            width={desktop ? 17 : 16}
-            height={desktop ? 17 : 16}
+            aria-hidden
+            width={18}
+            height={18}
             viewBox="0 0 24 24"
             fill="none"
             stroke="#fff"
@@ -340,7 +268,13 @@ export function SearchSuggest({
           id={listId}
           role="listbox"
           aria-label={t("protaseis_anazitisis")}
-          className="absolute inset-x-0 top-[calc(100%+6px)] z-50 max-h-[70vh] overflow-y-auto border border-k-line bg-white shadow-[0_18px_40px_rgba(0,0,0,.14)]"
+          className={`absolute z-50 max-h-[70vh] overflow-y-auto border-2 border-k-ink bg-white shadow-[0_18px_40px_rgba(0,0,0,.18)] ${
+            // Desktop: drops to the header's bottom edge (the 44px box sits
+            // 20px above it) and is wider than the box, right-aligned to it.
+            desktop
+              ? "top-[calc(100%+20px)] right-0 w-[min(560px,calc(100vw-48px))]"
+              : "inset-x-0 top-[calc(100%+6px)]"
+          }`}
         >
           {loading && !data && <SuggestSkeleton />}
 

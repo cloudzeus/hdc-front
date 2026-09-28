@@ -1,91 +1,67 @@
 import { useTranslations } from "next-intl";
 import Image from "next/image";
+import { GoogleReviewsBadge } from "@/components/seo/GoogleReviewsBadge";
+import { SHOP } from "@/config/shop";
 import { Link } from "@/i18n/navigation";
 import type { CategoryTile } from "@/lib/catalog/queries";
-import { GoogleReviewsBadge } from "@/components/seo/GoogleReviewsBadge";
 import { upGreek } from "@/lib/greek";
+import { resolveHdcNav } from "@/lib/hdc-nav";
 
 /*
- * `prefetch={false}` σε κάθε σύνδεσμο αυτού του αρχείου.
- * ─────────────────────────────────────────────────────────────────────────────
- * Μετρημένο στην παραγωγή: μία επίσκεψη στο `/katalogos` έβγαζε **34** αιτήματα
- * RSC — 18 για κατηγορίες, 14 για την πλοήγηση και το υποσέλιδο, καθένα 450-780ms.
- * Κάθε ένα από αυτά είναι ΠΛΗΡΗΣ απόδοση στον διακομιστή, γιατί οι σελίδες
- * απαντούν `cache-control: no-store` (διαβάζουν καλάθι και γλώσσα από cookies).
- *
- * Δηλαδή ένας επισκέπτης παρήγαγε 34 renders, και με μερικούς ταυτόχρονους ο
- * διακομιστής κορεννύεται — γι' αυτό «αργεί σε ΟΛΕΣ τις σελίδες» και όχι σε μία.
- *
- * Η πλοήγηση και το υποσέλιδο είναι σε κάθε σελίδα και δείχνουν παντού· κανείς
- * δεν πρόκειται να πατήσει και τα δεκατέσσερα. Το prefetch έχει νόημα για τον
- * έναν σύνδεσμο που ΘΑ πατηθεί, όχι για τον κατάλογο των πάντων.
+ * `prefetch={false}` on every link here: the footer is on every page, nobody
+ * follows all of its links, and every prefetch is a full server render (the
+ * pages answer `no-store`, they read the cart and locale from cookies).
  */
 
-const PAYMENTS = ["VISA", "MC", "MAESTRO", "IRIS", "PAYPAL"];
+const PAYMENTS = ["VISA", "MASTERCARD", "IRIS"] as const;
 
 /**
- * Real accounts, not placeholders — the same four Google's own Merchant
- * Center "social profiles" panel asks for, so this list and that panel stay
- * in step by construction rather than by remembering to update both.
+ * The platforms column. There are no platform pages yet (the platform filter
+ * arrives with the new catalogue, Plan 3 Task 3), so each opens a search for
+ * the platform's name — a real, non-empty page today.
  */
-const SOCIALS = [
-  {
-    label: "TikTok",
-    short: "TT",
-    href: "https://www.tiktok.com/@kolleris_tools_official",
-  },
-  {
-    label: "Facebook",
-    short: "FB",
-    href: "https://www.facebook.com/kolleristools/",
-  },
-  {
-    label: "Instagram",
-    short: "IG",
-    href: "https://www.instagram.com/kolleris_tools/",
-  },
-  {
-    label: "LinkedIn",
-    short: "IN",
-    href: "https://gr.linkedin.com/company/kolleris-bros-ike",
-  },
+const PLATFORMS = [
+  { label: "M12", q: "M12" },
+  { label: "M18", q: "M18" },
+  { label: "MX FUEL", q: "MX FUEL" },
+  { label: "ONE-KEY™", q: "ONE-KEY" },
+  { label: "REDLITHIUM™", q: "REDLITHIUM" },
 ] as const;
 
 /**
- * The legal small print. Every one of these 404'd or didn't exist until now —
- * which is most of what Google's Merchant Center flagged as Misrepresentation:
- * a machine reading the site for "can this business be trusted" found a
- * returns link and a warranty link that both led nowhere, and no terms, no
- * privacy policy, no stated payment methods or shipping policy at all.
- */
-const LEGAL_LINKS = [
-  { href: "/oroi-chrisis", key: "oroi_chrisis" },
-  { href: "/aporrito", key: "aporrito" },
-  { href: "/tropoi-pliromis", key: "tropoi_pliromis" },
-  { href: "/apostoli-paradosi", key: "apostoli_paradosi" },
-] as const;
-
-/**
- * Footer. Handoff: four columns on desktop; on mobile the link columns collapse
- * to accordion headers (`<details>`, so it works without JavaScript) and the
- * payment row drops.
+ * The HDC footer (mockup `home.html` `footer`): black, four columns — lockup,
+ * contact and payment marks; shop; service; platforms — then the legal line.
  *
- * The category column is live from the projection.
+ * The operating company appears here and only here, as the company that runs
+ * the HDC. Its details, and the contact placeholders, come from `SHOP` in
+ * src/config/shop.ts so they change in one place.
+ *
+ * `categories` (the synced root categories) is what the shop column resolves
+ * its category links against.
  */
 export function SiteFooter({ categories }: { categories: CategoryTile[] }) {
   const t = useTranslations("chrome.SiteFooter");
+  const { contact, operator } = SHOP;
+  const nav = Object.fromEntries(resolveHdcNav(categories).map((i) => [i.key, i.href]));
+
   const columns = [
     {
-      title: upGreek(t("katigories")),
-      links: categories.slice(0, 6).map((c) => ({
-        href: `/katalogos/${c.slug}`,
-        label: upGreek(c.name),
-      })),
+      title: t("katastima"),
+      links: [
+        { href: nav.battery, label: t("ergaleia_mpatarias") },
+        { href: nav.accessories, label: t("axesouar") },
+        { href: nav.packout, label: "PACKOUT" },
+        { href: nav.hand, label: t("ergaleia_cheiros") },
+        { href: "/prosfores", label: t("prosfores") },
+        { href: "/nees-afixeis", label: t("nees_afixeis") },
+      ],
     },
     {
-      title: upGreek(t("exypiretisi")),
+      title: t("exypiretisi"),
       links: [
         { href: "/logariasmos/entopismos", label: t("entopismos_paraggelias") },
+        { href: "/apostoli-paradosi", label: t("apostoli_paradosi") },
+        { href: "/tropoi-pliromis", label: t("tropoi_pliromis") },
         { href: "/epistrofes", label: t("epistrofes") },
         { href: "/eggyiseis", label: t("eggyiseis") },
         { href: "/syxnes-erotiseis", label: t("sychnes_erotiseis") },
@@ -93,137 +69,96 @@ export function SiteFooter({ categories }: { categories: CategoryTile[] }) {
       ],
     },
     {
-      title: upGreek(t("i_etaireia")),
-      links: [
-        { href: "/etaireia", label: t("poioi_eimaste") },
-        { href: "/brands", label: "Brands" },
-        { href: "/prosfores", label: t("prosfores") },
-        { href: "/blog", label: "Blog" },
-        { href: "/eisodos", label: t("logariasmos_b2b") },
-      ],
+      title: t("platformes"),
+      links: PLATFORMS.map((p) => ({
+        href: `/anazitisi?q=${encodeURIComponent(p.q)}`,
+        label: p.label,
+      })),
     },
   ];
 
   return (
-    <footer className="bg-k-ink-deep shell-x py-7 lg:pt-14 lg:pb-0">
-      <div className="lg:grid lg:grid-cols-[300px_1fr_1fr_1fr] lg:gap-12 lg:pb-11">
-        <div>
-          <Image
-            src="/brand/logo-horizontal-white.png"
-            alt="Kolleris"
-            width={170}
-            height={38}
-            className="block h-auto w-[140px] lg:w-[170px]"
-          />
-          <p className="t-footer-tag mt-3 text-white/40 lg:mt-4">
-            PROFESSIONAL TOOLS · SINCE 1978
-          </p>
-          <div className="mt-5 hidden gap-2.5 lg:flex">
-            {SOCIALS.map((social) => (
-              <a
-                key={social.href}
-                href={social.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={social.label}
-                className="t-social flex h-9 w-9 items-center justify-center border border-white/18 text-white/72 transition-colors hover:border-k-red hover:text-white"
-              >
-                {social.short}
+    <footer className="hdc-foot">
+      <div className="hdc-wrap">
+        <div className="hdc-foot-top">
+          <div>
+            <Image
+              src="/brand/hdc-lockup-440.png"
+              alt={SHOP.name}
+              width={159}
+              height={66}
+              unoptimized
+              className="hdc-foot-logo"
+            />
+            <address className="hdc-foot-contact">
+              <a href={`tel:${contact.phoneE164}`}>
+                <strong>{contact.phone}</strong>
               </a>
-            ))}
+              <br />
+              <a href={`mailto:${contact.email}`}>{contact.email}</a>
+              <br />
+              {contact.street}, {contact.postcode} {contact.city}
+              <br />
+              {t("orario", contact.hours)}
+            </address>
+            <ul className="hdc-foot-pay" aria-label={t("pliromes")}>
+              {PAYMENTS.map((payment) => (
+                <li key={payment}>{payment}</li>
+              ))}
+              <li>{upGreek(t("trapeza"))}</li>
+            </ul>
           </div>
-        </div>
 
-        {/* Mobile: collapsible sections. `<details>` needs no JavaScript. */}
-        <div className="mt-5 border-t border-white/10 lg:hidden">
           {columns.map((column) => (
-            <details key={column.title} className="border-b border-white/10">
-              <summary className="t-footer-col flex cursor-pointer items-center justify-between py-4 text-white marker:content-none">
-                {column.title}
-                <span className="text-[15px] text-k-red">+</span>
-              </summary>
-              <ul className="flex flex-col gap-2.5 pb-4">
+            <nav key={column.title} aria-label={column.title}>
+              <h2>{upGreek(column.title)}</h2>
+              <ul>
                 {column.links.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="t-footer-link text-white/58"
-                      prefetch={false}
-                    >
+                  <li key={link.label}>
+                    <Link href={link.href} prefetch={false}>
                       {link.label}
                     </Link>
                   </li>
                 ))}
               </ul>
-            </details>
+            </nav>
           ))}
         </div>
 
-        {/* Desktop: open columns. */}
-        {columns.map((column) => (
-          <div key={column.title} className="hidden lg:block">
-            <p className="t-footer-col mb-[18px] text-white">{column.title}</p>
-            <ul className="flex flex-col gap-2.5">
-              {column.links.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="t-footer-link text-white/58 transition-colors hover:text-k-red"
-                    prefetch={false}
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+        <div className="hdc-foot-legal">
+          <div>
+            <p>
+              {t.rich("operator", {
+                company: operator.name,
+                vat: operator.vat,
+                gemi: operator.gemi,
+                b: (chunks) => <b>{chunks}</b>,
+              })}
+            </p>
+            <p>{t("trademarks")}</p>
           </div>
-        ))}
-      </div>
-
-      <div className="mt-5 flex flex-col gap-3 lg:mt-0 lg:border-t lg:border-white/10 lg:py-[18px]">
-        <nav
-          aria-label={upGreek(t("nomika"))}
-          className="flex flex-wrap gap-x-5 gap-y-2"
-        >
-          {LEGAL_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="t-footer-legal text-white/45 underline-offset-4 transition-colors hover:text-white hover:underline"
-              prefetch={false}
-            >
-              {t(link.key)}
+          <nav aria-label={t("nomika")}>
+            <Link href="/oroi-chrisis" prefetch={false}>
+              {t("oroi_chrisis")}
             </Link>
-          ))}
-        </nav>
-
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <p className="t-footer-legal text-white/40">
-            {/* The registered legal entity, not a marketing name — it must
-                match what HDCtool and every order document say. */}
-            © {new Date().getFullYear()} ΑΦΟΙ ΚΟΛΛΕΡΗ ΙΚΕ
-            <br className="lg:hidden" />
-            <span className="hidden lg:inline"> · </span>
-            {t("k_mayromichali_4_18545_peiraias")}
-          </p>
-          <div className="hidden items-center gap-2 lg:flex">
-            {PAYMENTS.map((payment) => (
-              <span
-                key={payment}
-                className="t-pay flex h-[26px] items-center border border-white/16 px-[9px] text-white/55"
-              >
-                {payment}
-              </span>
-            ))}
-          </div>
+            {" · "}
+            <Link href="/aporrito" prefetch={false}>
+              {t("aporrito")}
+            </Link>
+            {" · "}
+            {/* No cookie page of its own: the cookie policy is a section of
+                the privacy policy. */}
+            <Link href="/aporrito" prefetch={false}>
+              {t("cookies")}
+            </Link>
+          </nav>
         </div>
       </div>
 
       {/*
-        The Google seller rating. Renders as a floating badge in the bottom
-        corner rather than here in the flow — that is the widget's own
-        behaviour, not a layout choice; see the component. Mounted from the
-        footer so it appears on storefront pages only, never in /admin.
+        The Google seller rating floats in the bottom-left corner (the widget's
+        own behaviour, see the component). Mounted from the footer so it
+        appears on storefront pages only, never in /admin.
       */}
       <GoogleReviewsBadge />
     </footer>
