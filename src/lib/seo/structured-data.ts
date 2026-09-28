@@ -1,5 +1,6 @@
 import { absoluteUrl, siteOrigin } from "@/lib/seo/urls";
 import type { Locale } from "@/i18n/routing";
+import { SHOP as CONFIG } from "@/config/shop";
 
 /**
  * Structured data for the whole site.
@@ -14,34 +15,38 @@ import type { Locale } from "@/i18n/routing";
  * phone number in a knowledge panel cannot drift from the one in the footer.
  */
 
-/** The shop. Kept here because three surfaces need the same facts. */
+/**
+ * The shop, as machines read it. Derived from `SHOP` in src/config/shop.ts —
+ * the same constants the footer prints — so the name and phone in a knowledge
+ * panel cannot drift from the page.
+ *
+ * `name` is the shop (Milwaukee Heavy Duty Centre); `legalName` is the company
+ * that operates it.
+ */
 export const SHOP = {
-  name: "Kolleris",
-  legalName: "ΚΟΛΛΕΡΗΣ",
-  phone: "+302104111355",
-  email: "info@kolleris.com",
-  street: "Κ. Μαυρομιχάλη 4",
-  city: "Πειραιάς",
-  postcode: "18545",
+  name: CONFIG.name,
+  legalName: CONFIG.operator.name,
+  phone: CONFIG.contact.phoneE164,
+  email: CONFIG.contact.email,
+  street: CONFIG.contact.street,
+  city: CONFIG.contact.city,
+  postcode: CONFIG.contact.postcode,
   country: "GR",
   lat: 37.949726,
   lon: 23.642506,
-  // 1978 everywhere a visitor can see it — the footer, /etaireia, /brands, the
-  // copywriter's own prompt. This said 1980, which is the one number a machine
-  // reads for business identity, disagreeing with the seven a person reads.
-  founded: "1978",
-  /**
-   * `sameAs` — the standard Schema.org way to say "this business and that
-   * social profile are the same entity". The same four accounts as the
-   * footer and Merchant Center's own "social profiles" panel, kept in one
-   * place so the three cannot drift.
+  hours: CONFIG.contact.hours,
+  /*
+   * The operating company's founding year. Still read by `yearsInBusiness()`
+   * for copy on pages not yet rewritten for the HDC; NOT published as the
+   * shop's `foundingDate`, which would claim the HDC opened in 1978.
    */
-  sameAs: [
-    "https://www.facebook.com/kolleristools/",
-    "https://www.instagram.com/kolleris_tools/",
-    "https://www.tiktok.com/@kolleris_tools_official",
-    "https://gr.linkedin.com/company/kolleris-bros-ike",
-  ],
+  founded: "1978",
+  /*
+   * `sameAs` — the shop's own social profiles. Empty until the HDC has its
+   * own: the Kolleris accounts are another business, and saying they are the
+   * same entity would merge the two in a knowledge panel.
+   */
+  sameAs: [] as string[],
 } as const;
 
 /**
@@ -67,8 +72,7 @@ export function siteJsonLd(locale: Locale) {
         url: absoluteUrl("/", locale),
         telephone: SHOP.phone,
         email: SHOP.email,
-        foundingDate: SHOP.founded,
-        sameAs: SHOP.sameAs,
+        ...(SHOP.sameAs.length ? { sameAs: SHOP.sameAs } : {}),
         priceRange: "€€",
         currenciesAccepted: "EUR",
         address: {
@@ -87,8 +91,8 @@ export function siteJsonLd(locale: Locale) {
           {
             "@type": "OpeningHoursSpecification",
             dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-            opens: "08:00",
-            closes: "16:30",
+            opens: SHOP.hours.open,
+            closes: SHOP.hours.close,
           },
         ],
       },

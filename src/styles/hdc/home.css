@@ -1,0 +1,767 @@
+/*
+ * HDC home page, section by section, in the mockup's order.
+ *
+ * Ported from docs/design/mockups/home.html (.hero, .plat, .sec/.cats, .cards,
+ * .pack, .pipe, .store, .nl). Class names carry the hdc- prefix; every font
+ * size is a fluid --fs-* token. The mockup is desktop only; below 1024px the
+ * columns stack, and below 768px product cards go two to a row.
+ */
+
+@layer components {
+  /* The mockup's body: 15px, normal line height. Sections set their own sizes
+     on top of this. */
+  .hdc-hero,
+  .hdc-plat,
+  .hdc-sec,
+  .hdc-pack,
+  .hdc-pipe,
+  .hdc-store,
+  .hdc-nl {
+    font-family: var(--hdc-font);
+    font-size: var(--fs-15);
+    line-height: normal;
+  }
+
+  /* ── Hero (.hero) ────────────────────────────────────────────────────── */
+  .hdc-hero {
+    position: relative;
+    height: 560px;
+    background: #111;
+    color: #fff;
+    overflow: hidden;
+  }
+  .hdc-hero-slide {
+    position: absolute;
+    inset: 0;
+    background-color: #111;
+    background-position: 70% 40%;
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+  .hdc-hero-slide[hidden] {
+    display: none;
+  }
+  .hdc-hero-slide::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      rgba(10, 10, 10, 0.92) 0%,
+      rgba(10, 10, 10, 0.78) 38%,
+      rgba(10, 10, 10, 0.05) 72%
+    );
+  }
+  .hdc-hero-inner {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 18px;
+  }
+  .hdc-hero-tag {
+    background: var(--hdc-red);
+    color: #fff;
+    font-size: var(--fs-13);
+  }
+  .hdc-hero-title {
+    margin: 0;
+    max-width: 800px;
+    font-size: var(--fs-52);
+  }
+  .hdc-hero-text {
+    margin: 0;
+    max-width: 520px;
+    font-size: var(--fs-18);
+    line-height: 1.5;
+    color: #d8d8d8;
+  }
+  .hdc-hero-price {
+    margin: 0;
+    font-weight: 900;
+    font-stretch: 125%;
+    font-size: var(--fs-34);
+    letter-spacing: -0.02em;
+  }
+  .hdc-hero-price small {
+    margin-left: 8px;
+    font-weight: 500;
+    font-stretch: 87.5%;
+    font-size: var(--fs-14);
+    letter-spacing: 0;
+    color: #bdbdbd;
+  }
+  .hdc-hero-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .hdc-hero-ctrl {
+    position: absolute;
+    right: 24px;
+    bottom: 26px;
+    display: flex;
+    gap: 6px;
+  }
+  .hdc-hero-ctrl button {
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: var(--hdc-red);
+    color: #fff;
+    font-size: var(--fs-20);
+    cursor: pointer;
+    transition: background-color 0.15s;
+  }
+  .hdc-hero-ctrl button:hover {
+    background: var(--hdc-red-d);
+  }
+  .hdc-hero-dots {
+    position: absolute;
+    left: 50%;
+    bottom: 32px;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+  }
+  .hdc-hero-dots button {
+    width: 34px;
+    height: 4px;
+    padding: 0;
+    border: 0;
+    background: rgba(255, 255, 255, 0.35);
+    cursor: pointer;
+  }
+  .hdc-hero-dots button[aria-current="true"] {
+    background: #fff;
+  }
+
+  /* ── Platforms (.plat) ───────────────────────────────────────────────── */
+  .hdc-plat {
+    background-color: var(--hdc-red);
+    background-image: repeating-linear-gradient(
+      115deg,
+      rgba(0, 0, 0, 0.06) 0 2px,
+      transparent 2px 22px
+    );
+    color: #fff;
+    padding: 56px 0 60px;
+  }
+  .hdc-plat h2 {
+    margin: 0 0 10px;
+    text-align: center;
+    font-size: var(--fs-40);
+  }
+  .hdc-plat-sub {
+    margin: 0 0 30px;
+    text-align: center;
+    font-size: var(--fs-16);
+    color: #ffe1e3;
+  }
+  .hdc-plat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .hdc-plat-tile {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 220px;
+    padding: 30px 24px 26px;
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    transition: background-color 0.15s;
+  }
+  .hdc-plat-tile:hover {
+    background: rgba(0, 0, 0, 0.42);
+  }
+  .hdc-plat-badge {
+    font-weight: 900;
+    font-stretch: 150%;
+    font-size: var(--fs-48);
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .hdc-plat-badge i {
+    font-style: normal;
+    background: #fff;
+    color: var(--hdc-red);
+    padding: 0 8px;
+    margin-right: 6px;
+  }
+  .hdc-plat-tag {
+    font-weight: 800;
+    font-stretch: 120%;
+    font-size: var(--fs-18);
+  }
+  .hdc-plat-d {
+    margin: 0;
+    font-size: var(--fs-14);
+    line-height: 1.45;
+    color: #ffe1e3;
+  }
+  .hdc-plat-go {
+    margin-top: auto;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-13);
+    letter-spacing: 0.06em;
+  }
+
+  /* ── Section with a head (.sec, .sechead) ────────────────────────────── */
+  .hdc-sec {
+    padding: 60px 0 20px;
+  }
+  .hdc-sechead {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    margin-bottom: 22px;
+  }
+  .hdc-sechead h2 {
+    margin: 0;
+    font-size: var(--fs-34);
+  }
+  .hdc-sechead a {
+    flex-shrink: 0;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-14);
+    letter-spacing: 0.05em;
+    color: var(--hdc-red);
+  }
+  .hdc-sechead a:hover {
+    color: var(--hdc-red-d);
+  }
+
+  /* ── Categories (.cats) ──────────────────────────────────────────────── */
+  .hdc-cats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+  .hdc-cat {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--hdc-ink);
+    background: #fff;
+  }
+  .hdc-cat-im {
+    aspect-ratio: 1 / 0.8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--hdc-g1);
+  }
+  .hdc-cat-im img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 78%;
+    max-height: 88%;
+  }
+  .hdc-cat-lb {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 62px;
+    padding: 14px;
+    background: var(--hdc-ink);
+    color: #fff;
+    font-weight: 800;
+    font-stretch: 115%;
+    font-size: var(--fs-14);
+    line-height: 1.15;
+    transition: background-color 0.15s;
+  }
+  .hdc-cat-lb span {
+    font-weight: 500;
+    font-stretch: 87.5%;
+    font-size: var(--fs-12);
+    color: #aaa;
+    white-space: nowrap;
+  }
+  .hdc-cat:hover .hdc-cat-lb {
+    background: var(--hdc-red);
+  }
+  .hdc-cat:hover .hdc-cat-lb span {
+    color: #ffe1e3;
+  }
+
+  /* ── Product rows (.cards) ───────────────────────────────────────────── */
+  .hdc-cards {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+  }
+
+  /* ── PACKOUT (.pack) ─────────────────────────────────────────────────── */
+  .hdc-pack {
+    position: relative;
+    height: 520px;
+    margin-top: 60px;
+    color: #fff;
+    background: #111 url("https://www.milwaukeetool.gr/wp-content/uploads/2021/09/Packout_Range.jpg")
+      center 60% / cover no-repeat;
+  }
+  .hdc-pack::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      rgba(10, 10, 10, 0.9) 0%,
+      rgba(10, 10, 10, 0.55) 45%,
+      rgba(10, 10, 10, 0.1) 80%
+    );
+  }
+  .hdc-pack .hdc-wrap {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .hdc-pack h2 {
+    margin: 0;
+    font-size: var(--fs-92);
+    line-height: 0.9;
+  }
+  .hdc-pack h2 small {
+    display: block;
+    margin-top: 8px;
+    font-size: var(--fs-24);
+    font-stretch: 120%;
+    font-weight: 800;
+    letter-spacing: 0;
+  }
+  .hdc-pack p {
+    margin: 0;
+    max-width: 480px;
+    font-size: var(--fs-17);
+    line-height: 1.5;
+    color: #d8d8d8;
+  }
+
+  /* ── New arrivals (.pipe) ────────────────────────────────────────────── */
+  .hdc-pipe {
+    background-color: var(--hdc-graph);
+    background-image: repeating-linear-gradient(
+      115deg,
+      rgba(219, 1, 28, 0.1) 0 3px,
+      transparent 3px 26px
+    );
+    color: #fff;
+    padding: 56px 0 60px;
+  }
+  .hdc-pipe-inner {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 28px;
+    align-items: stretch;
+  }
+  .hdc-pipe-intro {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .hdc-pipe-intro .hdc-slant {
+    background: var(--hdc-red);
+    color: #fff;
+  }
+  .hdc-pipe-intro h2 {
+    margin: 0;
+    font-size: var(--fs-44);
+  }
+  .hdc-pipe-intro p {
+    margin: 0;
+    font-size: var(--fs-15);
+    line-height: 1.5;
+    color: #bdbdbd;
+  }
+  .hdc-pipe-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  /* ── Store (.store) ──────────────────────────────────────────────────── */
+  .hdc-store {
+    margin-top: 60px;
+    padding: 60px 0;
+    background: var(--hdc-g1);
+  }
+  .hdc-store-inner {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+  .hdc-store-tag {
+    background: var(--hdc-ink);
+    color: #fff;
+  }
+  .hdc-store h2 {
+    margin: 14px 0 14px;
+    font-size: var(--fs-38);
+  }
+  .hdc-store-text {
+    margin: 0;
+    max-width: 560px;
+    font-size: var(--fs-16);
+    line-height: 1.6;
+    color: var(--hdc-g7);
+  }
+  .hdc-store-facts {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin: 22px 0 24px;
+    padding: 0;
+    list-style: none;
+  }
+  .hdc-store-facts li {
+    padding: 14px;
+    background: #fff;
+    border-left: 4px solid var(--hdc-red);
+  }
+  .hdc-store-facts b {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 800;
+    font-stretch: 120%;
+    font-size: var(--fs-15);
+  }
+  .hdc-store-facts span {
+    font-stretch: 87.5%;
+    font-size: var(--fs-14);
+    color: var(--hdc-g5);
+  }
+  .hdc-store-map {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    height: 380px;
+    border: 1px solid var(--hdc-g3);
+    background: #ddd url("https://www.milwaukeetool.gr/wp-content/uploads/2023/04/diktuo-katastyimaton.jpg")
+      center / cover no-repeat;
+  }
+  .hdc-store-pin {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--hdc-ink);
+    color: #fff;
+    font-style: normal;
+  }
+  .hdc-store-pin b {
+    font-weight: 800;
+    font-stretch: 115%;
+    font-size: var(--fs-15);
+  }
+  .hdc-store-pin span {
+    font-stretch: 87.5%;
+    font-size: var(--fs-14);
+    color: #ccc;
+  }
+  .hdc-store-pin .hdc-store-open {
+    color: #6fd08c;
+  }
+
+  /* ── Newsletter (.nl) ────────────────────────────────────────────────── */
+  .hdc-nl {
+    background: var(--hdc-red);
+    color: #fff;
+    padding: 40px 0;
+  }
+  .hdc-nl-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+  }
+  .hdc-nl h2 {
+    margin: 0;
+    font-size: var(--fs-30);
+  }
+  .hdc-nl-text {
+    margin: 6px 0 0;
+    font-size: var(--fs-15);
+    color: #ffe1e3;
+  }
+  .hdc-nl-form {
+    width: 520px;
+    max-width: 100%;
+  }
+  .hdc-nl-row {
+    display: flex;
+  }
+  .hdc-nl-row input[type="email"] {
+    flex: 1;
+    min-width: 0;
+    height: 52px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 0;
+    background: #fff;
+    color: var(--hdc-ink);
+    font-family: var(--hdc-font);
+    font-size: var(--fs-16);
+    outline: none;
+  }
+  .hdc-nl-row input[type="email"]:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--hdc-ink);
+  }
+  .hdc-nl-row button {
+    height: 52px;
+    padding: 0 22px;
+    border: 0;
+    background: var(--hdc-ink);
+    color: #fff;
+    font-family: var(--hdc-font);
+    font-weight: 800;
+    font-stretch: 110%;
+    font-size: var(--fs-15);
+    letter-spacing: 0.04em;
+    cursor: pointer;
+  }
+  .hdc-nl-row button:hover {
+    background: var(--hdc-graph);
+  }
+  .hdc-nl-status {
+    min-height: 18px;
+    margin: 6px 0 0;
+    font-size: var(--fs-13);
+  }
+  .hdc-nl-status:empty {
+    margin: 0;
+    min-height: 0;
+  }
+
+  /* Focus on the dark and red bands: white, never lost. */
+  .hdc-hero a:focus-visible,
+  .hdc-hero button:focus-visible,
+  .hdc-plat a:focus-visible,
+  .hdc-pack a:focus-visible,
+  .hdc-pipe-intro a:focus-visible,
+  .hdc-nl button:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+
+  /* ── Tablet ──────────────────────────────────────────────────────────── */
+  @media (max-width: 1279px) {
+    .hdc-cards {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    .hdc-cards > :nth-child(n + 5) {
+      display: none;
+    }
+  }
+  @media (max-width: 1023px) {
+    .hdc-cards {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .hdc-cards > :nth-child(n + 4) {
+      display: none;
+    }
+    .hdc-cats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .hdc-plat-grid {
+      grid-template-columns: 1fr;
+    }
+    .hdc-plat-tile {
+      min-height: 0;
+    }
+    .hdc-pipe-inner {
+      grid-template-columns: 1fr;
+    }
+    .hdc-pipe-row {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .hdc-store-inner {
+      grid-template-columns: 1fr;
+    }
+    .hdc-nl-inner {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .hdc-nl-form {
+      width: 100%;
+    }
+  }
+
+  /* ── Phone ───────────────────────────────────────────────────────────── */
+  @media (max-width: 767px) {
+    /* The copy decides the height on a phone: a fixed 560px either clips it
+       or leaves a hole. */
+    .hdc-hero {
+      height: auto;
+    }
+    .hdc-hero-slide {
+      position: relative;
+      min-height: 520px;
+      background-position: 70% 30%;
+    }
+    .hdc-hero-slide::before {
+      background: linear-gradient(
+        180deg,
+        rgba(10, 10, 10, 0.35) 0%,
+        rgba(10, 10, 10, 0.82) 45%,
+        rgba(10, 10, 10, 0.94) 100%
+      );
+    }
+    .hdc-hero-inner {
+      min-height: 520px;
+      justify-content: flex-end;
+      gap: 14px;
+      padding-top: 120px;
+      padding-bottom: 32px;
+    }
+    .hdc-hero--many .hdc-hero-inner {
+      padding-bottom: 88px;
+    }
+    /* One long word ("ΔΡΑΠΑΝΟΚΑΤΣΑΒΙΔΟ") has to fit 360px at 150% width. */
+    .hdc-hero-title {
+      font-size: var(--fs-26);
+      overflow-wrap: anywhere;
+    }
+    .hdc-hero-price small {
+      display: block;
+      margin: 4px 0 0;
+    }
+    .hdc-hero-ctas {
+      width: 100%;
+    }
+    .hdc-hero-ctas a {
+      flex: 1 1 100%;
+    }
+    .hdc-hero-ctrl {
+      right: 16px;
+      bottom: 16px;
+    }
+    .hdc-hero-ctrl button {
+      width: 44px;
+      height: 44px;
+    }
+    .hdc-hero-dots {
+      left: 16px;
+      bottom: 36px;
+      transform: none;
+    }
+
+    .hdc-plat {
+      padding: 40px 0 44px;
+    }
+    .hdc-plat-sub {
+      margin-bottom: 22px;
+    }
+    .hdc-plat-grid {
+      gap: 12px;
+    }
+    .hdc-plat-tile {
+      padding: 22px 18px 20px;
+    }
+
+    .hdc-sec {
+      padding: 40px 0 8px;
+    }
+    .hdc-sechead {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .hdc-sechead a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+    .hdc-cats {
+      gap: 10px;
+    }
+    .hdc-cat-lb {
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 4px;
+      padding: 12px 10px;
+    }
+
+    .hdc-cards {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .hdc-cards > :nth-child(n + 4) {
+      display: flex;
+    }
+    .hdc-cards > :nth-child(n + 5) {
+      display: none;
+    }
+
+    .hdc-pack {
+      height: 460px;
+      margin-top: 40px;
+    }
+    .hdc-pack h2 {
+      font-size: var(--fs-48);
+    }
+    .hdc-pack h2 small {
+      font-size: var(--fs-18);
+    }
+    .hdc-pack::before {
+      background: linear-gradient(
+        180deg,
+        rgba(10, 10, 10, 0.55) 0%,
+        rgba(10, 10, 10, 0.88) 100%
+      );
+    }
+    .hdc-pack .hdc-wrap {
+      justify-content: flex-end;
+      padding-bottom: 36px;
+    }
+
+    .hdc-pipe {
+      padding: 40px 0 44px;
+    }
+    .hdc-pipe-row {
+      gap: 10px;
+    }
+
+    .hdc-store {
+      margin-top: 40px;
+      padding: 40px 0;
+    }
+    .hdc-store-facts {
+      grid-template-columns: 1fr;
+    }
+    .hdc-store-map {
+      height: 280px;
+    }
+
+    .hdc-nl {
+      padding: 32px 0;
+    }
+    .hdc-nl-row {
+      flex-direction: column;
+      gap: 10px;
+    }
+    .hdc-nl-row input[type="email"],
+    .hdc-nl-row button {
+      height: 48px;
+      flex: none;
+    }
+  }
+}

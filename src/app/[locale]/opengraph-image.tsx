@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { SHOP } from "@/config/shop";
 
 /**
  * Η εικόνα που βλέπει κανείς όταν κάποιος στέλνει ένα link του καταστήματος.
@@ -24,21 +25,15 @@ import { ImageResponse } from "next/og";
  * αυτά αποδίδει σε system sans, που για 1200×630 σε λευκά κεφαλαία είναι
  * αρκετά κοντά — και σαφώς καλύτερο από το να μην υπάρχει καθόλου εικόνα.
  */
-export const alt = "Kolleris — Εργαλεία & Επαγγελματικός Εξοπλισμός";
+export const alt = `${SHOP.name} — Milwaukee M12, M18, MX FUEL & PACKOUT`;
 
 export const size = { width: 1200, height: 630 };
 
 export const contentType = "image/png";
 
-/* Το σήμα, ως διαδρομές: το ίδιο διάνυσμα με το `public/brand`. Γραμμένο εδώ
-   και όχι διαβασμένο από αρχείο, γιατί το `ImageResponse` δεν φορτώνει
-   εξωτερικό SVG — θέλει στοιχεία που ξέρει να ζωγραφίσει. */
-const MARK = (
-  <svg width="150" height="113" viewBox="0 0 91.8 69.1" fill="#EA3E39">
-    <polygon points="91.8,0 49.9,0 0,35.4 0,65.5" />
-    <polygon points="33.7,41.4 58.2,69.1 91.8,69.1 67.3,41.4" />
-  </svg>
-);
+/* The HDC palette (src/styles/hdc/tokens.css): Milwaukee red on ink. */
+const RED = "#DB011C";
+const INK = "#0A0A0A";
 
 export default function Image() {
   return new ImageResponse(
@@ -50,22 +45,34 @@ export default function Image() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          backgroundColor: "#1A1B1E",
+          backgroundColor: INK,
           padding: "72px 80px",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
-          {MARK}
+        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
           <div
             style={{
               display: "flex",
-              fontSize: 64,
+              backgroundColor: RED,
+              color: "#FFFFFF",
+              fontSize: 44,
               fontWeight: 900,
-              letterSpacing: "-0.02em",
+              padding: "10px 22px",
+              letterSpacing: "-0.01em",
+            }}
+          >
+            MILWAUKEE
+          </div>
+          <div
+            style={{
+              display: "flex",
+              fontSize: 44,
+              fontWeight: 900,
+              letterSpacing: "-0.01em",
               color: "#FFFFFF",
             }}
           >
-            ΚΟΛΛΕΡΗΣ
+            HEAVY DUTY CENTRE
           </div>
         </div>
 
@@ -73,22 +80,21 @@ export default function Image() {
           <div
             style={{
               display: "flex",
-              fontSize: 74,
+              fontSize: 80,
               fontWeight: 900,
-              lineHeight: 1.05,
+              lineHeight: 1.02,
               letterSpacing: "-0.03em",
               color: "#FFFFFF",
             }}
           >
-            ΕΡΓΑΛΕΙΑ ΠΟΥ ΔΟΥΛΕΥΟΥΝ.
+            M12 · M18 · MX FUEL · PACKOUT
           </div>
           <div style={{ display: "flex", fontSize: 30, color: "rgba(255,255,255,0.72)" }}>
-            Επαγγελματικά εργαλεία, μηχανήματα και αναλώσιμα — από το 1978.
+            {`Όλη η γκάμα Milwaukee — ${SHOP.contact.city}.`}
           </div>
         </div>
 
-        {/* Η κόκκινη γραμμή του design system, στο κάτω άκρο. */}
-        <div style={{ display: "flex", height: 10, backgroundColor: "#EA3E39", width: 260 }} />
+        <div style={{ display: "flex", height: 10, backgroundColor: RED, width: 260 }} />
       </div>
     ),
     size,

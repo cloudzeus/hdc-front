@@ -1,6 +1,6 @@
 {
   "common": {
-    "brand": "KOLLERIS",
+    "brand": "MILWAUKEE HEAVY DUTY CENTRE",
     "search": "Cerca",
     "cart": "Carrello",
     "account": "Account",
@@ -53,6 +53,15 @@
     },
     "QuickViewTrigger": {
       "grigori_provoli": "Vista rapida"
+    },
+    "HdcProductCard": {
+      "neo": "NUOVO",
+      "choris_mpataria": "Senza batteria",
+      "kit": "{count, plural, one {# batteria} other {# batterie}} {ah}Ah",
+      "se_apothema": "Disponibile",
+      "se_apothema_tem": "Disponibile · {qty} pz",
+      "paradosi_1_3": "Consegna in 1–3 giorni lavorativi",
+      "choris_eikona": "Nessuna immagine"
     }
   },
   "plp": {
@@ -175,57 +184,81 @@
     }
   },
   "home": {
-    "AboutSplit": {
-      "gia_46_chronia_i_kolleris": "Per {years} anni, Kolleris è il fornitore a cui si rivolgono compagnie di navigazione,\n          fabbriche e officine. Rapporti diretti con Milwaukee, Knipex,\n          Wera — disponibilità precisa, senza 'vedremo'.",
-      "apo_to_1978": "Dal 1978",
-      "motto_line1": "Coerenza",
-      "motto_line2": "senza interruzioni.",
-      "motto_lead": "Se diciamo che è disponibile, lo è. Stessi marchi, stesse persone al telefono, stessa risposta."
+    "HdcHero": {
+      "titlos": "TRAPANO AVVITATORE A PERCUSSIONE M18 FPD3",
+      "keimeno": "Solo corpo o in kit con due batterie REDLITHIUM™ da 5.0Ah, caricabatterie e valigetta.",
+      "apo": "da {price}",
+      "me_fpa_sketo": "IVA inclusa · solo corpo",
+      "kit": "kit {price}",
+      "deite_to": "SCOPRILO",
+      "ola_ta_drapana": "TUTTI I TRAPANI M18",
+      "perioxi": "In evidenza",
+      "proigoumeni": "Diapositiva precedente",
+      "epomeni": "Diapositiva successiva",
+      "diafaneia": "Diapositiva"
     },
-    "BrandWall": {
-      "ta_brands_poy_antiprosopeyoyme": "I marchi che distribuiamo",
-      "brands_me_energa_proionta_mia": "brand con prodotti attivi · un unico indirizzo",
-      "kod": "cod.",
-      "ola_ta_brands": "Tutti i {totalBrands} brand"
+    "PlatformBand": {
+      "titlos": "SCEGLI LA PIATTAFORMA",
+      "ypotitlos": "Una batteria, tutti gli utensili della piattaforma.",
+      "m12_tag": "PRESTAZIONI PORTATILI",
+      "m12_keimeno": "Utensili compatti per elettricisti, idraulici e lavori in spazi ristretti.",
+      "m12_go": "VEDI GLI UTENSILI M12",
+      "m18_tag": "POTENZA MASSIMA",
+      "m18_keimeno": "La più grande piattaforma di utensili professionali a batteria — dai trapani agli avvitatori a impulsi da 1″.",
+      "m18_go": "VEDI GLI UTENSILI M18",
+      "mx_tag": "ATTREZZATURA DA CANTIERE",
+      "mx_keimeno": "Tagliasuolo, demolitori e torri faro senza generatore.",
+      "mx_go": "VEDI MX FUEL"
     },
-    "CategoryGrid": {
-      "agora_ana_katigoria": "Acquista per categoria",
-      "kod": "cod.",
-      "ypokatigories": "sottocategorie",
-      "to_plires_inventory": "L'inventario completo",
-      "oles_oi_katigories": "Tutte le {totalCategories} categorie"
+    "HomeCategories": {
+      "titlos": "CATEGORIE",
+      "oles": "TUTTE LE CATEGORIE",
+      "omades": "{count, plural, one {# gruppo} other {# gruppi}}",
+      "onoma_battery": "UTENSILI A BATTERIA",
+      "onoma_accessories": "ACCESSORI PER UTENSILI",
+      "onoma_packout": "PACKOUT E STOCCAGGIO",
+      "onoma_hand": "UTENSILI MANUALI",
+      "onoma_drilling": "FORATURA",
+      "onoma_grinding": "SMERIGLIATURA E TAGLIO",
+      "onoma_electrical": "ELETTRICITÀ E ILLUMINAZIONE",
+      "onoma_ppe": "DISPOSITIVI DI PROTEZIONE INDIVIDUALE"
     },
-    "FeaturedProducts": {
-      "ta_pio_dimofili_ergaleia": "Gli strumenti più popolari",
-      "oles_oi_times_me_fpa": "Tutti i prezzi IVA inclusa",
-      "deite_ola_ta_proionta": "Vedi tutti i prodotti",
-      "epilegmenoi_kodikoi": "Codici selezionati"
+    "BestSellers": {
+      "titlos": "I PIÙ VENDUTI",
+      "ola_ta_proionta": "TUTTI I PRODOTTI"
     },
-    "HeroBanner": {
-      "kodikon": "codici",
-      "deite_ta": "Vedi tutti"
+    "PackoutBand": {
+      "ypotitlos": "SISTEMA DI STOCCAGGIO MODULARE",
+      "keimeno": "Cassette, organizer e borse che si agganciano tra loro. Dal furgone al cantiere, senza risistemare nulla.",
+      "cta": "CREA IL TUO PACKOUT"
+    },
+    "NewArrivalsBand": {
+      "neo": "NUOVO",
+      "titlos": "NUOVI ARRIVI",
+      "keimeno": "Ciò che è appena arrivato in negozio. Ogni mese, nuovi utensili della piattaforma.",
+      "oles": "TUTTI I NUOVI ARRIVI"
+    },
+    "StoreBand": {
+      "titlos": "VIENI A PROVARLI",
+      "keimeno": "Il primo Milwaukee Heavy Duty Centre in Grecia. Tutta la gamma in un unico posto — prendi in mano l'utensile prima di acquistarlo e ritira il tuo ordine in giornata.",
+      "paralavi_titlos": "RITIRO IN 2 ORE",
+      "paralavi_keimeno": "Ordina online, passa in negozio.",
+      "dokimi_titlos": "PROVA DAL VIVO",
+      "dokimi_keimeno": "Tutte le piattaforme M12, M18 e MX FUEL.",
+      "symvouli_titlos": "CONSULENZA TECNICA",
+      "symvouli_keimeno": "Quale batteria, quale kit, quale accessorio.",
+      "eggyisi_titlos": "GARANZIA MILWAUKEE",
+      "eggyisi_keimeno": "Assistenza in garanzia tramite il negozio.",
+      "odigies": "INDICAZIONI STRADALI",
+      "orario": "Lun–Ven {open}–{close}",
+      "anoichta": "Aperto ora",
+      "kleista": "Chiuso ora"
     },
     "NewsletterBand": {
-      "eggrafi_sto_newsletter": "Iscrizione alla newsletter",
-      "nea_proionta_prosfores_kai_technika": "Nuovi prodotti, offerte e consigli tecnici — una volta al mese.",
+      "titlos": "I PRIMI A CONOSCERE I NUOVI UTENSILI",
+      "keimeno": "Nuovi arrivi e offerte Milwaukee, una volta al mese.",
       "to_email_sas": "La tua email",
-      "eggrafi": "Iscriviti"
-    },
-    "ReviewsBand": {
-      "vasismeno_se": "Basato su",
-      "axiologiseis_epaggelmation_synergeion_kai_naypigeion": "recensioni di professionisti, officine e\n            cantieri navali.",
-      "sta_5": "{rating} su 5",
-      "sta_5_2": "{rating} su 5"
-    },
-    "QuickOrder": {
-      "grigori_paraggelia_me_kodiko": "Ordine rapido con codice",
-      "xerete_ti_thelete": "Sai già cosa ti serve? Il codice va dritto nel carrello — nostro, del produttore o barcode.",
-      "kodikos_proiontos": "Codice prodotto",
-      "p_ch_4932499207_81_11": "es. 4932499207, 81 11 250, 05052504001",
-      "prosthiki_sto_kalathi": "Aggiungi al carrello",
-      "prostethike_sto_kalathi": "Aggiunto al carrello.",
-      "den_vrethike_kodikos": "Nessun prodotto con questo codice. Verificalo o usa la ricerca.",
-      "kati_pige_strava": "Qualcosa è andato storto. Riprova."
+      "eggrafi": "ISCRIVITI"
     }
   },
   "faq": {
@@ -824,37 +857,6 @@
       "deite_tin_prosfora": "Vedi l'offerta"
     }
   },
-  "page": {
-    "nea_afixi": "NUOVO ARRIVO",
-    "milwaukee_ergaleia_mpatarias": "MILWAUKEE\nUTENSILI A BATTERIA",
-    "seires_m12_m18_se_amesi": "Serie M12 e M18 in pronta consegna",
-    "eos_25": "FINO AL -25%",
-    "knipex_pensika_tsimpidika": "KNIPEX\nPINZE E TRONCHESI",
-    "germaniki_poiotita_eggyisi_ef_oroy": "Qualità tedesca, garanzia a vita",
-    "kodikoi_se": "Codici in",
-    "diathesimo_katalogo": "catalogo disponibile",
-    "brands_me": "Brand con",
-    "energa_proionta": "prodotti attivi",
-    "amesi_diathesimotita": "pronta consegna",
-    "24_48o": "24-48h",
-    "paradosi_se": "Consegna in",
-    "oli_tin_ellada": "tutta la Grecia",
-    "paraggelnoyme_gia_tria_ploia_o": "Ordiniamo per tre navi. Quello che dicono di avere, lo hanno — e parte in giornata.",
-    "d_papadopoylos": "D. Papadopoulos",
-    "technikos_dieythyntis_naytiliaki": "DIRETTORE TECNICO · MARITTIMO",
-    "oi_times_synergati_einai_pragmatikes": "I prezzi partner sono reali, non una trattativa ogni volta. Ci fa risparmiare tempo.",
-    "k_vasileioy": "K. Vasileiou",
-    "ypeythynos_promitheion_ergostasio": "RESPONSABILE APPROVVIGIONAMENTI · FABBRICA",
-    "46_chronia_stin_agora_fainontai": "{years} anni sul mercato si notano. Sanno cosa chiedi prima che finisci la frase.",
-    "g_antonioy": "G. Antoniou",
-    "idioktitis_synergeio": "TITOLARE · OFFICINA",
-    "pragmatiko_apothema_ochi_yposcheseis": "Scorte reali, non promesse",
-    "episimi_antiprosopeysi": "Distributore ufficiale",
-    "times_synergati_b2b": "Prezzi partner B2B",
-    "statheri_timologisi_ana_logariasmo_choris": "Prezzi fissi per account, senza negoziazione a ogni ordine.",
-    "kodikoi_se_amesi_diathesimotita_ayti": "{n} codici disponibili immediatamente in questo momento.",
-    "brands_me_energa_proionta_eggyisi": "{brands} marchi con prodotti attivi, garanzia e supporto tecnico."
-  },
   "syxnes-erotiseis": {
     "page": {
       "archiki": "Home",
@@ -1424,8 +1426,8 @@
     }
   },
   "layout": {
-    "titlos_kolleris_ergaleia_epaggelmatikos": "Kolleris — Utensili & Attrezzature Professionali",
-    "perigrafi_epaggelmatika_ergaleia_michanimata": "Utensili professionali, macchinari e consumabili. Disponibilità immediata, prezzi da partner."
+    "perigrafi_epaggelmatika_ergaleia_michanimata": "Tutta la gamma Milwaukee M12, M18 e MX FUEL, PACKOUT e accessori. Prezzi IVA inclusa, disponibilità in tempo reale, ritiro in negozio al Pireo.",
+    "titlos_site": "Milwaukee Heavy Duty Centre — Utensili Milwaukee al Pireo"
   },
   "paraggelies": {
     "page": {

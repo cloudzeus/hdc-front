@@ -358,11 +358,18 @@ export const getFeaturedProducts = sharedCatalogue(
     locale: Locale,
     limit = 8,
     perCategory = 2,
+    /** Only products with a feature image — for bands where a blank card would stand out. */
+    requireImage = false,
   ): Promise<ProductCardData[]> => {
     const [rows, brands] = await Promise.all([
       prisma.product.findMany({
         // Over-fetch so there is enough to spread across categories.
-        where: { isActive: true, inStock: true, priceNet: { gt: 0 } },
+        where: {
+          isActive: true,
+          inStock: true,
+          priceNet: { gt: 0 },
+          ...(requireImage ? { images: { some: { isFeature: true } } } : {}),
+        },
         orderBy: [
           { onSale: "desc" },
           { erpInsertedAt: "desc" },
@@ -396,6 +403,127 @@ export const getFeaturedProducts = sharedCatalogue(
     }
 
     return picked.map((row) => toCard(row, locale, brands));
+  },
+);
+
+/**
+ * Specific products by manufacturer code (code2), in the order asked — for a
+ * hero slide that names a product and must print its live price.
+ */
+export const getProductsByCode2 = sharedCatalogue(
+  "products-by-code2",
+  FAST,
+  async (locale: Locale, codes: string[]): Promise<ProductCardData[]> => {
+    const [rows, brands] = await Promise.all([
+      prisma.product.findMany({
+        where: { isActive: true, code2: { in: codes } },
+        select: PRODUCT_CARD_SELECT,
+      }),
+      getBrandsByMtrmark(locale),
+    ]);
+    const byCode = new Map((rows as ProductRow[]).map((row) => [row.code2, row]));
+    return codes
+      .map((code) => byCode.get(code))
+      .filter((row): row is ProductRow => row != null)
+      .map((row) => toCard(row, locale, brands));
+  },
+);
+
+/**
+ * The home page's "ΝΕΕΣ ΑΦΙΞΕΙΣ" band: the newest in-stock products with a
+ * picture, by `firstListedAt` — the same date the new-arrivals page reads.
+ *
+ * On a freshly synced catalogue every product was "first listed" by the same
+ * sync run, minutes apart, so "newest" would just be whatever the sync wrote
+ * last. Until the listing dates span more than a day the band shows the most
+ * expensive in-stock products instead — a stable placeholder, flagged as such.
+ */
+export const getHomeNewArrivals = sharedCatalogue(
+  "home-new-arrivals",
+  FAST,
+  async (
+    locale: Locale,
+    limit = 4,
+  ): Promise<{ products: ProductCardData[]; placeholder: boolean }> => {
+    const where = {
+      isActive: true,
+      inStock: true,
+      priceNet: { gt: 0 },
+      images: { some: { isFeature: true } },
+    } as const;
+
+    const span = await prisma.product.aggregate({
+      where: { isActive: true, firstListedAt: { not: null } },
+      _min: { firstListedAt: true },
+      _max: { firstListedAt: true },
+    });
+    const first = span._min.firstListedAt?.getTime();
+    const last = span._max.firstListedAt?.getTime();
+    const placeholder = first == null || last == null || last - first < 86_400_000;
+
+    const [rows, brands] = await Promise.all([
+      prisma.product.findMany({
+        where: placeholder ? where : { ...where, firstListedAt: { not: null } },
+        orderBy: placeholder
+          ? [{ priceNet: "desc" }, { mtrl: "desc" }]
+          : [{ firstListedAt: "desc" }, { mtrl: "desc" }],
+        take: limit,
+        select: PRODUCT_CARD_SELECT,
+      }),
+      getBrandsByMtrmark(locale),
+    ]);
+
+    return {
+      products: (rows as ProductRow[]).map((row) => toCard(row, locale, brands)),
+      placeholder,
+    };
+  },
+);
+
+/**
+ * Root categories with the number of their sub-groups that have products —
+ * what the home page's category cards are matched against.
+ *
+ * The Greek (ERP) name, whatever the visitor's language, so a card's match does
+ * not depend on how a translator rendered the category.
+ */
+export const getHomeCategorySources = sharedCatalogue(
+  "home-category-sources",
+  SLOW,
+  async (): Promise<Array<{ slug: string; name: string; groups: number }>> => {
+    const roots = await prisma.category.findMany({
+      where: { erpType: "CATEGORY", productCount: { gt: 0 } },
+      orderBy: [{ productCount: "desc" }, { nameEl: "asc" }],
+      select: { id: true, slug: true, nameEl: true },
+    });
+    const counts = await prisma.category.groupBy({
+      by: ["parentId"],
+      where: { parentId: { in: roots.map((r) => r.id) }, productCount: { gt: 0 } },
+      _count: { _all: true },
+    });
+    const byParent = new Map(counts.map((c) => [c.parentId, c._count._all]));
+    return roots.map((root) => ({
+      slug: root.slug,
+      name: root.nameEl,
+      groups: byParent.get(root.id) ?? 0,
+    }));
+  },
+);
+
+/**
+ * The children of one category that have products, with their Greek (ERP)
+ * names — for links that have to find a group by what it is called.
+ */
+export const getCategoryChildren = sharedCatalogue(
+  "category-children",
+  SLOW,
+  async (parentSlug: string): Promise<Array<{ slug: string; name: string }>> => {
+    const rows = await prisma.category.findMany({
+      where: { parent: { slug: parentSlug }, productCount: { gt: 0 } },
+      orderBy: [{ productCount: "desc" }, { nameEl: "asc" }],
+      select: { slug: true, nameEl: true },
+    });
+    return rows.map((row) => ({ slug: row.slug, name: row.nameEl }));
   },
 );
 

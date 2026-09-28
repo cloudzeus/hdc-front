@@ -1,6 +1,5 @@
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { GoogleReviewsBadge } from "@/components/seo/GoogleReviewsBadge";
 import { SHOP } from "@/config/shop";
 import { Link } from "@/i18n/navigation";
 import type { CategoryTile } from "@/lib/catalog/queries";
@@ -23,7 +22,8 @@ const PAYMENTS = ["VISA", "MASTERCARD", "IRIS"] as const;
 const PLATFORMS = [
   { label: "M12", q: "M12" },
   { label: "M18", q: "M18" },
-  { label: "MX FUEL", q: "MX FUEL" },
+  /* The ERP writes the platform as "MXF": a search for "MX FUEL" finds nothing. */
+  { label: "MX FUEL", q: "MXF" },
   { label: "ONE-KEY™", q: "ONE-KEY" },
   { label: "REDLITHIUM™", q: "REDLITHIUM" },
 ] as const;
@@ -154,13 +154,6 @@ export function SiteFooter({ categories }: { categories: CategoryTile[] }) {
           </nav>
         </div>
       </div>
-
-      {/*
-        The Google seller rating floats in the bottom-left corner (the widget's
-        own behaviour, see the component). Mounted from the footer so it
-        appears on storefront pages only, never in /admin.
-      */}
-      <GoogleReviewsBadge />
     </footer>
   );
 }

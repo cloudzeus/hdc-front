@@ -17,18 +17,18 @@ export type HdcNavKey = "battery" | "accessories" | "packout" | "hand" | "offers
 
 export type HdcNavItem = { key: HdcNavKey; href: string };
 
-type Named = { slug: string; name: string };
+export type Named = { slug: string; name: string };
 
 /** Needles are in `searchKey` form: lowercase, no accents, final ς as σ. */
-const has = (name: string, ...needles: string[]) => {
+export const has = (name: string, ...needles: string[]) => {
   const key = searchKey(name);
   return needles.some((needle) => key.includes(needle));
 };
 
-const isAccessories = (c: Named) => has(c.name, "αξεσουαρ", "εξαρτημ", "accessor");
-const isPackout = (c: Named) => has(c.name, "packout");
-const isHand = (c: Named) => has(c.name, "χειροσ", "hand tool");
-const isBattery = (c: Named) =>
+export const isAccessories = (c: Named) => has(c.name, "αξεσουαρ", "εξαρτημ", "accessor");
+export const isPackout = (c: Named) => has(c.name, "packout");
+export const isHand = (c: Named) => has(c.name, "χειροσ", "hand tool");
+export const isBattery = (c: Named) =>
   !isAccessories(c) && !isPackout(c) && !isHand(c) && has(c.name, "μπαταρ", "battery", "cordless");
 
 const categoryHref = (categories: Named[], match: (c: Named) => boolean, fallback: string) => {

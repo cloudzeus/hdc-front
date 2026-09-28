@@ -16,6 +16,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import "./globals.css";
 import { alternatesFor } from "@/lib/seo/urls";
 import { siteJsonLd } from "@/lib/seo/structured-data";
+import { SHOP } from "@/config/shop";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { GoogleTagManager, GoogleTagManagerNoScript } from "@/components/analytics/GoogleTagManager";
 import type { Locale } from "@/i18n/routing";
@@ -82,8 +83,8 @@ export async function generateMetadata(): Promise<Metadata> {
         "KQ3VCyEKM40wz6J0F86WUhuE8kOmtOLKo0K7_aW6jl4",
     },
     title: {
-      default: t("titlos_kolleris_ergaleia_epaggelmatikos"),
-      template: "%s | Kolleris",
+      default: t("titlos_site"),
+      template: `%s | ${SHOP.name}`,
     },
     description: t("perigrafi_epaggelmatika_ergaleia_michanimata"),
     /*
@@ -102,9 +103,9 @@ export async function generateMetadata(): Promise<Metadata> {
      */
     openGraph: {
       type: "website",
-      siteName: "Kolleris",
+      siteName: SHOP.name,
       locale: locale === "el" ? "el_GR" : locale === "it" ? "it_IT" : "en_US",
-      title: t("titlos_kolleris_ergaleia_epaggelmatikos"),
+      title: t("titlos_site"),
       description: t("perigrafi_epaggelmatika_ergaleia_michanimata"),
       /*
        * Χωρίς `url` επίτηδες.
@@ -118,7 +119,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: t("titlos_kolleris_ergaleia_epaggelmatikos"),
+      title: t("titlos_site"),
       description: t("perigrafi_epaggelmatika_ergaleia_michanimata"),
     },
   };
