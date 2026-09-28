@@ -225,6 +225,8 @@ export type ProductCardData = {
    * than after the server refuses it. See `lib/compare/options.ts`.
    */
   scopeKey?: string | null;
+  /** ONE-KEY tool: the card adds a second tag under the platform. */
+  oneKey?: boolean;
 };
 
 const PRODUCT_CARD_SELECT = {

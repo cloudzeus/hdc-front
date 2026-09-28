@@ -1,5 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "@/generated/prisma/client";
+import { Prisma, PrismaClient } from "@/generated/prisma/client";
 
 /**
  * Η δεξαμενή συνδέσεων.
@@ -57,9 +57,31 @@ const createPrismaClient = () =>
 
 const globalForPrisma = globalThis as unknown as {
   prisma?: ReturnType<typeof createPrismaClient>;
+  prismaShape?: string;
 };
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
+/*
+ * The generated client's shape: every model's columns. In dev the client is
+ * kept on `globalThis` across reloads, so after a `prisma generate` the
+ * running server kept the OLD client and rejected the new columns ("Unknown
+ * field") until someone restarted it. A changed shape now replaces it.
+ */
+const shape =
+  process.env.NODE_ENV === "production"
+    ? ""
+    : JSON.stringify(
+        Object.entries(Prisma)
+          .filter(([key]) => key.endsWith("ScalarFieldEnum"))
+          .map(([key, value]) => [key, Object.keys(value as object)]),
+      );
+
+const stale = globalForPrisma.prisma != null && globalForPrisma.prismaShape !== shape;
+if (stale) void globalForPrisma.prisma!.$disconnect().catch(() => {});
+
+export const prisma = (!stale && globalForPrisma.prisma) || createPrismaClient();
 
 // Survive HMR in dev without opening a new pool on every reload.
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = prisma;
+  globalForPrisma.prismaShape = shape;
+}

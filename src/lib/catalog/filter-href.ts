@@ -30,16 +30,25 @@ function finish(basePath: string, next: URLSearchParams): string {
 export function toggleMultiHref(
   basePath: string,
   raw: RawParams,
-  key: "sub" | "brand",
+  key: "sub" | "brand" | "content" | "series" | "avail",
   slug: string,
+  /*
+   * Every value the group has. Ticking the last unticked box selects
+   * everything, which is the same as no filter — so the param goes, rather
+   * than leaving a URL whose boxes all read "on" and filter nothing.
+   */
+  all?: readonly string[],
 ): string {
   const next = toSearchParams(raw);
   const current = new Set((next.get(key) ?? "").split(",").filter(Boolean));
   if (current.has(slug)) current.delete(slug);
   else current.add(slug);
 
-  if (current.size) next.set(key, [...current].join(","));
-  else next.delete(key);
+  const everything = all != null && all.every((value) => current.has(value));
+  if (current.size && !everything) {
+    const ordered = all ? all.filter((value) => current.has(value)) : [...current];
+    next.set(key, ordered.join(","));
+  } else next.delete(key);
   return finish(basePath, next);
 }
 

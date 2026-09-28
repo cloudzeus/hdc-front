@@ -2,6 +2,8 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Image from "next/image";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { FavouriteButton } from "@/components/product/FavouriteButton";
+import { HdcCompareCheckbox } from "@/components/product/HdcCompareCheckbox";
+import { HdcQuickViewButton } from "@/components/product/HdcQuickViewButton";
 import { Link } from "@/i18n/navigation";
 import { favouriteIds } from "@/lib/account/favourite-ids";
 import type { ProductCardData } from "@/lib/catalog/queries";
@@ -31,9 +33,15 @@ import { showsExactQty } from "@/lib/stock-display";
 export async function HdcProductCard({
   product,
   variant = "default",
+  quickView = false,
+  compare,
 }: {
   product: ProductCardData;
   variant?: "default" | "new";
+  /** The 👁 button (listing pages, which mount a `QuickViewProvider`). */
+  quickView?: boolean;
+  /** «Σύγκριση»: whether ticked, and whether it may be ticked at all. */
+  compare?: { selected: boolean; disabled: boolean };
 }) {
   const locale = await getLocale();
   const t = await getTranslations("product.HdcProductCard");
@@ -74,9 +82,14 @@ export async function HdcProductCard({
             {tag}
           </span>
         )}
+        {/* A second tag under the platform, as in the mockup's ONE-KEY cards. */}
+        {!isNew && product.oneKey && (
+          <span className="hdc-slant hdc-card-tag hdc-card-tag--k1">ONE-KEY</span>
+        )}
         {!isNew && (
           <FavouriteButton productId={product.id} initial={favourite} className="hdc-card-fav" />
         )}
+        {quickView && <HdcQuickViewButton slug={product.slug} label={t("grigori_provoli")} />}
         <Link href={href} className="hdc-card-media" prefetch={false} tabIndex={-1} aria-hidden>
           {product.image ? (
             <Image
@@ -119,6 +132,14 @@ export async function HdcProductCard({
                 : t("se_apothema")
               : t("paradosi_1_3")}
           </p>
+        )}
+        {compare && (
+          <HdcCompareCheckbox
+            slug={product.slug}
+            selected={compare.selected}
+            disabled={compare.disabled}
+            label={t("sygkrisi")}
+          />
         )}
         <AddToCartButton
           productId={product.id}

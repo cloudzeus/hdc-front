@@ -1,0 +1,945 @@
+/*
+ * HDC listing pages: the category page and the search results.
+ *
+ * Ported from docs/design/mockups/plp.html (desktop and the two phone frames)
+ * and section 2 of search.html (.rband and its platform control). Class names
+ * carry the hdc- prefix; every font size is a fluid --fs-* token.
+ *
+ * Breakpoints: the filter column from 1024px; below it the filters live in
+ * the bottom sheet behind the sticky bar, with three cards a row on tablets
+ * and two on phones (below 768px).
+ */
+
+@layer components {
+  .hdc-plp-page {
+    font-family: var(--hdc-font);
+    font-size: var(--fs-15);
+    line-height: normal;
+    color: var(--hdc-ink);
+    background: #fff;
+  }
+  .hdc-plp-page a:focus-visible,
+  .hdc-plp-page button:focus-visible,
+  .hdc-plp-page select:focus-visible,
+  .hdc-plp-page input:focus-visible,
+  .hdc-plp-page summary:focus-visible {
+    outline: 2px solid var(--hdc-ink);
+    outline-offset: 2px;
+  }
+
+  /* ── Breadcrumb (.crumb) ─────────────────────────────────────────────── */
+  .hdc-crumb {
+    display: flex;
+    align-items: center;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    font-size: var(--fs-13);
+  }
+  .hdc-crumb a {
+    color: var(--hdc-red);
+  }
+  .hdc-crumb a:hover {
+    text-decoration: underline;
+  }
+  .hdc-crumb i {
+    margin: 0 8px;
+    font-style: normal;
+    color: var(--hdc-g5);
+  }
+
+  /* ── Category band (.band) ───────────────────────────────────────────── */
+  .hdc-band,
+  .hdc-rband {
+    background-color: var(--hdc-graph);
+    background-image: repeating-linear-gradient(
+      115deg,
+      rgba(219, 1, 28, 0.1) 0 3px,
+      transparent 3px 26px
+    );
+    color: #fff;
+  }
+  .hdc-band > .hdc-wrap {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: 30px;
+    align-items: center;
+    min-height: 250px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+  .hdc-band h1 {
+    margin: 0 0 12px;
+    font-size: var(--fs-54);
+    overflow-wrap: anywhere;
+  }
+  .hdc-band p {
+    max-width: 620px;
+    margin: 0;
+    font-size: var(--fs-16);
+    line-height: 1.55;
+    color: #cfcfcf;
+  }
+  .hdc-band-stats {
+    display: flex;
+    gap: 26px;
+    margin-top: 18px;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-13);
+    letter-spacing: 0.05em;
+    color: #bdbdbd;
+  }
+  .hdc-band-stats b {
+    display: block;
+    font-weight: 900;
+    font-stretch: 125%;
+    font-size: var(--fs-22);
+    letter-spacing: 0;
+    color: #fff;
+  }
+  .hdc-band-img {
+    display: block;
+    max-width: 100%;
+    max-height: 230px;
+    margin-left: auto;
+  }
+
+  /* ── Groups strip (.groups) ──────────────────────────────────────────── */
+  .hdc-groups {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 18px 0 4px;
+    scrollbar-width: thin;
+  }
+  .hdc-groups a {
+    flex: 0 0 auto;
+    padding: 10px 14px;
+    border: 1px solid var(--hdc-g3);
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-13);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    transition: border-color 0.15s;
+  }
+  .hdc-groups a:hover {
+    border-color: var(--hdc-ink);
+  }
+  .hdc-groups a.is-on {
+    padding: 9px 13px;
+    border: 2px solid var(--hdc-ink);
+  }
+
+  /* ── Search band (.rband) ────────────────────────────────────────────── */
+  .hdc-rband > .hdc-wrap {
+    padding-top: 30px;
+    padding-bottom: 30px;
+  }
+  .hdc-rband h1 {
+    margin: 0;
+    font-size: var(--fs-44);
+    overflow-wrap: anywhere;
+  }
+  .hdc-rband-k {
+    margin: 0 0 8px;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-13);
+    letter-spacing: 0.08em;
+    color: #aaa;
+  }
+  .hdc-rband-m {
+    margin: 12px 0 0;
+    font-stretch: 87.5%;
+    font-weight: 500;
+    font-size: var(--fs-15);
+    color: #cfcfcf;
+  }
+  .hdc-rband-m b {
+    color: #fff;
+  }
+
+  /* ── Platform control (.plat) ────────────────────────────────────────── */
+  .hdc-pfc-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin: 18px 0 6px;
+  }
+  .hdc-pfc--search .hdc-pfc-grid {
+    margin-top: 22px;
+  }
+  .hdc-pfc-grid > * {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 12px 14px;
+    border: 2px solid var(--hdc-ink);
+    transition: background-color 0.15s, color 0.15s;
+  }
+  .hdc-pfc-grid b {
+    font-weight: 900;
+    font-stretch: 150%;
+    font-size: var(--fs-26);
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+  .hdc-pfc--search .hdc-pfc-grid b {
+    font-size: var(--fs-24);
+  }
+  .hdc-pfc-grid span {
+    font-stretch: 87.5%;
+    font-weight: 500;
+    font-size: var(--fs-13);
+    color: var(--hdc-g5);
+    text-align: right;
+  }
+  .hdc-pfc--search .hdc-pfc-grid span {
+    font-size: var(--fs-14);
+  }
+  .hdc-pfc-grid a:hover {
+    background: var(--hdc-g1);
+  }
+  .hdc-pfc-grid .is-on,
+  .hdc-pfc-grid .is-on:hover {
+    background: var(--hdc-red);
+    border-color: var(--hdc-red);
+    color: #fff;
+  }
+  .hdc-pfc-grid .is-on span {
+    color: #ffe1e3;
+  }
+  /* Search results: the chosen platform is black (search.html). */
+  .hdc-pfc--search .hdc-pfc-grid .is-on,
+  .hdc-pfc--search .hdc-pfc-grid .is-on:hover {
+    background: var(--hdc-ink);
+    border-color: var(--hdc-ink);
+  }
+  .hdc-pfc--search .hdc-pfc-grid .is-on span {
+    color: #bbb;
+  }
+  .hdc-pfc-grid .is-off {
+    border-color: var(--hdc-g3);
+    color: #b5b5b5;
+    cursor: default;
+  }
+  .hdc-pfc-grid .is-off span {
+    color: #b5b5b5;
+  }
+
+  /* Phones: the platforms as chips (.pchips). */
+  .hdc-pchips {
+    display: none;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 12px 0 10px;
+    scrollbar-width: none;
+  }
+  .hdc-pchips > * {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 5px 10px;
+    border: 2px solid var(--hdc-ink);
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-12);
+    white-space: nowrap;
+  }
+  .hdc-pchips .is-on {
+    background: var(--hdc-red);
+    border-color: var(--hdc-red);
+    color: #fff;
+  }
+  .hdc-pfc--search .hdc-pchips .is-on {
+    background: var(--hdc-ink);
+    border-color: var(--hdc-ink);
+  }
+  .hdc-pchips .is-off {
+    border-color: var(--hdc-g3);
+    color: #b5b5b5;
+  }
+
+  /* ── Body: filters + results (.body) ─────────────────────────────────── */
+  .hdc-plp-body {
+    display: grid;
+    grid-template-columns: 270px minmax(0, 1fr);
+    gap: 28px;
+    padding: 18px 0 40px;
+  }
+  .hdc-pfc--search + .hdc-plp-body {
+    grid-template-columns: 260px minmax(0, 1fr);
+    padding-bottom: 50px;
+  }
+  .hdc-plp-main {
+    min-width: 0;
+  }
+
+  /* ── Filters (.filters / .fg) ────────────────────────────────────────── */
+  .hdc-filters-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 10px;
+    border-bottom: 4px solid var(--hdc-ink);
+    font-weight: 800;
+    font-stretch: 120%;
+    font-size: var(--fs-14);
+  }
+  .hdc-filters-head a {
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-12);
+    letter-spacing: 0.04em;
+    color: var(--hdc-red);
+  }
+  .hdc-filters-head a:hover {
+    text-decoration: underline;
+  }
+  .hdc-fg {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--hdc-g3);
+  }
+  .hdc-fg > summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    list-style: none;
+    cursor: pointer;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-14);
+    letter-spacing: 0.05em;
+  }
+  .hdc-fg > summary::-webkit-details-marker {
+    display: none;
+  }
+  .hdc-fg > summary::after {
+    content: "⌃";
+    color: var(--hdc-red);
+    transition: transform 0.15s;
+  }
+  .hdc-fg:not([open]) > summary {
+    margin-bottom: 0;
+  }
+  .hdc-fg:not([open]) > summary::after {
+    transform: rotate(180deg);
+  }
+  .hdc-fopt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 32px;
+    padding: 5px 0;
+    font-stretch: 87.5%;
+    font-weight: 400;
+    font-size: var(--fs-15);
+  }
+  .hdc-fopt > i {
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--hdc-ink);
+  }
+  .hdc-fopt > i.on {
+    background: var(--hdc-red);
+    border-color: var(--hdc-red);
+    box-shadow: inset 0 0 0 3px #fff;
+  }
+  a.hdc-fopt:hover .hdc-fopt-label {
+    text-decoration: underline;
+  }
+  .hdc-fopt.is-off {
+    opacity: 0.45;
+    cursor: default;
+  }
+  .hdc-fopt-label {
+    min-width: 0;
+  }
+  .hdc-fopt-count {
+    margin-left: auto;
+    padding-left: 8px;
+    font-size: var(--fs-13);
+    color: var(--hdc-g5);
+  }
+  .hdc-fdot {
+    flex: 0 0 auto;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+  }
+  .hdc-fdot--ok {
+    background: var(--hdc-ok);
+  }
+  .hdc-fdot--wait {
+    background: var(--hdc-wait);
+  }
+
+  /* ΤΙΜΗ (.range + .bar) */
+  .hdc-range {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hdc-range-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 44px;
+    padding: 0 10px;
+    border: 1px solid var(--hdc-g3);
+    font-size: var(--fs-15);
+    cursor: text;
+  }
+  .hdc-range-box input {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    padding: 0;
+    background: none;
+    font: inherit;
+    color: inherit;
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+  .hdc-range-box input::-webkit-outer-spin-button,
+  .hdc-range-box input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .hdc-bar {
+    position: relative;
+    height: 4px;
+    margin: 20px 9px 10px;
+    background: var(--hdc-g3);
+  }
+  .hdc-bar > i {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: var(--hdc-red);
+  }
+  .hdc-bar input[type="range"] {
+    position: absolute;
+    left: -9px;
+    top: -7px;
+    width: calc(100% + 18px);
+    height: 18px;
+    margin: 0;
+    background: none;
+    pointer-events: none;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .hdc-bar input[type="range"]::-webkit-slider-runnable-track {
+    background: none;
+    border: 0;
+  }
+  .hdc-bar input[type="range"]::-moz-range-track {
+    background: none;
+    border: 0;
+  }
+  .hdc-bar input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 3px solid var(--hdc-red);
+    border-radius: 0;
+    background: #fff;
+    cursor: grab;
+    pointer-events: auto;
+  }
+  .hdc-bar input[type="range"]::-moz-range-thumb {
+    box-sizing: border-box;
+    width: 18px;
+    height: 18px;
+    border: 3px solid var(--hdc-red);
+    border-radius: 0;
+    background: #fff;
+    cursor: grab;
+    pointer-events: auto;
+  }
+
+  /* ── Toolbar (.toolbar / .chip / .sort) ──────────────────────────────── */
+  .hdc-toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--hdc-g3);
+  }
+  .hdc-toolbar-count {
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-14);
+    letter-spacing: 0.04em;
+  }
+  .hdc-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    background: var(--hdc-ink);
+    color: #fff;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-12);
+    letter-spacing: 0.04em;
+    transition: background-color 0.15s;
+  }
+  .hdc-chip b {
+    font-weight: 400;
+    color: #bbb;
+  }
+  .hdc-chip:hover {
+    background: var(--hdc-red);
+  }
+  .hdc-chip:hover b {
+    color: #fff;
+  }
+  .hdc-sort {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-13);
+  }
+  .hdc-sort-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-width: 210px;
+    height: 44px;
+    border: 1px solid var(--hdc-g3);
+    font-stretch: 100%;
+    font-weight: 400;
+    font-size: var(--fs-15);
+  }
+  .hdc-sort-box select {
+    flex: 1;
+    height: 100%;
+    padding: 0 34px 0 12px;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .hdc-sort-box > span {
+    position: absolute;
+    right: 12px;
+    pointer-events: none;
+  }
+
+  /* ── Grid ────────────────────────────────────────────────────────────── */
+  .hdc-plp-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  /* ── Load more (.more) ───────────────────────────────────────────────── */
+  .hdc-more {
+    margin-top: 26px;
+    text-align: center;
+  }
+  .hdc-more p {
+    margin: 0 0 8px;
+    font-stretch: 87.5%;
+    font-weight: 500;
+    font-size: var(--fs-13);
+    color: var(--hdc-g5);
+  }
+  .hdc-more-bar {
+    width: 280px;
+    max-width: 100%;
+    height: 4px;
+    margin: 0 auto 16px;
+    background: var(--hdc-g3);
+  }
+  .hdc-more-bar i {
+    display: block;
+    height: 100%;
+    background: var(--hdc-ink);
+  }
+  .hdc-more-btn {
+    display: inline-block;
+    padding: 13px 28px;
+    border: 2px solid var(--hdc-ink);
+    font-weight: 800;
+    font-stretch: 110%;
+    font-size: var(--fs-13);
+    letter-spacing: 0.05em;
+    transition: background-color 0.15s, color 0.15s;
+  }
+  .hdc-more-btn:hover {
+    background: var(--hdc-ink);
+    color: #fff;
+  }
+
+  /* ── No product under these filters ──────────────────────────────────── */
+  .hdc-plp-empty {
+    padding: 60px 24px;
+    background: var(--hdc-g1);
+    text-align: center;
+  }
+  .hdc-plp-empty .hdc-disp {
+    margin: 0 0 8px;
+    font-size: var(--fs-24);
+  }
+  .hdc-plp-empty p {
+    margin: 0 0 20px;
+    color: var(--hdc-g7);
+  }
+
+  /* ── Exact code (search) ─────────────────────────────────────────────── */
+  .hdc-exact {
+    padding-top: 22px;
+  }
+  .hdc-exact-k {
+    margin: 0 0 10px;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-13);
+    letter-spacing: 0.08em;
+    color: var(--hdc-red);
+  }
+  .hdc-exact-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 18px;
+    padding: 14px;
+    border: 2px solid var(--hdc-ink);
+  }
+  .hdc-exact-img {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+  }
+  .hdc-exact-img img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+  }
+  .hdc-exact-main {
+    flex: 1;
+    min-width: 200px;
+  }
+  .hdc-exact-name {
+    font-weight: 800;
+    font-stretch: 120%;
+    font-size: var(--fs-16);
+  }
+  .hdc-exact-name:hover {
+    color: var(--hdc-red);
+  }
+  .hdc-exact-code {
+    margin: 4px 0 0;
+    font-stretch: 87.5%;
+    font-size: var(--fs-13);
+    color: var(--hdc-g5);
+  }
+  .hdc-exact-price {
+    text-align: right;
+  }
+  .hdc-exact-price p {
+    margin: 0;
+    font-stretch: 87.5%;
+    font-weight: 500;
+    font-size: var(--fs-13);
+  }
+  .hdc-exact-price p:first-child {
+    font-weight: 900;
+    font-stretch: 125%;
+    font-size: var(--fs-22);
+    letter-spacing: -0.02em;
+  }
+
+  /* ── No results (search) ─────────────────────────────────────────────── */
+  .hdc-zero {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+  .hdc-zero h2 {
+    margin: 0 0 14px;
+    font-size: var(--fs-40);
+  }
+  .hdc-zero > p {
+    max-width: 640px;
+    margin: 0;
+    font-size: var(--fs-16);
+    line-height: 1.55;
+    color: var(--hdc-g7);
+  }
+  .hdc-zero ul {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin: 26px 0;
+    padding: 0;
+    list-style: none;
+  }
+  .hdc-zero li {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px;
+    background: var(--hdc-g1);
+    font-size: var(--fs-14);
+    line-height: 1.5;
+  }
+  .hdc-zero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  /* ── Phones and tablets: sticky bar and sheet ────────────────────────── */
+  .hdc-mbar {
+    display: none;
+  }
+  .hdc-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    font-family: var(--hdc-font);
+    font-size: var(--fs-15);
+    color: var(--hdc-ink);
+  }
+  .hdc-sheet-scrim {
+    position: absolute;
+    inset: 0;
+    border: 0;
+    background: rgba(10, 10, 10, 0.55);
+  }
+  .hdc-sheet-panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 90px;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+  }
+  .hdc-sheet-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px;
+    border-bottom: 4px solid var(--hdc-ink);
+    font-weight: 800;
+    font-stretch: 120%;
+    font-size: var(--fs-15);
+  }
+  .hdc-sheet-top button {
+    width: 44px;
+    height: 44px;
+    margin: -10px -10px -10px 0;
+    border: 0;
+    background: none;
+    font-size: var(--fs-22);
+    cursor: pointer;
+  }
+  .hdc-sheet-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 14px;
+    overscroll-behavior: contain;
+  }
+  .hdc-sheet-body .hdc-fopt {
+    min-height: 44px;
+  }
+  .hdc-sheet-apply {
+    flex: 0 0 auto;
+    height: 56px;
+    border: 0;
+    background: var(--hdc-red);
+    color: #fff;
+    font-family: var(--hdc-font);
+    font-weight: 800;
+    font-stretch: 110%;
+    font-size: var(--fs-15);
+    letter-spacing: 0.04em;
+    cursor: pointer;
+  }
+
+  @media (max-width: 1279px) {
+    .hdc-plp-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .hdc-plp-page {
+      padding-bottom: 52px;
+    }
+    .hdc-band > .hdc-wrap {
+      grid-template-columns: minmax(0, 1fr) 260px;
+    }
+    .hdc-plp-body,
+    .hdc-pfc--search + .hdc-plp-body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .hdc-filters {
+      display: none;
+    }
+    .hdc-toolbar .hdc-sort {
+      display: none;
+    }
+    .hdc-mbar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 45;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-top: 1px solid var(--hdc-g3);
+      font-family: var(--hdc-font);
+    }
+    .hdc-mbar-filters,
+    .hdc-mbar-sort {
+      position: relative;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      font-family: var(--hdc-font);
+      font-weight: 800;
+      font-stretch: 110%;
+      font-size: var(--fs-13);
+      letter-spacing: 0.04em;
+      cursor: pointer;
+    }
+    .hdc-mbar-filters {
+      background: var(--hdc-ink);
+      color: #fff;
+    }
+    .hdc-mbar-sort {
+      background: #fff;
+      color: var(--hdc-ink);
+      border-left: 1px solid var(--hdc-g3);
+    }
+    /* The phone's own picker opens from anywhere on the button. */
+    .hdc-mbar-sort select {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .hdc-crumb {
+      display: none;
+    }
+    /* The phone frame: a plain title on white, no band. */
+    .hdc-band {
+      background: #fff;
+      color: var(--hdc-ink);
+    }
+    .hdc-band > .hdc-wrap {
+      display: block;
+      min-height: 0;
+      padding-top: 10px;
+      padding-bottom: 0;
+    }
+    .hdc-band h1 {
+      margin: 0;
+      font-size: var(--fs-30);
+    }
+    .hdc-band p,
+    .hdc-band-stats,
+    .hdc-band-img {
+      display: none;
+    }
+    .hdc-rband > .hdc-wrap {
+      padding-top: 18px;
+      padding-bottom: 18px;
+    }
+    .hdc-groups {
+      padding-top: 10px;
+      gap: 8px;
+      scrollbar-width: none;
+    }
+    .hdc-groups a {
+      padding: 9px 12px;
+      font-size: var(--fs-12);
+    }
+    .hdc-groups a.is-on {
+      padding: 8px 11px;
+    }
+    .hdc-pfc-grid {
+      display: none;
+    }
+    .hdc-pchips {
+      display: flex;
+    }
+    .hdc-plp-body {
+      padding-top: 6px;
+    }
+    .hdc-toolbar {
+      gap: 8px;
+    }
+    .hdc-plp-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .hdc-plp-grid .hdc-card-body {
+      padding: 8px;
+    }
+    .hdc-plp-grid .hdc-card-name {
+      min-height: 30px;
+      font-size: var(--fs-12);
+    }
+    .hdc-plp-grid .hdc-card-price {
+      font-size: var(--fs-17);
+    }
+    .hdc-plp-grid .hdc-card-avail {
+      margin-bottom: 0;
+    }
+    .hdc-plp-grid .hdc-card-tag {
+      font-size: var(--fs-9);
+    }
+    .hdc-exact-price {
+      text-align: left;
+    }
+    .hdc-zero ul {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+}
+
+/*
+ * Phone cards as in the frame: tag, photo, name, price, availability.
+ * Unlayered on purpose: the heart carries Tailwind utilities (`flex`), and a
+ * utility beats anything inside @layer components.
+ */
+@media (max-width: 767px) {
+  .hdc-plp-grid .hdc-card-code,
+  .hdc-plp-grid .hdc-card-fav,
+  .hdc-plp-grid .hdc-card-qv,
+  .hdc-plp-grid .hdc-card-cmp,
+  .hdc-plp-grid .hdc-card-add,
+  .hdc-plp-grid .hdc-card-tag--k1 {
+    display: none;
+  }
+}

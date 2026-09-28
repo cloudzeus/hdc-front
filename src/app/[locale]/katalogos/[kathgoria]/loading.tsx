@@ -1,1 +1,1 @@
-export { PlpSkeleton as default } from "@/components/skeleton/PlpSkeleton";
+export { HdcPlpSkeleton as default } from "@/components/skeleton/HdcPlpSkeleton";

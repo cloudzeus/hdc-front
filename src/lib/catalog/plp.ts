@@ -8,6 +8,22 @@ import type { Locale } from "@/i18n/routing";
 import { nameWithoutSize } from "@/lib/catalog/variant-name";
 import { scopeKeyOf } from "@/lib/compare/options";
 import { searchKey } from "@/lib/greek";
+import { DEFAULT_VAT_RATE } from "@/lib/format";
+import {
+  contentCounts,
+  grossToNet,
+  hdcFilterClauses,
+  parseAvail,
+  parseContent,
+  parsePlatform,
+  parseSeries,
+  platformCounts,
+  seriesCounts,
+  stockClause,
+  type Content,
+  type Platform,
+  type Series,
+} from "@/lib/catalog/hdc-filters";
 import type { ProductCardData } from "@/lib/catalog/queries";
 import {
   PER_PAGE_OPTIONS,
@@ -37,19 +53,36 @@ export type PlpParams = {
   brand?: string[];
   min?: number;
   max?: number;
-  avail?: "in-stock" | "all";
+  /** `order` = the products NOT in stock («Παράδοση 1–3 εργάσιμες»). */
+  avail?: "in-stock" | "order" | "all";
   sale?: boolean;
   isNew?: boolean;
   q?: string;
   sort?: SortValue;
   page?: number;
   perPage?: number;
+  /** Milwaukee filters — see `hdc-filters.ts`. */
+  platform?: Platform;
+  content?: Content[];
+  series?: Series[];
+  /**
+   * «Περισσότερα προϊόντα»: `page` N shows pages 1..N together rather than
+   * page N alone, so the URL keeps how far the visitor got.
+   */
+  cumulative?: boolean;
 };
 
 /** Parses raw `searchParams` into a typed, clamped shape. */
 export function parsePlpParams(
   raw: Record<string, string | string[] | undefined>,
-  scope: { categorySlug?: string; brandScopeSlug?: string } = {},
+  scope: {
+    categorySlug?: string;
+    brandScopeSlug?: string;
+    /** The HDC pages: `min`/`max` are euros WITH VAT, as the cards print them. */
+    grossPrices?: boolean;
+    /** The HDC pages: load-more paging (see `PlpParams.cumulative`). */
+    cumulative?: boolean;
+  } = {},
 ): PlpParams {
   const list = (v: string | string[] | undefined): string[] | undefined => {
     if (v == null) return undefined;
@@ -72,14 +105,21 @@ export function parsePlpParams(
     ? (perPageRaw as number)
     : 24;
 
+  const price = (v: number | undefined) =>
+    v == null ? undefined : scope.grossPrices ? grossToNet(v, DEFAULT_VAT_RATE) : v;
+
   return {
     categorySlug: scope.categorySlug,
     brandScopeSlug: scope.brandScopeSlug,
     sub: list(raw.sub),
     brand: list(raw.brand),
-    min: num(raw.min),
-    max: num(raw.max),
-    avail: raw.avail === "in-stock" ? "in-stock" : "all",
+    min: price(num(raw.min)),
+    max: price(num(raw.max)),
+    avail: parseAvail(raw.avail),
+    platform: parsePlatform(raw.platform),
+    content: parseContent(raw.content),
+    series: parseSeries(raw.series),
+    cumulative: scope.cumulative,
     sale: raw.sale === "1",
     isNew: raw.new === "1",
     q: (Array.isArray(raw.q) ? raw.q[0] : raw.q)?.trim() || undefined,
@@ -247,7 +287,7 @@ async function resolveFilters(params: PlpParams): Promise<ResolvedFilters | null
 function buildWhere(
   params: PlpParams,
   filters: ResolvedFilters,
-  exclude?: "brand" | "sub" | "price" | "avail",
+  exclude?: "brand" | "sub" | "price" | "avail" | "platform" | "content" | "series",
   /*
    * An outer scope the params cannot express.
    *
@@ -294,7 +334,11 @@ function buildWhere(
     });
   }
 
-  if (exclude !== "avail" && params.avail === "in-stock") and.push({ inStock: true });
+  if (exclude !== "avail") {
+    const stock = stockClause(params.avail);
+    if (stock) and.push(stock);
+  }
+  and.push(...hdcFilterClauses(params, exclude));
   /*
    * "Με προσφορά" means a live CAMPAIGN, not `onSale`.
    *
@@ -310,9 +354,15 @@ function buildWhere(
   if (params.sale) and.push(filters.campaigns ?? { id: { in: [] } });
   if (params.isNew) and.push({ isNew: true });
 
+  /*
+   * Words, not a phrase: «κρουστικό δραπανοκατσάβιδο» must also find the names
+   * written «ΔΡΑΠΑΝΟΚΑΤΣΑΒΙΔΟ ΚΡΟΥΣΤΙΚΟ» — half the catalogue is written that
+   * way round, and the phrase found 8 of 13.
+   */
   if (params.q) {
-    const key = searchKey(params.q);
-    and.push({ searchKey: { contains: key } });
+    for (const word of new Set(searchKey(params.q).split(" ").filter(Boolean))) {
+      and.push({ searchKey: { contains: word } });
+    }
   }
 
   return { AND: and };
@@ -357,6 +407,7 @@ const CARD_SELECT = {
   /* Μία ετικέτα αρκεί: ένας κωδικός είναι ΕΝΑ νούμερο, και η ομάδα χτίζεται
      πάνω σε αυτή την παραδοχή. */
   sizes: { select: { label: true }, orderBy: { order: "asc" }, take: 1 },
+  isOneKey: true,
 } as const;
 
 function num(value: unknown): number | null {
@@ -385,14 +436,16 @@ export async function getPlpData(
 
   const where = buildWhere(params, filters, undefined, extraWhere);
   const perPage = params.perPage ?? 24;
-  const page = params.page ?? 1;
+  // Load-more renders pages 1..N at once; 60 pages (1.440 cards) is the most
+  // one request will draw, whatever the URL says.
+  const page = params.cumulative ? Math.min(params.page ?? 1, 60) : (params.page ?? 1);
 
   const [rows, total, linkedBrands] = await Promise.all([
     prisma.product.findMany({
       where,
       orderBy: orderBy(params.sort ?? "relevance"),
-      skip: (page - 1) * perPage,
-      take: perPage,
+      skip: params.cumulative ? 0 : (page - 1) * perPage,
+      take: params.cumulative ? page * perPage : perPage,
       select: CARD_SELECT,
     }),
     prisma.product.count({ where }),
@@ -425,6 +478,7 @@ export async function getPlpData(
       qty: num(row.qty) ?? 0,
       inStock: row.inStock,
       scopeKey: scopeKeyOf(row),
+      oneKey: row.isOneKey,
     };
   });
 
@@ -455,10 +509,13 @@ type FacetKey = {
   brand: string[] | null;
   min: number | null;
   max: number | null;
-  avail: "in-stock" | "all";
+  avail: "in-stock" | "order" | "all";
   sale: boolean;
   isNew: boolean;
   q: string | null;
+  platform: Platform | null;
+  content: Content[] | null;
+  series: Series[] | null;
 };
 
 function facetKeyOf(params: PlpParams): FacetKey {
@@ -469,10 +526,13 @@ function facetKeyOf(params: PlpParams): FacetKey {
     brand: params.brand?.length ? [...params.brand].sort() : null,
     min: params.min ?? null,
     max: params.max ?? null,
-    avail: params.avail === "in-stock" ? "in-stock" : "all",
+    avail: params.avail ?? "all",
     sale: Boolean(params.sale),
     isNew: Boolean(params.isNew),
     q: params.q || null,
+    platform: params.platform ?? null,
+    content: params.content?.length ? [...params.content] : null,
+    series: params.series?.length ? [...params.series] : null,
   };
 }
 
@@ -488,6 +548,9 @@ function paramsOfFacetKey(key: FacetKey): PlpParams {
     sale: key.sale,
     isNew: key.isNew,
     q: key.q ?? undefined,
+    platform: key.platform ?? undefined,
+    content: key.content ?? undefined,
+    series: key.series ?? undefined,
   };
 }
 
@@ -497,6 +560,11 @@ const NO_FACETS: PlpFacets = {
   availability: [],
   priceBounds: { min: 0, max: 0 },
   flags: { sale: 0, isNew: 0 },
+  platforms: { all: 0, M12: 0, M18: 0, MX: 0 },
+  content: { bare: 0, kit: 0 },
+  series: { fuel: 0, onekey: 0, basic: 0 },
+  stock: { inStock: 0, order: 0 },
+  models: 0,
 };
 
 /**
@@ -545,6 +613,9 @@ const getFacets = sharedCatalogue(
     const whereForSubs = buildWhere(params, filters, "sub", extraWhere);
     const whereForPrice = buildWhere(params, filters, "price", extraWhere);
     const whereForAvail = buildWhere(params, filters, "avail", extraWhere);
+    const whereForPlatform = buildWhere(params, filters, "platform", extraWhere);
+    const whereForContent = buildWhere(params, filters, "content", extraWhere);
+    const whereForSeries = buildWhere(params, filters, "series", extraWhere);
 
     /*
      * Which nodes the facet offers depends on where we are:
@@ -569,7 +640,9 @@ const getFacets = sharedCatalogue(
     } as const;
     const childRows = parent
       ? await prisma.category.findMany({ where: { parentId: parent.id }, select: childSelect })
-      : params.brandScopeSlug
+      : /* Search results are narrowed by category the same way («ΚΑΤΗΓΟΡΙΑ»,
+           search.html section 2). */
+        params.brandScopeSlug || params.q
         ? await prisma.category.findMany({
             where: { erpType: "CATEGORY", productCount: { gt: 0 } },
             select: childSelect,
@@ -615,6 +688,23 @@ const getFacets = sharedCatalogue(
           ? prisma.product.count({ where: { AND: [whereForBrands, campaigns] } })
           : 0,
       ),
+    ]);
+
+    /* The Milwaukee filters, and on search the number of distinct models. */
+    const [byPlatform, byContent, bySeries, byModel] = await Promise.all([
+      prisma.product.groupBy({ by: ["platform"], where: whereForPlatform, _count: { _all: true } }),
+      prisma.product.groupBy({ by: ["modelContent"], where: whereForContent, _count: { _all: true } }),
+      prisma.product.groupBy({
+        by: ["isFuel", "isOneKey"],
+        where: whereForSeries,
+        _count: { _all: true },
+      }),
+      params.q
+        ? prisma.product.groupBy({
+            by: ["modelRoot"],
+            where: { AND: [buildWhere(params, filters, undefined, extraWhere), { modelRoot: { not: null } }] },
+          })
+        : Promise.resolve([]),
     ]);
 
     let newCount = 0;
@@ -696,6 +786,29 @@ const getFacets = sharedCatalogue(
         max: Math.ceil(num(priceAgg._max.priceNet) ?? 0),
       },
       flags: { sale: saleCount, isNew: newCount },
+      platforms: platformCounts(byPlatform),
+      content: contentCounts(byContent),
+      series: seriesCounts(bySeries),
+      stock: { inStock: inStockCount, order: allCount - inStockCount },
+      models: byModel.length,
     };
   },
 );
+
+/**
+ * The listing's scope before any filter — what the HDC category band counts
+ * (groups, products, platforms) and what the search band describes.
+ *
+ * The same cached facet set a filter-free visit renders, so on the plain
+ * category page it costs nothing extra.
+ */
+export async function getPlpSummary(
+  scope: { categorySlug?: string; q?: string },
+  locale: Locale,
+): Promise<PlpFacets> {
+  return getFacets(
+    facetKeyOf({ categorySlug: scope.categorySlug, q: scope.q, avail: "all" }),
+    locale,
+    null,
+  );
+}

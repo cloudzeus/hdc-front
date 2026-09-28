@@ -64,6 +64,75 @@
     z-index: 1;
   }
 
+  /* ONE-KEY: a white slant under the platform tag (plp.html `.k1`). */
+  .hdc-card-tag--k1 {
+    top: 40px;
+    font-size: var(--fs-10);
+    background: #fff;
+    color: var(--hdc-ink);
+    border: 1px solid var(--hdc-g3);
+  }
+  /* Quick view: under the heart (plp.html `.qv`). */
+  .hdc-card-qv {
+    position: absolute;
+    right: 8px;
+    top: 46px;
+    z-index: 1;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--hdc-g3);
+    background: #fff;
+    color: var(--hdc-ink);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .hdc-card-qv:hover {
+    border-color: var(--hdc-ink);
+    color: var(--hdc-red);
+  }
+
+  /* «Σύγκριση» (plp.html `.cmp`). */
+  .hdc-card-cmp {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 0 8px;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: var(--hdc-font);
+    font-stretch: 87.5%;
+    font-weight: 500;
+    font-size: var(--fs-12);
+    color: var(--hdc-g7);
+    cursor: pointer;
+    text-align: left;
+  }
+  .hdc-card-cmp i {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 auto;
+    border: 2px solid var(--hdc-g5);
+  }
+  .hdc-card-cmp i.on {
+    background: var(--hdc-red);
+    border-color: var(--hdc-red);
+    box-shadow: inset 0 0 0 2px #fff;
+  }
+  .hdc-card-cmp:hover {
+    color: var(--hdc-ink);
+  }
+  .hdc-card-cmp:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  .hdc-card-body:has(.hdc-card-cmp) .hdc-card-avail {
+    margin-bottom: 8px;
+  }
+
   .hdc-card-body {
     display: flex;
     flex: 1;

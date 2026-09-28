@@ -92,7 +92,11 @@ export { request as hdctoolRequest };
 async function request<T>(
   endpoint: string,
   body?: unknown,
-  { method = "POST", retryOn401 = true }: { method?: string; retryOn401?: boolean } = {},
+  {
+    method = "POST",
+    retryOn401 = true,
+    timeoutMs = REQUEST_TIMEOUT_MS,
+  }: { method?: string; retryOn401?: boolean; timeoutMs?: number } = {},
 ): Promise<T> {
   const token = await getToken();
 
@@ -104,12 +108,12 @@ async function request<T>(
     },
     body: method === "GET" ? undefined : JSON.stringify(body ?? {}),
     cache: "no-store",
-    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    signal: AbortSignal.timeout(timeoutMs),
   });
 
   if (response.status === 401 && retryOn401) {
     cachedToken = null;
-    return request<T>(endpoint, body, { method, retryOn401: false });
+    return request<T>(endpoint, body, { method, retryOn401: false, timeoutMs });
   }
 
   if (!response.ok) {
@@ -275,6 +279,22 @@ export type HdctoolCategory = {
   heroImage: string | null;
 };
 
+/**
+ * A node of HDCtool's Milwaukee category tree (`/api/public/milwaukee-categories`):
+ * the same ERP codes as the eshop taxonomy, with Milwaukee's own names and
+ * photos.
+ */
+export type HdctoolMilwaukeeCategory = {
+  id: string;
+  parentId: string | null;
+  erpType: "CATEGORY" | "GROUP" | "SUBGROUP";
+  erpCode: string;
+  name: { el: string; en: string; it: string };
+  order: number;
+  mainImage: string | null;
+  children: HdctoolMilwaukeeCategory[];
+};
+
 // ── Methods ─────────────────────────────────────────────────────────────────
 
 /** Max the API accepts (PUBLIC_ESHOP_MAX_LIMIT). */
@@ -351,6 +371,21 @@ export const hdctool = {
     params: { categoryId?: string; brandId?: string; type?: string } = {},
   ): Promise<{ categories: unknown[]; count: number }> {
     return request("/api/public/categories-with-products", params);
+  },
+
+  /**
+   * The Milwaukee category tree (18 roots, children nested). A GET with a short
+   * timeout: it decorates a page, and a page must not wait 30s for a picture.
+   */
+  milwaukeeCategories(): Promise<{
+    success: boolean;
+    data: HdctoolMilwaukeeCategory[];
+    count: number;
+  }> {
+    return request("/api/public/milwaukee-categories", undefined, {
+      method: "GET",
+      timeoutMs: 5_000,
+    });
   },
 
   similarProducts(params: { mtrl: number; limit?: number }): Promise<unknown> {

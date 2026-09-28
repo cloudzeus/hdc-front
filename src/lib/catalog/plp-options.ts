@@ -28,6 +28,18 @@ export type PlpFacets = {
   availability: FacetItem[];
   priceBounds: { min: number; max: number };
   flags: { sale: number; isNew: number };
+  /*
+   * The Milwaukee filters (HDC pages). Each group is counted against the result
+   * set without its own filter, like every other facet.
+   */
+  /** Products per battery platform; `all` includes the ones with none. */
+  platforms: { all: number; M12: number; M18: number; MX: number };
+  content: { bare: number; kit: number };
+  series: { fuel: number; onekey: number; basic: number };
+  /** «Σε απόθεμα» / «Παράδοση 1–3 εργάσιμες». */
+  stock: { inStock: number; order: number };
+  /** Distinct model roots in the result set (search only; 0 elsewhere). */
+  models: number;
 };
 
 /**
