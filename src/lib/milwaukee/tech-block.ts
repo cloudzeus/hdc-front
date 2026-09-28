@@ -32,10 +32,24 @@ export function parseTechBlock(description: string | null | undefined): TechRow[
     .filter((row): row is TechRow => row !== null);
 }
 
+/**
+ * The source words the same line several ways: «Αρ. παρεχόμενων μπαταριών»,
+ * «Αρ. Μπαταριών», «Αριθμός παρεχόμενων μπαταριών», «Αρ. των παρεχόμενων
+ * μπαταριών», «Αριθμός μπαταριών που παρέχονται».
+ */
+const BATTERY_COUNT = /^(Αρ\.|Αριθμός)\s+(των\s+)?(παρεχόμενων\s+)?μπαταριών/i;
+const BATTERY_AH = /^Χωρητικότητα μπαταρίας/i;
+
+/** The first number in a value: "5.0", "5,0 Ah", "2 τεμ." */
+const firstNumber = (value: string | undefined) => {
+  const match = value?.match(/\d+(?:[.,]\d+)?/);
+  return match ? Number(match[0].replace(",", ".")) : NaN;
+};
+
 export function kitFromTechBlock(rows: TechRow[]): { batteries: number; ah: number } | null {
-  const find = (prefix: string) => rows.find((r) => r.label.startsWith(prefix))?.value;
-  const batteries = Number(find("Αρ. παρεχόμενων μπαταριών"));
-  const ah = Number(find("Χωρητικότητα μπαταρίας")?.replace(",", "."));
+  const find = (label: RegExp) => rows.find((r) => label.test(r.label))?.value;
+  const batteries = firstNumber(find(BATTERY_COUNT));
+  const ah = firstNumber(find(BATTERY_AH));
   return Number.isFinite(batteries) && batteries > 0 && Number.isFinite(ah) && ah > 0
     ? { batteries, ah }
     : null;

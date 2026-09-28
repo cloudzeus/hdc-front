@@ -51,10 +51,37 @@ export type ProductDetail = {
   colors: string[];
   /** Assigned sizes. `family` disambiguates "M" across categories. */
   sizes: Array<{ label: string; family: string | null }>;
+
+  /** The ERP (Greek) name — model codes live here, not in the translations. */
+  erpName: string;
+  /** Manufacturer code and EAN, raw ("" when absent). */
+  code2: string;
+  code1: string;
+  /** Milwaukee columns (spec §8), computed at sync from the name. */
+  platform: "M12" | "M18" | "MX" | null;
+  modelRoot: string | null;
+  modelContent: "bare" | "kit" | null;
+  isOneKey: boolean;
+  /**
+   * The GREEK long description, whatever the page's language: its
+   * «Τεχνικά χαρακτηριστικά» block is the manufacturer's spec source.
+   */
+  longDescriptionEl: string | null;
+  /** Category → group → subgroup, as far as the synced tree resolves them. */
+  categoryChain: Array<{ name: string; slug: string }>;
+  /** Classification codes, for the compare scope. */
+  mtrcategory: number | null;
+  mtrgroup: number | null;
+  cccSubgroup2: number | null;
+  /** Files that are documents (PDF) rather than pictures. */
+  documents: Array<{ id: string; url: string }>;
 };
 
 /** The four headings above the spec table — message keys, not words. */
 const SPEC_GROUPS = ["identification", "physical", "technical", "performance"] as const;
+
+/** A synced "image" that is really a document — the only kind is PDF. */
+const isDocument = (url: string) => /\.pdf(\?|#|$)/i.test(url);
 
 function num(value: unknown): number | null {
   if (value == null) return null;
@@ -67,7 +94,8 @@ export const getProductBySlug = cache(
     const product = await prisma.product.findFirst({
       where: { slug, isActive: true },
       include: {
-        images: { orderBy: [{ isFeature: "desc" }, { order: "asc" }], take: 8 },
+        // Every picture, in order: the HDC gallery shows all of them.
+        images: { orderBy: [{ isFeature: "desc" }, { order: "asc" }] },
         translations: true,
         specs: { where: { locale }, orderBy: { order: "asc" } },
         // Only present on 242 and 500 products respectively, but on those it is
@@ -92,7 +120,7 @@ export const getProductBySlug = cache(
       product.translations.find((t) => t.locale === locale) ??
       product.translations.find((t) => t.locale === "el");
 
-    const [brand, category] = await Promise.all([
+    const [brand, category, group, subgroup] = await Promise.all([
       product.mtrmark != null
         ? prisma.brand.findFirst({
             where: { mtrmark: product.mtrmark },
@@ -102,6 +130,18 @@ export const getProductBySlug = cache(
       product.mtrcategory != null
         ? prisma.category.findFirst({
             where: { erpType: "CATEGORY", erpCode: String(product.mtrcategory) },
+            select: { slug: true, nameEl: true, nameEn: true, nameIt: true },
+          })
+        : null,
+      product.mtrgroup != null
+        ? prisma.category.findFirst({
+            where: { erpType: "GROUP", erpCode: String(product.mtrgroup) },
+            select: { slug: true, nameEl: true, nameEn: true, nameIt: true },
+          })
+        : null,
+      product.cccSubgroup2 != null
+        ? prisma.category.findFirst({
+            where: { erpType: "SUBGROUP", erpCode: String(product.cccSubgroup2) },
             select: { slug: true, nameEl: true, nameEn: true, nameIt: true },
           })
         : null,
@@ -154,7 +194,12 @@ export const getProductBySlug = cache(
       ratingCount: product.ratingCount,
       brand: brand ? { name: pick(brand), slug: brand.slug, logo: brand.logo } : null,
       category: category ? { name: pick(category), slug: category.slug } : null,
-      images: product.images.map((i) => ({ id: i.id, url: i.url })),
+      images: product.images
+        .filter((i) => !isDocument(i.url))
+        .map((i) => ({ id: i.id, url: i.url })),
+      documents: product.images
+        .filter((i) => isDocument(i.url))
+        .map((i) => ({ id: i.id, url: i.url })),
       priceNet: num(product.priceNet),
       priceListNet: num(product.priceList),
       vatRate: num(product.vatRate) ?? 24,
@@ -169,6 +214,25 @@ export const getProductBySlug = cache(
       specGroups,
       colors: product.colors.map((c) => c.name),
       sizes: product.sizes.map((s) => ({ label: s.label, family: s.family })),
+      erpName: product.name,
+      code2: product.code2,
+      code1: product.code1,
+      platform:
+        product.platform === "M12" || product.platform === "M18" || product.platform === "MX"
+          ? product.platform
+          : null,
+      modelRoot: product.modelRoot,
+      modelContent:
+        product.modelContent === "bare" || product.modelContent === "kit" ? product.modelContent : null,
+      isOneKey: product.isOneKey,
+      longDescriptionEl:
+        product.translations.find((t) => t.locale === "el")?.longDescription ?? null,
+      categoryChain: [category, group, subgroup]
+        .filter((c): c is NonNullable<typeof c> => c != null)
+        .map((c) => ({ name: pick(c), slug: c.slug })),
+      mtrcategory: product.mtrcategory,
+      mtrgroup: product.mtrgroup,
+      cccSubgroup2: product.cccSubgroup2,
     };
   },
 );

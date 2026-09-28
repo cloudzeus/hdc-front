@@ -181,17 +181,21 @@ export function productBreadcrumb(
     name: string;
     slug: string;
     category?: { name: string; slug: string } | null;
+    /** The whole path, category → group → subgroup; wins over `category`. */
+    categories?: Array<{ name: string; slug: string }>;
   },
 ) {
   const items: Array<{ name: string; path: string }> = [
     { name: "Αρχική", path: "/" },
     { name: "Κατάλογος", path: "/katalogos" },
   ];
-  if (product.category) {
-    items.push({
-      name: product.category.name,
-      path: `/katalogos/${product.category.slug}`,
-    });
+  const chain = product.categories?.length
+    ? product.categories
+    : product.category
+      ? [product.category]
+      : [];
+  for (const category of chain) {
+    items.push({ name: category.name, path: `/katalogos/${category.slug}` });
   }
   items.push({ name: product.name, path: `/proion/${product.slug}` });
 

@@ -552,3 +552,92 @@ export const getCatalogueStats = sharedCatalogue(
     return { products, inStock, brands, categories, subcategories };
   },
 );
+
+/**
+ * The batteries of one platform — what the product page matches a kit's
+ * «2 × 5.0Ah» against (`matchBattery`), for the in-the-box tile and the first
+ * card of the same-battery band. Accessories and batteries carry no model root.
+ */
+export const getPlatformBatteries = sharedCatalogue(
+  "platform-batteries",
+  FAST,
+  async (
+    platform: string,
+  ): Promise<Array<{ id: string; slug: string; name: string; code2: string; inStock: boolean; image: string | null }>> => {
+    const rows = await prisma.product.findMany({
+      where: {
+        isActive: true,
+        platform,
+        modelRoot: null,
+        name: { contains: "ΜΠΑΤΑΡΙΑ", mode: "insensitive" },
+      },
+      orderBy: [{ inStock: "desc" }, { mtrl: "asc" }],
+      take: 60,
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        code2: true,
+        inStock: true,
+        images: { where: { isFeature: true }, take: 1, select: { url: true } },
+      },
+    });
+    return rows.map(({ images, ...row }) => ({ ...row, image: images[0]?.url ?? null }));
+  },
+);
+
+/**
+ * «ΙΔΙΑ ΜΠΑΤΑΡΙΑ, ΚΙ ΑΛΛΑ ΕΡΓΑΛΕΙΑ» on the product page: in-stock BARE tools
+ * of one platform, other than the model being viewed — for whoever bought a
+ * kit and wants a second tool without paying for batteries again.
+ *
+ * One tool per subgroup, so the band is four different jobs rather than four
+ * drills; FUEL first, newest first.
+ */
+export const getSameBatteryTools = sharedCatalogue(
+  "same-battery-tools",
+  FAST,
+  async (
+    locale: Locale,
+    platform: string,
+    excludeRoot: string | null,
+    limit = 4,
+  ): Promise<ProductCardData[]> => {
+    const [rows, brands] = await Promise.all([
+      prisma.product.findMany({
+        where: {
+          isActive: true,
+          inStock: true,
+          platform,
+          modelContent: "bare",
+          priceNet: { gt: 0 },
+          images: { some: { isFeature: true } },
+          ...(excludeRoot ? { NOT: { modelRoot: excludeRoot } } : {}),
+        },
+        orderBy: [{ isFuel: "desc" }, { erpInsertedAt: "desc" }, { mtrl: "desc" }],
+        take: limit * 15,
+        select: { ...PRODUCT_CARD_SELECT, cccSubgroup2: true, isOneKey: true },
+      }),
+      getBrandsByMtrmark(locale),
+    ]);
+
+    const seen = new Set<number | null>();
+    const picked: typeof rows = [];
+    for (const row of rows) {
+      if (seen.has(row.cccSubgroup2)) continue;
+      seen.add(row.cccSubgroup2);
+      picked.push(row);
+      if (picked.length === limit) break;
+    }
+    // Few subgroups on this platform: top up rather than leave a hole.
+    for (const row of rows) {
+      if (picked.length === limit) break;
+      if (!picked.includes(row)) picked.push(row);
+    }
+
+    return picked.map((row) => ({
+      ...toCard(row as unknown as ProductRow, locale, brands),
+      oneKey: row.isOneKey,
+    }));
+  },
+);

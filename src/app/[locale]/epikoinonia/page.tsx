@@ -57,12 +57,22 @@ export const dynamic = "force-dynamic";
 
 export default async function ContactPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: Locale }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const t = await getTranslations("epikoinonia.page");
   const { locale } = await params;
   setRequestLocale(locale);
+
+  /* «Ερώτηση για το προϊόν» on a product page lands here with the code in
+     `?product=`; it pre-fills the subject. Only a plain code is accepted. */
+  const productParam = (await searchParams).product;
+  const productCode =
+    typeof productParam === "string" && /^[A-Za-z0-9 ._-]{1,64}$/.test(productParam)
+      ? productParam.trim()
+      : null;
 
   const [menuTree, brands, stats, rootCategories, miniCart] = await Promise.all(
     [
@@ -283,7 +293,13 @@ export default async function ContactPage({
                   lead={t("dialexte_thema_kai_ta_pedia")}
                 />
                 <div className="mt-8 lg:mt-10">
-                  <ContactForm locale={locale} pagePath="/epikoinonia" />
+                  <ContactForm
+                    locale={locale}
+                    pagePath="/epikoinonia"
+                    defaultSubject={
+                      productCode ? t("erotisi_gia_proion", { code: productCode }) : undefined
+                    }
+                  />
                 </div>
               </div>
 

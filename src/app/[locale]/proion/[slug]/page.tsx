@@ -1,76 +1,79 @@
-import { getTranslations } from "next-intl/server";
-import { yearsInBusiness } from "@/lib/seo/structured-data";
-import { absoluteUrl, pageMeta } from "@/lib/seo/urls";
-import { faqJsonLd, productFaq } from "@/lib/seo/product-faq";
-import { showsExactQty } from "@/lib/stock-display";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { SiteChrome } from "@/components/chrome/SiteChrome";
+import { SiteFooter } from "@/components/chrome/SiteFooter";
+import { AddToCartButton } from "@/components/cart/AddToCartButton";
+import { HdcBuyActions } from "@/components/pdp/hdc/HdcBuyActions";
+import { HdcGallery, type GalleryTag } from "@/components/pdp/hdc/HdcGallery";
+import { HdcSection } from "@/components/pdp/hdc/HdcSection";
+import { HdcSectionNav } from "@/components/pdp/hdc/HdcSectionNav";
+import { HdcProductCard } from "@/components/product/HdcProductCard";
+import { QuickViewProvider } from "@/components/product/QuickViewProvider";
+import { Zone } from "@/components/zones/Zone";
+import { Link } from "@/i18n/navigation";
+import type { Locale } from "@/i18n/routing";
+import { approvedReviews } from "@/lib/account/reviews";
+import { favouriteIds } from "@/lib/account/favourite-ids";
+import { getMiniCart } from "@/lib/cart/cart";
+import { FREE_SHIPPING_THRESHOLD_NET } from "@/lib/cart/options";
+import { getModelVariants, type ModelVariant } from "@/lib/catalog/hdc-pdp";
+import { isBattery } from "@/lib/hdc-nav";
+import { getProductBySlug } from "@/lib/catalog/pdp";
+import {
+  getCatalogueStats,
+  getMenuTree,
+  getPlatformBatteries,
+  getProductsByCode2,
+  getRootCategories,
+  getSameBatteryTools,
+  getTopBrands,
+} from "@/lib/catalog/queries";
+import { COMPARE_MAX, getCompareSelection } from "@/lib/compare/compare";
+import { scopeKeyOf } from "@/lib/compare/options";
+import { formatMoney, grossAmount } from "@/lib/format";
+import { upGreek } from "@/lib/greek";
+import { displayName, platformTag } from "@/lib/milwaukee/display";
+import { parseModel } from "@/lib/milwaukee/model";
+import {
+  ahLabel,
+  boxFacts,
+  descriptionParagraphs,
+  inTheBox,
+  keyNumbers,
+  matchBattery,
+  pdpTitle,
+  specTable,
+  withTrademark,
+} from "@/lib/milwaukee/pdp";
+import { kitFromTechBlock, parseTechBlock } from "@/lib/milwaukee/tech-block";
+import { discountedNet, offerBadgeFor } from "@/lib/offers/badges";
 import {
   priceValidUntil,
   productBreadcrumb,
   returnPolicy,
   shippingDetails,
-  specsAsProperties,
 } from "@/lib/seo/product-schema";
-import type { Metadata } from "next";
-import Image from "next/image";
-import { notFound } from "next/navigation";
-import { setRequestLocale } from "next-intl/server";
-import { SiteChrome } from "@/components/chrome/SiteChrome";
-import { SiteFooter } from "@/components/chrome/SiteFooter";
-import { PriceBox } from "@/components/pdp/PriceBox";
-import { ProductGallery } from "@/components/pdp/ProductGallery";
-import { ProductTabs } from "@/components/pdp/ProductTabs";
-import { Expandable } from "@/components/ui/Expandable";
-import { SectionHead } from "@/components/chrome/SectionHead";
-import { ProductCard } from "@/components/product/ProductCard";
-import { ProductRail } from "@/components/product/ProductRail";
-import { QuickViewProvider } from "@/components/product/QuickViewProvider";
-import { Link } from "@/i18n/navigation";
-import type { Locale } from "@/i18n/routing";
-import { getMiniCart } from "@/lib/cart/cart";
-import { getProductBySlug, getRelatedProducts } from "@/lib/catalog/pdp";
-import {
-  getCatalogueStats,
-  getMenuTree,
-  getRootCategories,
-  getTopBrands,
-} from "@/lib/catalog/queries";
-import { formatPercent, grossAmount, savingsOf } from "@/lib/format";
-import { upGreek } from "@/lib/greek";
-import { cn } from "@/lib/utils";
-import { Zone } from "@/components/zones/Zone";
-import { VariantPicker } from "@/components/pdp/VariantPicker";
-import { ProductReviews } from "@/components/pdp/ProductReviews";
-import { approvedReviews } from "@/lib/account/reviews";
-import { FavouriteButton } from "@/components/product/FavouriteButton";
-import { favouriteIds } from "@/lib/account/favourite-ids";
-import { variantsOf } from "@/lib/catalog/variants";
-import { discountedNet, offerBadgeFor } from "@/lib/offers/badges";
+import { absoluteUrl, pageMeta } from "@/lib/seo/urls";
+import { showsExactQty } from "@/lib/stock-display";
 
 type PageProps = {
   params: Promise<{ locale: Locale; slug: string }>;
 };
 
-export async function generateMetadata({
-  params,
-}: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug, locale } = await params;
   // Explicit locale: `setRequestLocale` belongs to the render pass, and metadata
   // is generated outside it.
-  const t = await getTranslations({ locale, namespace: "proion.page" });
+  const t = await getTranslations({ locale, namespace: "pdp.Hdc" });
   const product = await getProductBySlug(slug, locale);
   if (!product) return {};
 
-  const title = product.name;
+  const title = displayName(product.name, product.code2);
   const description =
     product.shortDescription ??
-    t("kodikos_amesi_diathesimotita_paradosi_24", {
-      name: product.name,
-      n: product.brand ? ` — ${product.brand.name}` : "",
-      sku: product.sku,
-    });
+    t("meta_description", { name: title, code: product.code2 || product.sku });
   return {
-    /* Η φωτογραφία του προϊόντος ως εικόνα προεπισκόπησης: ένα link προϊόντος
-       που δείχνει το γενικό banner του καταστήματος δεν λέει τι μοιράστηκε. */
     ...pageMeta({
       path: `/proion/${slug}`,
       locale,
@@ -83,174 +86,269 @@ export async function generateMetadata({
   };
 }
 
+/** Kit sizes Milwaukee sells in, «5.0» — used when a kit says nothing else. */
+const DEFAULT_BAND_AH: Record<string, number> = { M18: 5, M12: 4 };
+
+/**
+ * The HDC product page (docs/design/mockups/pdp.html).
+ *
+ * Top: breadcrumb, gallery and buy box — platform tag, title with the model
+ * root, codes, the four key numbers, the bare/kit selector, the price box and
+ * the service grid. Then a sticky section bar over the description, the
+ * specifications, what is in the box, documents and reviews, and the graphite
+ * «same battery» band.
+ *
+ * Every technical fact comes from the manufacturer's «Τεχνικά χαρακτηριστικά»
+ * block of the Greek description (`parseTechBlock`), never from the AI-filled
+ * spec table — it says 135 Nm for the FPD3, Milwaukee says 158.
+ */
 export default async function ProductPage({ params }: PageProps) {
-  const t = await getTranslations("proion.page");
+  const t = await getTranslations("pdp.Hdc");
   const { locale, slug } = await params;
   setRequestLocale(locale);
 
   const product = await getProductBySlug(slug, locale);
   if (!product) notFound();
 
-  const [related, menuTree, brands, stats, rootCategories, miniCart] =
-    await Promise.all([
-      // Twelve, not five: the rail reaches the rest with its arrows.
-      getRelatedProducts(product.mtrl, locale, 12),
-      getMenuTree(locale),
-      getTopBrands(locale),
-      getCatalogueStats(),
-      getRootCategories(locale),
-      getMiniCart(locale),
-    ]);
+  const platform = product.platform;
+  const model = parseModel(product.erpName);
+  const techRows = parseTechBlock(product.longDescriptionEl);
+  const kit =
+    product.modelContent === "kit" ? (kitFromTechBlock(techRows) ?? model?.kit ?? null) : null;
 
+  const [
+    menuTree,
+    brands,
+    stats,
+    rootCategories,
+    miniCart,
+    favourites,
+    compareSelection,
+    reviews,
+    variants,
+    batteries,
+    offer,
+  ] = await Promise.all([
+    getMenuTree(locale),
+    getTopBrands(locale),
+    getCatalogueStats(),
+    getRootCategories(locale),
+    getMiniCart(locale),
+    favouriteIds(),
+    getCompareSelection(),
+    approvedReviews(product),
+    product.modelRoot ? getModelVariants(product.modelRoot) : Promise.resolve([] as ModelVariant[]),
+    platform ? getPlatformBatteries(platform) : Promise.resolve([]),
+    offerBadgeFor(
+      { slug: product.slug, brandSlug: product.brand?.slug ?? null, unitNet: product.priceNet },
+      locale,
+    ),
+  ]);
+
+  /* The same-battery band: the platform's battery first, then bare tools. */
+  const bandBattery = platform
+    ? matchBattery(batteries, platform, kit?.ah ?? DEFAULT_BAND_AH[platform] ?? 0)
+    : null;
+  const [bandBatteryCards, bandTools] = await Promise.all([
+    bandBattery ? getProductsByCode2(locale, [bandBattery.product.code2]) : Promise.resolve([]),
+    platform
+      ? getSameBatteryTools(locale, platform, product.modelRoot, bandBattery ? 4 : 5)
+      : Promise.resolve([]),
+  ]);
+  const bandCards = [...bandBatteryCards, ...bandTools].slice(0, 5);
+
+  // ── Prices ───────────────────────────────────────────────────────────────
   const ctx = { vatRate: product.vatRate };
-  // Η καμπάνια που καλύπτει αυτό το προϊόν, αν τρέχει κάποια.
-  const offer = await offerBadgeFor(
-    {
-      slug: product.slug,
-      brandSlug: product.brand?.slug ?? null,
-      unitNet: product.priceNet,
-    },
-    locale,
+  /* The price the cart charges: the campaign discount, when one covers it. */
+  const finalNet =
+    product.priceNet == null ? null : discountedNet(product.priceNet, offer?.discountPercent ?? 0);
+  const discounted = product.priceNet != null && (offer?.discountPercent ?? 0) > 0;
+  const gross = finalNet == null ? null : grossAmount(finalNet, ctx);
+  const price = gross == null ? "—" : formatMoney(gross, locale);
+
+  /* Sibling prices on the same footing — the hint's difference is real money. */
+  const variantGross = new Map<string, number | null>(
+    await Promise.all(
+      variants.map(async (v): Promise<[string, number | null]> => {
+        if (v.id === product.id) return [v.id, gross];
+        if (v.priceNet == null) return [v.id, null];
+        const o = await offerBadgeFor(
+          { slug: v.slug, brandSlug: product.brand?.slug ?? null, unitNet: v.priceNet },
+          locale,
+        );
+        return [v.id, grossAmount(discountedNet(v.priceNet, o?.discountPercent ?? 0), { vatRate: v.vatRate })];
+      }),
+    ),
   );
 
-  const favourite = (await favouriteIds()).has(product.id);
-  /* Οι κριτικές διαβάζονται σε ΟΛΗ την ομάδα μεγεθών: αγόρασε το 42 και
-     αξιολογεί «το παπούτσι», όχι «το 42». */
-  const reviews = await approvedReviews(product);
+  // ── Title, tags, codes ───────────────────────────────────────────────────
+  const title = upGreek(pdpTitle(product.name, product.code2));
+  const tag = platformTag(product.erpName);
+  const platformText = tag ? withTrademark(tag) : null;
+  const galleryTags: GalleryTag[] = [
+    ...(platformText ? [{ text: platformText, tone: "ink" as const }] : []),
+    ...(product.modelContent === "kit"
+      ? [
+          {
+            text: kit ? t("tag_kit", { count: kit.batteries, ah: ahLabel(kit.ah) }) : t("opt_kit"),
+            tone: "red" as const,
+          },
+        ]
+      : []),
+  ];
+  const ean = product.code1 && product.code1 !== "—" ? product.code1 : null;
+  const code = product.code2 || product.sku;
 
-  /* Τα αδέλφια του προϊόντος — τα ίδια, σε άλλο νούμερο. */
-  const variants = await variantsOf(product, locale);
-  /* Η οικογένεια μεγεθών λέει πώς λέγεται: «Παπούτσια (EU)» δεν είναι το ίδιο
-     με «Ρούχα», και το «Μέγεθος» σκέτο δεν λέει σε ποια κλίμακα. */
-  const variantLabel = variants.find((v) => v.family)?.family ?? "Μέγεθος";
+  // ── Key numbers ──────────────────────────────────────────────────────────
+  const keys = keyNumbers(techRows, locale);
+  const keyLabel = (key: (typeof keys)[number]) => {
+    switch (key.key) {
+      case "torque":
+        return t("key_torque", { unit: key.unit });
+      case "speed":
+        return t("key_speed", { unit: key.unit });
+      case "impact":
+        return t("key_impact", { unit: key.unit });
+      case "energy":
+        return t("key_energy", { unit: key.unit });
+      case "chuck":
+        return t("key_chuck", { unit: key.unit });
+      default:
+        return t("key_drive");
+    }
+  };
 
+  // ── Variants (bare / kit) ────────────────────────────────────────────────
+  const kitCount = variants.filter((v) => v.content === "kit").length;
+  const variantView = variants.map((v) => {
+    const vModel = parseModel(v.name);
+    const vFacts = boxFacts(parseTechBlock(v.longDescriptionEl));
+    const vKit = v.content === "kit" ? (vFacts.batteries ?? (vModel?.kit ? { count: vModel.kit.batteries, ah: vModel.kit.ah } : null)) : null;
+
+    let contents: string;
+    if (v.content === "bare") {
+      contents = vFacts.case ? t("desc_bare_case", { case: vFacts.case }) : t("desc_bare");
+    } else {
+      const parts: string[] = [];
+      if (vKit) {
+        const code = matchBattery(batteries, platform, vKit.ah)?.code;
+        parts.push(
+          code
+            ? t("desc_batteries_code", { count: vKit.count, code, ah: ahLabel(vKit.ah) })
+            : t("desc_batteries", { count: vKit.count, ah: ahLabel(vKit.ah) }),
+        );
+      }
+      if (vFacts.charger != null)
+        parts.push(vFacts.charger ? t("desc_charger", { model: vFacts.charger }) : t("desc_charger_plain"));
+      if (vFacts.case) parts.push(vFacts.case);
+      contents = parts.length ? `${parts.join(", ")}.` : "";
+    }
+
+    const name =
+      v.content === "bare"
+        ? t("opt_bare")
+        : kitCount > 1 && vKit
+          ? t("tag_kit", { count: vKit.count, ah: ahLabel(vKit.ah) })
+          : t("opt_kit");
+    const chip =
+      v.content === "bare"
+        ? t("chip_bare")
+        : vKit
+          ? t("tag_kit", { count: vKit.count, ah: ahLabel(vKit.ah) })
+          : t("opt_kit");
+    const g = variantGross.get(v.id) ?? null;
+    return {
+      id: v.id,
+      slug: v.slug,
+      current: v.id === product.id,
+      name,
+      chip,
+      codes: [vModel?.code, v.code2].filter(Boolean).join(" · "),
+      contents,
+      price: g == null ? "—" : formatMoney(g, locale),
+      gross: g,
+      content: v.content,
+      image: v.image,
+    };
+  });
+  const showVariants = variantView.length > 1;
+  const bareVariant = variantView.find((v) => v.content === "bare" && !v.current);
   const saving =
-    product.priceListNet != null && product.priceNet != null
-      ? savingsOf(product.priceListNet, product.priceNet, locale, ctx)
+    product.modelContent === "kit" && bareVariant?.gross != null && gross != null
+      ? gross - bareVariant.gross
       : null;
 
-  /*
-   * At-a-glance strip. Candidates in priority order, sliced to exactly four —
-   * a 4-column grid fed 3 items leaves a dead grey square, which is what it
-   * was doing on most products.
-   */
-  /*
-   * Η μονάδα ανήκει στην ΤΙΜΗ, όχι στην ετικέτα.
-   * ───────────────────────────────────────────────────────────────────────────
-   * «ΔΙΑΣΤΑΣΕΙΣ (CM)» δεν χωρούσε σε κελί ενός τετάρτου και τυλιγόταν σε δύο
-   * σειρές, οπότε εκείνο το κελί ήταν ψηλότερο από τα άλλα τρία και η λωρίδα
-   * φαινόταν ξεστοιχισμένη — σε κάθε προϊόν με διαστάσεις.
-   *
-   * Και τα δεκαδικά με κόμμα: «8.6» είναι αγγλικά, και δίπλα στις τιμές που
-   * γράφονται «152,52 €» διαβάζεται ως λάθος.
-   */
-  const el = (n: number) => n.toLocaleString(locale);
-  const dimensions =
-    product.width != null && product.length != null && product.height != null
-      ? `${el(product.width)}×${el(product.length)}×${el(product.height)} cm`
-      : null;
+  // ── Availability ─────────────────────────────────────────────────────────
+  const stockLine = product.inStock
+    ? showsExactQty(product.qty)
+      ? t("se_apothema_tem", { qty: product.qty })
+      : t("se_apothema")
+    : t("paradosi");
 
-  const glance = (
-    [
-      {
-        k: t("diathesimotita"),
-        /* Ακριβής αριθμός μόνο στα τρία και κάτω — βλ. `stock-display`. */
-        v: product.inStock
-          ? showsExactQty(product.qty)
-            ? t("tem", { qty: product.qty })
-            : t("diathesimo")
-          : t("katopin"),
-      },
-      /*
-       * Ο κωδικός IMPA, δεύτερος μετά τη διαθεσιμότητα.
-       * ───────────────────────────────────────────────────────────────────
-       * Χωρίς λογότυπο: η λωρίδα είναι τέσσερα ίσα κελιά με ετικέτα και τιμή,
-       * και μια εικόνα μέσα σε ένα από αυτά σπάει τη στοίχιση όλης της
-       * γραμμής — αυτό ακριβώς έκανε όταν μπήκε στη σειρά των κωδικών.
-       *
-       * Ψηλά στη λίστα επειδή για το κοινό που τον ψάχνει είναι ΤΟ
-       * αναγνωριστικό: ο αγοραστής πλοίου δουλεύει με λίστα κωδικών IMPA και
-       * το όνομα του προϊόντος το διαβάζει δεύτερο. Για όλους τους άλλους δεν
-       * υπάρχει καν — μόνο τρία προϊόντα τον έχουν σήμερα.
-       */
-      product.impaCode ? { k: "IMPA", v: product.impaCode } : null,
-      /*
-       * Colour and size sit above weight and dimensions on purpose. They are
-       * absent from all but a few hundred products, and where they exist they
-       * are what the product IS — a glove is chosen by size long before anyone
-       * asks what it weighs. Ranking them below would let the four-item slice
-       * drop them in favour of trivia.
-       */
-      /*
-       * Το μέγεθος φεύγει από τη λωρίδα όταν υπάρχει επιλογέας.
-       * ───────────────────────────────────────────────────────────────────
-       * Ο επιλογέας από πάνω δείχνει ήδη ποιο νούμερο είναι διαλεγμένο, και
-       * μάλιστα δείχνει ΚΑΙ τα υπόλοιπα. Μια δεύτερη αναφορά «ΜΕΓΕΘΟΣ 36»
-       * δίπλα στη διαθεσιμότητα δεν προσθέτει τίποτα και ρωτάει τον
-       * αναγνώστη ποιο από τα δύο να πιστέψει.
-       *
-       * Χωρίς ομάδα μένει: εκεί το μέγεθος είναι σταθερό χαρακτηριστικό του
-       * προϊόντος, όχι επιλογή — ένα γάντι που υπάρχει μόνο σε L.
-       */
-      product.sizes.length > 0 && !product.variantGroup
-        ? { k: t("megethos"), v: product.sizes.map((s) => s.label).join(", ") }
-        : null,
-      product.colors.length > 0
-        ? { k: t("chroma"), v: product.colors.join(", ") }
-        : null,
-      product.weight != null
-        ? { k: t("varos"), v: `${el(product.weight)} kg` }
-        : null,
-      product.guaranteeMonths
-        ? {
-            k: t("eggyisi"),
-            v: t("mines", { guaranteeMonths: product.guaranteeMonths }),
-          }
-        : null,
-      dimensions ? { k: t("diastaseis_cm"), v: dimensions } : null,
-      product.length != null
-        ? { k: t("mikos"), v: `${product.length} cm` }
-        : null,
-      product.brand ? { k: t("kataskeyastis"), v: product.brand.name } : null,
-      { k: t("kodikos"), v: product.sku },
-    ].filter(Boolean) as Array<{ k: string; v: string }>
-  ).slice(0, 4);
+  // ── Sections ─────────────────────────────────────────────────────────────
+  let paragraphs = descriptionParagraphs(product.longDescription);
+  if (paragraphs.length === 0 && locale !== "el") paragraphs = descriptionParagraphs(product.longDescriptionEl);
+  const photo = product.images[1]?.url ?? null;
+  const specs = specTable(techRows, locale);
+  const half = Math.ceil(specs.length / 2);
+  const box = inTheBox({
+    facts: boxFacts(techRows),
+    platform,
+    isTool: product.modelRoot != null,
+    kitFallback: product.modelContent === "kit" ? (model?.kit ?? null) : null,
+    batteries,
+  });
+  const toolImage =
+    variants.find((v) => v.content === "bare")?.image ?? product.images[0]?.url ?? null;
 
+  const sections = [
+    paragraphs.length > 0 && { id: "perigrafi", label: t("nav_perigrafi") },
+    specs.length > 0 && { id: "prodiagrafes", label: t("nav_prodiagrafes") },
+    box.length > 0 && { id: "syskevasia", label: t("nav_syskevasia") },
+    product.documents.length > 0 && { id: "eggrafa", label: t("nav_eggrafa") },
+    { id: "kritikes", label: t("nav_kritikes") },
+  ].filter((s): s is { id: string; label: string } => Boolean(s));
+
+  // ── Compare, band link ───────────────────────────────────────────────────
+  const scopeKey = scopeKeyOf(product);
+  const compared = compareSelection.slugs.includes(product.slug);
+  const compare = {
+    selected: compared,
+    disabled:
+      !compared &&
+      (scopeKey == null ||
+        compareSelection.slugs.length >= COMPARE_MAX ||
+        (compareSelection.scopeKey != null && scopeKey !== compareSelection.scopeKey)),
+  };
+  const batteryCategory = rootCategories.find((c) => isBattery({ slug: c.slug, name: c.name }));
+  const platformHref = platform
+    ? `${batteryCategory ? `/katalogos/${batteryCategory.slug}` : "/katalogos"}?platform=${platform}`
+    : null;
+  const platformName = platform === "MX" ? "MX FUEL" : platform;
+
+  const reviewCount = reviews.length;
+  const average =
+    reviewCount > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount : null;
+  const formatAverage = (n: number) =>
+    new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(n);
+
+  // ── Structured data ──────────────────────────────────────────────────────
   /** Product JSON-LD — real values only; no invented ratings. */
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
-    name: product.name,
-    sku: product.sku,
-    mpn: product.mpn !== "—" ? product.mpn : undefined,
-    gtin13: product.ean !== "—" ? product.ean : undefined,
+    name: displayName(product.name, product.code2),
+    sku: code,
+    mpn: product.code2 || undefined,
+    ...(ean ? (ean.length === 13 ? { gtin13: ean } : { gtin: ean }) : {}),
     image: product.images.map((i) => i.url),
-    description: product.shortDescription ?? undefined,
-    brand: product.brand
-      ? { "@type": "Brand", name: product.brand.name }
-      : undefined,
+    description: product.shortDescription ?? paragraphs[0] ?? undefined,
+    brand: { "@type": "Brand", name: "Milwaukee" },
+    category: product.categoryChain.at(-1)?.name ?? undefined,
     /*
-     * Colour and size, matching what the Merchant feed emits for this product.
-     *
-     * Google reads this page to keep the feed item current, so the two must
-     * agree — the feed takes the first assigned value of each and so does this.
-     * Omitted rather than empty when absent; an empty string is a claim that
-     * the product has no colour.
-     */
-    color: product.colors[0] ?? undefined,
-    size: product.sizes[0]?.label ?? undefined,
-    /*
-     * The offer, and it has to agree with the Merchant Center feed.
-     *
-     * Google reads this page to keep a feed item current between fetches, so a
-     * page and a feed that disagree is not a cosmetic inconsistency: it
-     * suspends the item. This said `BackOrder` where the feed said
-     * `out_of_stock` for every product without stock, which is two different
-     * claims about the same tool. Out of stock is also the truthful one - a
-     * back order is a promise to supply, and nothing here makes that promise.
-     *
-     * `itemCondition` and the offer `url` are what the automatic updates want
-     * in order to match this page to its feed row at all.
+     * The offer has to agree with the Merchant Center feed, which Google reads
+     * this page to keep current — out of stock is `OutOfStock`, not a promise
+     * of `BackOrder`.
      */
     offers:
       product.priceNet != null
@@ -260,92 +358,34 @@ export default async function ProductPage({ params }: PageProps) {
             price: grossAmount(product.priceNet, ctx).toFixed(2),
             priceCurrency: "EUR",
             itemCondition: "https://schema.org/NewCondition",
-            availability: product.inStock
-              ? "https://schema.org/InStock"
-              : "https://schema.org/OutOfStock",
-            /*
-             * Χωρίς ημερομηνία λήξης, το Google θεωρεί την τιμή δυνητικά
-             * μπαγιάτικη και μπορεί να πάψει να τη δείχνει στο αποτέλεσμα.
-             */
+            availability: product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
             priceValidUntil: priceValidUntil(),
-            /*
-             * Μεταφορικά και επιστροφές μέσα στην προσφορά.
-             *
-             * Είναι αυτά που επιτρέπουν στο αποτέλεσμα αναζήτησης να δείξει
-             * «δωρεάν μεταφορικά» και «14 ημέρες επιστροφή» δίπλα στην τιμή.
-             * Χωρίς αυτά το αποτέλεσμα δείχνει μόνο ποσό — και ένα μοντέλο που
-             * συγκρίνει καταστήματα διαβάζει την απουσία ως άγνωστη πολιτική,
-             * όχι ως την προβλεπόμενη.
-             */
             shippingDetails: shippingDetails(locale),
             hasMerchantReturnPolicy: returnPolicy(),
           }
         : undefined,
-    /*
-     * Τα χαρακτηριστικά ως δεδομένα, όχι ως πρόζα.
-     *
-     * Υπάρχουν ήδη στη βάση ανά γλώσσα και με μονάδα, και ως τώρα έβγαιναν μόνο
-     * ως κείμενο στη σελίδα. Ένα μοντέλο που ρωτιέται «μύτες 25mm σε σετ των 3»
-     * δεν μπορεί να προτείνει σελίδα που δεν ΔΗΛΩΝΕΙ μήκος και τεμάχια — ακόμα
-     * κι αν η περιγραφή τα λέει, γιατί εκείνη είναι πρόζα και αυτά μετρήσιμα.
-     */
-    additionalProperty: specsAsProperties(product.specs, {
-      brand: product.brand?.name,
-      category: product.category?.name,
-    }),
-    /*
-     * Βάρος μόνο όταν υπάρχει πραγματικά.
-     *
-     * Το `!= null` περνούσε το μηδέν, και `value: 0` δεν σημαίνει «άγνωστο» —
-     * σημαίνει «δεν ζυγίζει τίποτα». Ο κατάλογος έχει πολλά είδη με GWEIGHT 0
-     * γιατί κανείς δεν το συμπλήρωσε ποτέ στο ERP· η παράλειψη είναι η αλήθεια.
-     */
-    weight:
-      product.weight != null && product.weight > 0
-        ? {
-            "@type": "QuantitativeValue",
-            value: product.weight,
-            unitCode: "KGM",
-          }
-        : undefined,
-    category: product.category?.name ?? undefined,
+    /* The manufacturer's figures, as data — the same rows as the table. */
+    additionalProperty: specs.length
+      ? specs.map((r) => ({ "@type": "PropertyValue", name: r.label, value: r.value }))
+      : undefined,
+    ...(average != null
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: average.toFixed(1),
+            reviewCount,
+          },
+        }
+      : {}),
   };
+  const breadcrumbLd = productBreadcrumb(locale, {
+    name: displayName(product.name, product.code2),
+    slug: product.slug,
+    categories: product.categoryChain,
+  });
 
-  /*
-   * Η διαδρομή στον κατάλογο.
-   *
-   * Ο helper `breadcrumbJsonLd` υπήρχε από την αρχή και δεν τον καλούσε καμία
-   * σελίδα. Η ταξινομία είναι αυτό που ρωτάει μια μηχανή — και ένα AI — όταν
-   * του ζητούν «τι κατσαβίδια έχει το κατάστημα».
-   */
-  const breadcrumbLd = productBreadcrumb(locale, product);
-
-  /*
-   * Οι ερωτήσεις που ρωτάει κάποιος πριν αγοράσει — απαντημένες από τα δεδομένα
-   * ΑΥΤΟΥ του προϊόντος.
-   *
-   * Παράγονται μόνο για την ελληνική έκδοση. Οι απαντήσεις είναι γραμμένες στα
-   * ελληνικά μέσα στον helper, και μια αγγλική σελίδα με ελληνικές ερωτήσεις
-   * είναι χειρότερη από καμία ερώτηση: λέει στη μηχανή ότι η σελίδα είναι
-   * ελληνική ενώ το `lang` της λέει το αντίθετο.
-   */
-  const faq =
-    locale === "el"
-      ? productFaq({
-          name: product.name,
-          sku: product.sku,
-          brandName: product.brand?.name ?? null,
-          inStock: product.inStock,
-          qty: product.qty,
-          guaranteeMonths: product.guaranteeMonths,
-          priceGross:
-            product.priceNet != null
-              ? grossAmount(product.priceNet, ctx)
-              : null,
-          specs: product.specs,
-        })
-      : [];
-  const faqLd = faqJsonLd(faq);
+  const crumbLast = product.modelRoot ?? displayName(product.name, product.code2);
+  const priceDisabled = finalNet == null;
 
   return (
     <QuickViewProvider locale={locale}>
@@ -355,566 +395,445 @@ export default async function ProductPage({ params }: PageProps) {
         categories={menuTree}
         brands={brands}
         stats={stats}
-        featured={related[0] ?? null}
+        featured={null}
       />
 
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
 
-      {/* Ξεχωριστό block, όχι μέσα στο Product: το BreadcrumbList είναι δική
-          του οντότητα και το Google το διαβάζει ως τέτοια. */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
-      />
+      <main id="main" className="hdc-pdp-page">
+        <nav aria-label="Breadcrumb" className="hdc-wrap hdc-pdp-crumb">
+          <Link href="/">{t("archiki")}</Link>
+          {product.categoryChain.map((c) => (
+            <span key={c.slug}>
+              <i aria-hidden>/</i>
+              <Link href={`/katalogos/${c.slug}`}>{c.name}</Link>
+            </span>
+          ))}
+          <i aria-hidden>/</i>
+          <span aria-current="page">{crumbLast}</span>
+        </nav>
 
-      {faqLd && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
-        />
-      )}
+        {/* ═══ Gallery + buy box ═══ */}
+        <div className="hdc-wrap hdc-pdp-top">
+          <HdcGallery images={product.images} alt={displayName(product.name, product.code2)} tags={galleryTags} />
 
-      <main id="main">
-        <div className="shell-x bg-k-ink-deep">
-          <nav
-            aria-label="Breadcrumb"
-            className="t-util flex min-h-11 flex-wrap items-center gap-x-2.5 gap-y-1 py-2 text-white/45"
-          >
-            <Link href="/" className="shrink-0 text-white/60 hover:text-white">
-              {upGreek(t("archiki"))}
-            </Link>
-            <span className="text-k-red">/</span>
-            {product.category && (
-              <>
-                <Link
-                  href={`/katalogos/${product.category.slug}`}
-                  className="shrink-0 text-white/60 hover:text-white"
-                >
-                  {upGreek(product.category.name)}
-                </Link>
-                <span className="text-k-red">/</span>
-              </>
-            )}
-            <span className="truncate text-white">{product.sku}</span>
-          </nav>
-        </div>
+          <div className="hdc-pdp-buy">
+            {platformText && <span className="hdc-slant hdc-pdp-tag hdc-pdp-tag--ink hdc-pdp-buytag">{platformText}</span>}
+            <h1 className="hdc-disp hdc-pdp-h1">{title}</h1>
 
-        {/*
-          Product block.
-          ─────────────────────────────────────────────────────────────────────
-          It used to be `shell-w grid [1fr_480px]`, which at a 1585px shell gave
-          the photo 1105px and the buy column 480 — 70/30 in favour of a picture
-          of a tool. That is why the h1 wrapped to four lines, the three code
-          cells were 133px wide, and the gallery column ran out of content 300px
-          before the buy column did.
-
-          Now the block caps at 1440 regardless of how wide the shell gets —
-          neither a product shot nor a buy box reads better at 1100px — and the
-          buy column takes a third of it. The specs strip and the two support
-          cards sit under the photo, filling the height difference between the
-          two columns so neither ends in dead white.
-        */}
-        <div className="pdp-band border-b border-k-line bg-white">
-          <div className="pdp-inner grid gap-8 py-6 lg:grid-cols-[minmax(0,1fr)_clamp(400px,34%,520px)] lg:gap-14 lg:py-9">
-            {/*
-              Gallery column. Everything under the photo lives HERE rather than
-              in its own full-width band: the buy column is ~200px taller than a
-              540px image, and that gap was the dead white the client kept
-              pointing at. Filling it with the specs strip and the two support
-              cards makes the two columns finish level and takes two bands —
-              and their vertical padding — off the page.
-            */}
-            <div className="flex min-w-0 flex-col">
-              {/*
-                Η καρδιά πάνω από τη φωτογραφία, όχι δίπλα στο «Στο καλάθι».
-                ──────────────────────────────────────────────────────────────
-                Το «αποθηκεύω για μετά» και το «αγοράζω τώρα» είναι αντίθετες
-                αποφάσεις· δίπλα-δίπλα η μία αραιώνει την άλλη. Στη γωνία της
-                φωτογραφίας βρίσκεται εύκολα και δεν διεκδικεί τίποτα.
-              */}
-              <div className="relative">
-                <div className="absolute top-3 right-3 z-10">
-                  <FavouriteButton productId={product.id} initial={favourite} />
-                </div>
-                <ProductGallery
-                  images={product.images}
-                  alt={product.name}
-                  discountLabel={saving ? formatPercent(saving.percent) : null}
-                />
-              </div>
-
-              {glance.length > 0 && (
-                /*
-                  `@container`, και το ίδιο padding σε όλα τα κελιά.
-                  ────────────────────────────────────────────────────────────
-                  Τα τέσσερα κελιά μοιράζονται τη ΣΤΗΛΗ, όχι την οθόνη: με
-                  `sm:` έμπαιναν τέσσερα σε πλάτος 310px, δηλαδή ~78px το
-                  καθένα, και το `lg:px-8` έτρωγε 64 από αυτά. Ό,τι περίσσευε
-                  δεν χωρούσε ούτε ένα «32×15×10 cm».
-                */
-                <dl className="@container mt-5 grid grid-cols-2 gap-px border border-k-line bg-k-line lg:mt-6 @[30rem]:grid-cols-4">
-                  {glance.map((item) => (
-                    <div
-                      key={item.k}
-                      className="bg-white px-4 py-4 @[44rem]:px-6"
-                    >
-                      <dt className="t-account-label text-k-text-4">
-                        {upGreek(item.k)}
-                      </dt>
-                      {/* Μικρότερο για μακριές τιμές: «32×15×10 cm» στα 17px
-                          τυλιγόταν, και το «cm» έπεφτε μόνο του στη δεύτερη
-                          σειρά. Οι σύντομες τιμές — «8 τεμ.», «2,3 kg» —
-                          κρατούν το μεγάλο μέγεθος. */}
-                      <dd
-                        className={cn(
-                          "mt-1.5 font-mono leading-[1.2] font-semibold text-k-ink",
-                          item.v.length > 9 ? "text-[13.5px]" : "text-[17px]",
-                        )}
-                      >
-                        {item.v}
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
+            <div className="hdc-pdp-codes">
+              <span>
+                {t("kodikos")} <b>{code}</b>
+              </span>
+              {model && (
+                <span>
+                  {t("montelo")} <b>{model.code}</b>
+                </span>
               )}
-
-              {/* Dealer band + expert help, side by side. */}
-              <div className="mt-px grid border border-k-line bg-white md:grid-cols-2">
-                {product.brand && (
-                  <div className="flex flex-wrap items-center justify-between gap-4 border-b border-k-line px-4 py-5 md:border-r md:border-b-0 md:px-5">
-                    <div className="flex min-w-0 items-center gap-4">
-                      {product.brand.logo && (
-                        <Image
-                          src={product.brand.logo}
-                          alt={product.brand.name}
-                          width={96}
-                          height={96}
-                          className="block h-12 w-12 shrink-0 object-contain"
-                        />
-                      )}
-                      <div className="min-w-0">
-                        <p className="text-[13px] font-semibold text-k-ink">
-                          {t("episimi_antiprosopeysi")} {product.brand.name}{" "}
-                          {t("stin_ellada")}
-                        </p>
-                        <p className="mt-1 text-[12.5px] leading-[1.55] text-k-text-3">
-                          {t("gnisio_proion_eggyisi_kataskeyasti_servis")}
-                        </p>
-                      </div>
-                    </div>
-                    <Link
-                      href={`/brands/${product.brand.slug}`}
-                      className="t-link-mono shrink-0 border-b-[1.5px] border-k-red pb-[3px] text-k-ink transition-colors hover:text-k-red"
-                    >
-                      {upGreek(t("ola_ta", { name: product.brand.name }))} →
-                    </Link>
-                  </div>
-                )}
-
-                <div className="flex flex-wrap items-center gap-4 border-l-[3px] border-k-red bg-k-surface-3 px-4 py-5 md:px-5">
-                  <div className="min-w-0 flex-1">
-                    <p className="t-account-label text-k-text-4">
-                      {upGreek(
-                        product.category
-                          ? t("ypeythynos_katigorias", {
-                              name: product.category.name,
-                            })
-                          : t("ypeythynos_katigorias"),
-                      )}
-                    </p>
-                    <p className="mt-1.5 text-[14px] font-semibold text-k-ink">
-                      {t("den_xerete_an_kanei_gia")}
-                    </p>
-                    <p className="mt-1 text-[12px] leading-[1.55] text-k-text-3">
-                      {t("kaleste_mas_46_chronia_sta", {
-                        years: yearsInBusiness(),
-                      })}
-                    </p>
-                  </div>
-                  <a
-                    href="tel:+302104111355"
-                    className="t-card-cta flex items-center justify-center bg-k-ink px-4 py-3 text-white transition-colors hover:bg-k-red"
-                  >
-                    210 411 1355
-                  </a>
-                </div>
-              </div>
+              {ean && <span>EAN {ean}</span>}
             </div>
+            <p className="hdc-pdp-mcodes">{[code, model?.code].filter(Boolean).join(" · ")}</p>
 
-            {/* Buy column */}
-            <div className="flex min-w-0 flex-col">
-              {product.brand && (
-                <div className="flex items-center gap-3">
-                  {product.brand.logo && (
-                    <Image
-                      src={product.brand.logo}
-                      alt=""
-                      width={96}
-                      height={96}
-                      className="block h-8 w-8 shrink-0 object-contain"
-                    />
-                  )}
-                  <Link
-                    href={`/brands/${product.brand.slug}`}
-                    className="text-[11px] font-bold tracking-[0.14em] text-k-red transition-colors hover:text-k-red-hover"
-                  >
-                    {upGreek(product.brand.name)}
-                  </Link>
-                  <span className="t-brand-count ml-auto flex items-center gap-1.5 border border-k-line-2 px-2 py-1 text-k-text-3">
-                    <span
-                      aria-hidden
-                      className="block h-1.5 w-1.5 bg-k-green"
-                    />
-                    {upGreek(t("episimi_antiprosopeysi"))}
-                  </span>
-                </div>
-              )}
+            {average != null ? (
+              <a href="#kritikes" className="hdc-pdp-rv">
+                ★ {formatAverage(average)} · {t("kritikes_count", { count: reviewCount })}
+              </a>
+            ) : (
+              <a href="#kritikes" className="hdc-pdp-rv">
+                {t("proti_kritiki")}
+              </a>
+            )}
 
-              <h1 className="font-display mt-3.5 text-[21px] leading-[1.24] t-display text-balance text-k-ink lg:text-[26px]">
-                {product.name}
-              </h1>
-
-              {/*
-                Η προσφορά, κάτω από τον τίτλο και ΠΑΝΩ από την τιμή.
-                ──────────────────────────────────────────────────────────────
-                Σύνδεσμος εδώ, ετικέτα στην κάρτα: στο πλέγμα ένα κλικ σημαίνει
-                «δείξε μου αυτό το προϊόν», και ένα σήμα που οδηγεί αλλού είναι
-                παγίδα. Εδώ το προϊόν είναι ήδη ανοιχτό, οπότε «τι άλλο έχει
-                αυτή η προσφορά» είναι εύλογη επόμενη κίνηση.
-
-                Πάνω από την τιμή, γιατί αλλάζει τον τρόπο που διαβάζεται: μια
-                τιμή που ξέρεις ότι είναι σε καμπάνια δεν είναι η ίδια τιμή.
-              */}
-              {offer && (
-                <Link
-                  href={offer.href}
-                  className="group/offer mt-3.5 inline-flex items-center gap-2.5 border border-k-red/30 bg-k-red/5 py-1.5 pr-3 pl-1.5 transition-colors hover:border-k-red"
-                >
-                  <span className="t-badge bg-k-red-600 px-[7px] py-1 text-white uppercase">
-                    {offer.label}
-                  </span>
-                  <span className="text-[12.5px] text-k-ink">
-                    {offer.title}
-                  </span>
-                  <span
-                    aria-hidden
-                    className="text-[12.5px] text-k-red transition-transform group-hover/offer:translate-x-1"
-                  >
-                    →
-                  </span>
-                </Link>
-              )}
-
-              {/*
-                Codes as one inline row, not three boxed cells. At 133px each
-                the labels truncated to "ΚΩΔ. ΚΑΤΑΣΚΕΥΑ…", which is worse than
-                no label.
-              */}
-              <dl className="mt-3.5 flex flex-wrap items-baseline gap-x-5 gap-y-1.5">
-                {[
-                  { label: t("kodikos"), value: product.sku },
-                  { label: t("kod_kataskeyasti"), value: product.mpn },
-                  /*
-                    Το EAN κρύβεται στα προϊόντα με νούμερα.
-                    ────────────────────────────────────────────────────────
-                    Είναι μοναδικό ανά νούμερο, οπότε αλλάζει σε κάθε πάτημα
-                    του επιλογέα — δίπλα σε έναν κωδικό κατασκευαστή που
-                    ΜΕΝΕΙ ίδιος, μοιάζει με σφάλμα. Και δεν το χρειάζεται
-                    κανείς εδώ: ο αγοραστής παραγγέλνει με τον κωδικό μας.
-                  */
-                  ...(product.variantGroup
-                    ? []
-                    : [{ label: "EAN", value: product.ean }]),
-                ]
-                  .filter((item) => item.value && item.value !== "—")
-                  .map((item) => (
-                    <div key={item.label} className="flex items-baseline gap-2">
-                      <dt className="t-account-label text-k-text-4">
-                        {upGreek(item.label)}
-                      </dt>
-                      <dd className="font-mono text-[12.5px] font-semibold text-k-ink">
-                        {item.value}
-                      </dd>
-                    </div>
-                  ))}
-              </dl>
-
-              {/*
-                The short description belongs HERE, above the price — it is the
-                sentence that answers "is this the right thing" and it was
-                buried two sections down behind a tab.
-              */}
-              {product.shortDescription && (
-                <Expandable
-                  lines={3}
-                  collapsible={product.shortDescription.length > 190}
-                  className="mt-4 text-[13.5px] leading-[1.65] text-k-text-2"
-                >
-                  {product.shortDescription}
-                </Expandable>
-              )}
-
-              {/*
-                Ο επιλογέας νούμερου πάνω από την τιμή.
-                ──────────────────────────────────────────────────────────
-                Το νούμερο είναι απόφαση που προηγείται της τιμής: κάθε
-                νούμερο είναι δικός του κωδικός με δικό του απόθεμα, και
-                διαλέγοντας μετά την τιμή ο πελάτης θα διάβαζε δύο φορές.
-              */}
-              <VariantPicker options={variants} label={variantLabel} />
-
-              <PriceBox
-                productId={product.id}
-                priceNet={product.priceNet}
-                priceListNet={product.priceListNet}
-                offer={
-                  offer && offer.discountPercent > 0 && product.priceNet != null
-                    ? {
-                        label: offer.label,
-                        title: offer.title,
-                        discountPercent: offer.discountPercent,
-                        finalNet: discountedNet(
-                          product.priceNet,
-                          offer.discountPercent,
-                        ),
-                      }
-                    : null
-                }
-                vatRate={product.vatRate}
-                qty={product.qty}
-                inStock={product.inStock}
-              />
-
-              {/*
-                Trust grid. `flex-1` with stretched rows: the buy column is the
-                taller of the two only until the gallery column gained the
-                specs strip and the support cards under the photo — after that
-                this block was left floating with ~180px of white beneath it.
-                Growing into that space lands its bottom edge exactly on the
-                left cards' bottom edge.
-
-                Each tile carries its own icon and accent colour. Four
-                identical grey paragraphs is what "flat and lifeless" looked
-                like here, and colour is doing real work: green for what is
-                guaranteed, red for what costs nothing, ink for logistics.
-              */}
-              <div className="grid flex-1 auto-rows-fr grid-cols-2 gap-px border border-t-0 border-k-line bg-k-line">
-                {[
-                  {
-                    t: t("paradosi_24_48o"),
-                    d: t("panelladika_me_courier"),
-                    tone: "ink" as const,
-                    icon: (
-                      <>
-                        <rect x="1" y="6" width="13" height="10" rx="1" />
-                        <path d="M14 9h4l3 3v4h-7z" />
-                        <circle cx="6" cy="18" r="2" />
-                        <circle cx="17" cy="18" r="2" />
-                      </>
-                    ),
-                  },
-                  {
-                    t: t("dorean_ano_150"),
-                    d: t("kathari_axia_paraggelias"),
-                    tone: "red" as const,
-                    icon: (
-                      <>
-                        <path d="M20 12V7a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h9" />
-                        <path d="M17 15h6M20 12v6" />
-                      </>
-                    ),
-                  },
-                  {
-                    t: t("epistrofi_14_imeron"),
-                    d: t("ametacheiristo_me_parastatiko"),
-                    tone: "ink" as const,
-                    icon: (
-                      <>
-                        <path d="M3 12a9 9 0 1 0 3-6.7" />
-                        <path d="M3 4v5h5" />
-                      </>
-                    ),
-                  },
-                  {
-                    t: product.guaranteeMonths
-                      ? t("eggyisi_minon", {
-                          guaranteeMonths: product.guaranteeMonths,
-                        })
-                      : t("episimi_eggyisi"),
-                    d: t("servis_antallaktika"),
-                    tone: "green" as const,
-                    icon: (
-                      <>
-                        <path d="M12 3l8 3v6c0 5-3.4 8.4-8 9.5C7.4 20.4 4 17 4 12V6z" />
-                        <path d="M9 12l2 2 4-4" />
-                      </>
-                    ),
-                  },
-                ].map((item) => (
-                  <div
-                    key={item.t}
-                    className="flex items-start gap-3 bg-white px-4 py-4 transition-colors hover:bg-k-surface-2"
-                  >
-                    <span
-                      aria-hidden
-                      className={`mt-px flex h-7 w-7 shrink-0 items-center justify-center ${
-                        item.tone === "red"
-                          ? "bg-k-red/10 text-k-red"
-                          : item.tone === "green"
-                            ? "bg-k-green/10 text-k-green"
-                            : "bg-k-ink/6 text-k-ink"
-                      }`}
-                    >
-                      <svg
-                        width="15"
-                        height="15"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        {item.icon}
-                      </svg>
-                    </span>
-                    <span className="min-w-0">
-                      <span className="block text-[11.5px] leading-[1.3] font-semibold text-k-ink">
-                        {item.t}
-                      </span>
-                      <span className="mt-1 block text-[11.5px] leading-[1.5] text-k-text-3">
-                        {item.d}
-                      </span>
-                    </span>
+            {keys.length >= 2 && (
+              <div className="hdc-pdp-keys" style={{ "--keys": keys.length } as React.CSSProperties}>
+                {keys.map((k) => (
+                  <div key={k.key}>
+                    <b>{k.value}</b>
+                    <span>{keyLabel(k)}</span>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {showVariants && (
+              <div className="hdc-pdp-variants">
+                <div className="hdc-pdp-lbl">
+                  <span>{t("epiloges")}</span>
+                  <details className="hdc-pdp-codehelp">
+                    <summary>{t("ti_simainoun")}</summary>
+                    <p>{t("ti_simainoun_apantisi")}</p>
+                  </details>
+                </div>
+                <div className="hdc-pdp-opts">
+                  {variantView.map((v) => {
+                    const inner = (
+                      <>
+                        <span className="n">{v.name}</span>
+                        <span className="m">{v.codes}</span>
+                        <span className="d">{v.contents}</span>
+                        <span className="p">{v.price}</span>
+                      </>
+                    );
+                    return v.current ? (
+                      <div key={v.id} className="hdc-pdp-opt on" aria-current="true">
+                        {inner}
+                      </div>
+                    ) : (
+                      <Link key={v.id} href={`/proion/${v.slug}`} className="hdc-pdp-opt" prefetch={false}>
+                        {inner}
+                      </Link>
+                    );
+                  })}
+                </div>
+                {saving != null && saving > 0 && platformName && (
+                  <p className="hdc-pdp-hint">
+                    {t.rich("hint", {
+                      platform: platformName,
+                      amount: formatMoney(saving, locale),
+                      b: (chunks) => <b>{chunks}</b>,
+                    })}
+                  </p>
+                )}
+                {/* Phones: compact chips under the title (phone frame `.popts`). */}
+                <div className="hdc-pdp-chips">
+                  {variantView.map((v) =>
+                    v.current ? (
+                      <span key={v.id} className="on" aria-current="true">
+                        {v.chip}
+                        <b>{v.price}</b>
+                      </span>
+                    ) : (
+                      <Link key={v.id} href={`/proion/${v.slug}`} prefetch={false}>
+                        {v.chip}
+                        <b>{v.price}</b>
+                      </Link>
+                    ),
+                  )}
+                </div>
+              </div>
+            )}
+
+            <div className="hdc-pdp-pricebox">
+              <p className="hdc-pdp-pr">
+                {price}
+                {discounted && product.priceNet != null && (
+                  <s>{formatMoney(grossAmount(product.priceNet, ctx), locale)}</s>
+                )}
+                <small>{t("me_fpa")}</small>
+              </p>
+              <div className="hdc-pdp-avail">
+                <div className={product.inStock ? "ok" : "wait"}>
+                  <span className="dot" aria-hidden />
+                  <span>{stockLine}</span>
+                </div>
+                <div>
+                  <span className="dot dot--ink" aria-hidden />
+                  <span>
+                    {t("paralavi")} <span className="g">· {t("paralavi_topos")}</span>
+                  </span>
+                </div>
+                <div>
+                  <span className="dot dot--ink" aria-hidden />
+                  <span>
+                    {t("dorean_apostoli")}{" "}
+                    <span className="g">· {t("dorean_orio", { amount: FREE_SHIPPING_THRESHOLD_NET })}</span>
+                  </span>
+                </div>
+              </div>
+              <HdcBuyActions
+                productId={product.id}
+                slug={product.slug}
+                disabled={priceDisabled}
+                favourite={favourites.has(product.id)}
+                compare={compare}
+                questionHref={`/epikoinonia?product=${encodeURIComponent(code)}`}
+                shareTitle={displayName(product.name, product.code2)}
+              />
+            </div>
+
+            <div className="hdc-pdp-serv">
+              <div>
+                <b>{t("serv_apostoli_t")}</b>
+                <span>{t("serv_apostoli_d", { amount: FREE_SHIPPING_THRESHOLD_NET })}</span>
+              </div>
+              <div>
+                <b>{t("serv_paralavi_t")}</b>
+                <span>{t("serv_paralavi_d")}</span>
+              </div>
+              <div>
+                <b>{t("serv_eggyisi_t")}</b>
+                <span>{t("serv_eggyisi_d")}</span>
+              </div>
+              <div>
+                <b>{t("serv_pliromi_t")}</b>
+                <span>{t("serv_pliromi_d")}</span>
               </div>
             </div>
           </div>
         </div>
 
-        <ProductTabs product={product} />
+        {/* ═══ Section bar ═══ */}
+        <HdcSectionNav
+          sections={sections}
+          price={price}
+          productId={product.id}
+          disabled={priceDisabled}
+          label={t("nav_label")}
+          addLabel={t("sto_kalathi")}
+        />
 
-        {/*
-          White, NOT dark. The footer is already #101012, so a dark band here
-          ran straight into it and the two read as one black mass with the
-          product cards floating in the middle. On this site the dark surface
-          means CHROME — hero, breadcrumb, footer — and borrowing it for a
-          content section breaks that meaning.
-
-          The rhythm through the page is therefore tinted (tabs) → white
-          (related) → dark (footer), with the hazard rule marking the change of
-          register from "this product" to "the alternatives".
-        */}
-        {/*
-          Οι ερωτήσεις, ΟΡΑΤΕΣ.
-          ────────────────────────────────────────────────────────────────────
-          Δεν είναι διακόσμηση για το schema: οι οδηγίες του Google απαιτούν το
-          περιεχόμενο του FAQPage να φαίνεται στη σελίδα, και schema που δηλώνει
-          κάτι που ο επισκέπτης δεν βλέπει είναι παράβαση — όχι έξυπνη κίνηση.
-
-          `<details>` και όχι accordion με JavaScript: ανοίγει χωρίς script,
-          είναι προσβάσιμο από πληκτρολόγιο εξ ορισμού, και το περιεχόμενο
-          υπάρχει στο HTML ακόμα και κλειστό — που είναι αυτό που διαβάζει ένας
-          crawler.
-        */}
-        {faq.length > 0 && (
-          <section className="band-base">
-            <div className="pdp-band py-9 lg:py-12">
-              <div className="pdp-inner">
-                <h2 className="t-eyebrow mb-5 text-k-text-4">
-                  {upGreek("Συχνές ερωτήσεις")}
-                </h2>
-                <div className="border-t border-k-line">
-                  {faq.map((item) => (
-                    <details
-                      key={item.q}
-                      className="group border-b border-k-line"
-                    >
-                      <summary className="flex cursor-pointer items-center justify-between gap-4 py-3.5 text-[14px] font-medium text-k-ink marker:content-none [&::-webkit-details-marker]:hidden">
-                        {item.q}
-                        <span
-                          aria-hidden
-                          className="shrink-0 text-k-text-4 transition-transform group-open:rotate-45"
-                        >
-                          +
-                        </span>
-                      </summary>
-                      <p className="max-w-[70ch] pb-4 text-[13.5px] leading-[1.7] text-k-text-2">
-                        {item.a}
-                      </p>
-                    </details>
+        <div className="hdc-wrap hdc-pdp-sections">
+          {paragraphs.length > 0 && (
+            <HdcSection id="perigrafi" title={t("nav_perigrafi")}>
+              <div className={`hdc-pdp-ov${photo ? "" : " hdc-pdp-ov--full"}`}>
+                <div>
+                  {paragraphs.map((p, i) => (
+                    <p key={i}>{p}</p>
                   ))}
                 </div>
+                {photo && (
+                  <figure className="hdc-pdp-ph">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- CDN WebP; the optimiser is off */}
+                    <img src={photo} alt={displayName(product.name, product.code2)} loading="lazy" />
+                    {product.modelRoot && <figcaption>{product.modelRoot}</figcaption>}
+                  </figure>
+                )}
               </div>
-            </div>
-          </section>
-        )}
+            </HdcSection>
+          )}
 
-        <ProductReviews
-          reviews={reviews}
-          average={product.ratingAvg}
-          count={product.ratingCount}
-        />
+          {specs.length > 0 && (
+            <HdcSection id="prodiagrafes" title={t("nav_prodiagrafes")} defaultOpen>
+              <div className="hdc-pdp-specs">
+                {[specs.slice(0, half), specs.slice(half)].map((column, i) =>
+                  column.length ? (
+                    <dl key={i}>
+                      {column.map((r) => (
+                        <div key={r.label}>
+                          <dt>{r.label}</dt>
+                          <dd>{r.value}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  ) : null,
+                )}
+              </div>
+            </HdcSection>
+          )}
+
+          {box.length > 0 && (
+            <HdcSection id="syskevasia" title={t("nav_syskevasia")}>
+              <div className="hdc-pdp-box">
+                {box.map((tile, i) => {
+                  switch (tile.kind) {
+                    case "tool":
+                      return (
+                        <div key={i}>
+                          <div className="im">
+                            <span className="x">{tile.qty}</span>
+                            {toolImage && (
+                              // eslint-disable-next-line @next/next/no-img-element -- CDN WebP; the optimiser is off
+                              <img src={toolImage} alt="" loading="lazy" />
+                            )}
+                          </div>
+                          <div className="t">
+                            {pdpTitle(product.name, product.code2)}
+                            <small>{t("box_tool_sub")}</small>
+                          </div>
+                        </div>
+                      );
+                    case "battery": {
+                      const battery = tile.product;
+                      const label = t("box_battery_title", {
+                        platform: platform ?? "",
+                        ah: ahLabel(tile.ah),
+                      });
+                      return battery ? (
+                        <Link key={i} href={`/proion/${battery.slug}`} prefetch={false}>
+                          <div className="im">
+                            <span className="x">{tile.qty}</span>
+                            {battery.image && (
+                              // eslint-disable-next-line @next/next/no-img-element -- CDN WebP; the optimiser is off
+                              <img src={battery.image} alt="" loading="lazy" />
+                            )}
+                          </div>
+                          <div className="t">
+                            {displayName(battery.name, battery.code2)}
+                            <small>
+                              {ahLabel(tile.ah)}Ah · {battery.code2}
+                            </small>
+                          </div>
+                        </Link>
+                      ) : (
+                        <div key={i}>
+                          <div className="im ph">
+                            <span className="x">{tile.qty}</span>
+                            {t("box_battery_ph")}
+                          </div>
+                          <div className="t">
+                            {label}
+                            <small>{t("box_battery_sub")}</small>
+                          </div>
+                        </div>
+                      );
+                    }
+                    case "charger":
+                      return (
+                        <div key={i}>
+                          <div className="im ph">
+                            <span className="x">{tile.qty}</span>
+                            {t("box_charger_ph")}
+                          </div>
+                          <div className="t">
+                            {tile.model ? t("box_charger_title", { model: tile.model }) : t("box_charger_plain")}
+                            <small>
+                              {/M12/.test(tile.model) && /M18/.test(tile.model)
+                                ? t("box_charger_both")
+                                : t("box_charger_sub")}
+                            </small>
+                          </div>
+                        </div>
+                      );
+                    case "case":
+                      return (
+                        <div key={i}>
+                          <div className="im ph">
+                            <span className="x">{tile.qty}</span>
+                            {upGreek(tile.value)}
+                          </div>
+                          <div className="t">
+                            {tile.value}
+                            <small>{t("box_case_sub")}</small>
+                          </div>
+                        </div>
+                      );
+                    case "accessories":
+                      return (
+                        <div key={i}>
+                          <div className="im ph">
+                            <span className="x">{tile.qty}</span>
+                            {t("box_acc_ph")}
+                          </div>
+                          <div className="t">
+                            {tile.items
+                              .join(", ")
+                              .replace(/^./, (c) => c.toLocaleUpperCase(locale))}
+                            <small>{t("box_acc_sub")}</small>
+                          </div>
+                        </div>
+                      );
+                  }
+                })}
+              </div>
+            </HdcSection>
+          )}
+
+          {product.documents.length > 0 && (
+            <HdcSection id="eggrafa" title={t("nav_eggrafa")}>
+              <div className="hdc-pdp-docs">
+                {product.documents.map((doc, i) => (
+                  <a key={doc.id} href={doc.url} target="_blank" rel="noopener noreferrer">
+                    <i>PDF</i>
+                    <div>
+                      <b>{t("eggrafo", { n: i + 1 })}</b>
+                      <span>{decodeURIComponent(doc.url.split("/").pop()?.split("?")[0] ?? "")}</span>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </HdcSection>
+          )}
+
+          <HdcSection id="kritikes" title={t("nav_kritikes")}>
+            {reviewCount === 0 ? (
+              <div className="hdc-pdp-rev">
+                <div>
+                  <h3>{t("rev_empty_t")}</h3>
+                  <p>{t("rev_empty_d")}</p>
+                </div>
+                <Link href="/logariasmos/axiologiseis" className="hdc-btn hdc-btn-ink" prefetch={false}>
+                  {t("rev_write")}
+                </Link>
+              </div>
+            ) : (
+              <>
+                <div className="hdc-pdp-rev-head">
+                  <b>★ {formatAverage(average ?? 0)}</b>
+                  <span>
+                    {t("kritikes_count", { count: reviewCount })} · {t("rev_note")}
+                  </span>
+                  <Link href="/logariasmos/axiologiseis" className="hdc-btn hdc-btn-ink" prefetch={false}>
+                    {t("rev_write")}
+                  </Link>
+                </div>
+                <ul className="hdc-pdp-revs">
+                  {reviews.map((r) => (
+                    <li key={r.id}>
+                      <div>
+                        <span className="stars" aria-label={t("asteria", { n: r.rating })}>
+                          {"★".repeat(r.rating)}
+                          <span aria-hidden>{"★".repeat(5 - r.rating)}</span>
+                        </span>
+                        <time dateTime={r.createdAt.toISOString()}>
+                          {r.createdAt.toLocaleDateString(locale === "el" ? "el-GR" : locale)}
+                        </time>
+                      </div>
+                      {r.title && <b>{r.title}</b>}
+                      <p>{r.body}</p>
+                      <small>
+                        {r.customer.firstName.trim()}
+                        {r.customer.lastName.trim() ? ` ${r.customer.lastName.trim().charAt(0)}.` : ""}
+                      </small>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </HdcSection>
+        </div>
 
         <Zone id="product.aboveRelated" locale={locale} />
 
-        {related.length > 0 && (
-          <section className="band-base">
-            <div className="rule-hazard" />
-            <div className="pdp-band py-9 lg:py-14">
-              <div className="pdp-inner">
-                <SectionHead
-                  eyebrow={
-                    product.category
-                      ? t("stin_idia_katigoria", {
-                          name: product.category.name,
-                        })
-                      : t("stin_idia_katigoria")
-                  }
-                  title={t("schetika_proionta")}
-                  lead={t("idia_chrisi_diaforetiko_megethos_i")}
-                  meta={
-                    product.category && (
-                      <Link
-                        href={`/katalogos/${product.category.slug}`}
-                        className="t-btn-sm inline-block border-[1.5px] border-k-ink px-6 py-3.5 text-k-ink transition-colors hover:bg-k-ink hover:text-white"
-                      >
-                        {upGreek(t("oli_i_katigoria"))} →
-                      </Link>
-                    )
-                  }
-                />
-
-                {/*
-                  A rail, not a grid. How many fit is CSS: each card claims a
-                  fifth of the row but never goes under 232px, so a wide band
-                  shows five and a narrow one three — and the arrows reach the
-                  rest instead of the row wrapping into a second line of
-                  suggestions nobody scrolled for.
-                */}
-                <div className="mt-7 lg:mt-9">
-                  <ProductRail>
-                    {related.map((item) => (
-                      <div
-                        key={item.id}
-                        className="w-[calc(50%-0.375rem)] shrink-0 snap-start sm:w-[calc(33.333%-0.667rem)] lg:w-[calc(20%-0.8rem)] lg:min-w-[232px]"
-                      >
-                        <ProductCard product={item} />
-                      </div>
-                    ))}
-                  </ProductRail>
+        {/* ═══ Same battery ═══ */}
+        {platform && bandCards.length > 0 && (
+          <section className="hdc-pdp-xs">
+            <div className="hdc-wrap">
+              <div className="hdc-pdp-xs-head">
+                <div>
+                  <h2 className="hdc-disp">{t("xs_title")}</h2>
+                  <p>
+                    {product.modelContent === "kit"
+                      ? t("xs_lead_kit", { platform: platformName ?? platform })
+                      : t("xs_lead", { platform: platformName ?? platform })}
+                  </p>
                 </div>
+                {platformHref && (
+                  <Link href={platformHref} prefetch={false}>
+                    {t("xs_all", { platform: platformName ?? platform })}
+                  </Link>
+                )}
+              </div>
+              <div className="hdc-pdp-xs-grid">
+                {bandCards.map((card) => (
+                  <HdcProductCard key={card.id} product={card} />
+                ))}
               </div>
             </div>
           </section>
         )}
-        <Zone id="product.middle" locale={locale} />
 
+        <Zone id="product.middle" locale={locale} />
         <Zone id="product.below" locale={locale} />
+
+        {/* Phones: price and «ΣΤΟ ΚΑΛΑΘΙ» always in reach (phone frame `.bar`). */}
+        <div className="hdc-pdp-mbar">
+          <div className="pp">
+            <b>{price}</b>
+            <span>{t("me_fpa")}</span>
+          </div>
+          <AddToCartButton productId={product.id} disabled={priceDisabled} label={t("sto_kalathi")} className="hdc-pdp-mbar-add" />
+        </div>
       </main>
 
       <SiteFooter categories={rootCategories} />

@@ -34,7 +34,16 @@ const TOPICS = [
   { value: "other" },
 ] as const;
 
-export function ContactForm({ locale, pagePath }: { locale: string; pagePath?: string }) {
+export function ContactForm({
+  locale,
+  pagePath,
+  defaultSubject,
+}: {
+  locale: string;
+  pagePath?: string;
+  /** Pre-filled subject — «Ερώτηση για το προϊόν …» from a product page. */
+  defaultSubject?: string;
+}) {
   const t = useTranslations("contact.ContactForm");
   const [state, action, pending] = useActionState<ContactState, FormData>(submitContact, {});
   const [topic, setTopic] = useState<(typeof TOPICS)[number]["value"]>("technical");
@@ -119,7 +128,13 @@ export function ContactForm({ locale, pagePath }: { locale: string; pagePath?: s
         )}
       </div>
 
-      <Field label={t("thema_minymatos")} name="subject" required error={state.fieldErrors?.subject} />
+      <Field
+        label={t("thema_minymatos")}
+        name="subject"
+        required
+        defaultValue={defaultSubject}
+        error={state.fieldErrors?.subject}
+      />
 
       <label className="block">
         <span className="t-account-label mb-1.5 block text-k-text-4">
@@ -161,9 +176,11 @@ function Field({
   placeholder,
   error,
   help,
+  defaultValue,
 }: {
   label: string;
   name: string;
+  defaultValue?: string;
   type?: string;
   required?: boolean;
   autoComplete?: string;
@@ -183,6 +200,7 @@ function Field({
         required={required}
         autoComplete={autoComplete}
         placeholder={placeholder}
+        defaultValue={defaultValue}
         aria-invalid={error ? true : undefined}
         className={`t-input h-12 w-full border px-3.5 text-k-ink outline-none focus:border-k-ink ${
           error ? "border-k-red" : "border-k-line-2"
