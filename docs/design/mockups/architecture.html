@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<title>Αρχιτεκτονική</title>
+<link href="https://fonts.googleapis.com/css2?family=TikTok+Sans:opsz,wdth,wght@12..36,75..150,300..900&display=swap" rel="stylesheet">
+<style>
+  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelReg.ttf) format("truetype"); font-weight:400; }
+  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelBol.ttf) format("truetype"); font-weight:700; }
+  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConReg.ttf) format("truetype"); font-weight:400; }
+  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConBol.ttf) format("truetype"); font-weight:700; }
+  :root { --red:#DB011C; --ink:#0A0A0A; --g7:#444; --g5:#6B6B6B; --g3:#D6D6D6; --g1:#F4F4F4; --ok:#1F7A3A; --api:#0B3D91; --new:#DB011C; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"CF Helvetica",Helvetica,Arial,sans-serif; color:var(--ink); background:#fff; font-size:15px; }
+  .wrap { max-width:1320px; margin:0 auto; padding:0 24px; }
+  .disp { font-family:"TikTok Sans",sans-serif; font-weight:900; font-stretch:150%; letter-spacing:-0.02em; line-height:1.02; }
+  .screen { background:var(--g1); border-top:4px solid var(--ink); border-bottom:1px solid var(--g3); }
+  .screen .wrap { display:flex; gap:16px; height:64px; align-items:center; }
+  .screen b { font-family:"TikTok Sans"; font-weight:900; font-stretch:150%; font-size:22px; letter-spacing:-.02em; }
+  .screen span { font:400 14px "CF Helvetica Condensed"; color:var(--g5); }
+  .legend { display:flex; gap:22px; padding:18px 0 0; font:700 13px "CF Helvetica Condensed"; letter-spacing:.04em; }
+  .legend span { display:flex; align-items:center; gap:8px; }
+  .legend i { width:26px; height:0; border-top:3px solid var(--ink); }
+  .legend i.n { border-top:3px dashed var(--new); }
+  .legend i.u { border-top:3px solid #b5b5b5; }
+  svg { display:block; width:100%; height:auto; margin:10px 0 30px; }
+  svg text { font-family:"CF Helvetica Condensed",sans-serif; }
+  .t { font-family:"TikTok Sans"; font-weight:900; font-stretch:130%; }
+  .sec { padding:10px 0 50px; }
+  .sec h2 { font-size:26px; margin:26px 0 14px; }
+  .cards { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .card { border:1px solid var(--g3); border-top:4px solid var(--ink); padding:16px; font-size:14px; line-height:1.55; color:var(--g7); }
+  .card.n { border-top-color:var(--red); }
+  .card b.h { display:block; font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:14px; color:var(--ink); margin-bottom:6px; }
+  .card code { font:600 12px ui-monospace,Menlo,monospace; background:var(--g1); padding:1px 4px; }
+  .card em { font-style:normal; font:700 11px "CF Helvetica Condensed"; letter-spacing:.08em; color:var(--red); display:block; margin-bottom:4px; }
+</style>
+</head>
+<body>
+<div class="screen"><div class="wrap"><b>ΑΡΧΙΤΕΚΤΟΝΙΚΗ</b><span>Τρία συστήματα — το HDC είναι ένας δεύτερος πελάτης του HDCtool, δίπλα στο eshop, χωρίς να το αγγίζει</span></div></div>
+<div class="wrap">
+  <div class="legend"><span><i></i>υπάρχει ήδη — το HDC το χρησιμοποιεί όπως είναι</span><span><i class="n"></i>ΝΕΟ — προσθήκη στο HDCtool</span><span><i class="u"></i>μένει όπως είναι</span></div>
+
+  <svg viewBox="0 0 1270 640" role="img" aria-label="Διάγραμμα αρχιτεκτονικής">
+    <defs>
+      <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0A0A0A"/></marker>
+      <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#DB011C"/></marker>
+      <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b5b5b5"/></marker>
+    </defs>
+
+    <!-- HDC eshop -->
+    <rect x="20" y="40" width="360" height="330" fill="#DB011C"/>
+    <rect x="20" y="40" width="360" height="54" fill="#0A0A0A"/>
+    <text x="38" y="75" fill="#fff" class="t" font-size="20">HDC ESHOP</text>
+    <text x="250" y="75" fill="#bbb" font-size="13">νέο domain</text>
+    <text x="38" y="122" fill="#fff" font-size="15" font-weight="700">Next.js 16 · αντίγραφο του eshop</text>
+    <text x="38" y="146" fill="#ffe1e3" font-size="14">Χωρίς B2B · μόνο Milwaukee (1364)</text>
+    <text x="38" y="168" fill="#ffe1e3" font-size="14">Νέο design system · el / en / it</text>
+    <rect x="38" y="190" width="324" height="80" fill="#0A0A0A"/>
+    <text x="52" y="216" fill="#fff" font-size="15" font-weight="700">Postgres «hdcfront»</text>
+    <text x="52" y="238" fill="#bbb" font-size="13">αντίγραφο καταλόγου · πελάτες · καλάθια</text>
+    <text x="52" y="258" fill="#bbb" font-size="13">παραγγελίες HDC- · κριτικές · κουπόνια</text>
+    <text x="38" y="298" fill="#fff" font-size="13">Υπολογίζει μόνο του: ρίζα μοντέλου (σκέτο/κιτ),</text>
+    <text x="38" y="316" fill="#fff" font-size="13">πλατφόρμα M12/M18/MX, πλήθη menu, αναζήτηση</text>
+    <text x="38" y="350" fill="#ffe1e3" font-size="12">Viva (δική του πηγή;) · Mailgun · GTM · Bunny CDN</text>
+
+    <!-- HDCtool -->
+    <rect x="455" y="40" width="360" height="560" fill="#0A0A0A"/>
+    <text x="473" y="75" fill="#fff" class="t" font-size="20">HDCTOOL</text>
+    <text x="473" y="100" fill="#bbb" font-size="13">Next.js 15 · MySQL · η μόνη πηγή καταλόγου και ERP</text>
+    <g font-size="13.5">
+      <rect x="473" y="118" width="324" height="30" fill="#1f1f1f"/><text x="485" y="138" fill="#fff">products · catalog/delta</text><text x="785" y="138" fill="#8a8a8a" text-anchor="end">κατάλογος</text>
+      <rect x="473" y="154" width="324" height="30" fill="#1f1f1f"/><text x="485" y="174" fill="#fff">most-sold · similar-products</text><text x="785" y="174" fill="#8a8a8a" text-anchor="end">προτάσεις</text>
+      <rect x="473" y="190" width="324" height="30" fill="#1f1f1f"/><text x="485" y="210" fill="#fff">courier/quote · courier/operations</text><text x="785" y="210" fill="#8a8a8a" text-anchor="end">ACS</text>
+      <rect x="473" y="226" width="324" height="30" fill="#1f1f1f"/><text x="485" y="246" fill="#fff">customers/lookup-by-vat</text><text x="785" y="246" fill="#8a8a8a" text-anchor="end">ΑΑΔΕ</text>
+      <rect x="473" y="262" width="324" height="30" fill="#1f1f1f"/><text x="485" y="282" fill="#fff">orders → orders/{n}/push</text><text x="785" y="282" fill="#8a8a8a" text-anchor="end">SoftOne</text>
+      <rect x="473" y="310" width="324" height="30" fill="none" stroke="#DB011C" stroke-width="2" stroke-dasharray="6 4"/><text x="485" y="330" fill="#ff6b78">ΝΕΟ milwaukee-categories</text><text x="785" y="330" fill="#8a8a8a" text-anchor="end">δέντρο</text>
+      <rect x="473" y="346" width="324" height="30" fill="none" stroke="#DB011C" stroke-width="2" stroke-dasharray="6 4"/><text x="485" y="366" fill="#ff6b78">ΝΕΟ συνδρομητές feed (2 καταστήματα)</text>
+      <rect x="473" y="382" width="324" height="30" fill="none" stroke="#DB011C" stroke-width="2" stroke-dasharray="6 4"/><text x="485" y="402" fill="#ff6b78">ΝΕΟ κλειδί API του HDC</text>
+      <rect x="473" y="418" width="324" height="30" fill="none" stroke="#DB011C" stroke-width="2" stroke-dasharray="6 4"/><text x="485" y="438" fill="#ff6b78">ΝΕΟ (φάση 2) orders/{n}/document — PDF</text>
+    </g>
+    <rect x="473" y="470" width="155" height="54" fill="#DB011C"/><text x="550" y="503" fill="#fff" text-anchor="middle" font-size="15" font-weight="700">SoftOne ERP</text>
+    <rect x="642" y="470" width="155" height="54" fill="#333"/><text x="719" y="503" fill="#fff" text-anchor="middle" font-size="15" font-weight="700">ACS · ΑΑΔΕ</text>
+    <text x="473" y="560" fill="#bbb" font-size="13">Τιμή PRICER02, απόθεμα, φωτογραφίες, μεταφράσεις,</text>
+    <text x="473" y="578" fill="#bbb" font-size="13">αποστολικά ACS — ίδια για τα δύο καταστήματα.</text>
+
+    <!-- Kolleris eshop -->
+    <rect x="890" y="40" width="360" height="200" fill="#fff" stroke="#b5b5b5" stroke-width="2"/>
+    <text x="908" y="75" fill="#6b6b6b" class="t" font-size="20">KOLLERIS ESHOP</text>
+    <text x="908" y="104" fill="#6b6b6b" font-size="14">web.kolleris.com · Postgres δικός του</text>
+    <text x="908" y="128" fill="#6b6b6b" font-size="14">Όλες οι μάρκες, μαζί και Milwaukee</text>
+    <text x="908" y="152" fill="#6b6b6b" font-size="14">B2B, KOL- παραγγελίες</text>
+    <text x="908" y="190" fill="#1F7A3A" font-size="14" font-weight="700">✓ Καμία αλλαγή στον κώδικα</text>
+    <text x="908" y="212" fill="#1F7A3A" font-size="14" font-weight="700">✓ Ίδιες παραδόσεις feed με σήμερα</text>
+
+    <rect x="890" y="300" width="360" height="130" fill="#F4F4F4"/>
+    <text x="908" y="332" class="t" font-size="15">ΚΟΙΝΟΣ POSTGRES</text>
+    <text x="908" y="358" fill="#444" font-size="13.5">Αν η hdcfront ζει στον ίδιο server: 5η βάση</text>
+    <text x="908" y="378" fill="#444" font-size="13.5">σε max_connections 100 — η δεξαμενή του HDC</text>
+    <text x="908" y="398" fill="#444" font-size="13.5">θέλει όριο (DATABASE_POOL_MAX), όπως</text>
+    <text x="908" y="418" fill="#444" font-size="13.5">έμαθε το eshop με τα 502.</text>
+
+    <!-- arrows HDC <-> HDCtool -->
+    <line x1="380" y1="130" x2="468" y2="130" stroke="#0A0A0A" stroke-width="2.5" marker-end="url(#a)"/>
+    <text x="424" y="122" text-anchor="middle" font-size="11" fill="#444">pull</text>
+    <line x1="380" y1="210" x2="468" y2="210" stroke="#0A0A0A" stroke-width="2.5" marker-end="url(#a)"/>
+    <line x1="380" y1="276" x2="468" y2="276" stroke="#0A0A0A" stroke-width="2.5" marker-end="url(#a)"/>
+    <text x="424" y="268" text-anchor="middle" font-size="11" fill="#444">push</text>
+    <line x1="468" y1="325" x2="384" y2="325" stroke="#DB011C" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#r)"/>
+    <line x1="468" y1="361" x2="384" y2="361" stroke="#DB011C" stroke-width="2.5" stroke-dasharray="7 5" marker-end="url(#r)"/>
+    <text x="424" y="388" text-anchor="middle" font-size="11" fill="#DB011C">webhook</text>
+    <text x="424" y="402" text-anchor="middle" font-size="11" fill="#DB011C">μόνο 1364</text>
+
+    <!-- arrows HDCtool <-> Kolleris -->
+    <line x1="886" y1="130" x2="820" y2="130" stroke="#b5b5b5" stroke-width="2.5" marker-end="url(#g)"/>
+    <line x1="820" y1="200" x2="886" y2="200" stroke="#b5b5b5" stroke-width="2.5" marker-end="url(#g)"/>
+    <text x="853" y="192" text-anchor="middle" font-size="11" fill="#8a8a8a">webhook</text>
+  </svg>
+</div>
+
+<section class="wrap sec">
+  <h2 class="disp">ΤΙ ΑΛΛΑΖΕΙ ΣΤΟ HDCTOOL — ΜΟΝΟ ΠΡΟΣΘΗΚΕΣ</h2>
+  <div class="cards">
+    <div class="card n"><em>H1 · ΑΠΑΡΑΙΤΗΤΟ</em><b class="h">ΣΥΝΔΡΟΜΗΤΕΣ FEED</b>Σήμερα η ουρά αλλαγών έχει <b>έναν</b> παραλήπτη: κάθε αλλαγή σημειώνεται «παραδόθηκε» μία φορά (<code>deliveredAt</code>). Δεύτερο URL χωρίς αλλαγή = τα δύο καταστήματα κλέβουν το ένα τις αλλαγές του άλλου. Νέος πίνακας συνδρομητών με δική του αλυσίδα <code>seq</code> ο καθένας· το σημερινό eshop γίνεται ο συνδρομητής #1 από τις ίδιες μεταβλητές — ίδιες παραδόσεις, byte προς byte.</div>
+    <div class="card n"><em>H2 · ΑΠΑΡΑΙΤΗΤΟ</em><b class="h">ΦΙΛΤΡΟ ΜΑΡΚΑΣ ΣΤΟ FEED ΚΑΙ ΣΤΟ DELTA</b>Ο συνδρομητής HDC παίρνει μόνο αλλαγές Milwaukee (1364) — και το <code>catalog/delta</code> δέχεται προαιρετικό <code>mtrmark</code>. Χωρίς την παράμετρο, απαντά όπως σήμερα.</div>
+    <div class="card n"><em>H3 · ΑΠΑΡΑΙΤΗΤΟ</em><b class="h">ΕΙΔΟΠΟΙΗΣΕΙΣ ΠΑΡΑΓΓΕΛΙΩΝ ΣΤΟ ΣΩΣΤΟ ΚΑΤΑΣΤΗΜΑ</b>Τα «άλλαξε κατάσταση» και «στάλθηκε» πάνε σήμερα πάντα στο <code>ESHOP_WEBHOOK_URL</code>. Θα πηγαίνουν στον συνδρομητή που έστειλε την παραγγελία (HDC- → HDC, KOL- → eshop).</div>
+    <div class="card n"><em>H4 · ΑΠΑΡΑΙΤΗΤΟ</em><b class="h">GET /API/PUBLIC/MILWAUKEE-CATEGORIES</b>Το δέντρο που ήδη υπάρχει για το προσωπικό, ανοιχτό σε κλειδί API, μόνο ανάγνωση. Τα πλήθη ανά πλατφόρμα τα μετράει το HDC από τον δικό του κατάλογο — το HDCtool δίνει μόνο δέντρο, εικόνες και κωδικούς ERP.</div>
+    <div class="card n"><em>H5 · ΑΠΑΡΑΙΤΗΤΟ</em><b class="h">ΚΛΕΙΔΙ API ΓΙΑ ΤΟ HDC</b>Δικό του κλειδί στον υπάρχοντα πίνακα <code>ApiKey</code> — ποτέ το κλειδί του eshop. Ανάκληση του ενός δεν ρίχνει το άλλο.</div>
+    <div class="card"><em>H6 · ΦΑΣΗ 2</em><b class="h">ΘΕΩΡΗΜΕΝΟ PDF ΠΑΡΑΣΤΑΤΙΚΟΥ</b><code>orders/{n}/document</code> — SOSIGNQR μέσω getData. Χρήσιμο και στο eshop, αλλά όχι προϋπόθεση για άνοιγμα.</div>
+  </div>
+
+  <h2 class="disp">ΤΙ ΔΕΝ ΑΛΛΑΖΕΙ ΣΤΟ HDCTOOL</h2>
+  <div class="cards">
+    <div class="card"><b class="h">ΣΚΕΤΟ / ΚΙΤ</b>Το <code>variantGroup</code> το χρησιμοποιεί ήδη το eshop για μεγέθη — αν το γεμίζαμε για Milwaukee, θα άλλαζε και η σελίδα προϊόντος του eshop, που πουλάει τα ίδια είδη. Η ρίζα του μοντέλου υπολογίζεται μέσα στο HDC.</div>
+    <div class="card"><b class="h">ΣΕΙΡΑ ΠΑΡΑΣΤΑΤΙΚΩΝ</b>Η παραγγελία φέρνει ήδη μόνη της σειρά και δείκτη καναλιού (<code>erpSeries</code>, <code>erpUftb01</code>). Το HDC στέλνει τα δικά του — χρειάζεται μόνο να τα ορίσει το λογιστήριο στο SoftOne.</div>
+    <div class="card"><b class="h">ΤΙΜΕΣ, ΑΠΟΘΕΜΑ, ACS</b>PRICER02 για όλους, πωλήσιμο απόθεμα, αποστολικά μόνο από το HDCtool — τα ίδια κανάλια που χρησιμοποιεί ήδη το eshop.</div>
+  </div>
+</section>
+</body>
+</html>

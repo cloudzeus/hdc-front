@@ -1,0 +1,198 @@
+<link href="https://fonts.googleapis.com/css2?family=TikTok+Sans:opsz,wdth,wght@12..36,75..150,300..900&display=swap" rel="stylesheet">
+<style>
+  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelReg.ttf) format("truetype"); font-weight:400; }
+  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelMed.ttf) format("truetype"); font-weight:500; }
+  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelBol.ttf) format("truetype"); font-weight:700; }
+  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConReg.ttf) format("truetype"); font-weight:400; }
+  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConMed.ttf) format("truetype"); font-weight:500; }
+  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConBol.ttf) format("truetype"); font-weight:700; }
+
+  .ds { --red:#DB011C; --red-d:#BD0118; --ink:#0A0A0A; --graph:#1A1A1A; --g7:#444444; --g5:#6B6B6B; --g3:#D6D6D6; --g1:#F4F4F4; --ok:#1F7A3A; --wait:#9A6700;
+        font-family:"CF Helvetica",Helvetica,Arial,sans-serif; color:var(--ink); }
+  .ds * { box-sizing:border-box; }
+  .ds .disp { font-family:"TikTok Sans",sans-serif; font-weight:900; font-stretch:150%; letter-spacing:-0.02em; line-height:1.02; }
+  .ds .semi { font-family:"TikTok Sans",sans-serif; font-weight:800; font-stretch:120%; }
+  .ds .cond { font-family:"CF Helvetica Condensed","CF Helvetica",sans-serif; }
+  .ds section { border-top:4px solid var(--ink); padding:16px 0 22px; }
+  .ds section > h3 { font-family:"TikTok Sans",sans-serif; font-weight:900; font-stretch:130%; font-size:20px; margin:0 0 4px; }
+  .ds section > p.why { color:var(--g5); font-size:13px; margin:0 0 14px; max-width:780px; }
+
+  /* χρώματα */
+  .ds .sw { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; }
+  .ds .sw div { border:1px solid var(--g3); }
+  .ds .sw i { display:block; height:62px; }
+  .ds .sw b { display:block; font-size:12px; padding:7px 8px 0; }
+  .ds .sw span { display:block; font-size:11px; color:var(--g5); padding:0 8px 8px; font-family:"CF Helvetica Condensed"; }
+
+  /* τυπογραφία */
+  .ds .ts { display:grid; grid-template-columns:190px 1fr; gap:6px 18px; align-items:baseline; }
+  .ds .ts .k { font-size:11px; color:var(--g5); font-family:"CF Helvetica Condensed"; line-height:1.3; }
+
+  /* σχήματα */
+  .ds .slant { clip-path:polygon(0 0,100% 0,calc(100% - 10px) 100%,0 100%); display:inline-block; padding:4px 18px 4px 10px; font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:12px; }
+  .ds .row { display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+  .ds .btn { font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; font-size:13px; letter-spacing:.04em; padding:13px 22px; display:inline-block; border:2px solid transparent; }
+  .ds .b1 { background:var(--red); color:#fff; } .ds .b1h { background:var(--red-d); color:#fff; }
+  .ds .b2 { background:var(--ink); color:#fff; }
+  .ds .b3 { border-color:var(--ink); color:var(--ink); background:#fff; }
+  .ds .b4 { border-color:#fff; color:#fff; background:transparent; }
+  .ds .dark { background:var(--graph); padding:14px; display:inline-flex; gap:12px; }
+  .ds .lab { font-size:10px; color:var(--g5); display:block; margin-top:4px; font-family:"CF Helvetica Condensed"; text-align:center; }
+
+  /* πλατφόρμες */
+  .ds .plat { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; max-width:560px; }
+  .ds .plat div { background:var(--red); color:#fff; padding:16px 10px 14px; text-align:center; }
+  .ds .plat b { display:block; font-family:"TikTok Sans"; font-weight:900; font-stretch:150%; font-size:26px; letter-spacing:-.02em; }
+  .ds .plat span { font-size:11px; letter-spacing:.06em; font-family:"CF Helvetica Condensed"; font-weight:700; }
+
+  /* κάρτα */
+  .ds .cards { display:grid; grid-template-columns:repeat(3,230px); gap:14px; }
+  .ds .card { border:1px solid var(--g3); background:#fff; display:flex; flex-direction:column; }
+  .ds .card:hover { box-shadow:0 4px 8px 3px rgba(0,0,0,.15),0 1px 3px rgba(0,0,0,.3); }
+  .ds .card .ci { height:170px; display:flex; align-items:center; justify-content:center; position:relative; }
+  .ds .card .ci img { max-height:150px; max-width:88%; }
+  .ds .card .ci .slant { position:absolute; left:0; top:10px; font-size:11px; }
+  .ds .card .ci .fav { position:absolute; right:8px; top:8px; width:30px; height:30px; border:1px solid var(--g3); background:#fff; display:flex; align-items:center; justify-content:center; font-size:14px; }
+  .ds .card .cb { background:var(--g1); padding:10px 12px 12px; display:flex; flex-direction:column; gap:2px; flex:1; }
+  .ds .card .t { font-weight:700; font-size:14px; line-height:1.25; margin:0; }
+  .ds .card .c { font-size:12px; color:var(--g5); margin:0; font-family:"CF Helvetica Condensed"; }
+  .ds .card .p { font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:22px; letter-spacing:-.02em; margin:6px 0 0; }
+  .ds .card .was { font-size:12px; color:var(--g5); text-decoration:line-through; margin-left:6px; font-family:"CF Helvetica Condensed"; }
+  .ds .card .a { font-size:12px; margin:2px 0 8px; font-family:"CF Helvetica Condensed"; font-weight:500; }
+  .ds .card .add { margin-top:auto; text-align:center; padding:10px; font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; font-size:12px; letter-spacing:.05em; background:var(--red); color:#fff; }
+
+  /* πεδία */
+  .ds .field { display:flex; flex-direction:column; gap:5px; width:260px; }
+  .ds .field label { font-size:12px; font-weight:700; font-family:"CF Helvetica Condensed"; letter-spacing:.04em; }
+  .ds .field .in { height:46px; border:1px solid var(--g3); padding:0 12px; display:flex; align-items:center; font-size:15px; color:var(--g5); }
+  .ds .field .in.focus { border:2px solid var(--ink); color:var(--ink); }
+  .ds .field .in.err { border:2px solid var(--red); color:var(--ink); }
+  .ds .field small { font-size:12px; color:var(--red); font-family:"CF Helvetica Condensed"; }
+  .ds .qty { display:inline-flex; border:1px solid var(--g3); height:46px; }
+  .ds .qty span { width:44px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+  .ds .qty b { width:48px; display:flex; align-items:center; justify-content:center; border-left:1px solid var(--g3); border-right:1px solid var(--g3); }
+  .ds .tabs { display:flex; gap:22px; border-bottom:1px solid var(--g3); }
+  .ds .tabs span { padding:10px 0; font-family:"CF Helvetica Condensed"; font-weight:700; font-size:14px; letter-spacing:.04em; color:var(--g5); }
+  .ds .tabs span.on { color:var(--ink); border-bottom:4px solid var(--red); }
+  .ds .crumb { font-size:13px; } .ds .crumb a { color:var(--red); } .ds .crumb i { color:var(--g5); font-style:normal; margin:0 8px; }
+
+  /* κανόνας κεφαλαίων */
+  .ds .caps { display:grid; grid-template-columns:1fr 1fr; gap:12px; max-width:780px; }
+  .ds .caps div { padding:12px 14px; border:1px solid var(--g3); }
+  .ds .caps .no { border-color:var(--red); }
+  .ds .caps small { display:block; font-size:11px; color:var(--g5); margin-top:6px; font-family:"CF Helvetica Condensed"; }
+</style>
+
+<h2>Design system — «Κόκκινο εργοστάσιο»</h2>
+<p class="subtitle">Ό,τι φαίνεται εδώ γίνεται μεταβλητές CSS που «ντύνουν» τα υπάρχοντα components του eshop (shadcn). Δεν ξαναγράφουμε κουμπιά και φόρμες — αλλάζουμε ό,τι φοράνε.</p>
+
+<div class="ds" lang="el">
+
+<section>
+  <h3>ΧΡΩΜΑΤΑ</h3>
+  <p class="why">Από τον ιστότοπο της Milwaukee, μετρημένα στην ίδια τη σελίδα τους. Το κόκκινο είναι πιο βαθύ από το κόκκινο του κεντρικού eshop (#EA3E39) — από εκεί ξεκινά η διαφοροποίηση.</p>
+  <div class="sw">
+    <div><i style="background:#DB011C"></i><b>Milwaukee Red</b><span>#DB011C · μπάρα, κύριο κουμπί, «ΝΕΟ»</span></div>
+    <div><i style="background:#BD0118"></i><b>Red Dark</b><span>#BD0118 · hover, ενεργό μενού</span></div>
+    <div><i style="background:#0A0A0A"></i><b>Ink</b><span>#0A0A0A · κείμενο, βάθρο λογοτύπου</span></div>
+    <div><i style="background:#1A1A1A"></i><b>Graphite</b><span>#1A1A1A · φόντο ήρωα, σκούρες ζώνες</span></div>
+    <div><i style="background:#444444"></i><b>Grey 700</b><span>#444444 · κείμενο σώματος</span></div>
+    <div><i style="background:#6B6B6B"></i><b>Grey 500</b><span>#6B6B6B · κωδικοί, βοηθητικά</span></div>
+    <div><i style="background:#D6D6D6"></i><b>Grey 300</b><span>#D6D6D6 · γραμμές, περιγράμματα</span></div>
+    <div><i style="background:#F4F4F4"></i><b>Grey 100</b><span>#F4F4F4 · ζώνη πληροφοριών κάρτας</span></div>
+    <div><i style="background:#1F7A3A"></i><b>Σε απόθεμα</b><span>#1F7A3A · πάντα με κείμενο</span></div>
+    <div><i style="background:#9A6700"></i><b>1–3 εργάσιμες</b><span>#9A6700 · από προμηθευτή</span></div>
+  </div>
+</section>
+
+<section>
+  <h3>ΤΥΠΟΓΡΑΦΙΑ</h3>
+  <p class="why">TikTok Sans φαρδιά για ό,τι «φωνάζει», CF Helvetica για ό,τι διαβάζεται, CF Helvetica Condensed για ό,τι χωράει σε στενό χώρο. Μεγέθη σε rem με clamp(): στο κινητό οι τίτλοι μικραίνουν ώστε να χωρούν σε 360px.</p>
+  <div class="ts">
+    <div class="k">Display · TikTok Sans 900 · πλάτος 150 · 56px</div><div class="disp" style="font-size:52px">ΤΙΠΟΤΑ ΠΑΡΑ HEAVY DUTY</div>
+    <div class="k">H1 · TikTok Sans 900 · 150 · 40px</div><div class="disp" style="font-size:38px">ΜΑΓΝΗΤΙΚΟ ΔΡΑΠΑΝΟ M18 FUEL™</div>
+    <div class="k">H2 · TikTok Sans 900 · 140 · 28px</div><div class="disp" style="font-size:28px;font-stretch:140%">ΚΟΡΥΦΑΙΕΣ ΠΩΛΗΣΕΙΣ</div>
+    <div class="k">H3 · TikTok Sans 800 · 120 · 20px</div><div class="semi" style="font-size:20px">ΠΡΟΔΙΑΓΡΑΦΕΣ</div>
+    <div class="k">Τιμή · TikTok Sans 900 · 125 · 28px</div><div class="disp" style="font-size:28px;font-stretch:125%">2.120,75 €</div>
+    <div class="k">Κείμενο · CF Helvetica 400 · 16/24</div><div style="font-size:16px;line-height:1.5;color:#444;max-width:620px">Διάτρηση έως 60 mm σε χάλυβα, χωρίς καλώδιο. Οι μπαταρίες M18 δουλεύουν σε όλη την πλατφόρμα των 250+ εργαλείων.</div>
+    <div class="k">Έμφαση · CF Helvetica 700 · 14</div><div style="font-size:14px;font-weight:700">Μαγνητικό δράπανο M18 FMDP-502C</div>
+    <div class="k">Μενού · Condensed 700 · 14 · διάστιχο .04em</div><div class="cond" style="font-size:14px;font-weight:700;letter-spacing:.04em">ΕΡΓΑΛΕΙΑ ΜΠΑΤΑΡΙΑΣ · ΑΞΕΣΟΥΑΡ · PACKOUT · ΧΕΙΡΟΣ</div>
+    <div class="k">Βοηθητικό · Condensed 400 · 12</div><div class="cond" style="font-size:12px;color:#6B6B6B">Κωδ. 4933451012 · Κιτ με 2 μπαταρίες 5.0Ah</div>
+  </div>
+</section>
+
+<section>
+  <h3>ΚΑΝΟΝΑΣ ΕΛΛΗΝΙΚΩΝ ΚΕΦΑΛΑΙΩΝ</h3>
+  <p class="why">Όταν όλο το κείμενο είναι κεφαλαία, χωρίς τόνους. Όπου ο τόνος χώριζε δίφθογγο, διαλυτικά. Γίνεται από συνάρτηση στον κώδικα, όχι από το text-transform του browser.</p>
+  <div class="caps">
+    <div class="no"><span class="semi" style="font-size:16px">ΜΑΓΝΗΤΙΚΌ ΔΡΆΠΑΝΟ</span><small>✗ Λάθος — τόνοι σε κεφαλαία</small></div>
+    <div><span class="semi" style="font-size:16px">ΜΑΓΝΗΤΙΚΟ ΔΡΑΠΑΝΟ</span><small>✓ Σωστό</small></div>
+    <div class="no"><span class="semi" style="font-size:16px">ΠΡΟΣΦΟΡΕΣ ΜΑΙΟΥ</span><small>✗ Χάνεται ότι το «αϊ» προφέρεται χωριστά</small></div>
+    <div><span class="semi" style="font-size:16px">ΠΡΟΣΦΟΡΕΣ ΜΑΪΟΥ</span><small>✓ Σωστό — «Μαΐου» → «ΜΑΪΟΥ»</small></div>
+  </div>
+</section>
+
+<section>
+  <h3>ΣΧΗΜΑΤΑ ΚΑΙ ΕΤΙΚΕΤΕΣ</h3>
+  <p class="why">Μηδενικές γωνίες παντού, όπως στη Milwaukee. Η λοξή ετικέτα είναι η υπογραφή: μπαίνει σε νέα, προσφορές και πλατφόρμα. Σκιά μόνο στο hover της κάρτας.</p>
+  <div class="row">
+    <span class="slant" style="background:var(--red);color:#fff">ΝΕΟ</span>
+    <span class="slant" style="background:var(--red);color:#fff">−15%</span>
+    <span class="slant" style="background:var(--ink);color:#fff">M18 FUEL</span>
+    <span class="slant" style="background:var(--ink);color:#fff">M12</span>
+    <span class="slant" style="background:var(--ink);color:#fff">PACKOUT</span>
+    <span class="slant" style="background:#fff;color:var(--ink);border:1px solid var(--g3)">ΚΙΤ</span>
+  </div>
+</section>
+
+<section>
+  <h3>ΚΟΥΜΠΙΑ</h3>
+  <p class="why">Ένα κύριο ανά οθόνη (κόκκινο). Όλα 46px ύψος ώστε να πατιούνται άνετα στο κινητό.</p>
+  <div class="row">
+    <div><span class="btn b1">ΣΤΟ ΚΑΛΑΘΙ</span><span class="lab">Κύριο</span></div>
+    <div><span class="btn b1h">ΣΤΟ ΚΑΛΑΘΙ</span><span class="lab">Κύριο · hover</span></div>
+    <div><span class="btn b2">ΣΥΝΕΧΕΙΑ</span><span class="lab">Δευτερεύον</span></div>
+    <div><span class="btn b3">ΠΡΟΔΙΑΓΡΑΦΕΣ</span><span class="lab">Περίγραμμα</span></div>
+    <div class="dark"><div><span class="btn b4">ΔΕΙΤΕ ΤΟ</span><span class="lab" style="color:#bbb">Πάνω σε φωτογραφία</span></div></div>
+  </div>
+</section>
+
+<section>
+  <h3>ΠΛΑΤΦΟΡΜΕΣ ΜΠΑΤΑΡΙΑΣ</h3>
+  <p class="why">Ο τρόπος που σκέφτεται ο πελάτης της Milwaukee: «έχω μπαταρίες M18». Γίνεται πρώτο φίλτρο, πλακίδια στην αρχική και ετικέτα σε κάθε κάρτα.</p>
+  <div class="plat">
+    <div><b>M12</b><span>ΦΟΡΗΤΗ ΑΠΟΔΟΣΗ</span></div>
+    <div><b>M18</b><span>ΚΟΡΥΦΑΙΑ ΙΣΧΥΣ</span></div>
+    <div><b>MX FUEL</b><span>ΕΞΟΠΛΙΣΜΟΣ ΕΡΓΟΤΑΞΙΟΥ</span></div>
+  </div>
+</section>
+
+<section>
+  <h3>ΚΑΡΤΑ ΠΡΟΪΟΝΤΟΣ</h3>
+  <p class="why">Λευκή εικόνα, γκρι ζώνη πληροφοριών — όπως της Milwaukee. Καθαρό όνομα χωρίς τον κωδικό μέσα, κωδικός κατασκευαστή σε ξεχωριστή γραμμή (όχι ο εσωτερικός του ERP), διαθεσιμότητα με χρώμα ΚΑΙ κείμενο. Χωρίς αστέρια όταν δεν υπάρχουν κριτικές.</p>
+  <div class="cards">
+    <div class="card"><div class="ci"><span class="slant" style="background:var(--ink);color:#fff">M18</span><span class="fav">♡</span><img src="https://kolleris.b-cdn.net/papatheo/4932430483/primary-0-1751214102874.webp" alt=""></div>
+      <div class="cb"><p class="t">Μπαταρία M18 B5 18V 5.0Ah</p><p class="c">4932430483</p><p class="p">165,42 €</p><p class="a" style="color:var(--ok)">● Σε απόθεμα</p><span class="add">ΣΤΟ ΚΑΛΑΘΙ</span></div></div>
+    <div class="card"><div class="ci"><span class="slant" style="background:var(--red);color:#fff">−15%</span><span class="fav">♡</span><img src="https://kolleris.b-cdn.net/papatheo/4932471066/primary-0-1751211821664.webp" alt=""></div>
+      <div class="cb"><p class="t">Εργαλειοθήκη PACKOUT 38cm</p><p class="c">4932471066</p><p class="p">82,42 €<span class="was">96,97 €</span></p><p class="a" style="color:var(--ok)">● Σε απόθεμα</p><span class="add">ΣΤΟ ΚΑΛΑΘΙ</span></div></div>
+    <div class="card"><div class="ci"><span class="slant" style="background:var(--ink);color:#fff">M18 FUEL</span><span class="fav">♡</span><img src="https://kolleris.b-cdn.net/papatheo/4933493213/primary-0-1751222752691.webp" alt=""></div>
+      <div class="cb"><p class="t">Φυσητήρας πλάτης M18 F2BPB</p><p class="c">4933493213</p><p class="p">2.052,30 €</p><p class="a" style="color:var(--wait)">● Παράδοση 1–3 εργάσιμες</p><span class="add">ΣΤΟ ΚΑΛΑΘΙ</span></div></div>
+  </div>
+</section>
+
+<section>
+  <h3>ΦΟΡΜΕΣ ΚΑΙ ΠΛΟΗΓΗΣΗ</h3>
+  <p class="why">Πεδία 46px, ετικέτα πάντα ορατή πάνω από το πεδίο, σφάλμα ακριβώς από κάτω. Στο κινητό γραμματοσειρά ≥16px ώστε το iPhone να μη μεγεθύνει.</p>
+  <div class="row" style="align-items:flex-start;gap:22px">
+    <div class="field"><label>ΤΑΧΥΔΡΟΜΙΚΟΣ ΚΩΔΙΚΑΣ</label><div class="in">π.χ. 18545</div></div>
+    <div class="field"><label>ΑΦΜ</label><div class="in focus">099095556</div></div>
+    <div class="field"><label>EMAIL</label><div class="in err">giannis@</div><small>Λείπει το domain — π.χ. giannis@example.gr</small></div>
+    <div><div class="qty"><span>−</span><b>1</b><span>+</span></div><span class="lab">Ποσότητα</span></div>
+  </div>
+  <div style="margin-top:18px;display:grid;gap:14px;max-width:780px">
+    <div class="crumb">Αρχική<i>/</i><a>Εργαλεία μπαταρίας</a><i>/</i><a>Δράπανα</a><i>/</i>Μαγνητικά δράπανα</div>
+    <div class="tabs"><span class="on">ΠΕΡΙΓΡΑΦΗ</span><span>ΠΡΟΔΙΑΓΡΑΦΕΣ</span><span>ΣΤΗ ΣΥΣΚΕΥΑΣΙΑ</span><span>ΚΡΙΤΙΚΕΣ</span></div>
+  </div>
+</section>
+
+</div>

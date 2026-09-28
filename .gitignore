@@ -1,0 +1,12 @@
+.superpowers/
+.DS_Store
+
+# CF Helvetica: web licence not confirmed yet (spec section 12, question 5)
+design/fonts/
+
+node_modules/
+.env*
+!.env.example
+
+# session tooling checkpoints
+.planning/

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<title>Αναζήτηση</title>
+<link href="https://fonts.googleapis.com/css2?family=TikTok+Sans:opsz,wdth,wght@12..36,75..150,300..900&display=swap" rel="stylesheet">
+<style>
+  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelReg.ttf) format("truetype"); font-weight:400; }
+  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelMed.ttf) format("truetype"); font-weight:500; }
+  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelBol.ttf) format("truetype"); font-weight:700; }
+  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConReg.ttf) format("truetype"); font-weight:400; }
+  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConMed.ttf) format("truetype"); font-weight:500; }
+  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConBol.ttf) format("truetype"); font-weight:700; }
+  :root { --red:#DB011C; --red-d:#BD0118; --ink:#0A0A0A; --graph:#1A1A1A; --g7:#444444; --g5:#6B6B6B; --g3:#D6D6D6; --g1:#F4F4F4; --ok:#1F7A3A; --wait:#9A6700; --api:#0B3D91; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"CF Helvetica",Helvetica,Arial,sans-serif; color:var(--ink); background:#fff; font-size:15px; }
+  a { color:inherit; text-decoration:none; }
+  mark { background:none; color:var(--red); font-weight:700; }
+  .wrap { max-width:1320px; margin:0 auto; padding:0 24px; }
+  .disp { font-family:"TikTok Sans",sans-serif; font-weight:900; font-stretch:150%; letter-spacing:-0.02em; line-height:1.02; }
+  .slant { clip-path:polygon(0 0,100% 0,calc(100% - 10px) 100%,0 100%); display:inline-block; padding:4px 18px 4px 10px; font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:12px; }
+  .btn { font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; font-size:13px; letter-spacing:.04em; padding:0 22px; height:48px; display:inline-flex; align-items:center; justify-content:center; border:2px solid transparent; }
+  .btn-red { background:var(--red); color:#fff; } .btn-line { border-color:var(--ink); }
+  .note { position:relative; }
+  .note::after { content:attr(data-note); position:absolute; right:10px; top:10px; background:#FFF6CC; color:#5b4a00; border:1px solid #E7D27A; font:600 11px/1.35 "CF Helvetica Condensed",sans-serif; padding:5px 8px; max-width:300px; z-index:5; box-shadow:0 2px 6px rgba(0,0,0,.15); }
+  .note.nb::after { top:auto; bottom:10px; }
+  [data-api] { position:relative; }
+  [data-api]::before { content:attr(data-api); position:absolute; left:0; top:-22px; background:var(--api); color:#fff; font:600 11px/1 ui-monospace,Menlo,monospace; padding:5px 7px; z-index:6; white-space:nowrap; }
+
+  .screen { background:var(--g1); border-top:4px solid var(--ink); border-bottom:1px solid var(--g3); }
+  .screen .wrap { display:flex; gap:16px; height:64px; align-items:center; }
+  .screen b { font-family:"TikTok Sans"; font-weight:900; font-stretch:150%; font-size:22px; letter-spacing:-.02em; }
+  .screen span { font:500 14px "CF Helvetica Condensed"; color:var(--g5); }
+  .screen code { margin-left:auto; font:600 13px ui-monospace,Menlo,monospace; color:var(--g7); }
+
+  .ann { background:var(--ink); color:#fff; font:700 12px "CF Helvetica Condensed"; letter-spacing:.06em; }
+  .ann .wrap { display:flex; justify-content:space-between; align-items:center; height:34px; }
+  .hdr { background:var(--red); color:#fff; position:relative; z-index:30; }
+  .hdr .wrap { display:flex; align-items:stretch; height:84px; padding-left:0; }
+  .hdr .plinth { background:var(--ink); display:flex; align-items:center; padding:0 22px 0 24px; margin-right:26px; }
+  .hdr .plinth img { height:58px; }
+  .hdr nav { display:flex; align-items:center; gap:26px; font:700 15px "CF Helvetica Condensed"; letter-spacing:.05em; }
+  .hdr .search { margin-left:auto; align-self:center; display:flex; background:#fff; width:340px; height:44px; }
+  .hdr .search span { flex:1; padding:0 14px; display:flex; align-items:center; color:var(--g5); font-size:15px; }
+  .hdr .search span.typed { color:var(--ink); }
+  .hdr .search span.typed::after { content:""; width:2px; height:20px; background:var(--ink); margin-left:2px; }
+  .hdr .search b { width:48px; background:var(--ink); display:flex; align-items:center; justify-content:center; }
+  .hdr .acts { display:flex; align-items:center; gap:4px; margin-left:18px; font-size:20px; }
+  .hdr .acts a { width:48px; height:48px; display:flex; align-items:center; justify-content:center; }
+  .hdr.open .search { width:520px; box-shadow:0 0 0 3px var(--ink); }
+
+  /* ── DROPDOWN ── */
+  .stage { position:relative; height:760px; background:#111 url("https://www.milwaukeetool.gr/wp-content/uploads/2023/05/M18_FPD3-502X-App_21.jpg") 70% 40%/cover no-repeat; }
+  .stage::before { content:""; position:absolute; inset:0; background:rgba(10,10,10,.62); }
+  .dd { position:absolute; right:24px; top:0; width:980px; background:#fff; border:3px solid var(--ink); border-top:0; display:grid; grid-template-columns:minmax(0,1fr) 300px; box-shadow:0 16px 40px rgba(0,0,0,.4); z-index:20; }
+  .dd .l { padding:18px 20px; border-right:1px solid var(--g3); }
+  .dd .r { padding:18px 20px; background:var(--g1); }
+  .dd h4 { font:700 12px "CF Helvetica Condensed"; letter-spacing:.08em; color:var(--g5); margin:0 0 10px; display:flex; justify-content:space-between; }
+  .dd h4 + * { margin-bottom:18px; }
+  .model { display:grid; grid-template-columns:72px 1fr auto; gap:14px; align-items:center; padding:10px; border:1px solid var(--g3); margin-bottom:8px; }
+  .model.hl { border:2px solid var(--ink); padding:9px; background:#fff; }
+  .model .im { width:72px; height:72px; display:flex; align-items:center; justify-content:center; } .model .im img { max-width:90%; max-height:90%; }
+  .model .n { font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:16px; }
+  .model .n .slant { font-size:10px; padding:2px 12px 2px 6px; margin-right:6px; vertical-align:2px; }
+  .model .v { display:flex; gap:6px; margin-top:6px; flex-wrap:wrap; }
+  .model .v span { border:1px solid var(--g3); padding:4px 8px; font:500 13px "CF Helvetica Condensed"; }
+  .model .v span b { font-family:"TikTok Sans"; font-weight:900; font-stretch:120%; font-size:13px; margin-left:4px; }
+  .model .a { font:500 13px "CF Helvetica Condensed"; text-align:right; white-space:nowrap; }
+  .acc { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .acc a { border:1px solid var(--g3); padding:8px; display:flex; flex-direction:column; gap:3px; }
+  .acc .im { height:64px; display:flex; align-items:center; justify-content:center; } .acc img { max-width:80%; max-height:60px; }
+  .acc b { font-size:12px; line-height:1.25; }
+  .acc span { font-family:"TikTok Sans"; font-weight:900; font-stretch:120%; font-size:14px; }
+  .dd .r a.row { display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--g3); font:500 15px "CF Helvetica Condensed"; }
+  .dd .r a.row span { color:var(--g5); }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .chips a { border:2px solid var(--ink); padding:6px 12px; font:700 13px "CF Helvetica Condensed"; letter-spacing:.04em; background:#fff; }
+  .chips a.red { background:var(--red); border-color:var(--red); color:#fff; }
+  .dd .all { grid-column:1 / -1; background:var(--ink); color:#fff; display:flex; justify-content:space-between; align-items:center; padding:0 20px; height:54px; font-family:"TikTok Sans"; font-weight:800; font-stretch:115%; font-size:14px; letter-spacing:.03em; }
+  .dd .all span { font:500 13px "CF Helvetica Condensed"; color:#aaa; letter-spacing:0; }
+  .kbd { position:absolute; left:24px; bottom:24px; color:#fff; font:500 13px "CF Helvetica Condensed"; background:rgba(0,0,0,.6); padding:8px 12px; z-index:4; }
+  .kbd b { border:1px solid #777; padding:1px 6px; margin:0 3px; font-weight:700; }
+
+  /* ── ΑΠΟΤΕΛΕΣΜΑΤΑ ── */
+  .rband { background:var(--graph); color:#fff; background-image:repeating-linear-gradient(115deg, rgba(219,1,28,.10) 0 3px, transparent 3px 26px); }
+  .rband .wrap { padding-top:30px; padding-bottom:30px; }
+  .rband p.k { font:700 13px "CF Helvetica Condensed"; letter-spacing:.08em; color:#aaa; margin-bottom:8px; }
+  .rband h1 { font-size:44px; }
+  .rband h1 q { quotes:"«" "»"; }
+  .rband .m { margin-top:12px; font:500 15px "CF Helvetica Condensed"; color:#cfcfcf; }
+  .rband .m b { color:#fff; }
+  .plat { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:22px 0 6px; }
+  .plat a { border:2px solid var(--ink); padding:12px 14px; display:flex; align-items:baseline; justify-content:space-between; }
+  .plat a b { font-family:"TikTok Sans"; font-weight:900; font-stretch:150%; font-size:24px; letter-spacing:-.02em; }
+  .plat a span { font:500 14px "CF Helvetica Condensed"; color:var(--g5); }
+  .plat a.on { background:var(--ink); color:#fff; } .plat a.on span { color:#bbb; }
+  .plat a.off { border-color:var(--g3); color:#b5b5b5; }
+  .body { display:grid; grid-template-columns:260px 1fr; gap:28px; padding:18px 0 50px; }
+  .filters .fh { font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:14px; padding-bottom:10px; border-bottom:4px solid var(--ink); }
+  .fg { border-bottom:1px solid var(--g3); padding:14px 0; }
+  .fg h4 { font:700 14px "CF Helvetica Condensed"; letter-spacing:.05em; margin-bottom:10px; }
+  .fg label { display:flex; align-items:center; gap:10px; font:400 15px "CF Helvetica Condensed"; padding:5px 0; min-height:32px; }
+  .fg label i { width:20px; height:20px; border:2px solid var(--ink); flex:0 0 auto; }
+  .fg label span { margin-left:auto; color:var(--g5); font-size:13px; }
+  .toolbar { display:flex; align-items:center; gap:12px; padding-bottom:12px; border-bottom:1px solid var(--g3); margin-bottom:16px; }
+  .toolbar .count { font:700 14px "CF Helvetica Condensed"; letter-spacing:.04em; }
+  .sort { margin-left:auto; display:flex; align-items:center; gap:10px; font:700 13px "CF Helvetica Condensed"; }
+  .sort div { border:1px solid var(--g3); height:44px; min-width:210px; display:flex; align-items:center; justify-content:space-between; padding:0 12px; font-weight:400; font-size:15px; }
+  .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+  .card { border:1px solid var(--g3); display:flex; flex-direction:column; }
+  .card .ci { aspect-ratio:1/1; display:flex; align-items:center; justify-content:center; position:relative; }
+  .card .ci img { max-height:80%; max-width:80%; }
+  .card .ci .slant { position:absolute; left:0; top:12px; font-size:11px; }
+  .card .cb { background:var(--g1); padding:12px; display:flex; flex-direction:column; gap:3px; flex:1; }
+  .card .t { font-weight:700; font-size:14px; line-height:1.28; min-height:36px; }
+  .card .c { font:400 12px "CF Helvetica Condensed"; color:var(--g5); }
+  .card .p { font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:21px; letter-spacing:-.02em; margin-top:6px; }
+  .card .a { font:500 12px "CF Helvetica Condensed"; margin:1px 0 8px; }
+  .card .add { text-align:center; padding:11px; font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; font-size:12px; letter-spacing:.05em; background:var(--red); color:#fff; margin-top:auto; }
+
+  /* ── ΚΑΝΕΝΑ ΑΠΟΤΕΛΕΣΜΑ ── */
+  .zero { display:grid; grid-template-columns:minmax(0,1fr) 380px; gap:36px; padding:40px 24px 30px; }
+  .zero h1 { font-size:40px; margin-bottom:14px; }
+  .zero p { font-size:16px; color:var(--g7); line-height:1.55; }
+  .zero .dym { margin:22px 0 26px; }
+  .zero .dym h4 { font:700 13px "CF Helvetica Condensed"; letter-spacing:.08em; color:var(--g5); margin-bottom:10px; }
+  .zero ul.tips { list-style:none; display:grid; gap:10px; }
+  .zero ul.tips li { display:grid; grid-template-columns:18px 1fr; gap:10px; font-size:15px; line-height:1.45; }
+  .zero ul.tips li::before { content:""; width:12px; height:12px; background:var(--red); margin-top:4px; clip-path:polygon(0 0,100% 0,calc(100% - 4px) 100%,0 100%); }
+  .ask { background:var(--ink); color:#fff; padding:24px; }
+  .ask h3 { font-size:22px; margin-bottom:10px; }
+  .ask p { color:#cfcfcf; font-size:15px; line-height:1.5; margin-bottom:16px; }
+  .ask .ph { font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:26px; margin-bottom:16px; }
+  .pop { padding:10px 0 60px; }
+  .pop h2 { font-size:26px; margin-bottom:16px; }
+  .pop .grid { grid-template-columns:repeat(5,1fr); }
+
+  /* ── ΚΙΝΗΤΟ ── */
+  .mob { background:var(--g1); padding:44px 0 60px; border-top:4px solid var(--ink); }
+  .mob h2 { font-size:28px; margin-bottom:6px; } .mob .s { color:var(--g5); margin-bottom:22px; max-width:780px; line-height:1.5; }
+  .phones { display:flex; gap:26px; flex-wrap:wrap; }
+  .phone { width:320px; border:10px solid var(--ink); border-radius:26px; overflow:hidden; background:#fff; height:640px; position:relative; }
+  .phone .sb { background:var(--red); padding:10px; display:flex; gap:8px; align-items:center; }
+  .phone .sb .in { flex:1; background:#fff; height:42px; display:flex; align-items:center; padding:0 12px; font-size:15px; }
+  .phone .sb .in.ph { color:var(--g5); }
+  .phone .sb a { color:#fff; font:700 13px "CF Helvetica Condensed"; letter-spacing:.04em; }
+  .phone .pad { padding:14px; }
+  .phone h4 { font:700 12px "CF Helvetica Condensed"; letter-spacing:.08em; color:var(--g5); margin:4px 0 10px; }
+  .phone .rec a { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--g3); font-size:15px; }
+  .phone .rec a span { color:var(--g5); }
+  .phone .mini { display:grid; grid-template-columns:56px 1fr auto; gap:10px; align-items:center; padding:8px 0; border-bottom:1px solid var(--g3); }
+  .phone .mini .im { width:56px; height:56px; border:1px solid var(--g3); display:flex; align-items:center; justify-content:center; } .phone .mini img { max-width:84%; max-height:84%; }
+  .phone .mini b { font-size:13px; line-height:1.25; }
+  .phone .mini span { font-family:"TikTok Sans"; font-weight:900; font-stretch:120%; font-size:14px; }
+  .phone .exact { border:3px solid var(--red); padding:12px; margin-top:4px; }
+  .phone .exact .ex { display:grid; grid-template-columns:90px 1fr; gap:12px; align-items:center; }
+  .phone .exact .im { width:90px; height:90px; display:flex; align-items:center; justify-content:center; } .phone .exact img { max-width:90%; max-height:90%; }
+  .phone .exact b { font-size:14px; line-height:1.3; display:block; }
+  .phone .exact small { font:400 12px "CF Helvetica Condensed"; color:var(--g5); display:block; margin:3px 0; }
+  .phone .exact .p { font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:20px; }
+  .phone .exact .qa { display:grid; grid-template-columns:100px 1fr; gap:8px; margin-top:12px; }
+  .phone .exact .qa div { border:2px solid var(--ink); height:46px; display:grid; grid-template-columns:1fr 1fr 1fr; align-items:center; text-align:center; font:700 16px "CF Helvetica Condensed"; }
+  .phone .exact .qa a { background:var(--red); color:#fff; display:flex; align-items:center; justify-content:center; font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; font-size:13px; }
+</style>
+</head>
+<body>
+
+<!-- ═════════════ 1 · ΚΑΘΩΣ ΓΡΑΦΕΤΕ ═════════════ -->
+<div class="screen"><div class="wrap"><b>1 · ΚΑΘΩΣ ΓΡΑΦΕΤΕ</b><span>Ο πελάτης της Milwaukee ψάχνει με μοντέλο — «fpd», «m18 fpd3», «4933479859»</span><code>/api/suggest?q=fpd</code></div></div>
+<div class="ann"><div class="wrap"><div>ΤΟ ΠΡΩΤΟ MILWAUKEE HEAVY DUTY CENTRE ΣΤΗΝ ΕΛΛΑΔΑ</div><div>ΔΩΡΕΑΝ ΑΠΟΣΤΟΛΗ ΑΝΩ ΤΩΝ 150 € · ΠΑΡΑΛΑΒΗ ΑΠΟ ΤΟ ΚΑΤΑΣΤΗΜΑ</div><div>EL · EN · IT</div></div></div>
+<header class="hdr open"><div class="wrap">
+  <a class="plinth"><img src="/files/hdc-lockup-440.png" alt=""></a>
+  <nav><a>ΕΡΓΑΛΕΙΑ ΜΠΑΤΑΡΙΑΣ</a><a>ΑΞΕΣΟΥΑΡ</a><a>PACKOUT</a></nav>
+  <div class="search"><span class="typed">fpd</span><b>⚲</b></div>
+  <div class="acts"><a>♡</a><a>◯</a><a>🛒</a></div>
+</div></header>
+<div class="stage">
+  <div class="dd">
+    <div class="l">
+      <h4 class="note" data-note="ΝΕΟ σε σχέση με το eshop: τα προϊόντα ομαδοποιούνται ανά ΜΟΝΤΕΛΟ (ρίζα κωδικού). 7 είδη γίνονται 3 γραμμές, και το κιτ M18 FPD2-502X — που λέγεται «ΔΡΑΠΑΝΟ ΚΡΟΥΣΤΙΚΟ» — έρχεται μαζί με το αδερφάκι του.">ΜΟΝΤΕΛΑ<span>3</span></h4>
+      <div data-api="βάση hdcfront ← products (name · code2) → ρίζα μοντέλου">
+        <a class="model hl"><div class="im"><img src="https://kolleris.b-cdn.net/papatheo/4933479860/primary-0-1751220334522.webp" alt=""></div>
+          <div><div class="n"><span class="slant" style="background:var(--ink);color:#fff">M18 FUEL</span>M18 <mark>FPD</mark>3</div><div class="v"><span>Σκέτο<b>318,28 €</b></span><span>Κιτ 2 × 5.0Ah<b>598,92 €</b></span></div></div>
+          <div class="a" style="color:var(--ok)">● Σε απόθεμα</div></a>
+        <a class="model"><div class="im"><img src="https://kolleris.b-cdn.net/papatheo/4933479868/primary-0-1751220000587.webp" alt=""></div>
+          <div><div class="n"><span class="slant" style="background:var(--ink);color:#fff">M12 FUEL</span>M12 <mark>FPD</mark>2</div><div class="v"><span>Σκέτο<b>192,80 €</b></span><span>Κιτ 2 × 2.0Ah<b>272,65 €</b></span><span>Κιτ 2 × 6.0Ah<b>363,92 €</b></span></div></div>
+          <div class="a" style="color:var(--ok)">● Σε απόθεμα</div></a>
+        <a class="model"><div class="im"><img src="https://kolleris.b-cdn.net/papatheo/4933464264/primary-0-1751215666908.webp" alt=""></div>
+          <div><div class="n"><span class="slant" style="background:var(--ink);color:#fff">M18 FUEL</span>M18 <mark>FPD</mark>2</div><div class="v"><span>Σκέτο<b>355,07 €</b></span><span>Κιτ 2 × 5.0Ah<b>683,05 €</b></span></div></div>
+          <div class="a" style="color:var(--wait)">● 1–3 εργάσιμες</div></a>
+      </div>
+      <h4 class="note" data-note="Αξεσουάρ και ανταλλακτικά που αναφέρουν το μοντέλο στο όνομα — το «ΤΣΟΚ Μ18 FPD2» είναι γραμμένο με ΕΛΛΗΝΙΚΟ Μ και με απλή αναζήτηση δεν θα έβγαινε ποτέ.">ΑΞΕΣΟΥΑΡ ΚΑΙ ΑΝΤΑΛΛΑΚΤΙΚΑ<span>4</span></h4>
+      <div class="acc">
+        <a><div class="im"><img src="https://kolleris.b-cdn.net/mtrl-files/image/_____M18_FPD_4931454827_MILWAUKEE_21193500014_1781772298935.webp" alt=""></div><b>Τσοκ M18-<mark>FPD</mark></b><span>88,98 €</span></a>
+        <a><div class="im"><img src="https://kolleris.b-cdn.net/mtrl-files/image/______18_FPD2_4931479550_MILWAUKEE_21191200163_1782891798199.webp" alt=""></div><b>Τσοκ M18 <mark>FPD</mark>2</b><span>89,36 €</span></a>
+        <a><div class="im"><img src="https://kolleris.b-cdn.net/papatheo/4932464481/primary-0-1751216976293.webp" alt=""></div><b>Αντάπτορας μυτών 1/4″ για M12 <mark>FPD</mark>X</b><span>94,12 €</span></a>
+        <a><div class="im"><img src="https://kolleris.b-cdn.net/papatheo/4933478509/primary-0-1751219098488.webp" alt=""></div><b>Εξαγωγέας σκόνης M18 <mark>FPD</mark>DEXL</b><span>238,43 €</span></a>
+      </div>
+    </div>
+    <div class="r">
+      <h4>ΚΑΤΗΓΟΡΙΕΣ</h4>
+      <div data-api="ΝΕΟ milwaukee-categories">
+        <a class="row">Κρουστικά δραπανοκατσάβιδα<span>›</span></a>
+        <a class="row">Τσοκ και αντάπτορες<span>›</span></a>
+        <a class="row">Συλλογή σκόνης<span>›</span></a>
+      </div>
+      <h4>ΠΛΑΤΦΟΡΜΑ</h4>
+      <div class="chips"><a>M12</a><a>M18</a></div>
+      <h4 style="margin-top:18px">ΓΡΗΓΟΡΑ</h4>
+      <div style="font:400 14px/1.5 'CF Helvetica Condensed';color:var(--g7)">Πληκτρολογήστε τον κωδικό της συσκευασίας (4933…) ή το EAN και πηγαίνετε κατευθείαν στο προϊόν.</div>
+    </div>
+    <a class="all">ΟΛΑ ΤΑ ΑΠΟΤΕΛΕΣΜΑΤΑ ΓΙΑ «FPD» →<span>14 προϊόντα</span></a>
+  </div>
+  <div class="kbd">Πλοήγηση με <b>↑</b><b>↓</b> · άνοιγμα με <b>Enter</b> · κλείσιμο με <b>Esc</b></div>
+</div>
+
+<!-- ═════════════ 2 · ΑΠΟΤΕΛΕΣΜΑΤΑ ═════════════ -->
+<div class="screen"><div class="wrap"><b>2 · ΑΠΟΤΕΛΕΣΜΑΤΑ</b><span>Η σελίδα κατηγορίας με φίλτρα — τα φίλτρα και τα πλήθη υπολογίζονται πάνω στα αποτελέσματα</span><code>/anazitisi?q=κρουστικο+δραπανοκατσαβιδο</code></div></div>
+<section class="rband note" data-note="Αντιστοίχιση ΛΕΞΕΩΝ, όχι φράσης: οι λέξεις μετρούν σε όποια σειρά κι αν είναι γραμμένες. Με ακριβή φράση θα έβγαιναν 8 από τα 13 — τα μισά ονόματα γράφουν «ΔΡΑΠΑΝΟΚΑΤΣΑΒΙΔΟ ΚΡΟΥΣΤΙΚΟ».">
+  <div class="wrap">
+    <p class="k">ΑΠΟΤΕΛΕΣΜΑΤΑ ΑΝΑΖΗΤΗΣΗΣ</p>
+    <h1 class="disp"><q>ΚΡΟΥΣΤΙΚΟ ΔΡΑΠΑΝΟΚΑΤΣΑΒΙΔΟ</q></h1>
+    <div class="m"><b>13 προϊόντα</b> · 9 μοντέλα · M12 και M18</div>
+  </div>
+</section>
+<div class="wrap">
+  <div class="plat note" data-note="Ίδιο με τη σελίδα κατηγορίας — πλήθη μέσα στα αποτελέσματα. Πλατφόρμα χωρίς αποτελέσματα φαίνεται σβηστή, όχι κρυμμένη.">
+    <a class="on"><b>ΟΛΕΣ</b><span>13</span></a><a><b>M12</b><span>7</span></a><a><b>M18</b><span>6</span></a><a class="off"><b>MX FUEL</b><span>0</span></a>
+  </div>
+  <div class="body">
+    <aside class="filters">
+      <div class="fh">ΦΙΛΤΡΑ</div>
+      <div class="fg"><h4>ΔΙΑΘΕΣΙΜΟΤΗΤΑ</h4><label><i></i>Σε απόθεμα<span>6</span></label><label><i></i>Παράδοση 1–3 εργάσιμες<span>7</span></label></div>
+      <div class="fg"><h4>ΠΕΡΙΕΧΟΜΕΝΟ</h4><label><i></i>Σκέτο εργαλείο<span>6</span></label><label><i></i>Κιτ με μπαταρίες<span>7</span></label></div>
+      <div class="fg"><h4>ΣΕΙΡΑ</h4><label><i></i>FUEL™<span>11</span></label><label><i></i>ONE-KEY™<span>2</span></label><label><i></i>Βασική σειρά<span>2</span></label></div>
+      <div class="fg"><h4>ΚΑΤΗΓΟΡΙΑ</h4><label><i></i>Κρουστικά δραπανοκατσάβιδα<span>13</span></label></div>
+    </aside>
+    <main>
+      <div class="toolbar"><span class="count">13 ΠΡΟΪΟΝΤΑ</span><div class="sort">ΤΑΞΙΝΟΜΗΣΗ<div>Σχετικότητα <span>⌄</span></div></div></div>
+      <div class="grid" data-api="βάση hdcfront ← products · πλήθη πάνω στα αποτελέσματα">
+        <div class="card"><div class="ci"><span class="slant" style="background:var(--ink);color:#fff">M18 FUEL</span><img src="https://kolleris.b-cdn.net/papatheo/4933479859/primary-0-1751220216324.webp" alt=""></div><div class="cb"><div class="t"><mark>Κρουστικό δραπανοκατσάβιδο</mark> M18 FPD3-0X</div><div class="c">4933479859 · Σκέτο εργαλείο</div><div class="p">318,28 €</div><div class="a" style="color:var(--ok)">● Σε απόθεμα</div><a class="add">ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+        <div class="card"><div class="ci"><span class="slant" style="background:var(--ink);color:#fff">M18 FUEL</span><img src="https://kolleris.b-cdn.net/papatheo/4933479860/primary-0-1751220334522.webp" alt=""></div><div class="cb"><div class="t"><mark>Κρουστικό δραπανοκατσάβιδο</mark> M18 FPD3-502X</div><div class="c">4933479860 · 2 × 5.0Ah</div><div class="p">598,92 €</div><div class="a" style="color:var(--ok)">● Σε απόθεμα</div><a class="add">ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+        <div class="card"><div class="ci"><span class="slant" style="background:var(--ink);color:#fff">M12 FUEL</span><img src="https://kolleris.b-cdn.net/papatheo/4933479868/primary-0-1751220000587.webp" alt=""></div><div class="cb"><div class="t"><mark>Κρουστικό δραπανοκατσάβιδο</mark> M12 FPD2-202X</div><div class="c">4933479868 · 2 × 2.0Ah</div><div class="p">272,65 €</div><div class="a" style="color:var(--ok)">● Σε απόθεμα</div><a class="add">ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+        <div class="card"><div class="ci"><span class="slant" style="background:var(--ink);color:#fff">M12 FUEL</span><img src="https://kolleris.b-cdn.net/papatheo/4933479867/primary-0-1751219855288.webp" alt=""></div><div class="cb"><div class="t"><mark>Κρουστικό δραπανοκατσάβιδο</mark> M12 FPD2-0</div><div class="c">4933479867 · Σκέτο εργαλείο</div><div class="p">192,80 €</div><div class="a" style="color:var(--ok)">● Σε απόθεμα</div><a class="add">ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+        <div class="card"><div class="ci"><span class="slant" style="background:var(--ink);color:#fff">M18</span><img src="https://kolleris.b-cdn.net/papatheo/4933492825/primary-0-1751222561996.webp" alt=""></div><div class="cb"><div class="t"><mark>Δραπανοκατσάβιδο κρουστικό</mark> M18 BLPDRC-422C</div><div class="c">4933492825 · Κιτ με μπαταρίες</div><div class="p">268,09 €</div><div class="a" style="color:var(--ok)">● Σε απόθεμα</div><a class="add">ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+        <div class="card"><div class="ci"><span class="slant" style="background:var(--ink);color:#fff">M12 FUEL</span><img src="https://kolleris.b-cdn.net/mtrl-files/image/____________________________________________M12_FP_20471111113_1785954306321_0.webp" alt=""></div><div class="cb"><div class="t"><mark>Δραπανοκατσάβιδο κρουστικό</mark> M12 FPDXKIT-202X</div><div class="c">4933464138 · 2 × 2.0Ah</div><div class="p">375,32 €</div><div class="a" style="color:var(--ok)">● Σε απόθεμα</div><a class="add">ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+        <div class="card"><div class="ci"><span class="slant" style="background:var(--ink);color:#fff">M18 FUEL</span><img src="https://kolleris.b-cdn.net/papatheo/4933464263/primary-0-1751215628514.webp" alt=""></div><div class="cb"><div class="t"><mark>Κρουστικό δραπανοκατσάβιδο</mark> M18 FPD2-0X</div><div class="c">4933464263 · Σκέτο εργαλείο</div><div class="p">355,07 €</div><div class="a" style="color:var(--wait)">● Παράδοση 1–3 εργάσιμες</div><a class="add">ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+        <div class="card"><div class="ci"><span class="slant" style="background:var(--ink);color:#fff">M18 ONE-KEY</span><img src="https://kolleris.b-cdn.net/papatheo/4933492801/primary-0-1751222332021.webp" alt=""></div><div class="cb"><div class="t"><mark>Κρουστικό δραπανοκατσάβιδο</mark> M18 ONEPD3-502X</div><div class="c">4933492801 · 2 × 5.0Ah</div><div class="p">637,71 €</div><div class="a" style="color:var(--wait)">● Παράδοση 1–3 εργάσιμες</div><a class="add">ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ═════════════ 3 · ΚΑΝΕΝΑ ΑΠΟΤΕΛΕΣΜΑ ═════════════ -->
+<div class="screen"><div class="wrap"><b>3 · ΚΑΝΕΝΑ ΑΠΟΤΕΛΕΣΜΑ</b><span>Ποτέ άδεια σελίδα — πάντα ένας δρόμος: κοντινό μοντέλο, οδηγίες, άνθρωπος</span><code>/anazitisi?q=fpd4</code></div></div>
+<div class="wrap zero">
+  <div>
+    <h1 class="disp">ΔΕΝ ΒΡΗΚΑΜΕ ΤΙΠΟΤΑ ΓΙΑ «FPD4»</h1>
+    <p>Ίσως το μοντέλο δεν κυκλοφορεί ακόμη στην Ευρώπη, ή γράφεται λίγο διαφορετικά.</p>
+    <div class="dym note" data-note="Τα πιο κοντινά ΜΟΝΤΕΛΑ του καταλόγου στο κείμενο που γράφτηκε (ομοιότητα χαρακτήρων στη ρίζα του κωδικού) — όχι μαντεψιά.">
+      <h4>ΜΗΠΩΣ ΕΝΝΟΕΙΤΕ</h4>
+      <div class="chips"><a class="red">M18 FPD3</a><a>M12 FPD2</a><a>M18 FPD2</a><a>M12 FPDX</a></div>
+    </div>
+    <ul class="tips">
+      <li><span>Ο <b>κωδικός της συσκευασίας</b> (10 ψηφία, 4933…) βρίσκει πάντα το σωστό προϊόν.</span></li>
+      <li><span>Κωδικοί από αμερικανικά βίντεο (π.χ. 2904-20) <b>δεν αντιστοιχούν</b> στους ευρωπαϊκούς — ψάξτε με το όνομα του μοντέλου.</span></li>
+      <li><span>Δοκιμάστε λιγότερες λέξεις: «fpd» αντί για «m18 fpd3 κιτ 5ah».</span></li>
+    </ul>
+  </div>
+  <div class="ask note nb" data-note="Το τηλέφωνο και το ωράριο είναι του eshop — επιβεβαιώστε για το HDC. Η φόρμα είναι η υπάρχουσα επικοινωνία του eshop, με το κείμενο της αναζήτησης ήδη συμπληρωμένο.">
+    <h3 class="disp">ΡΩΤΗΣΤΕ ΤΟ ΚΑΤΑΣΤΗΜΑ</h3>
+    <p>Αν το ζητάτε, μάλλον μπορούμε να το φέρουμε. Πείτε μας τι ψάχνετε.</p>
+    <div class="ph">210 411 1355</div>
+    <a class="btn btn-red" style="width:100%">ΣΤΕΙΛΤΕ ΜΑΣ ΜΗΝΥΜΑ</a>
+  </div>
+</div>
+<div class="wrap pop">
+  <h2 class="disp" data-api="most-sold-products (MTRMARK 1364)">ΑΥΤΑ ΑΓΟΡΑΖΟΥΝ ΟΙ ΠΕΛΑΤΕΣ ΜΑΣ</h2>
+  <div class="grid">
+    <div class="card"><div class="ci"><img src="https://kolleris.b-cdn.net/papatheo/4932430483/primary-0-1751214102874.webp" alt=""></div><div class="cb"><div class="t">Μπαταρία REDLITHIUM™ M18 B5 5.0Ah</div><div class="p">165,42 €</div></div></div>
+    <div class="card"><div class="ci"><img src="https://kolleris.b-cdn.net/papatheo/4933478429/primary-0-1751218639483.webp" alt=""></div><div class="cb"><div class="t">Γωνιακός τροχός M18 FSAG125XB-0X</div><div class="p">329,69 €</div></div></div>
+    <div class="card"><div class="ci"><img src="https://kolleris.b-cdn.net/papatheo/4933480587/primary-0-1751219907079.webp" alt=""></div><div class="cb"><div class="t">Σετ εργαλείων M12 FPP2A2-402X FUEL</div><div class="p">443,77 €</div></div></div>
+    <div class="card"><div class="ci"><img src="https://kolleris.b-cdn.net/papatheo/4933492783/primary-0-1751222566870.webp" alt=""></div><div class="cb"><div class="t">Μπουλονόκλειδο 1/2″ M18 FHIW2F12-502X</div><div class="p">740,38 €</div></div></div>
+    <div class="card"><div class="ci"><img src="https://kolleris.b-cdn.net/papatheo/4933464618/primary-0-1751215650852.webp" alt=""></div><div class="cb"><div class="t">Γωνιακός τροχός M12 FCOT-0 FUEL</div><div class="p">215,61 €</div></div></div>
+  </div>
+</div>
+
+<!-- ═════════════ ΚΙΝΗΤΟ ═════════════ -->
+<section class="mob">
+  <div class="wrap">
+    <h2 class="disp">ΣΤΟ ΚΙΝΗΤΟ</h2>
+    <p class="s">Η αναζήτηση ανοίγει σε πλήρη οθόνη. Πριν γράψετε: οι πρόσφατες αναζητήσεις σας (μόνο στη δική σας συσκευή) και τα δημοφιλή. Με ακριβή κωδικό, το προϊόν έρχεται μόνο του με ποσότητα και «Στο καλάθι» — χωρίς να ανοίξει καν η σελίδα του.</p>
+    <div class="phones">
+      <div class="phone note nb" data-note="Πρόσφατες: localStorage του browser — ΝΕΟ, το eshop δεν τις έχει. Δημοφιλή: most-sold-products.">
+        <div class="sb"><div class="in ph">Κωδικός ή εργαλείο…</div><a>ΑΚΥΡΟ</a></div>
+        <div class="pad">
+          <h4>ΠΡΟΣΦΑΤΕΣ ΑΝΑΖΗΤΗΣΕΙΣ</h4>
+          <div class="rec"><a>fpd3<span>✕</span></a><a>packout<span>✕</span></a><a>4932430483<span>✕</span></a></div>
+          <h4 style="margin-top:18px">ΠΛΑΤΦΟΡΜΕΣ</h4>
+          <div class="chips"><a>M12</a><a>M18</a><a>MX FUEL</a><a>PACKOUT</a></div>
+          <h4 style="margin-top:18px">ΔΗΜΟΦΙΛΗ</h4>
+          <div class="mini"><div class="im"><img src="https://kolleris.b-cdn.net/papatheo/4932430483/primary-0-1751214102874.webp" alt=""></div><b>Μπαταρία M18 B5 5.0Ah</b><span>165,42 €</span></div>
+          <div class="mini"><div class="im"><img src="https://kolleris.b-cdn.net/papatheo/4933478429/primary-0-1751218639483.webp" alt=""></div><b>Γωνιακός τροχός M18 FSAG125XB-0X</b><span>329,69 €</span></div>
+          <div class="mini"><div class="im"><img src="https://kolleris.b-cdn.net/papatheo/4933480587/primary-0-1751219907079.webp" alt=""></div><b>Σετ M12 FPP2A2-402X</b><span>443,77 €</span></div>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="sb"><div class="in">4933479859</div><a>ΑΚΥΡΟ</a></div>
+        <div class="pad">
+          <h4>ΑΚΡΙΒΗΣ ΚΩΔΙΚΟΣ</h4>
+          <div class="exact">
+            <div class="ex"><div class="im"><img src="https://kolleris.b-cdn.net/papatheo/4933479859/primary-0-1751220216324.webp" alt=""></div><div><b>Κρουστικό δραπανοκατσάβιδο M18 FPD3-0X</b><small><mark>4933479859</mark> · Σκέτο εργαλείο</small><span class="p">318,28 €</span></div></div>
+            <div class="qa"><div><span>−</span><span>1</span><span>+</span></div><a>ΣΤΟ ΚΑΛΑΘΙ</a></div>
+          </div>
+          <h4 style="margin-top:18px">ΤΟ ΙΔΙΟ ΜΟΝΤΕΛΟ</h4>
+          <div class="mini"><div class="im"><img src="https://kolleris.b-cdn.net/papatheo/4933479860/primary-0-1751220334522.webp" alt=""></div><b>M18 FPD3-502X — Κιτ 2 × 5.0Ah</b><span>598,92 €</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

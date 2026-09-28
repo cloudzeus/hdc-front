@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<title>Προϊόν — M18 FPD3</title>
+<link href="https://fonts.googleapis.com/css2?family=TikTok+Sans:opsz,wdth,wght@12..36,75..150,300..900&display=swap" rel="stylesheet">
+<style>
+  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelReg.ttf) format("truetype"); font-weight:400; }
+  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelMed.ttf) format("truetype"); font-weight:500; }
+  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelBol.ttf) format("truetype"); font-weight:700; }
+  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConReg.ttf) format("truetype"); font-weight:400; }
+  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConMed.ttf) format("truetype"); font-weight:500; }
+  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConBol.ttf) format("truetype"); font-weight:700; }
+  :root { --red:#DB011C; --red-d:#BD0118; --ink:#0A0A0A; --graph:#1A1A1A; --g7:#444444; --g5:#6B6B6B; --g3:#D6D6D6; --g1:#F4F4F4; --ok:#1F7A3A; --wait:#9A6700; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"CF Helvetica",Helvetica,Arial,sans-serif; color:var(--ink); background:#fff; font-size:15px; }
+  a { color:inherit; text-decoration:none; }
+  .wrap { max-width:1320px; margin:0 auto; padding:0 24px; }
+  .disp { font-family:"TikTok Sans",sans-serif; font-weight:900; font-stretch:150%; letter-spacing:-0.02em; line-height:1.02; }
+  .cond { font-family:"CF Helvetica Condensed",sans-serif; }
+  .slant { clip-path:polygon(0 0,100% 0,calc(100% - 10px) 100%,0 100%); display:inline-block; padding:4px 18px 4px 10px; font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:12px; }
+  .btn { font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; font-size:13px; letter-spacing:.04em; padding:14px 24px; display:inline-flex; align-items:center; justify-content:center; border:2px solid transparent; cursor:pointer; }
+  .note { position:relative; }
+  .note::after { content:attr(data-note); position:absolute; right:10px; top:10px; background:#FFF6CC; color:#5b4a00; border:1px solid #E7D27A; font:600 11px/1.35 "CF Helvetica Condensed",sans-serif; padding:5px 8px; max-width:290px; z-index:5; box-shadow:0 2px 6px rgba(0,0,0,.15); }
+  .note.nb::after { top:auto; bottom:10px; }
+  [data-api] { position:relative; }
+  [data-api]::before { content:attr(data-api); position:absolute; left:0; top:-22px; background:#0B3D91; color:#fff; font:600 11px/1 ui-monospace,Menlo,monospace; padding:5px 7px; z-index:6; white-space:nowrap; }
+  .apileg { background:#EAF1FB; border:1px solid #B9CCEB; border-left:6px solid #0B3D91; padding:16px 18px; margin:4px 24px 34px; display:grid; grid-template-columns:260px 1fr; gap:22px; font-size:14px; line-height:1.5; }
+  .apileg h3 { font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:15px; color:#0B3D91; margin-bottom:6px; }
+  .apileg code { font:600 12px ui-monospace,Menlo,monospace; background:#fff; border:1px solid #B9CCEB; padding:1px 5px; }
+  .apileg ul { list-style:none; display:grid; grid-template-columns:1fr 1fr; gap:6px 22px; }
+  .apileg li b { color:#0B3D91; }
+  .apileg .new { color:var(--red); font-weight:700; }
+
+  /* ── ΚΕΦΑΛΙΔΑ (ίδια με αρχική) ── */
+  .ann { background:var(--ink); color:#fff; font:700 12px "CF Helvetica Condensed"; letter-spacing:.06em; }
+  .ann .wrap { display:flex; justify-content:space-between; align-items:center; height:34px; }
+  .hdr { background:var(--red); color:#fff; }
+  .hdr .wrap { display:flex; align-items:stretch; height:84px; padding-left:0; }
+  .hdr .plinth { background:var(--ink); display:flex; align-items:center; padding:0 22px 0 24px; margin-right:26px; }
+  .hdr .plinth img { height:58px; }
+  .hdr nav { display:flex; align-items:center; gap:26px; font:700 15px "CF Helvetica Condensed"; letter-spacing:.05em; }
+  .hdr nav a { padding:31px 0 27px; border-bottom:4px solid transparent; } .hdr nav a.on { border-bottom-color:#fff; }
+  .hdr .search { margin-left:auto; align-self:center; display:flex; background:#fff; width:340px; height:44px; }
+  .hdr .search span { flex:1; padding:0 14px; display:flex; align-items:center; color:var(--g5); font-size:15px; }
+  .hdr .search b { width:48px; background:var(--ink); display:flex; align-items:center; justify-content:center; }
+  .hdr .acts { display:flex; align-items:center; gap:4px; margin-left:18px; font-size:20px; }
+  .hdr .acts a { width:48px; height:48px; display:flex; align-items:center; justify-content:center; }
+  .crumb { font-size:13px; padding:14px 24px; }
+  .crumb a { color:var(--red); } .crumb i { color:var(--g5); font-style:normal; margin:0 8px; }
+
+  /* ── ΠΑΝΩ ΜΕΡΟΣ: ΓΚΑΛΕΡΙ + ΑΓΟΡΑ ── */
+  .top { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); gap:40px; padding:6px 24px 40px; }
+  .gal { display:grid; grid-template-columns:84px 1fr; gap:14px; align-self:start; }
+  .gal .th { display:flex; flex-direction:column; gap:10px; }
+  .gal .th div { width:84px; height:84px; border:1px solid var(--g3); display:flex; align-items:center; justify-content:center; background:#fff; }
+  .gal .th div.on { border:2px solid var(--ink); }
+  .gal .th img { max-width:86%; max-height:86%; }
+  .gal .th .more { font:700 13px "CF Helvetica Condensed"; background:var(--g1); }
+  .gal .main { border:1px solid var(--g3); aspect-ratio:1/1; display:flex; align-items:center; justify-content:center; position:relative; }
+  .gal .main img { max-width:84%; max-height:84%; }
+  .gal .main .tags { position:absolute; left:0; top:16px; display:flex; flex-direction:column; gap:6px; align-items:flex-start; }
+  .gal .main .zoom { position:absolute; right:12px; bottom:12px; width:44px; height:44px; background:var(--ink); color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; }
+  .gal .main .arr { position:absolute; top:50%; transform:translateY(-50%); width:44px; height:44px; background:var(--red); color:#fff; display:flex; align-items:center; justify-content:center; font-size:22px; }
+
+  .buy h1 { font-size:36px; font-stretch:140%; margin:12px 0 10px; }
+  .buy .codes { font:400 14px "CF Helvetica Condensed"; color:var(--g5); display:flex; gap:16px; flex-wrap:wrap; }
+  .buy .codes b { color:var(--ink); font-weight:700; }
+  .buy .rv { font:500 13px "CF Helvetica Condensed"; color:var(--red); margin-top:8px; display:inline-block; border-bottom:1px solid var(--red); }
+  .keys { display:grid; grid-template-columns:repeat(4,1fr); border:1px solid var(--g3); margin:20px 0 22px; }
+  .keys div { padding:12px 12px; border-right:1px solid var(--g3); }
+  .keys div:last-child { border-right:0; }
+  .keys b { display:block; font-family:"TikTok Sans"; font-weight:900; font-stretch:130%; font-size:22px; letter-spacing:-.02em; }
+  .keys span { font:500 12px "CF Helvetica Condensed"; color:var(--g5); letter-spacing:.03em; }
+  .lbl { font:700 14px "CF Helvetica Condensed"; letter-spacing:.06em; margin-bottom:10px; display:flex; justify-content:space-between; }
+  .lbl a { color:var(--red); font-weight:500; letter-spacing:0; }
+  .opts { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .opt { border:1px solid var(--g3); padding:14px 14px 12px; display:flex; flex-direction:column; gap:4px; position:relative; cursor:pointer; }
+  .opt.on { border:3px solid var(--red); padding:12px 12px 10px; }
+  .opt.on::before { content:"✓"; position:absolute; right:0; top:0; background:var(--red); color:#fff; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:13px; }
+  .opt .n { font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:14px; }
+  .opt .m { font:400 12px "CF Helvetica Condensed"; color:var(--g5); }
+  .opt .d { font:400 13px/1.35 "CF Helvetica Condensed"; color:var(--g7); min-height:36px; }
+  .opt .p { font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:20px; letter-spacing:-.02em; margin-top:4px; }
+  .hint { background:var(--g1); border-left:4px solid var(--ink); padding:10px 12px; font:400 14px "CF Helvetica Condensed"; margin-top:10px; }
+  .hint b { font-weight:700; }
+  .pricebox { margin-top:22px; padding-top:18px; border-top:4px solid var(--ink); }
+  .pricebox .pr { font-family:"TikTok Sans"; font-weight:900; font-stretch:130%; font-size:44px; letter-spacing:-.03em; line-height:1; }
+  .pricebox .pr small { font:500 14px "CF Helvetica Condensed"; color:var(--g5); letter-spacing:0; margin-left:10px; }
+  .avail { display:flex; flex-direction:column; gap:6px; margin:14px 0 16px; font:500 15px "CF Helvetica Condensed"; }
+  .avail div { display:flex; align-items:center; gap:10px; }
+  .avail .dot { width:10px; height:10px; border-radius:50%; flex:0 0 auto; }
+  .avail span.g { color:var(--g5); font-weight:400; }
+  .cta { display:grid; grid-template-columns:128px 1fr 54px; gap:10px; }
+  .qty { border:2px solid var(--ink); display:grid; grid-template-columns:40px 1fr 40px; align-items:center; text-align:center; height:54px; font:700 18px "CF Helvetica Condensed"; }
+  .qty span:first-child, .qty span:last-child { font-size:22px; }
+  .cta .add { background:var(--red); color:#fff; height:54px; font-size:15px; }
+  .cta .add:hover { background:var(--red-d); }
+  .cta .fav { border:2px solid var(--ink); height:54px; display:flex; align-items:center; justify-content:center; font-size:20px; }
+  .subacts { display:flex; gap:22px; margin-top:12px; font:500 13px "CF Helvetica Condensed"; color:var(--g7); }
+  .subacts span::before { content:"▸ "; color:var(--red); }
+  .serv { display:grid; grid-template-columns:1fr 1fr; gap:0; margin-top:22px; border:1px solid var(--g3); }
+  .serv div { padding:12px 14px; border-bottom:1px solid var(--g3); }
+  .serv div:nth-child(odd) { border-right:1px solid var(--g3); }
+  .serv div:nth-last-child(-n+2) { border-bottom:0; }
+  .serv b { display:block; font-family:"TikTok Sans"; font-weight:800; font-stretch:115%; font-size:13px; margin-bottom:3px; }
+  .serv span { font:400 13px "CF Helvetica Condensed"; color:var(--g5); }
+
+  /* ── ΜΠΑΡΑ ΕΝΟΤΗΤΩΝ ── */
+  .secnav { background:var(--ink); color:#fff; position:sticky; top:0; z-index:10; }
+  .secnav .wrap { display:flex; align-items:center; gap:34px; height:58px; font:700 15px "CF Helvetica Condensed"; letter-spacing:.06em; }
+  .secnav a { padding:19px 0 15px; border-bottom:4px solid transparent; } .secnav a.on { border-bottom-color:var(--red); }
+  .secnav .mini { margin-left:auto; display:flex; align-items:center; gap:14px; }
+  .secnav .mini b { font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:20px; letter-spacing:-.02em; }
+  .secnav .mini a { background:var(--red); padding:10px 18px; border:0; font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; font-size:12px; }
+
+  .sec { padding:56px 0 8px; }
+  .sec h2 { font-size:34px; margin-bottom:22px; }
+
+  /* Περιγραφή */
+  .ov { display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:start; }
+  .ov p { font-size:16px; line-height:1.65; color:var(--g7); margin-bottom:14px; max-width:62ch; }
+  .ov ul { list-style:none; margin-top:18px; display:grid; gap:10px; }
+  .ov li { display:grid; grid-template-columns:18px 1fr; gap:10px; font-size:15px; line-height:1.45; }
+  .ov li::before { content:""; width:12px; height:12px; background:var(--red); margin-top:4px; clip-path:polygon(0 0,100% 0,calc(100% - 4px) 100%,0 100%); }
+  .ov li b { font-weight:700; }
+  .ov .ph { position:relative; aspect-ratio:4/3; background:#111 url("https://www.milwaukeetool.gr/wp-content/uploads/2023/05/M18_FPD3-502X-App_21.jpg") center/cover no-repeat; }
+  .ov .ph span { position:absolute; left:0; bottom:0; background:var(--ink); color:#fff; padding:10px 14px; font:700 13px "CF Helvetica Condensed"; letter-spacing:.05em; }
+
+  /* Προδιαγραφές */
+  .specs { display:grid; grid-template-columns:1fr 1fr; gap:0 40px; }
+  .specs dl { display:grid; grid-template-columns:1fr auto; }
+  .specs dt, .specs dd { padding:11px 12px; border-bottom:1px solid var(--g3); font:400 15px "CF Helvetica Condensed"; }
+  .specs dt { color:var(--g7); }
+  .specs dd { font-weight:700; text-align:right; }
+  .specs dl > :nth-child(4n+1), .specs dl > :nth-child(4n+2) { background:var(--g1); }
+
+  /* Στη συσκευασία */
+  .box { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+  .box div { border:1px solid var(--g3); display:flex; flex-direction:column; }
+  .box .im { aspect-ratio:1/0.85; display:flex; align-items:center; justify-content:center; position:relative; }
+  .box .im img { max-width:74%; max-height:80%; }
+  .box .im .x { position:absolute; left:0; top:10px; background:var(--red); color:#fff; font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:16px; padding:3px 14px 3px 10px; clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%); }
+  .box .im.ph { background:var(--g1); font:700 13px "CF Helvetica Condensed"; color:var(--g5); letter-spacing:.05em; }
+  .box .t { background:var(--g1); padding:10px 12px; font-weight:700; font-size:14px; line-height:1.3; flex:1; }
+  .box .t small { display:block; font:400 12px "CF Helvetica Condensed"; color:var(--g5); margin-top:3px; }
+
+  /* Έγγραφα */
+  .docs { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .docs a { border:1px solid var(--g3); padding:16px; display:grid; grid-template-columns:46px 1fr; gap:14px; align-items:center; }
+  .docs a:hover { border-color:var(--ink); }
+  .docs i { width:46px; height:54px; background:var(--ink); color:#fff; font:700 11px "CF Helvetica Condensed"; display:flex; align-items:flex-end; justify-content:center; padding-bottom:8px; font-style:normal; clip-path:polygon(0 0,70% 0,100% 22%,100% 100%,0 100%); }
+  .docs b { display:block; font-size:15px; }
+  .docs span { font:400 13px "CF Helvetica Condensed"; color:var(--g5); }
+
+  /* Κριτικές */
+  .rev { border:1px solid var(--g3); display:grid; grid-template-columns:1fr auto; align-items:center; gap:30px; padding:30px; }
+  .rev h3 { font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:20px; margin-bottom:6px; }
+  .rev p { color:var(--g7); font-size:15px; line-height:1.5; max-width:62ch; }
+
+  /* Ίδια μπαταρία */
+  .xs { background:var(--graph); color:#fff; margin-top:60px; padding:52px 0 56px; background-image:repeating-linear-gradient(115deg, rgba(219,1,28,.10) 0 3px, transparent 3px 26px); }
+  .xs .head { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:22px; gap:30px; }
+  .xs h2 { font-size:36px; }
+  .xs .head p { color:#bdbdbd; font-size:15px; margin-top:8px; }
+  .xs .head a { font:700 14px "CF Helvetica Condensed"; letter-spacing:.05em; color:#fff; border-bottom:2px solid var(--red); padding-bottom:3px; white-space:nowrap; }
+  .grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+  .card { border:1px solid var(--g3); background:#fff; color:var(--ink); display:flex; flex-direction:column; }
+  .xs .card { border:0; }
+  .card .ci { aspect-ratio:1/1; display:flex; align-items:center; justify-content:center; position:relative; background:#fff; }
+  .card .ci img { max-height:82%; max-width:82%; }
+  .card .ci .slant { position:absolute; left:0; top:12px; font-size:11px; }
+  .card .cb { background:var(--g1); padding:12px; display:flex; flex-direction:column; gap:3px; flex:1; }
+  .card .t { font-weight:700; font-size:14px; line-height:1.28; min-height:36px; }
+  .card .c { font:400 12px "CF Helvetica Condensed"; color:var(--g5); }
+  .card .p { font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:21px; letter-spacing:-.02em; margin-top:6px; }
+  .card .add { text-align:center; padding:11px; font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; font-size:12px; letter-spacing:.05em; background:var(--red); color:#fff; margin-top:8px; }
+
+  /* ── ΚΙΝΗΤΟ ── */
+  .mob { background:var(--g1); padding:44px 0 60px; border-top:4px solid var(--ink); }
+  .mob h2 { font-size:28px; margin-bottom:6px; } .mob .s { color:var(--g5); margin-bottom:22px; max-width:760px; line-height:1.5; }
+  .phones { display:flex; gap:26px; flex-wrap:wrap; }
+  .phone { width:320px; border:10px solid var(--ink); border-radius:26px; overflow:hidden; background:#fff; height:640px; position:relative; }
+  .phone .ph { background:var(--red); height:56px; display:flex; align-items:center; }
+  .phone .ph .pl { background:var(--ink); height:100%; display:flex; align-items:center; padding:0 10px; } .phone .ph img { height:34px; }
+  .phone .ph .ic { margin-left:auto; color:#fff; display:flex; gap:14px; padding-right:12px; font-size:18px; }
+  .phone .pim { height:250px; display:flex; align-items:center; justify-content:center; position:relative; border-bottom:1px solid var(--g3); }
+  .phone .pim img { max-height:88%; max-width:80%; }
+  .phone .pim .slant { position:absolute; left:0; top:10px; font-size:10px; }
+  .phone .pdots { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); display:flex; gap:5px; }
+  .phone .pdots i { width:18px; height:3px; background:var(--g3); } .phone .pdots i.on { background:var(--ink); }
+  .phone .pb { padding:12px; }
+  .phone .pb h3 { font-size:20px; line-height:1.05; margin-bottom:4px; }
+  .phone .pb .c { font:400 12px "CF Helvetica Condensed"; color:var(--g5); margin-bottom:10px; }
+  .phone .popts { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px; }
+  .phone .popts span { border:1px solid var(--g3); padding:8px; font:700 12px "CF Helvetica Condensed"; line-height:1.3; }
+  .phone .popts span b { display:block; font-family:"TikTok Sans"; font-weight:900; font-stretch:120%; font-size:14px; }
+  .phone .popts span.on { border:2px solid var(--red); padding:7px; }
+  .phone .pa { font:500 13px "CF Helvetica Condensed"; color:var(--ok); }
+  .phone .bar { position:absolute; left:0; right:0; bottom:0; display:grid; grid-template-columns:auto 1fr; border-top:1px solid var(--g3); background:#fff; }
+  .phone .bar .pp { padding:0 14px; display:flex; flex-direction:column; justify-content:center; }
+  .phone .bar .pp b { font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:20px; letter-spacing:-.02em; }
+  .phone .bar .pp span { font:400 11px "CF Helvetica Condensed"; color:var(--g5); }
+  .phone .bar a { background:var(--red); color:#fff; height:60px; display:flex; align-items:center; justify-content:center; font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; font-size:14px; letter-spacing:.04em; }
+  .acc { border-top:1px solid var(--g3); }
+  .acc div.h { display:flex; justify-content:space-between; align-items:center; padding:0 12px; height:52px; border-bottom:1px solid var(--g3); font:700 14px "CF Helvetica Condensed"; letter-spacing:.05em; }
+  .acc div.h::after { content:"+"; color:var(--red); font-size:20px; }
+  .acc div.h.open::after { content:"–"; }
+  .acc dl { display:grid; grid-template-columns:1fr auto; padding:0 12px 6px; border-bottom:1px solid var(--g3); }
+  .acc dt, .acc dd { padding:8px 0; border-bottom:1px solid var(--g1); font:400 13px "CF Helvetica Condensed"; }
+  .acc dt { color:var(--g7); } .acc dd { font-weight:700; text-align:right; }
+</style>
+</head>
+<body>
+<div class="ann"><div class="wrap"><div>ΤΟ ΠΡΩΤΟ MILWAUKEE HEAVY DUTY CENTRE ΣΤΗΝ ΕΛΛΑΔΑ</div><div>ΔΩΡΕΑΝ ΑΠΟΣΤΟΛΗ ΑΝΩ ΤΩΝ 150 € · ΠΑΡΑΛΑΒΗ ΑΠΟ ΤΟ ΚΑΤΑΣΤΗΜΑ</div><div>EL · EN · IT</div></div></div>
+<header class="hdr"><div class="wrap">
+  <a class="plinth"><img src="/files/hdc-lockup-440.png" alt=""></a>
+  <nav><a class="on">ΕΡΓΑΛΕΙΑ ΜΠΑΤΑΡΙΑΣ</a><a>ΑΞΕΣΟΥΑΡ</a><a>PACKOUT</a><a>ΧΕΙΡΟΣ</a><a>ΠΡΟΣΦΟΡΕΣ</a></nav>
+  <div class="search"><span>Κωδικός ή εργαλείο…</span><b>⚲</b></div>
+  <div class="acts"><a>♡</a><a>◯</a><a>🛒</a></div>
+</div></header>
+<div class="wrap crumb" style="padding-left:24px;margin-top:22px" data-api="ΝΕΟ milwaukee-categories ↔ mtrcategory · mtrgroup · cccSubgroup2"><a>Αρχική</a><i>/</i><a>Εργαλεία μπαταρίας</a><i>/</i><a>Δράπανα</a><i>/</i>M18 FPD3</div>
+
+<div class="wrap"><div class="apileg">
+  <div><h3>ΑΠΟ ΠΟΥ ΕΡΧΟΝΤΑΙ ΤΑ ΔΕΔΟΜΕΝΑ</h3>Όλα από το public API του HDCtool (<code>Bearer</code> με κλειδί του HDC), φιλτραρισμένα στη μάρκα Milwaukee (MTRMARK 1364). Οι μπλε ετικέτες δείχνουν service → πεδίο.</div>
+  <ul>
+    <li><b>Συγχρονισμός:</b> <code>catalog/delta</code> + <code>products</code> → βάση <code>hdcfront</code>, όπως κάνει ήδη το eshop. Η σελίδα διαβάζει την τοπική βάση — όχι ζωντανή κλήση ανά επισκέπτη.</li>
+    <li><b>Τιμή &amp; απόθεμα:</b> <code>pricer02</code>, <code>quantity</code> (πωλήσιμο = διαθέσιμο − δεσμευμένο), ανανέωση από delta και webhook.</li>
+    <li><b>Παραγγελία:</b> <code>orders</code> → <code>orders/{n}/push</code> → SoftOne, με δική του σειρά παραστατικών για το HDC.</li>
+    <li><b>Μεταφορικά:</b> <code>courier/quote</code> (ACS, μόνο μέσω HDCtool).</li>
+    <li class="new">ΝΕΟ στο HDCtool: <code>GET /api/public/milwaukee-categories</code> — το δέντρο Milwaukee σήμερα το βλέπει μόνο το προσωπικό. Προσθήκη μόνο ανάγνωσης, δεν αλλάζει τίποτα στο eshop.</li>
+    <li class="new">ΝΕΟ στο HDCtool: δεύτερο webhook URL/secret για το HDC — σήμερα υπάρχει ένα (<code>ESHOP_WEBHOOK_URL</code>).</li>
+  </ul>
+</div></div>
+
+<!-- ═══ Γκαλερί + αγορά ═══ -->
+<div class="wrap top">
+  <div class="gal note nb" data-api="products → images[] (type=image, order, isFeature)" data-note="Όλες οι φωτογραφίες του HDCtool (το κιτ έχει 34, το σκέτο 3). Κλικ = μεγέθυνση σε πλήρη οθόνη. Αλλάζει μαζί με την επιλογή σκέτο/κιτ.">
+    <div class="th">
+      <div class="on"><img src="https://kolleris.b-cdn.net/papatheo/4933479860/primary-0-1751220334522.webp" alt=""></div>
+      <div><img src="https://kolleris.b-cdn.net/papatheo/4933479860/gallery-2-1751220335719.webp" alt=""></div>
+      <div><img src="https://kolleris.b-cdn.net/papatheo/4933479860/gallery-3-1751220336257.webp" alt=""></div>
+      <div><img src="https://kolleris.b-cdn.net/papatheo/4933479860/gallery-4-1751220336885.webp" alt=""></div>
+      <div><img src="https://kolleris.b-cdn.net/papatheo/4933479860/gallery-5-1751220337524.webp" alt=""></div>
+      <div class="more">+29</div>
+    </div>
+    <div class="main">
+      <div class="tags"><span class="slant" style="background:var(--ink);color:#fff">M18 FUEL™</span><span class="slant" style="background:var(--red);color:#fff">ΚΙΤ 2 × 5.0Ah</span></div>
+      <span class="arr" style="left:0">‹</span><span class="arr" style="right:0">›</span>
+      <img src="https://kolleris.b-cdn.net/papatheo/4933479860/primary-0-1751220334522.webp" alt="Κρουστικό δραπανοκατσάβιδο M18 FPD3-502X">
+      <span class="zoom">⤢</span>
+    </div>
+  </div>
+
+  <div class="buy">
+    <span class="slant" style="background:var(--ink);color:#fff">M18 FUEL™</span>
+    <h1 class="disp">ΚΡΟΥΣΤΙΚΟ ΔΡΑΠΑΝΟΚΑΤΣΑΒΙΔΟ M18 FPD3</h1>
+    <div class="codes" style="margin-top:26px" data-api="products → translations[el].name · code2 · code1"><span>Κωδικός <b>4933479860</b></span><span>Μοντέλο <b>M18 FPD3-502X</b></span><span>EAN 4058546376543</span></div>
+    <a class="rv">Γράψτε την πρώτη κριτική</a>
+
+    <div class="keys note" data-api="products → translations[el].longDescription «Τεχνικά χαρακτηριστικά»" data-note="Τέσσερα νούμερα που κρίνουν την αγορά — από τα στοιχεία του κατασκευαστή, όχι από τον πίνακα προδιαγραφών του HDCtool (δείτε σημείωση πιο κάτω).">
+      <div><b>158</b><span>NM ΡΟΠΗ</span></div>
+      <div><b>2.100</b><span>RPM ΜΕΓΙΣΤΕΣ</span></div>
+      <div><b>33.000</b><span>BPM ΚΡΟΥΣΕΙΣ</span></div>
+      <div><b>13</b><span>MM ΤΣΟΚ</span></div>
+    </div>
+
+    <div class="note" data-api="products → variantGroup (για Milwaukee: ρίζα μοντέλου)" data-note="Δύο ξεχωριστοί κωδικοί στο ERP, ενωμένοι με τη ρίζα του μοντέλου (M18 FPD3). Το -0X / -502X λέει τι περιέχει. Η επιλογή αλλάζει URL, φωτογραφίες, τιμή και απόθεμα.">
+      <div class="lbl">ΕΠΙΛΟΓΕΣ ΕΡΓΑΛΕΙΟΥ<a>Τι σημαίνουν οι κωδικοί;</a></div>
+      <div class="opts">
+        <div class="opt"><span class="n">ΣΚΕΤΟ ΕΡΓΑΛΕΙΟ</span><span class="m">M18 FPD3-0X · 4933479859</span><span class="d">Σε HD Box, χωρίς μπαταρίες και φορτιστή.</span><span class="p">318,28 €</span></div>
+        <div class="opt on"><span class="n">ΚΙΤ</span><span class="m">M18 FPD3-502X · 4933479860</span><span class="d">2 × M18 B5 5.0Ah, φορτιστής M12–M18 FC, HD Box.</span><span class="p">598,92 €</span></div>
+      </div>
+      <div class="hint">Έχετε ήδη μπαταρίες M18; Το σκέτο εργαλείο κοστίζει <b>280,64 € λιγότερο</b>.</div>
+    </div>
+
+    <div class="pricebox note" data-api="products → pricer02 · quantity" data-note="Τιμή PRICER02 με ΦΠΑ, ίδια για όλους. Ακριβής ποσότητα μόνο όταν είναι ≤ 3 — αλλιώς σκέτο «Σε απόθεμα».">
+      <div class="pr">598,92 €<small>με ΦΠΑ</small></div>
+      <div class="avail">
+        <div><span class="dot" style="background:var(--ok)"></span><span style="color:var(--ok)">Σε απόθεμα — 2 τεμάχια</span></div>
+        <div><span class="dot" style="background:var(--ink)"></span>Παραλαβή από το κατάστημα <span class="g">· Πειραιάς</span></div>
+        <div><span class="dot" style="background:var(--ink)"></span>Δωρεάν αποστολή <span class="g">· παραγγελίες άνω των 150 €</span></div>
+      </div>
+      <div class="cta">
+        <div class="qty"><span>−</span><span>1</span><span>+</span></div>
+        <a class="btn add">ΣΤΟ ΚΑΛΑΘΙ</a>
+        <a class="fav">♡</a>
+      </div>
+      <div class="subacts"><span>Σύγκριση</span><span>Κοινοποίηση</span><span>Ερώτηση για το προϊόν</span></div>
+    </div>
+
+    <div class="serv note nb" data-api="courier/quote · κανόνας δωρεάν αποστολής του eshop" data-note="Το «Εγγύηση Milwaukee» θέλει επιβεβαίωση — όπως και στην αρχική.">
+      <div><b>ΔΩΡΕΑΝ ΑΠΟΣΤΟΛΗ</b><span>Άνω των 150 € · ACS</span></div>
+      <div><b>ΠΑΡΑΛΑΒΗ ΑΠΟ ΤΟ ΚΑΤΑΣΤΗΜΑ</b><span>Χωρίς χρέωση</span></div>
+      <div><b>ΕΓΓΥΗΣΗ MILWAUKEE</b><span>Υποστήριξη μέσω του καταστήματος</span></div>
+      <div><b>ΠΛΗΡΩΜΗ</b><span>Κάρτα · IRIS · Κατάθεση</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Μπάρα ενοτήτων ═══ -->
+<nav class="secnav note" data-note="Κολλάει στην κορυφή στο scroll. Όταν το κουμπί «Στο καλάθι» φύγει από την οθόνη, εμφανίζεται δεξιά η τιμή και ένα μικρό κουμπί.">
+  <div class="wrap"><a class="on">ΠΕΡΙΓΡΑΦΗ</a><a>ΠΡΟΔΙΑΓΡΑΦΕΣ</a><a>ΣΤΗ ΣΥΣΚΕΥΑΣΙΑ</a><a>ΕΓΓΡΑΦΑ</a><a>ΚΡΙΤΙΚΕΣ</a>
+    <div class="mini"><b>598,92 €</b><a>ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+</nav>
+
+<div class="wrap">
+  <!-- Περιγραφή -->
+  <section class="sec" data-api="products → translations[el].longDescription (πριν τα «Τεχνικά χαρακτηριστικά»)">
+    <h2 class="disp">ΠΕΡΙΓΡΑΦΗ</h2>
+    <div class="ov">
+      <div>
+        <p>Επαγγελματικό κρουστικό δραπανοκατσάβιδο μπαταρίας για βαριά καθημερινή χρήση. Ο κινητήρας POWERSTATE™ χωρίς ψήκτρες κρατά την απόδοση υπό φορτίο, και τα 158 Nm ροπής περνούν γρήγορα βίδες και τρυπάνια ακόμη και σε δύσκολα υλικά.</p>
+        <p>Με μήκος μόλις 175 mm χωράει σε στενούς χώρους, ενώ το μεταλλικό τσοκ 13 mm κρατά σταθερά τα εξαρτήματα. Διάτρηση έως 89 mm σε ξύλο, 16 mm σε σίδηρο και 16 mm σε δομικά υλικά.</p>
+        <ul>
+          <li><span><b>AUTOSTOP™</b> — κόβει την περιστροφή αν μπλοκάρει το τρυπάνι, με λυχνία ένδειξης στη βάση.</span></li>
+          <li><span><b>REDLINK PLUS™</b> — προστατεύει εργαλείο και μπαταρία από υπερφόρτωση.</span></li>
+          <li><span><b>REDLITHIUM™ 5.0Ah</b> — μεγαλύτερη αυτονομία, με μετρητή φόρτισης σε κάθε μπαταρία.</span></li>
+          <li><span><b>Φωτισμός LED</b>, μεταλλικό αναστρέψιμο κλιπ ζώνης και πλαϊνή χειρολαβή.</span></li>
+        </ul>
+      </div>
+      <div class="ph note" data-note="Φωτογραφία εφαρμογής από milwaukeetool.gr. Στην παραγωγή: υλικό Milwaukee υψηλής ανάλυσης, όπου υπάρχει."><span>M18 FPD3 ΣΤΗ ΔΟΥΛΕΙΑ</span></div>
+    </div>
+  </section>
+
+  <!-- Προδιαγραφές -->
+  <section class="sec note" data-api="products → translations[el].longDescription — ΟΧΙ specifications[]" data-note="ΠΡΟΣΟΧΗ: ο πίνακας product_specifications του HDCtool (γεμισμένος με AI) γράφει 135 Nm / 0–1800 rpm — λάθος. Εδώ διαβάζουμε το μπλοκ «Τεχνικά χαρακτηριστικά» της περιγραφής, που είναι του κατασκευαστή.">
+    <h2 class="disp">ΠΡΟΔΙΑΓΡΑΦΕΣ</h2>
+    <div class="specs">
+      <dl>
+        <dt>Τάση</dt><dd>18 V</dd>
+        <dt>Μέγιστη ροπή</dt><dd>158 Nm</dd>
+        <dt>Ταχύτητα χωρίς φορτίο — 1η</dt><dd>0 – 500 rpm</dd>
+        <dt>Ταχύτητα χωρίς φορτίο — 2η</dt><dd>0 – 2.100 rpm</dd>
+        <dt>Συχνότητα κρούσης</dt><dd>0 – 33.000 bpm</dd>
+        <dt>Χωρητικότητα τσοκ</dt><dd>13 mm</dd>
+        <dt>Μήκος εργαλείου</dt><dd>175 mm</dd>
+      </dl>
+      <dl>
+        <dt>Διάτρηση σε ξύλο</dt><dd>89 mm</dd>
+        <dt>Διάτρηση σε σίδηρο</dt><dd>16 mm</dd>
+        <dt>Διάτρηση σε δομικά υλικά</dt><dd>16 mm</dd>
+        <dt>Μπαταρίες στο κιτ</dt><dd>2 × M18 B5 5.0Ah</dd>
+        <dt>Φορτιστής</dt><dd>M12–M18 FC</dd>
+        <dt>Βάρος με μπαταρία (EPTA)</dt><dd>2,2 kg</dd>
+        <dt>Παραδίδεται σε</dt><dd>HD Box</dd>
+      </dl>
+    </div>
+  </section>
+
+  <!-- Στη συσκευασία -->
+  <section class="sec note" data-api="products → longDescription + products {mtrl:[…]} για τα εξαρτήματα" data-note="Βγαίνει από τις γραμμές «Βασικός εξοπλισμός / Παραδίδεται σε / Αρ. μπαταριών / Φορτιστής». Όπου το εξάρτημα είναι κι αυτό προϊόν μας (π.χ. M18 B5), η κάρτα οδηγεί εκεί.">
+    <h2 class="disp">ΣΤΗ ΣΥΣΚΕΥΑΣΙΑ</h2>
+    <div class="box">
+      <div><div class="im"><span class="x">1×</span><img src="https://kolleris.b-cdn.net/papatheo/4933479859/primary-0-1751220216324.webp" alt=""></div><div class="t">Κρουστικό δραπανοκατσάβιδο M18 FPD3<small>Σκέτο εργαλείο</small></div></div>
+      <div><div class="im"><span class="x">2×</span><img src="https://kolleris.b-cdn.net/papatheo/4932430483/primary-0-1751214102874.webp" alt=""></div><div class="t">Μπαταρία REDLITHIUM™ M18 B5<small>5.0Ah · 4932430483</small></div></div>
+      <div><div class="im ph"><span class="x">1×</span>ΦΟΡΤΙΣΤΗΣ</div><div class="t">Ταχυφορτιστής M12–M18 FC<small>Για μπαταρίες M12 και M18</small></div></div>
+      <div><div class="im ph"><span class="x">1×</span>HD BOX</div><div class="t">Βαλίτσα μεταφοράς HD Box<small>Με θέσεις για το κιτ</small></div></div>
+      <div><div class="im ph"><span class="x">1+1</span>ΕΞΑΡΤΗΜΑΤΑ</div><div class="t">Πλαϊνή χειρολαβή, κλιπ ζώνης<small>Βασικός εξοπλισμός</small></div></div>
+    </div>
+  </section>
+
+  <!-- Έγγραφα -->
+  <section class="sec note" data-api="products → images[] (type=doc)" data-note="Από τα αρχεία τύπου «doc» του HDCtool. Αυτό το προϊόν δεν έχει ακόμη κανένα — τότε η ενότητα απλώς δεν εμφανίζεται.">
+    <h2 class="disp">ΕΓΓΡΑΦΑ</h2>
+    <div class="docs">
+      <a><i>PDF</i><div><b>Οδηγίες χρήσης</b><span>Ελληνικά · 2,4 MB</span></div></a>
+      <a><i>PDF</i><div><b>Δήλωση συμμόρφωσης CE</b><span>0,3 MB</span></div></a>
+      <a><i>PDF</i><div><b>Φύλλο προδιαγραφών</b><span>0,8 MB</span></div></a>
+    </div>
+  </section>
+
+  <!-- Κριτικές -->
+  <section class="sec note nb" data-api="βάση hdcfront (κριτικές του eshop) — όχι HDCtool" data-note="Χωρίς κριτικές δεν δείχνουμε άδεια αστεράκια. Οι κριτικές του eshop ισχύουν όπως είναι (έγκριση από διαχειριστή).">
+    <h2 class="disp">ΚΡΙΤΙΚΕΣ</h2>
+    <div class="rev">
+      <div><h3>ΔΕΝ ΥΠΑΡΧΟΥΝ ΑΚΟΜΗ ΚΡΙΤΙΚΕΣ</h3><p>Το έχετε χρησιμοποιήσει; Πείτε στους άλλους επαγγελματίες πώς τα πάει στη δουλειά.</p></div>
+      <a class="btn" style="background:var(--ink);color:#fff">ΓΡΑΨΤΕ ΚΡΙΤΙΚΗ</a>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ Ίδια μπαταρία ═══ -->
+<section class="xs note nb" data-api="similar-products + φίλτρο πλατφόρμας M18 από τον κωδικό" data-note="Το κλειδί της Milwaukee: η μπαταρία. Πρώτα η μπαταρία της πλατφόρμας, μετά σκέτα εργαλεία M18 — για όποιον αγόρασε κιτ και θέλει δεύτερο εργαλείο χωρίς να ξαναπληρώσει μπαταρίες.">
+  <div class="wrap">
+    <div class="head">
+      <div><h2 class="disp">ΙΔΙΑ ΜΠΑΤΑΡΙΑ, ΚΙ ΑΛΛΑ ΕΡΓΑΛΕΙΑ</h2><p>Όλα δουλεύουν με τις μπαταρίες M18 του κιτ σας.</p></div>
+      <a>ΟΛΑ ΤΑ ΕΡΓΑΛΕΙΑ M18 →</a>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="ci"><span class="slant" style="background:var(--ink);color:#fff">M18</span><img src="https://kolleris.b-cdn.net/papatheo/4932430483/primary-0-1751214102874.webp" alt=""></div><div class="cb"><div class="t">Μπαταρία REDLITHIUM™ M18 B5 5.0Ah</div><div class="c">4932430483</div><div class="p">165,42 €</div><a class="add">ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+      <div class="card"><div class="ci"><span class="slant" style="background:var(--ink);color:#fff">M18 FUEL</span><img src="https://kolleris.b-cdn.net/papatheo/4933492782/primary-0-1751222565411.webp" alt=""></div><div class="cb"><div class="t">Μπουλονόκλειδο 1/2″ M18 FHIW2F12-0X</div><div class="c">4933492782 · Σκέτο εργαλείο</div><div class="p">489,40 €</div><a class="add">ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+      <div class="card"><div class="ci"><span class="slant" style="background:var(--ink);color:#fff">M18 FUEL</span><img src="https://kolleris.b-cdn.net/papatheo/4933478429/primary-0-1751218639483.webp" alt=""></div><div class="cb"><div class="t">Γωνιακός τροχός M18 FSAG125XB-0X</div><div class="c">4933478429 · Σκέτο εργαλείο</div><div class="p">329,69 €</div><a class="add">ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+      <div class="card"><div class="ci"><span class="slant" style="background:var(--ink);color:#fff">M18 FUEL</span><img src="https://kolleris.b-cdn.net/papatheo/4933459729/primary-0-1751215034751.webp" alt=""></div><div class="cb"><div class="t">Μπουλονόκλειδο 3/4″ M18 ONEFHIWF34-0X</div><div class="c">4933459729 · Σκέτο εργαλείο</div><div class="p">466,59 €</div><a class="add">ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+      <div class="card"><div class="ci"><span class="slant" style="background:var(--red);color:#fff">ΚΙΤ</span><img src="https://kolleris.b-cdn.net/papatheo/4933480873/primary-0-1751221236440.webp" alt=""></div><div class="cb"><div class="t">Σετ εργαλείων M18 FPP2A3-502X FUEL</div><div class="c">4933480873 · 2 εργαλεία</div><div class="p">683,34 €</div><a class="add">ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Κινητό ═══ -->
+<section class="mob">
+  <div class="wrap">
+    <h2 class="disp">ΣΤΟ ΚΙΝΗΤΟ</h2>
+    <p class="s">Φωτογραφίες που σύρονται, η επιλογή σκέτο/κιτ αμέσως κάτω από τον τίτλο, και τιμή με «Στο καλάθι» σταθερά στο κάτω μέρος. Οι ενότητες γίνονται πτυσσόμενες — ανοιχτή μόνο η πρώτη.</p>
+    <div class="phones">
+      <div class="phone">
+        <div class="ph"><div class="pl"><img src="/files/hdc-lockup-440.png" alt=""></div><div class="ic">⚲ ♡ 🛒</div></div>
+        <div class="pim"><span class="slant" style="background:var(--ink);color:#fff">M18 FUEL™</span><img src="https://kolleris.b-cdn.net/papatheo/4933479860/primary-0-1751220334522.webp" alt=""><div class="pdots"><i class="on"></i><i></i><i></i><i></i><i></i></div></div>
+        <div class="pb">
+          <h3 class="disp">ΚΡΟΥΣΤΙΚΟ ΔΡΑΠΑΝΟΚΑΤΣΑΒΙΔΟ M18 FPD3</h3>
+          <div class="c">4933479860 · M18 FPD3-502X</div>
+          <div class="popts"><span>ΣΚΕΤΟ<b>318,28 €</b></span><span class="on">ΚΙΤ 2 × 5.0Ah<b>598,92 €</b></span></div>
+          <div class="pa">● Σε απόθεμα — 2 τεμάχια</div>
+        </div>
+        <div class="bar"><div class="pp"><b>598,92 €</b><span>με ΦΠΑ</span></div><a>ΣΤΟ ΚΑΛΑΘΙ</a></div>
+      </div>
+      <div class="phone">
+        <div class="ph"><div class="pl"><img src="/files/hdc-lockup-440.png" alt=""></div><div class="ic">⚲ ♡ 🛒</div></div>
+        <div class="acc">
+          <div class="h">ΠΕΡΙΓΡΑΦΗ</div>
+          <div class="h open">ΠΡΟΔΙΑΓΡΑΦΕΣ</div>
+          <dl><dt>Τάση</dt><dd>18 V</dd><dt>Μέγιστη ροπή</dt><dd>158 Nm</dd><dt>Ταχύτητα 1η</dt><dd>0 – 500 rpm</dd><dt>Ταχύτητα 2η</dt><dd>0 – 2.100 rpm</dd><dt>Κρούση</dt><dd>0 – 33.000 bpm</dd><dt>Τσοκ</dt><dd>13 mm</dd><dt>Μήκος</dt><dd>175 mm</dd><dt>Βάρος (EPTA)</dt><dd>2,2 kg</dd></dl>
+          <div class="h">ΣΤΗ ΣΥΣΚΕΥΑΣΙΑ</div>
+          <div class="h">ΚΡΙΤΙΚΕΣ</div>
+        </div>
+        <div class="bar"><div class="pp"><b>598,92 €</b><span>με ΦΠΑ</span></div><a>ΣΤΟ ΚΑΛΑΘΙ</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

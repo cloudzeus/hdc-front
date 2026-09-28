@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<title>Κατηγορία — Εργαλεία μπαταρίας</title>
+<link href="https://fonts.googleapis.com/css2?family=TikTok+Sans:opsz,wdth,wght@12..36,75..150,300..900&display=swap" rel="stylesheet">
+<style>
+  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelReg.ttf) format("truetype"); font-weight:400; }
+  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelMed.ttf) format("truetype"); font-weight:500; }
+  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelBol.ttf) format("truetype"); font-weight:700; }
+  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConReg.ttf) format("truetype"); font-weight:400; }
+  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConMed.ttf) format("truetype"); font-weight:500; }
+  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConBol.ttf) format("truetype"); font-weight:700; }
+  :root { --red:#DB011C; --red-d:#BD0118; --ink:#0A0A0A; --graph:#1A1A1A; --g7:#444444; --g5:#6B6B6B; --g3:#D6D6D6; --g1:#F4F4F4; --ok:#1F7A3A; --wait:#9A6700; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"CF Helvetica",Helvetica,Arial,sans-serif; color:var(--ink); background:#fff; font-size:15px; }
+  a { color:inherit; text-decoration:none; }
+  .wrap { max-width:1320px; margin:0 auto; padding:0 24px; }
+  .disp { font-family:"TikTok Sans",sans-serif; font-weight:900; font-stretch:150%; letter-spacing:-0.02em; line-height:1.02; }
+  .slant { clip-path:polygon(0 0,100% 0,calc(100% - 10px) 100%,0 100%); display:inline-block; padding:4px 18px 4px 10px; font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:12px; }
+  .note { position:relative; }
+  .note::after { content:attr(data-note); position:absolute; right:10px; top:10px; background:#FFF6CC; color:#5b4a00; border:1px solid #E7D27A; font:600 11px/1.35 "CF Helvetica Condensed",sans-serif; padding:5px 8px; max-width:280px; z-index:5; box-shadow:0 2px 6px rgba(0,0,0,.15); }
+  .ann { background:var(--ink); color:#fff; font:700 12px "CF Helvetica Condensed"; letter-spacing:.06em; }
+  .ann .wrap { display:flex; justify-content:space-between; align-items:center; height:34px; }
+  .hdr { background:var(--red); color:#fff; }
+  .hdr .wrap { display:flex; align-items:stretch; height:84px; padding-left:0; }
+  .hdr .plinth { background:var(--ink); display:flex; align-items:center; padding:0 22px 0 24px; margin-right:26px; }
+  .hdr .plinth img { height:58px; }
+  .hdr nav { display:flex; align-items:center; gap:26px; font:700 15px "CF Helvetica Condensed"; letter-spacing:.05em; }
+  .hdr nav a { padding:31px 0 27px; border-bottom:4px solid transparent; } .hdr nav a.on { border-bottom-color:#fff; }
+  .hdr .search { margin-left:auto; align-self:center; display:flex; background:#fff; width:340px; height:44px; }
+  .hdr .search span { flex:1; padding:0 14px; display:flex; align-items:center; color:var(--g5); font-size:15px; }
+  .hdr .search b { width:48px; background:var(--ink); display:flex; align-items:center; justify-content:center; }
+  .hdr .acts { display:flex; align-items:center; gap:4px; margin-left:18px; font-size:20px; }
+  .hdr .acts a { width:48px; height:48px; display:flex; align-items:center; justify-content:center; }
+  .crumb { font-size:13px; padding:14px 0; }
+  .crumb a { color:var(--red); } .crumb i { color:var(--g5); font-style:normal; margin:0 8px; }
+  .band { background:var(--graph); color:#fff; background-image:repeating-linear-gradient(115deg, rgba(219,1,28,.10) 0 3px, transparent 3px 26px); }
+  .band .wrap { display:grid; grid-template-columns:1fr 360px; gap:30px; align-items:center; min-height:250px; }
+  .band h1 { font-size:54px; margin-bottom:12px; }
+  .band p { color:#cfcfcf; font-size:16px; line-height:1.55; max-width:620px; }
+  .band .stats { display:flex; gap:26px; margin-top:18px; font:700 13px "CF Helvetica Condensed"; letter-spacing:.05em; color:#bdbdbd; }
+  .band .stats b { color:#fff; font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:22px; display:block; }
+  .band img { max-width:100%; max-height:230px; display:block; margin-left:auto; }
+  .groups { display:flex; gap:10px; overflow-x:auto; padding:18px 0 4px; }
+  .groups a { flex:0 0 auto; border:1px solid var(--g3); padding:10px 14px; font:700 13px "CF Helvetica Condensed"; letter-spacing:.04em; }
+  .groups a.on { border:2px solid var(--ink); }
+  .plat { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:18px 0 6px; }
+  .plat a { border:2px solid var(--ink); padding:12px 14px; display:flex; align-items:baseline; justify-content:space-between; }
+  .plat a b { font-family:"TikTok Sans"; font-weight:900; font-stretch:150%; font-size:26px; letter-spacing:-.02em; }
+  .plat a span { font:500 13px "CF Helvetica Condensed"; color:var(--g5); }
+  .plat a.on { background:var(--red); border-color:var(--red); color:#fff; } .plat a.on span { color:#ffe1e3; }
+  .body { display:grid; grid-template-columns:270px 1fr; gap:28px; padding:18px 0 40px; }
+  .filters .fh { font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:14px; display:flex; justify-content:space-between; align-items:center; padding-bottom:10px; border-bottom:4px solid var(--ink); }
+  .filters .fh a { font:700 12px "CF Helvetica Condensed"; color:var(--red); letter-spacing:.04em; }
+  .fg { border-bottom:1px solid var(--g3); padding:14px 0; }
+  .fg h4 { font:700 14px "CF Helvetica Condensed"; letter-spacing:.05em; display:flex; justify-content:space-between; margin-bottom:10px; }
+  .fg h4::after { content:"⌃"; color:var(--red); }
+  .fg label { display:flex; align-items:center; gap:10px; font:400 15px "CF Helvetica Condensed"; padding:5px 0; min-height:32px; }
+  .fg label i { width:20px; height:20px; border:2px solid var(--ink); flex:0 0 auto; }
+  .fg label i.on { background:var(--red); border-color:var(--red); box-shadow:inset 0 0 0 3px #fff; }
+  .fg label span { margin-left:auto; color:var(--g5); font-size:13px; }
+  .fg .dot { width:9px; height:9px; border-radius:50%; flex:0 0 auto; }
+  .range { display:flex; gap:8px; align-items:center; }
+  .range div { flex:1; border:1px solid var(--g3); height:44px; display:flex; align-items:center; padding:0 10px; font-size:15px; }
+  .bar { height:4px; background:var(--g3); position:relative; margin:16px 6px 6px; }
+  .bar i { position:absolute; left:8%; right:35%; top:0; bottom:0; background:var(--red); }
+  .bar b { position:absolute; top:-7px; width:18px; height:18px; background:#fff; border:3px solid var(--red); }
+  .toolbar { display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding-bottom:12px; border-bottom:1px solid var(--g3); margin-bottom:16px; }
+  .toolbar .count { font:700 14px "CF Helvetica Condensed"; letter-spacing:.04em; }
+  .chip { display:inline-flex; align-items:center; gap:8px; background:var(--ink); color:#fff; padding:7px 10px; font:700 12px "CF Helvetica Condensed"; letter-spacing:.04em; }
+  .chip b { color:#bbb; font-weight:400; }
+  .sort { margin-left:auto; display:flex; align-items:center; gap:10px; font:700 13px "CF Helvetica Condensed"; }
+  .sort div { border:1px solid var(--g3); height:44px; min-width:210px; display:flex; align-items:center; justify-content:space-between; padding:0 12px; font-weight:400; font-size:15px; }
+  .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+  .card { border:1px solid var(--g3); background:#fff; display:flex; flex-direction:column; }
+  .card:hover { box-shadow:0 4px 8px 3px rgba(0,0,0,.15),0 1px 3px rgba(0,0,0,.3); }
+  .card .ci { aspect-ratio:1/1; display:flex; align-items:center; justify-content:center; position:relative; }
+  .card .ci img { max-height:82%; max-width:82%; }
+  .card .ci .slant { position:absolute; left:0; top:12px; font-size:11px; }
+  .card .ci .k1 { position:absolute; left:0; top:40px; font-size:10px; }
+  .card .ci .fav { position:absolute; right:8px; top:8px; width:32px; height:32px; border:1px solid var(--g3); background:#fff; display:flex; align-items:center; justify-content:center; }
+  .card .ci .qv { position:absolute; right:8px; top:46px; width:32px; height:32px; border:1px solid var(--g3); background:#fff; display:flex; align-items:center; justify-content:center; font-size:13px; }
+  .card .cb { background:var(--g1); padding:12px; display:flex; flex-direction:column; gap:3px; flex:1; }
+  .card .t { font-weight:700; font-size:14px; line-height:1.28; min-height:36px; }
+  .card .c { font:400 12px "CF Helvetica Condensed"; color:var(--g5); }
+  .card .p { font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:22px; letter-spacing:-.02em; margin-top:6px; }
+  .card .a { font:500 12px "CF Helvetica Condensed"; margin:1px 0 8px; }
+  .card .add { text-align:center; padding:11px; font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; font-size:12px; letter-spacing:.05em; background:var(--red); color:#fff; margin-top:auto; }
+  .card .cmp { display:flex; align-items:center; gap:6px; font:500 12px "CF Helvetica Condensed"; color:var(--g7); margin:0 0 8px; }
+  .card .cmp i { width:16px; height:16px; border:2px solid var(--g5); }
+  .more { text-align:center; margin-top:26px; }
+  .more p { font:500 13px "CF Helvetica Condensed"; color:var(--g5); margin-bottom:8px; }
+  .more .pbar { width:280px; height:4px; background:var(--g3); margin:0 auto 16px; } .more .pbar i { display:block; width:30%; height:100%; background:var(--ink); }
+  .more a { display:inline-block; border:2px solid var(--ink); padding:13px 28px; font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; font-size:13px; letter-spacing:.05em; }
+  .mob { background:var(--g1); padding:40px 0 60px; border-top:4px solid var(--ink); }
+  .mob h2 { font-size:28px; margin-bottom:6px; } .mob .s { color:var(--g5); margin-bottom:22px; }
+  .phones { display:flex; gap:26px; flex-wrap:wrap; }
+  .phone { width:320px; border:10px solid var(--ink); border-radius:26px; overflow:hidden; background:#fff; height:620px; position:relative; }
+  .phone .ph { background:var(--red); height:56px; display:flex; align-items:center; }
+  .phone .ph .pl { background:var(--ink); height:100%; display:flex; align-items:center; padding:0 10px; } .phone .ph img { height:34px; }
+  .phone .ph .ic { margin-left:auto; color:#fff; display:flex; gap:14px; padding-right:12px; font-size:18px; }
+  .phone .pt { padding:10px 12px; } .phone .pt h3 { font-size:24px; }
+  .phone .pchips { display:flex; gap:6px; overflow:hidden; padding:0 12px 10px; }
+  .phone .pchips span { border:2px solid var(--ink); padding:5px 10px; font:700 12px "CF Helvetica Condensed"; white-space:nowrap; } .phone .pchips span.on { background:var(--red); border-color:var(--red); color:#fff; }
+  .phone .pg { display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:0 12px; }
+  .phone .pg .card .t { font-size:12px; min-height:30px; } .phone .pg .card .p { font-size:17px; } .phone .pg .card .cb { padding:8px; }
+  .phone .sticky { position:absolute; left:0; right:0; bottom:0; display:grid; grid-template-columns:1fr 1fr; border-top:1px solid var(--g3); }
+  .phone .sticky a { height:52px; display:flex; align-items:center; justify-content:center; font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; font-size:13px; letter-spacing:.04em; }
+  .sheet { position:absolute; inset:0; background:rgba(10,10,10,.55); }
+  .sheet .panel { position:absolute; left:0; right:0; bottom:0; top:90px; background:#fff; display:flex; flex-direction:column; }
+  .sheet .panel .top { display:flex; justify-content:space-between; align-items:center; padding:14px; border-bottom:4px solid var(--ink); font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; }
+  .sheet .panel .fgs { padding:0 14px; overflow:hidden; flex:1; }
+  .sheet .panel .apply { background:var(--red); color:#fff; height:56px; display:flex; align-items:center; justify-content:center; font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; letter-spacing:.04em; }
+</style>
+</head>
+<body>
+<div class="ann"><div class="wrap"><div>ΤΟ ΠΡΩΤΟ MILWAUKEE HEAVY DUTY CENTRE ΣΤΗΝ ΕΛΛΑΔΑ</div><div>ΔΩΡΕΑΝ ΑΠΟΣΤΟΛΗ ΑΝΩ ΤΩΝ 150 € · ΠΑΡΑΛΑΒΗ ΑΠΟ ΤΟ ΚΑΤΑΣΤΗΜΑ</div><div>EL · EN · IT</div></div></div>
+<header class="hdr"><div class="wrap">
+  <a class="plinth"><img src="/files/hdc-lockup-440.png" alt=""></a>
+  <nav><a class="on">ΕΡΓΑΛΕΙΑ ΜΠΑΤΑΡΙΑΣ</a><a>ΑΞΕΣΟΥΑΡ</a><a>PACKOUT</a><a>ΧΕΙΡΟΣ</a><a>ΠΡΟΣΦΟΡΕΣ</a></nav>
+  <div class="search"><span>Κωδικός ή εργαλείο…</span><b>⚲</b></div>
+  <div class="acts"><a>♡</a><a>◯</a><a>🛒</a></div>
+</div></header>
+<div class="wrap crumb"><a>Αρχική</a><i>/</i>Εργαλεία μπαταρίας</div>
+
+<section class="band note" data-note="Τίτλος, κείμενο και εικόνα από το δέντρο κατηγοριών Milwaukee του HDCtool. *Πλήθος προϊόντων ενδεικτικό.">
+  <div class="wrap">
+    <div>
+      <h1 class="disp">ΕΡΓΑΛΕΙΑ ΜΠΑΤΑΡΙΑΣ</h1>
+      <p>Δράπανα, μπουλονόκλειδα, τροχοί, σέγες και φωτισμός — όλη η γκάμα M12, M18 και MX FUEL. Μία μπαταρία, όλα τα εργαλεία της πλατφόρμας.</p>
+      <div class="stats"><div><b>17</b>ΟΜΑΔΕΣ</div><div><b>1.100+</b>ΠΡΟΪΟΝΤΑ*</div><div><b>3</b>ΠΛΑΤΦΟΡΜΕΣ</div></div>
+    </div>
+    <img src="https://kolleris.b-cdn.net/milwaukee-categories/cmi5h59py000jd4uqbek352zg-mainImage-1763557467437.webp" alt="">
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="groups note" data-note="Οι ομάδες της κατηγορίας ως οριζόντια λωρίδα — στο κινητό σύρεται. Ονόματα ενδεικτικά μέχρι να διαβαστούν από τη βάση.">
+    <a class="on">ΟΛΑ</a><a>ΔΡΑΠΑΝΑ</a><a>ΜΠΟΥΛΟΝΟΚΛΕΙΔΑ</a><a>ΓΩΝΙΑΚΟΙ ΤΡΟΧΟΙ</a><a>ΠΑΛΜΙΚΑ ΚΑΤΣΑΒΙΔΙΑ</a><a>ΣΕΓΕΣ</a><a>ΣΚΑΠΤΙΚΑ</a><a>ΦΩΤΙΣΜΟΣ</a><a>ΣΕΤ ΕΡΓΑΛΕΙΩΝ</a><a>ΜΠΑΤΑΡΙΕΣ & ΦΟΡΤΙΣΤΕΣ</a>
+  </div>
+  <div class="plat note" data-note="Το πρώτο φίλτρο, πάνω από όλα. Βγαίνει από τον κωδικό μοντέλου (M12 / M18 / MX) — δεν το συμπληρώνει κανείς.">
+    <a><b>ΟΛΕΣ</b><span>όλα τα προϊόντα</span></a><a><b>M12</b><span>φορητή απόδοση</span></a><a class="on"><b>M18</b><span>κορυφαία ισχύς</span></a><a><b>MX FUEL</b><span>εργοτάξιο</span></a>
+  </div>
+  <div class="body">
+    <aside class="filters note" data-note="Πλήθη ενδεικτικά. Τα φίλτρα με ★ βγαίνουν από τον κωδικό μοντέλου: FUEL (F), ONE-KEY (ONE), σκέτο (-0/-0X) ή κιτ (-502X = 2×5.0Ah).">
+      <div class="fh">ΦΙΛΤΡΑ<a>ΚΑΘΑΡΙΣΜΟΣ</a></div>
+      <div class="fg"><h4>ΔΙΑΘΕΣΙΜΟΤΗΤΑ</h4><label><i class="on"></i><span class="dot" style="background:var(--ok)"></span>Σε απόθεμα<span>42</span></label><label><i></i><span class="dot" style="background:var(--wait)"></span>Παράδοση 1–3 εργάσιμες<span>118</span></label></div>
+      <div class="fg"><h4>ΠΕΡΙΕΧΟΜΕΝΟ ★</h4><label><i></i>Σκέτο εργαλείο<span>71</span></label><label><i></i>Κιτ με μπαταρίες<span>89</span></label></div>
+      <div class="fg"><h4>ΣΕΙΡΑ ★</h4><label><i class="on"></i>FUEL™<span>104</span></label><label><i></i>ONE-KEY™<span>23</span></label><label><i></i>Βασική σειρά<span>56</span></label></div>
+      <div class="fg"><h4>ΜΠΑΤΑΡΙΕΣ ΣΤΟ ΚΙΤ ★</h4><label><i></i>2 × 5.0Ah<span>31</span></label><label><i></i>2 × 4.0Ah<span>12</span></label><label><i></i>1 × 12.0Ah<span>7</span></label></div>
+      <div class="fg"><h4>ΤΙΜΗ</h4><div class="range"><div>100 €</div>—<div>900 €</div></div><div class="bar"><i></i><b style="left:6%"></b><b style="left:62%"></b></div></div>
+      <div class="fg"><h4>ΥΠΟΔΟΧΗ</h4><label><i></i>1/2″<span>9</span></label><label><i></i>3/4″<span>4</span></label><label><i></i>1″<span>2</span></label></div>
+    </aside>
+    <main>
+      <div class="toolbar note" data-note="Κάθε φίλτρο γράφεται στο URL — ο σύνδεσμος μοιράζεται και ανοίγει στην ίδια εικόνα.">
+        <span class="count">42 ΠΡΟΪΟΝΤΑ</span><span class="chip">M18 <b>✕</b></span><span class="chip">FUEL™ <b>✕</b></span><span class="chip">ΣΕ ΑΠΟΘΕΜΑ <b>✕</b></span>
+        <div class="sort">ΤΑΞΙΝΟΜΗΣΗ<div>Δημοφιλή <span>⌄</span></div></div>
+      </div>
+      <div class="grid">
+        <div class="card"><div class="ci"><span class="slant" style="background:var(--ink);color:#fff">M18 FUEL</span><span class="fav">♡</span><span class="qv">👁</span><img src="https://kolleris.b-cdn.net/papatheo/4933492783/primary-0-1751222566870.webp" alt=""></div><div class="cb"><div class="t">Μπουλονόκλειδο 1/2″ M18 FHIW2F12-502X</div><div class="c">4933492783 · 2 × 5.0Ah</div><div class="p">740,38 €</div><div class="a" style="color:var(--ok)">● Σε απόθεμα</div><label class="cmp"><i></i>Σύγκριση</label><a class="add">ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+        <div class="card"><div class="ci"><span class="slant" style="background:var(--ink);color:#fff">M18 FUEL</span><span class="fav">♡</span><span class="qv">👁</span><img src="https://kolleris.b-cdn.net/papatheo/4933492782/primary-0-1751222565411.webp" alt=""></div><div class="cb"><div class="t">Μπουλονόκλειδο 1/2″ M18 FHIW2F12-0X</div><div class="c">4933492782 · Σκέτο εργαλείο</div><div class="p">489,40 €</div><div class="a" style="color:var(--ok)">● Σε απόθεμα</div><label class="cmp"><i></i>Σύγκριση</label><a class="add">ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+        <div class="card"><div class="ci"><span class="slant" style="background:var(--ink);color:#fff">M18 FUEL</span><span class="slant k1" style="background:#fff;color:var(--ink);border:1px solid var(--g3)">ONE-KEY</span><span class="fav">♡</span><span class="qv">👁</span><img src="https://kolleris.b-cdn.net/papatheo/4933459727/primary-0-1751215163484.webp" alt=""></div><div class="cb"><div class="t">Μπουλονόκλειδο 1/2″ M18 ONEFHIWF12-502X</div><div class="c">4933459727 · 2 × 5.0Ah</div><div class="p">694,75 €</div><div class="a" style="color:var(--ok)">● Σε απόθεμα</div><label class="cmp"><i></i>Σύγκριση</label><a class="add">ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+        <div class="card"><div class="ci"><span class="slant" style="background:var(--ink);color:#fff">M18 FUEL</span><span class="slant k1" style="background:#fff;color:var(--ink);border:1px solid var(--g3)">ONE-KEY</span><span class="fav">♡</span><span class="qv">👁</span><img src="https://kolleris.b-cdn.net/papatheo/4933459729/primary-0-1751215034751.webp" alt=""></div><div class="cb"><div class="t">Μπουλονόκλειδο 3/4″ M18 ONEFHIWF34-0X</div><div class="c">4933459729 · Σκέτο εργαλείο</div><div class="p">466,59 €</div><div class="a" style="color:var(--ok)">● Σε απόθεμα</div><label class="cmp"><i></i>Σύγκριση</label><a class="add">ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+        <div class="card"><div class="ci"><span class="slant" style="background:var(--ink);color:#fff">M18 FUEL</span><span class="fav">♡</span><span class="qv">👁</span><img src="https://kolleris.b-cdn.net/papatheo/4933478429/primary-0-1751218639483.webp" alt=""></div><div class="cb"><div class="t">Γωνιακός τροχός M18 FSAG125XB-0X</div><div class="c">4933478429 · Σκέτο εργαλείο</div><div class="p">329,69 €</div><div class="a" style="color:var(--ok)">● Σε απόθεμα</div><label class="cmp"><i></i>Σύγκριση</label><a class="add">ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+        <div class="card"><div class="ci"><span class="slant" style="background:var(--ink);color:#fff">M18 FUEL</span><span class="slant k1" style="background:#fff;color:var(--ink);border:1px solid var(--g3)">ONE-KEY</span><span class="fav">♡</span><span class="qv">👁</span><img src="https://kolleris.b-cdn.net/papatheo/4933478435/primary-0-1751218515594.webp" alt=""></div><div class="cb"><div class="t">Γωνιακός τροχός M18 ONEFSAG125XPDB-502X</div><div class="c">4933478435 · 2 × 5.0Ah</div><div class="p">592,08 €</div><div class="a" style="color:var(--ok)">● Σε απόθεμα</div><label class="cmp"><i></i>Σύγκριση</label><a class="add">ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+        <div class="card"><div class="ci"><span class="slant" style="background:var(--red);color:#fff">ΚΙΤ</span><span class="fav">♡</span><span class="qv">👁</span><img src="https://kolleris.b-cdn.net/papatheo/4933480873/primary-0-1751221236440.webp" alt=""></div><div class="cb"><div class="t">Σετ εργαλείων M18 FPP2A3-502X FUEL</div><div class="c">4933480873 · 2 εργαλεία · 2 × 5.0Ah</div><div class="p">683,34 €</div><div class="a" style="color:var(--ok)">● Σε απόθεμα</div><label class="cmp"><i></i>Σύγκριση</label><a class="add">ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+        <div class="card"><div class="ci"><span class="slant" style="background:var(--ink);color:#fff">M18 FUEL</span><span class="fav">♡</span><span class="qv">👁</span><img src="https://kolleris.b-cdn.net/papatheo/4933451012/primary-0-1751214314392.webp" alt=""></div><div class="cb"><div class="t">Μαγνητικό δράπανο M18 FMDP-502C</div><div class="c">4933451012 · 2 × 5.0Ah</div><div class="p">2.120,75 €</div><div class="a" style="color:var(--wait)">● Παράδοση 1–3 εργάσιμες</div><label class="cmp"><i></i>Σύγκριση</label><a class="add">ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+      </div>
+      <div class="more note" data-note="«Περισσότερα» αντί για σελίδες 1-2-3: φορτώνει τα επόμενα 24 χωρίς να χάνεται η θέση. Το URL κρατά μέχρι πού φτάσατε.">
+        <p>Βλέπετε 8 από 42 προϊόντα</p><div class="pbar"><i></i></div><a>ΠΕΡΙΣΣΟΤΕΡΑ ΠΡΟΪΟΝΤΑ</a>
+      </div>
+    </main>
+  </div>
+</div>
+
+<section class="mob">
+  <div class="wrap">
+    <h2 class="disp">ΣΤΟ ΚΙΝΗΤΟ</h2>
+    <p class="s">Δύο στήλες κάρτες, οι πλατφόρμες ως κουμπιά, και τα φίλτρα σε φύλλο που ανεβαίνει από κάτω — με σταθερά κουμπιά «Φίλτρα» και «Ταξινόμηση» στο κάτω μέρος.</p>
+    <div class="phones">
+      <div class="phone">
+        <div class="ph"><div class="pl"><img src="/files/hdc-lockup-440.png" alt=""></div><div class="ic">⚲ ♡ 🛒</div></div>
+        <div class="pt"><h3 class="disp">ΕΡΓΑΛΕΙΑ ΜΠΑΤΑΡΙΑΣ</h3></div>
+        <div class="pchips"><span>ΟΛΕΣ</span><span>M12</span><span class="on">M18</span><span>MX FUEL</span></div>
+        <div class="pg">
+          <div class="card"><div class="ci"><span class="slant" style="background:var(--ink);color:#fff;font-size:9px">M18 FUEL</span><img src="https://kolleris.b-cdn.net/papatheo/4933492783/primary-0-1751222566870.webp" alt=""></div><div class="cb"><div class="t">Μπουλονόκλειδο 1/2″ M18 FHIW2F12-502X</div><div class="p">740,38 €</div><div class="a" style="color:var(--ok)">● Σε απόθεμα</div></div></div>
+          <div class="card"><div class="ci"><span class="slant" style="background:var(--ink);color:#fff;font-size:9px">M18 FUEL</span><img src="https://kolleris.b-cdn.net/papatheo/4933478429/primary-0-1751218639483.webp" alt=""></div><div class="cb"><div class="t">Γωνιακός τροχός M18 FSAG125XB-0X</div><div class="p">329,69 €</div><div class="a" style="color:var(--ok)">● Σε απόθεμα</div></div></div>
+        </div>
+        <div class="sticky"><a style="background:var(--ink);color:#fff">ΦΙΛΤΡΑ (3)</a><a style="background:#fff;border-left:1px solid var(--g3)">ΤΑΞΙΝΟΜΗΣΗ</a></div>
+      </div>
+      <div class="phone">
+        <div class="ph"><div class="pl"><img src="/files/hdc-lockup-440.png" alt=""></div><div class="ic">⚲ ♡ 🛒</div></div>
+        <div class="sheet"><div class="panel">
+          <div class="top">ΦΙΛΤΡΑ<span style="font-size:22px">✕</span></div>
+          <div class="fgs">
+            <div class="fg"><h4>ΔΙΑΘΕΣΙΜΟΤΗΤΑ</h4><label><i class="on"></i>Σε απόθεμα<span>42</span></label><label><i></i>Παράδοση 1–3 εργάσιμες<span>118</span></label></div>
+            <div class="fg"><h4>ΠΕΡΙΕΧΟΜΕΝΟ</h4><label><i></i>Σκέτο εργαλείο<span>71</span></label><label><i></i>Κιτ με μπαταρίες<span>89</span></label></div>
+            <div class="fg"><h4>ΣΕΙΡΑ</h4><label><i class="on"></i>FUEL™<span>104</span></label><label><i></i>ONE-KEY™<span>23</span></label></div>
+          </div>
+          <div class="apply">ΔΕΙΤΕ 42 ΠΡΟΪΟΝΤΑ</div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<title>Λογαριασμός πελάτη</title>
+<link href="https://fonts.googleapis.com/css2?family=TikTok+Sans:opsz,wdth,wght@12..36,75..150,300..900&display=swap" rel="stylesheet">
+<style>
+  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelReg.ttf) format("truetype"); font-weight:400; }
+  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelMed.ttf) format("truetype"); font-weight:500; }
+  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelBol.ttf) format("truetype"); font-weight:700; }
+  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConReg.ttf) format("truetype"); font-weight:400; }
+  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConMed.ttf) format("truetype"); font-weight:500; }
+  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConBol.ttf) format("truetype"); font-weight:700; }
+  :root { --red:#DB011C; --red-d:#BD0118; --ink:#0A0A0A; --graph:#1A1A1A; --g7:#444444; --g5:#6B6B6B; --g3:#D6D6D6; --g1:#F4F4F4; --ok:#1F7A3A; --wait:#9A6700; --info:#1D4E89; --api:#0B3D91; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"CF Helvetica",Helvetica,Arial,sans-serif; color:var(--ink); background:#fff; font-size:15px; }
+  a { color:inherit; text-decoration:none; }
+  .wrap { max-width:1320px; margin:0 auto; padding:0 24px; }
+  .disp { font-family:"TikTok Sans",sans-serif; font-weight:900; font-stretch:150%; letter-spacing:-0.02em; line-height:1.02; }
+  .cond { font-family:"CF Helvetica Condensed",sans-serif; }
+  .slant { clip-path:polygon(0 0,100% 0,calc(100% - 10px) 100%,0 100%); display:inline-block; padding:4px 18px 4px 10px; font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:12px; }
+  .btn { font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; font-size:14px; letter-spacing:.04em; padding:0 24px; height:52px; display:flex; align-items:center; justify-content:center; border:2px solid transparent; cursor:pointer; }
+  .btn-red { background:var(--red); color:#fff; } .btn-ink { background:var(--ink); color:#fff; } .btn-line { border-color:var(--ink); }
+  .note { position:relative; }
+  .note::after { content:attr(data-note); position:absolute; right:10px; top:10px; background:#FFF6CC; color:#5b4a00; border:1px solid #E7D27A; font:600 11px/1.35 "CF Helvetica Condensed",sans-serif; padding:5px 8px; max-width:290px; z-index:5; box-shadow:0 2px 6px rgba(0,0,0,.15); }
+  .note.nb::after { top:auto; bottom:10px; }
+  [data-api] { position:relative; }
+  [data-api]::before { content:attr(data-api); position:absolute; left:0; top:-22px; background:var(--api); color:#fff; font:600 11px/1 ui-monospace,Menlo,monospace; padding:5px 7px; z-index:6; white-space:nowrap; }
+
+  .screen { background:var(--g1); border-top:4px solid var(--ink); border-bottom:1px solid var(--g3); }
+  .screen .wrap { display:flex; gap:16px; height:64px; align-items:center; }
+  .screen b { font-family:"TikTok Sans"; font-weight:900; font-stretch:150%; font-size:22px; letter-spacing:-.02em; }
+  .screen span { font:500 14px "CF Helvetica Condensed"; color:var(--g5); }
+  .screen code { margin-left:auto; font:600 13px ui-monospace,Menlo,monospace; color:var(--g7); }
+
+  .ann { background:var(--ink); color:#fff; font:700 12px "CF Helvetica Condensed"; letter-spacing:.06em; }
+  .ann .wrap { display:flex; justify-content:space-between; align-items:center; height:34px; }
+  .hdr { background:var(--red); color:#fff; }
+  .hdr .wrap { display:flex; align-items:stretch; height:84px; padding-left:0; }
+  .hdr .plinth { background:var(--ink); display:flex; align-items:center; padding:0 22px 0 24px; margin-right:26px; }
+  .hdr .plinth img { height:58px; }
+  .hdr nav { display:flex; align-items:center; gap:26px; font:700 15px "CF Helvetica Condensed"; letter-spacing:.05em; }
+  .hdr .search { margin-left:auto; align-self:center; display:flex; background:#fff; width:340px; height:44px; }
+  .hdr .search span { flex:1; padding:0 14px; display:flex; align-items:center; color:var(--g5); font-size:15px; }
+  .hdr .search b { width:48px; background:var(--ink); display:flex; align-items:center; justify-content:center; }
+  .hdr .acts { display:flex; align-items:center; gap:4px; margin-left:18px; font-size:20px; }
+  .hdr .acts a { width:48px; height:48px; display:flex; align-items:center; justify-content:center; }
+  .hdr .acts a.on { background:var(--red-d); }
+
+  /* Φόρμες */
+  .fld { margin-bottom:14px; }
+  .fld label { display:flex; justify-content:space-between; font:700 12px "CF Helvetica Condensed"; letter-spacing:.06em; margin-bottom:6px; }
+  .fld label a { color:var(--red); font-weight:500; letter-spacing:0; font-size:13px; }
+  .fld div { border:1px solid var(--g3); height:48px; display:flex; align-items:center; padding:0 12px; font-size:15px; color:#9a9a9a; }
+  .fld small { display:block; font:400 12px "CF Helvetica Condensed"; color:var(--g5); margin-top:5px; }
+
+  /* ── ΕΙΣΟΔΟΣ ── */
+  .auth { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0; margin:40px 24px 60px; border:1px solid var(--g3); }
+  .auth > div { padding:30px 28px; border-right:1px solid var(--g3); display:flex; flex-direction:column; }
+  .auth > div:last-child { border-right:0; }
+  .auth h2 { font-size:26px; margin-bottom:8px; }
+  .auth p.s { color:var(--g7); line-height:1.5; font-size:15px; margin-bottom:20px; min-height:46px; }
+  .auth .btn { margin-top:auto; }
+  .auth .new { background:var(--graph); color:#fff; background-image:repeating-linear-gradient(115deg, rgba(219,1,28,.12) 0 3px, transparent 3px 26px); }
+  .auth .new p.s { color:#cfcfcf; }
+  .auth .new ul { list-style:none; display:grid; gap:12px; margin-bottom:26px; }
+  .auth .new li { display:grid; grid-template-columns:18px 1fr; gap:10px; font-size:15px; line-height:1.45; }
+  .auth .new li::before { content:""; width:12px; height:12px; background:var(--red); margin-top:4px; clip-path:polygon(0 0,100% 0,calc(100% - 4px) 100%,0 100%); }
+  .auth .new li b { color:#fff; }
+
+  /* ── ΛΟΓΑΡΙΑΣΜΟΣ ── */
+  .acbar { background:var(--ink); color:#fff; }
+  .acbar .wrap { display:flex; align-items:center; justify-content:space-between; height:110px; }
+  .acbar h1 { font-size:40px; }
+  .acbar p { font:500 14px "CF Helvetica Condensed"; color:#aaa; margin-top:6px; letter-spacing:.03em; }
+  .acbar .out { font:700 13px "CF Helvetica Condensed"; letter-spacing:.06em; border:1px solid #444; padding:10px 14px; }
+  .acc { display:grid; grid-template-columns:250px minmax(0,1fr); gap:32px; padding:30px 24px 56px; align-items:start; }
+  .side { border:1px solid var(--g3); }
+  .side a { display:flex; justify-content:space-between; align-items:center; padding:0 16px; height:50px; border-bottom:1px solid var(--g3); font:700 14px "CF Helvetica Condensed"; letter-spacing:.05em; border-left:4px solid transparent; }
+  .side a span { font-weight:400; color:var(--g5); }
+  .side a.on { border-left-color:var(--red); background:var(--g1); }
+  .side a.newf { color:var(--ink); }
+  .side a.newf em { font-style:normal; background:var(--red); color:#fff; font:700 10px "CF Helvetica Condensed"; padding:2px 6px; letter-spacing:.06em; }
+  .side a:last-child { border-bottom:0; color:var(--g5); }
+  .main > * + * { margin-top:26px; }
+
+  .track { background:var(--ink); color:#fff; padding:20px 22px; }
+  .track .top { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; gap:20px; }
+  .track .top b { font-family:"TikTok Sans"; font-weight:800; font-stretch:125%; font-size:18px; }
+  .track .top span { font:500 14px "CF Helvetica Condensed"; color:#aaa; display:block; margin-top:4px; }
+  .track .top a { background:var(--red); padding:12px 18px; font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; font-size:12px; letter-spacing:.04em; white-space:nowrap; }
+  .steps { display:grid; grid-template-columns:repeat(4,1fr); }
+  .steps div { border-top:5px solid #3a3a3a; padding:10px 12px 0 0; }
+  .steps div.done { border-top-color:#fff; } .steps div.now { border-top-color:var(--red); }
+  .steps b { display:block; font:700 14px "CF Helvetica Condensed"; letter-spacing:.05em; }
+  .steps span { font:400 13px "CF Helvetica Condensed"; color:#aaa; }
+
+  .stats { display:grid; grid-template-columns:repeat(4,1fr); border:1px solid var(--g3); }
+  .stats div { padding:16px 18px; border-right:1px solid var(--g3); }
+  .stats div:last-child { border-right:0; }
+  .stats b { display:block; font-family:"TikTok Sans"; font-weight:900; font-stretch:130%; font-size:30px; letter-spacing:-.02em; }
+  .stats span { font:700 12px "CF Helvetica Condensed"; letter-spacing:.06em; color:var(--g5); }
+  .stats div.hl b { color:var(--red); }
+
+  .box { border:1px solid var(--g3); }
+  .box > h2 { display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:4px solid var(--ink); font-size:18px; font-stretch:130%; }
+  .box > h2 a { font:700 13px "CF Helvetica Condensed"; letter-spacing:.05em; color:var(--red); }
+
+  .kit { display:grid; grid-template-columns:1fr 1fr; }
+  .kit > div { padding:18px; border-right:1px solid var(--g3); }
+  .kit > div:last-child { border-right:0; }
+  .kit .pl { display:flex; align-items:baseline; gap:12px; margin-bottom:12px; }
+  .kit .pl b { font-family:"TikTok Sans"; font-weight:900; font-stretch:150%; font-size:34px; letter-spacing:-.03em; }
+  .kit .pl span { font:500 14px "CF Helvetica Condensed"; color:var(--g5); }
+  .kit .own { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+  .kit .own div { width:74px; height:74px; border:1px solid var(--g3); display:flex; align-items:center; justify-content:center; position:relative; }
+  .kit .own img { max-width:84%; max-height:84%; }
+  .kit .own em { position:absolute; right:-6px; top:-6px; background:var(--ink); color:#fff; font:700 11px "CF Helvetica Condensed"; font-style:normal; min-width:22px; height:22px; display:flex; align-items:center; justify-content:center; padding:0 4px; }
+  .kit .tip { border-left:4px solid var(--red); background:var(--g1); padding:10px 12px; font:400 14px/1.45 "CF Helvetica Condensed"; }
+  .kit .tip a { color:var(--red); font-weight:700; }
+
+  .ord { display:grid; grid-template-columns:200px minmax(0,1fr) 150px 130px; gap:18px; align-items:center; padding:16px 18px; border-bottom:1px solid var(--g3); }
+  .ord:last-child { border-bottom:0; }
+  .ord .no b { display:block; font:700 15px "CF Helvetica Condensed"; letter-spacing:.02em; }
+  .ord .no span { font:400 13px "CF Helvetica Condensed"; color:var(--g5); }
+  .ord .th { display:flex; gap:6px; }
+  .ord .th div { width:56px; height:56px; border:1px solid var(--g3); display:flex; align-items:center; justify-content:center; }
+  .ord .th img { max-width:84%; max-height:84%; }
+  .chip { display:inline-block; padding:5px 10px; font:700 12px "CF Helvetica Condensed"; letter-spacing:.05em; }
+  .c-ship { background:#E6EEF8; color:var(--info); } .c-del { background:#E5F2E9; color:var(--ok); } .c-pay { background:#FBF1DC; color:var(--wait); } .c-conf { background:var(--ink); color:#fff; }
+  .ord .tt { font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:19px; text-align:right; }
+  .ord .tt small { display:block; font:500 12px "CF Helvetica Condensed"; color:var(--red); letter-spacing:.04em; margin-top:4px; }
+
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:26px; }
+  .addr { padding:18px; line-height:1.6; font-size:15px; }
+  .addr b { font-family:"TikTok Sans"; font-weight:800; font-stretch:115%; font-size:14px; }
+  .qa a { display:flex; justify-content:space-between; padding:0 18px; height:50px; align-items:center; border-bottom:1px solid var(--g3); font:700 14px "CF Helvetica Condensed"; letter-spacing:.04em; }
+  .qa a:last-child { border-bottom:0; }
+  .qa a::after { content:"→"; color:var(--red); }
+
+  /* Λεπτομέρεια παραγγελίας */
+  .od { border:1px solid var(--g3); }
+  .od .h { display:grid; grid-template-columns:1fr auto; padding:18px; border-bottom:4px solid var(--ink); gap:20px; align-items:center; }
+  .od .h h2 { font-size:26px; font-stretch:130%; }
+  .od .h p { font:500 14px "CF Helvetica Condensed"; color:var(--g5); margin-top:6px; }
+  .od .acts { display:flex; gap:10px; }
+  .od .acts a { height:46px; font-size:12px; padding:0 16px; }
+  .od .ln { display:grid; grid-template-columns:72px 1fr 90px 120px; gap:16px; align-items:center; padding:14px 18px; border-bottom:1px solid var(--g3); }
+  .od .ln .im { width:72px; height:72px; border:1px solid var(--g3); display:flex; align-items:center; justify-content:center; } .od .ln img { max-width:84%; max-height:84%; }
+  .od .ln b { display:block; font-size:15px; } .od .ln span { font:400 13px "CF Helvetica Condensed"; color:var(--g5); }
+  .od .ln .q { font:400 15px "CF Helvetica Condensed"; color:var(--g7); text-align:center; }
+  .od .ln .p { font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:17px; text-align:right; }
+  .od .ft { display:grid; grid-template-columns:repeat(3,1fr) 260px; }
+  .od .ft > div { padding:16px 18px; border-right:1px solid var(--g3); font-size:14px; line-height:1.55; }
+  .od .ft h4 { font:700 12px "CF Helvetica Condensed"; letter-spacing:.07em; color:var(--g5); margin-bottom:6px; }
+  .od .ft dl { display:grid; grid-template-columns:1fr auto; row-gap:6px; }
+  .od .ft dd { text-align:right; font-weight:700; }
+  .od .ft .tot { font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:20px; }
+  .od .ft > div:last-child { border-right:0; background:var(--g1); }
+
+  /* ── ΚΙΝΗΤΟ ── */
+  .mob { background:var(--g1); padding:44px 0 60px; border-top:4px solid var(--ink); }
+  .mob h2 { font-size:28px; margin-bottom:6px; } .mob .s { color:var(--g5); margin-bottom:22px; max-width:780px; line-height:1.5; }
+  .phones { display:flex; gap:26px; flex-wrap:wrap; }
+  .phone { width:320px; border:10px solid var(--ink); border-radius:26px; overflow:hidden; background:#fff; height:640px; position:relative; }
+  .phone .ph { background:var(--red); height:56px; display:flex; align-items:center; }
+  .phone .ph .pl { background:var(--ink); height:100%; display:flex; align-items:center; padding:0 10px; } .phone .ph img { height:34px; }
+  .phone .ph .ic { margin-left:auto; color:#fff; display:flex; gap:14px; padding-right:12px; font-size:18px; }
+  .phone .pad { padding:14px; }
+  .phone h3 { font-size:22px; margin-bottom:6px; }
+  .phone p.s2 { font-size:13px; color:var(--g7); line-height:1.45; margin-bottom:14px; }
+  .phone .fld div { height:44px; }
+  .phone .btn { height:48px; font-size:13px; }
+  .phone .or { text-align:center; font:700 12px "CF Helvetica Condensed"; color:var(--g5); letter-spacing:.06em; margin:14px 0; }
+  .phone .mtrack { background:var(--ink); color:#fff; padding:12px 14px; }
+  .phone .mtrack b { font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:14px; display:block; }
+  .phone .mtrack span { font:400 12px "CF Helvetica Condensed"; color:#aaa; }
+  .phone .mtrack .steps { margin-top:10px; } .phone .mtrack .steps b { font-size:11px; } .phone .mtrack .steps span { font-size:11px; }
+  .phone .tabs { display:flex; overflow:hidden; border-bottom:1px solid var(--g3); }
+  .phone .tabs a { padding:12px 12px; font:700 12px "CF Helvetica Condensed"; letter-spacing:.05em; white-space:nowrap; border-bottom:3px solid transparent; }
+  .phone .tabs a.on { border-bottom-color:var(--red); }
+  .phone .mo { padding:12px 14px; border-bottom:1px solid var(--g3); }
+  .phone .mo .r1 { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .phone .mo .r1 b { font:700 14px "CF Helvetica Condensed"; }
+  .phone .mo .r2 { display:flex; justify-content:space-between; align-items:center; }
+  .phone .mo .th { display:flex; gap:5px; } .phone .mo .th div { width:44px; height:44px; border:1px solid var(--g3); display:flex; align-items:center; justify-content:center; } .phone .mo .th img { max-width:84%; max-height:84%; }
+  .phone .mo .p { font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:17px; }
+</style>
+</head>
+<body>
+
+<!-- ═════════════ 1 · ΕΙΣΟΔΟΣ ═════════════ -->
+<div class="screen"><div class="wrap"><b>1 · ΕΙΣΟΔΟΣ ΚΑΙ ΕΓΓΡΑΦΗ</b><span>Τρεις δρόμοι σε μία σελίδα — όπως το eshop, χωρίς την αίτηση B2B</span><code>/eisodos</code></div></div>
+<div class="ann"><div class="wrap"><div>ΤΟ ΠΡΩΤΟ MILWAUKEE HEAVY DUTY CENTRE ΣΤΗΝ ΕΛΛΑΔΑ</div><div>ΔΩΡΕΑΝ ΑΠΟΣΤΟΛΗ ΑΝΩ ΤΩΝ 150 € · ΠΑΡΑΛΑΒΗ ΑΠΟ ΤΟ ΚΑΤΑΣΤΗΜΑ</div><div>EL · EN · IT</div></div></div>
+<header class="hdr"><div class="wrap">
+  <a class="plinth"><img src="/files/hdc-lockup-440.png" alt=""></a>
+  <nav><a>ΕΡΓΑΛΕΙΑ ΜΠΑΤΑΡΙΑΣ</a><a>ΑΞΕΣΟΥΑΡ</a><a>PACKOUT</a><a>ΧΕΙΡΟΣ</a><a>ΠΡΟΣΦΟΡΕΣ</a></nav>
+  <div class="search"><span>Κωδικός ή εργαλείο…</span><b>⚲</b></div>
+  <div class="acts"><a>♡</a><a class="on">◯</a><a>🛒</a></div>
+</div></header>
+
+<div class="wrap"><div class="auth" data-api="βάση hdcfront — λογαριασμοί στο eshop, όχι στο HDCtool">
+  <div>
+    <h2 class="disp">ΣΥΝΔΕΣΗ</h2>
+    <p class="s">Με το email και τον κωδικό του λογαριασμού σας.</p>
+    <div class="fld"><label>EMAIL</label><div>email@παράδειγμα.gr</div></div>
+    <div class="fld"><label>ΚΩΔΙΚΟΣ<a>Ξεχάσατε τον κωδικό;</a></label><div>••••••••</div></div>
+    <a class="btn btn-red">ΣΥΝΔΕΣΗ</a>
+  </div>
+  <div class="note nb" data-note="Το «Έχω ήδη παραγγείλει» του eshop: ο πελάτης που αγόρασε ως επισκέπτης βλέπει την παραγγελία του χωρίς να φτιάξει λογαριασμό. Του στέλνουμε σύνδεσμο στο email.">
+    <h2 class="disp">ΕΧΩ ΗΔΗ ΠΑΡΑΓΓΕΙΛΕΙ</h2>
+    <p class="s">Χωρίς λογαριασμό; Δείτε την παραγγελία σας με το email και τον αριθμό της.</p>
+    <div class="fld"><label>EMAIL</label><div>email@παράδειγμα.gr</div></div>
+    <div class="fld"><label>ΑΡΙΘΜΟΣ ΠΑΡΑΓΓΕΛΙΑΣ</label><div>HDC-…</div><small>Είναι στο email επιβεβαίωσης.</small></div>
+    <a class="btn btn-line">ΣΤΕΙΛΤΕ ΜΟΥ ΣΥΝΔΕΣΜΟ</a>
+  </div>
+  <div class="new note nb" data-note="Μόνο πλεονεκτήματα που ήδη ισχύουν στο eshop. Κανένας εταιρικός λογαριασμός — το τιμολόγιο ζητιέται στο checkout.">
+    <h2 class="disp">ΝΕΟΣ ΠΕΛΑΤΗΣ</h2>
+    <p class="s">Ένας λογαριασμός για όλες τις αγορές σας στο Heavy Duty Centre.</p>
+    <ul>
+      <li><span><b>Πού είναι το δέμα μου</b> — η πορεία της ACS με μια ματιά.</span></li>
+      <li><span><b>Ξανά στο καλάθι</b> — μια παλιά παραγγελία με ένα κλικ.</span></li>
+      <li><span><b>Αποθηκευμένες διευθύνσεις</b> και στοιχεία τιμολογίου.</span></li>
+      <li><span><b>Αγαπημένα</b> και οι κριτικές σας.</span></li>
+    </ul>
+    <a class="btn btn-red">ΔΗΜΙΟΥΡΓΙΑ ΛΟΓΑΡΙΑΣΜΟΥ</a>
+  </div>
+</div></div>
+
+<!-- ═════════════ 2 · Ο ΛΟΓΑΡΙΑΣΜΟΣ ΜΟΥ ═════════════ -->
+<div class="screen"><div class="wrap"><b>2 · Ο ΛΟΓΑΡΙΑΣΜΟΣ ΜΟΥ</b><span>Με τη σειρά που έρχεται ο πελάτης: πού είναι το δέμα, τι αγόρασα, αλλάζω κάτι</span><code>/logariasmos</code></div></div>
+<div class="acbar"><div class="wrap">
+  <div><h1 class="disp">ΚΑΛΩΣ ΗΡΘΑΤΕ ΞΑΝΑ</h1><p>ΠΕΛΑΤΗΣ ΑΠΟ ΑΥΓΟΥΣΤΟ 2026 · 3 ΠΑΡΑΓΓΕΛΙΕΣ</p></div>
+  <a class="out">ΑΠΟΣΥΝΔΕΣΗ</a>
+</div></div>
+
+<div class="wrap acc">
+  <nav class="side">
+    <a class="on">ΕΠΙΣΚΟΠΗΣΗ</a>
+    <a>ΠΑΡΑΓΓΕΛΙΕΣ<span>3</span></a>
+    <a class="newf">ΤΑ ΕΡΓΑΛΕΙΑ ΜΟΥ<em>ΝΕΟ</em></a>
+    <a>ΔΙΕΥΘΥΝΣΕΙΣ<span>2</span></a>
+    <a>ΑΓΑΠΗΜΕΝΑ<span>4</span></a>
+    <a>ΑΞΙΟΛΟΓΗΣΕΙΣ</a>
+    <a>ΤΑ ΣΤΟΙΧΕΙΑ ΜΟΥ</a>
+    <a>ΑΠΟΣΥΝΔΕΣΗ</a>
+  </nav>
+
+  <div class="main">
+    <section class="track note" data-note="Εμφανίζεται μόνο όταν υπάρχει δέμα καθ' οδόν — όπως στο eshop. Αλλιώς δεν υπάρχει καθόλου (όχι «καμία αποστολή»)." data-api="courier/operations (tracking) · κατάσταση από webhook HDCtool">
+      <div class="top">
+        <div><b>ΤΟ ΔΕΜΑ ΣΑΣ ΕΙΝΑΙ ΚΑΘ' ΟΔΟΝ</b><span>HDC-20260926-0004 · ACS 7…</span></div>
+        <a>ΠΑΡΑΚΟΛΟΥΘΗΣΗ ΣΤΗΝ ACS</a>
+      </div>
+      <div class="steps">
+        <div class="done"><b>ΠΑΡΑΛΗΦΘΗΚΕ</b><span>26/9 · Πειραιάς</span></div>
+        <div class="done"><b>ΣΕ ΔΙΑΛΟΓΗ</b><span>26/9 · Κέντρο ACS</span></div>
+        <div class="now"><b>ΣΕ ΔΙΑΝΟΜΗ</b><span>Σήμερα</span></div>
+        <div><b>ΠΑΡΑΔΟΘΗΚΕ</b><span>—</span></div>
+      </div>
+    </section>
+
+    <div class="stats">
+      <div><b>3</b><span>ΠΑΡΑΓΓΕΛΙΕΣ</span></div>
+      <div class="hl"><b>1</b><span>ΣΕ ΕΞΕΛΙΞΗ</span></div>
+      <div><b>2</b><span>ΠΑΡΑΔΟΘΗΚΑΝ</span></div>
+      <div><b>1.358,70 €</b><span>ΣΥΝΟΛΟ 2026</span></div>
+    </div>
+
+    <section class="box note" data-note="ΠΡΟΤΑΣΗ, δεν υπάρχει στο eshop. Χωρίς νέα δεδομένα: βγαίνει από τις γραμμές των παραγγελιών και τον κωδικό μοντέλου (M12/M18, -502X = 2 μπαταρίες). Το «ποια μπαταρία έχω» είναι η ερώτηση του πελάτη της Milwaukee. Αν δεν σας αρέσει, φεύγει χωρίς να λείψει τίποτα.">
+      <h2 class="disp">ΤΑ ΕΡΓΑΛΕΙΑ ΜΟΥ<a>ΟΛΑ →</a></h2>
+      <div class="kit">
+        <div>
+          <div class="pl"><b>M18</b><span>2 εργαλεία · 4 μπαταρίες 5.0Ah</span></div>
+          <div class="own">
+            <div><img src="https://kolleris.b-cdn.net/papatheo/4933479859/primary-0-1751220216324.webp" alt=""></div>
+            <div><img src="https://kolleris.b-cdn.net/papatheo/4933478429/primary-0-1751218639483.webp" alt=""></div>
+            <div><img src="https://kolleris.b-cdn.net/papatheo/4932430483/primary-0-1751214102874.webp" alt=""><em>×4</em></div>
+          </div>
+          <div class="tip">Οι 4 μπαταρίες σας κινούν κάθε εργαλείο M18 — <a>δείτε τα σκέτα εργαλεία →</a></div>
+        </div>
+        <div>
+          <div class="pl"><b>M12</b><span>0 εργαλεία · 1 μπαταρία 5.0Ah</span></div>
+          <div class="own">
+            <div><img src="https://kolleris.b-cdn.net/papatheo/4932480165/primary-0-1751219830273.webp" alt=""><em>×1</em></div>
+          </div>
+          <div class="tip">Έχετε μπαταρία M12 χωρίς εργαλείο M12 — <a>δείτε τα εργαλεία M12 →</a></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="box" data-api="βάση hdcfront (παραγγελίες) · κατάσταση από webhook HDCtool">
+      <h2 class="disp">ΠΡΟΣΦΑΤΕΣ ΠΑΡΑΓΓΕΛΙΕΣ<a>ΟΛΕΣ →</a></h2>
+      <div class="ord">
+        <div class="no"><b>HDC-20260926-0004</b><span>26 Σεπ 2026 · ACS Courier</span></div>
+        <div class="th"><div><img src="https://kolleris.b-cdn.net/papatheo/4933479860/primary-0-1751220334522.webp" alt=""></div></div>
+        <div><span class="chip c-ship">ΑΠΕΣΤΑΛΗ</span></div>
+        <div class="tt">598,92 €<small>ΛΕΠΤΟΜΕΡΕΙΕΣ</small></div>
+      </div>
+      <div class="ord">
+        <div class="no"><b>HDC-20260902-0011</b><span>2 Σεπ 2026 · ACS Courier</span></div>
+        <div class="th"><div><img src="https://kolleris.b-cdn.net/papatheo/4932430483/primary-0-1751214102874.webp" alt=""></div><div><img src="https://kolleris.b-cdn.net/papatheo/4933478429/primary-0-1751218639483.webp" alt=""></div></div>
+        <div><span class="chip c-del">ΠΑΡΑΔΟΘΗΚΕ</span></div>
+        <div class="tt">660,53 €<small>ΞΑΝΑ ΣΤΟ ΚΑΛΑΘΙ</small></div>
+      </div>
+      <div class="ord">
+        <div class="no"><b>HDC-20260814-0007</b><span>14 Αυγ 2026 · Παραλαβή από το κατάστημα</span></div>
+        <div class="th"><div><img src="https://kolleris.b-cdn.net/papatheo/4932480165/primary-0-1751219830273.webp" alt=""></div></div>
+        <div><span class="chip c-del">ΠΑΡΑΛΗΦΘΗΚΕ</span></div>
+        <div class="tt">99,25 €<small>ΞΑΝΑ ΣΤΟ ΚΑΛΑΘΙ</small></div>
+      </div>
+    </section>
+
+    <div class="two">
+      <section class="box">
+        <h2 class="disp">ΔΙΕΥΘΥΝΣΗ ΠΑΡΑΔΟΣΗΣ<a>ΑΛΛΑΓΗ</a></h2>
+        <div class="addr"><b>ΚΥΡΙΑ ΔΙΕΥΘΥΝΣΗ</b><br>Οδός και αριθμός<br>18545 Πειραιάς<br><span class="cond" style="color:var(--g5)">+ 1 ακόμη αποθηκευμένη</span></div>
+      </section>
+      <section class="box qa">
+        <h2 class="disp">ΓΡΗΓΟΡΕΣ ΕΝΕΡΓΕΙΕΣ</h2>
+        <a>ΟΙ ΠΑΡΑΓΓΕΛΙΕΣ ΜΟΥ</a><a>ΤΑ ΣΤΟΙΧΕΙΑ ΜΟΥ</a><a>ΕΠΙΣΤΡΟΦΗ ΠΡΟΪΟΝΤΟΣ</a><a>ΕΠΙΚΟΙΝΩΝΙΑ ΜΕ ΤΟ ΚΑΤΑΣΤΗΜΑ</a>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════ 3 · ΠΑΡΑΓΓΕΛΙΑ ═════════════ -->
+<div class="screen"><div class="wrap"><b>3 · ΛΕΠΤΟΜΕΡΕΙΕΣ ΠΑΡΑΓΓΕΛΙΑΣ</b><span>Ό,τι χρειάζεται για μια ερώτηση ή μια επιστροφή, σε μία οθόνη</span><code>/logariasmos/paraggelies/HDC-20260902-0011</code></div></div>
+<div class="wrap" style="padding:30px 24px 56px">
+  <div class="od">
+    <div class="h">
+      <div><h2 class="disp">HDC-20260902-0011</h2><p>2 Σεπτεμβρίου 2026 · <span class="chip c-del">ΠΑΡΑΔΟΘΗΚΕ</span> στις 4 Σεπ</p></div>
+      <div class="acts">
+        <a class="btn btn-red" data-api="τρέχουσα τιμή + απόθεμα από hdcfront">ΞΑΝΑ ΣΤΟ ΚΑΛΑΘΙ</a>
+        <a class="btn btn-line note nb" data-note="ΝΕΟ — δεν υπάρχει στο eshop. Το θεωρημένο PDF του SoftOne (MTRDOC.SOSIGNQR, μόνο με getData· MTRLINES.FINDOCS συνδέει παραγγελία → παραστατικό). Θέλει ένα endpoint μόνο ανάγνωσης στο HDCtool." data-api="ΝΕΟ HDCtool: orders/{n}/document">ΠΑΡΑΣΤΑΤΙΚΟ PDF</a>
+        <a class="btn btn-line">ΕΠΙΣΤΡΟΦΗ</a>
+      </div>
+    </div>
+    <div class="ln"><div class="im"><img src="https://kolleris.b-cdn.net/papatheo/4932430483/primary-0-1751214102874.webp" alt=""></div><div><b>Μπαταρία REDLITHIUM™ M18 B5 5.0Ah</b><span>4932430483</span></div><div class="q">× 2</div><div class="p">330,84 €</div></div>
+    <div class="ln"><div class="im"><img src="https://kolleris.b-cdn.net/papatheo/4933478429/primary-0-1751218639483.webp" alt=""></div><div><b>Γωνιακός τροχός M18 FSAG125XB-0X</b><span>4933478429 · Σκέτο εργαλείο</span></div><div class="q">× 1</div><div class="p">329,69 €</div></div>
+    <div class="ft">
+      <div><h4>ΑΠΟΣΤΟΛΗ</h4>ACS Courier — δωρεάν<br>Οδός και αριθμός, 18545 Πειραιάς<br><span class="cond" style="color:var(--red)">ACS 7… — παραδόθηκε 4/9</span></div>
+      <div><h4>ΠΛΗΡΩΜΗ</h4>IRIS<br>Εξοφλήθηκε 2/9</div>
+      <div><h4>ΠΑΡΑΣΤΑΤΙΚΟ</h4>Απόδειξη λιανικής<br><span class="cond" style="color:var(--g5)">Εκδόθηκε από το SoftOne</span></div>
+      <div><dl><dt>Προϊόντα</dt><dd>660,53 €</dd><dt>Μεταφορικά</dt><dd style="color:var(--ok)">ΔΩΡΕΑΝ</dd><dt>ΦΠΑ 24%</dt><dd>127,84 €</dd><dt class="tot">ΣΥΝΟΛΟ</dt><dd class="tot">660,53 €</dd></dl></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════ ΚΙΝΗΤΟ ═════════════ -->
+<section class="mob">
+  <div class="wrap">
+    <h2 class="disp">ΣΤΟ ΚΙΝΗΤΟ</h2>
+    <p class="s">Η είσοδος σε μία στήλη — πρώτα η σύνδεση, από κάτω «Έχω ήδη παραγγείλει» και «Νέος πελάτης». Στον λογαριασμό το μενού γίνεται λωρίδα καρτελών που σύρεται, με το δέμα καθ' οδόν πάντα πρώτο.</p>
+    <div class="phones">
+      <div class="phone">
+        <div class="ph"><div class="pl"><img src="/files/hdc-lockup-440.png" alt=""></div><div class="ic">⚲ ♡ 🛒</div></div>
+        <div class="pad">
+          <h3 class="disp">ΣΥΝΔΕΣΗ</h3>
+          <p class="s2">Με το email και τον κωδικό του λογαριασμού σας.</p>
+          <div class="fld"><label>EMAIL</label><div>email@παράδειγμα.gr</div></div>
+          <div class="fld"><label>ΚΩΔΙΚΟΣ<a>Ξεχάσατε;</a></label><div>••••••••</div></div>
+          <a class="btn btn-red">ΣΥΝΔΕΣΗ</a>
+          <div class="or">— Ή —</div>
+          <a class="btn btn-line" style="margin-bottom:10px">ΕΧΩ ΗΔΗ ΠΑΡΑΓΓΕΙΛΕΙ</a>
+          <a class="btn btn-ink">ΔΗΜΙΟΥΡΓΙΑ ΛΟΓΑΡΙΑΣΜΟΥ</a>
+        </div>
+      </div>
+      <div class="phone">
+        <div class="ph"><div class="pl"><img src="/files/hdc-lockup-440.png" alt=""></div><div class="ic">⚲ ♡ 🛒</div></div>
+        <div class="tabs"><a class="on">ΕΠΙΣΚΟΠΗΣΗ</a><a>ΠΑΡΑΓΓΕΛΙΕΣ</a><a>ΤΑ ΕΡΓΑΛΕΙΑ ΜΟΥ</a><a>ΔΙΕΥΘΥΝΣΕΙΣ</a></div>
+        <div class="mtrack">
+          <b>ΤΟ ΔΕΜΑ ΣΑΣ ΕΙΝΑΙ ΚΑΘ' ΟΔΟΝ</b><span>HDC-20260926-0004 · ACS 7…</span>
+          <div class="steps"><div class="done"><b>ΠΑΡΑΛΗΦΘΗΚΕ</b></div><div class="done"><b>ΔΙΑΛΟΓΗ</b></div><div class="now"><b>ΔΙΑΝΟΜΗ</b></div><div><b>ΠΑΡΑΔΟΣΗ</b></div></div>
+        </div>
+        <div class="mo"><div class="r1"><b>HDC-20260926-0004</b><span class="chip c-ship">ΑΠΕΣΤΑΛΗ</span></div><div class="r2"><div class="th"><div><img src="https://kolleris.b-cdn.net/papatheo/4933479860/primary-0-1751220334522.webp" alt=""></div></div><span class="p">598,92 €</span></div></div>
+        <div class="mo"><div class="r1"><b>HDC-20260902-0011</b><span class="chip c-del">ΠΑΡΑΔΟΘΗΚΕ</span></div><div class="r2"><div class="th"><div><img src="https://kolleris.b-cdn.net/papatheo/4932430483/primary-0-1751214102874.webp" alt=""></div><div><img src="https://kolleris.b-cdn.net/papatheo/4933478429/primary-0-1751218639483.webp" alt=""></div></div><span class="p">660,53 €</span></div></div>
+        <div class="mo"><div class="r1"><b>HDC-20260814-0007</b><span class="chip c-del">ΠΑΡΑΛΗΦΘΗΚΕ</span></div><div class="r2"><div class="th"><div><img src="https://kolleris.b-cdn.net/papatheo/4932480165/primary-0-1751219830273.webp" alt=""></div></div><span class="p">99,25 €</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

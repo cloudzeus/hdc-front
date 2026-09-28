@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<title>Καλάθι και ολοκλήρωση</title>
+<link href="https://fonts.googleapis.com/css2?family=TikTok+Sans:opsz,wdth,wght@12..36,75..150,300..900&display=swap" rel="stylesheet">
+<style>
+  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelReg.ttf) format("truetype"); font-weight:400; }
+  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelMed.ttf) format("truetype"); font-weight:500; }
+  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelBol.ttf) format("truetype"); font-weight:700; }
+  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConReg.ttf) format("truetype"); font-weight:400; }
+  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConMed.ttf) format("truetype"); font-weight:500; }
+  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConBol.ttf) format("truetype"); font-weight:700; }
+  :root { --red:#DB011C; --red-d:#BD0118; --ink:#0A0A0A; --graph:#1A1A1A; --g7:#444444; --g5:#6B6B6B; --g3:#D6D6D6; --g1:#F4F4F4; --ok:#1F7A3A; --wait:#9A6700; --api:#0B3D91; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"CF Helvetica",Helvetica,Arial,sans-serif; color:var(--ink); background:#fff; font-size:15px; }
+  a { color:inherit; text-decoration:none; }
+  .wrap { max-width:1320px; margin:0 auto; padding:0 24px; }
+  .disp { font-family:"TikTok Sans",sans-serif; font-weight:900; font-stretch:150%; letter-spacing:-0.02em; line-height:1.02; }
+  .semi { font-family:"TikTok Sans",sans-serif; font-weight:800; font-stretch:120%; }
+  .cond { font-family:"CF Helvetica Condensed",sans-serif; }
+  .slant { clip-path:polygon(0 0,100% 0,calc(100% - 10px) 100%,0 100%); display:inline-block; padding:4px 18px 4px 10px; font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:12px; }
+  .btn { font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; font-size:14px; letter-spacing:.04em; padding:0 24px; height:54px; display:flex; align-items:center; justify-content:center; border:2px solid transparent; cursor:pointer; }
+  .btn-red { background:var(--red); color:#fff; } .btn-red:hover { background:var(--red-d); }
+  .btn-line { border-color:var(--ink); }
+  .note { position:relative; }
+  .note::after { content:attr(data-note); position:absolute; right:10px; top:10px; background:#FFF6CC; color:#5b4a00; border:1px solid #E7D27A; font:600 11px/1.35 "CF Helvetica Condensed",sans-serif; padding:5px 8px; max-width:290px; z-index:5; box-shadow:0 2px 6px rgba(0,0,0,.15); }
+  .note.nb::after { top:auto; bottom:10px; }
+  [data-api] { position:relative; }
+  [data-api]::before { content:attr(data-api); position:absolute; left:0; top:-22px; background:var(--api); color:#fff; font:600 11px/1 ui-monospace,Menlo,monospace; padding:5px 7px; z-index:6; white-space:nowrap; }
+
+  /* Σήμανση οθόνης */
+  .screen { background:var(--g1); border-top:4px solid var(--ink); border-bottom:1px solid var(--g3); }
+  .screen .wrap { display:flex; align-items:baseline; gap:16px; height:64px; align-items:center; }
+  .screen b { font-family:"TikTok Sans"; font-weight:900; font-stretch:150%; font-size:22px; letter-spacing:-.02em; }
+  .screen span { font:500 14px "CF Helvetica Condensed"; color:var(--g5); }
+  .screen code { margin-left:auto; font:600 13px ui-monospace,Menlo,monospace; color:var(--g7); }
+
+  /* Κεφαλίδα */
+  .ann { background:var(--ink); color:#fff; font:700 12px "CF Helvetica Condensed"; letter-spacing:.06em; }
+  .ann .wrap { display:flex; justify-content:space-between; align-items:center; height:34px; }
+  .hdr { background:var(--red); color:#fff; }
+  .hdr .wrap { display:flex; align-items:stretch; height:84px; padding-left:0; }
+  .hdr .plinth { background:var(--ink); display:flex; align-items:center; padding:0 22px 0 24px; margin-right:26px; }
+  .hdr .plinth img { height:58px; }
+  .hdr nav { display:flex; align-items:center; gap:26px; font:700 15px "CF Helvetica Condensed"; letter-spacing:.05em; }
+  .hdr nav a { padding:31px 0 27px; }
+  .hdr .search { margin-left:auto; align-self:center; display:flex; background:#fff; width:340px; height:44px; }
+  .hdr .search span { flex:1; padding:0 14px; display:flex; align-items:center; color:var(--g5); font-size:15px; }
+  .hdr .search b { width:48px; background:var(--ink); display:flex; align-items:center; justify-content:center; }
+  .hdr .acts { display:flex; align-items:center; gap:4px; margin-left:18px; font-size:20px; }
+  .hdr .acts a { width:48px; height:48px; display:flex; align-items:center; justify-content:center; position:relative; }
+  .hdr .acts a.on { background:var(--red-d); }
+  .hdr .acts .n { position:absolute; top:5px; right:4px; background:var(--ink); color:#fff; font:700 11px "CF Helvetica Condensed"; min-width:18px; height:18px; display:flex; align-items:center; justify-content:center; }
+
+  /* ── ΚΑΛΑΘΙ ── */
+  .cart { display:grid; grid-template-columns:minmax(0,1fr) 400px; gap:36px; padding:34px 24px 50px; align-items:start; }
+  .cart h1 { font-size:44px; margin-bottom:22px; }
+  .cart h1 small { font-size:20px; color:var(--g5); font-stretch:120%; margin-left:8px; }
+  .free { border:1px solid var(--g3); padding:14px 16px; margin-bottom:26px; }
+  .free .row { display:flex; justify-content:space-between; font:700 14px "CF Helvetica Condensed"; letter-spacing:.05em; margin-bottom:10px; }
+  .free .row span { color:var(--ok); }
+  .free .bar { height:6px; background:var(--g3); } .free .bar i { display:block; height:100%; background:var(--ok); }
+  .lines .th { display:grid; grid-template-columns:minmax(0,1fr) 130px 120px 120px 44px; gap:16px; padding:0 0 10px; border-bottom:4px solid var(--ink); font:700 13px "CF Helvetica Condensed"; letter-spacing:.06em; }
+  .line { display:grid; grid-template-columns:minmax(0,1fr) 130px 120px 120px 44px; gap:16px; align-items:center; padding:18px 0; border-bottom:1px solid var(--g3); }
+  .line .pr { display:grid; grid-template-columns:104px 1fr; gap:16px; align-items:center; }
+  .line .im { width:104px; height:104px; border:1px solid var(--g3); display:flex; align-items:center; justify-content:center; position:relative; }
+  .line .im img { max-width:84%; max-height:84%; }
+  .line .im .slant { position:absolute; left:0; top:6px; font-size:9px; padding:2px 12px 2px 6px; }
+  .line .n { font-weight:700; font-size:16px; line-height:1.3; }
+  .line .c { font:400 13px "CF Helvetica Condensed"; color:var(--g5); margin:3px 0 6px; }
+  .line .a { font:500 13px "CF Helvetica Condensed"; color:var(--ok); }
+  .line .sw { font:500 13px "CF Helvetica Condensed"; color:var(--red); margin-top:6px; display:inline-block; border-bottom:1px solid var(--red); }
+  .qty { border:2px solid var(--ink); display:grid; grid-template-columns:36px 1fr 36px; align-items:center; text-align:center; height:46px; font:700 17px "CF Helvetica Condensed"; }
+  .qty span:first-child, .qty span:last-child { font-size:20px; }
+  .line .u { font:400 15px "CF Helvetica Condensed"; color:var(--g7); text-align:right; }
+  .line .t { font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:20px; letter-spacing:-.02em; text-align:right; }
+  .line .x { width:44px; height:44px; border:1px solid var(--g3); display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--g5); }
+  .cartacts { display:flex; justify-content:space-between; margin-top:16px; font:700 14px "CF Helvetica Condensed"; letter-spacing:.04em; }
+  .cartacts a:first-child::before { content:"← "; color:var(--red); }
+  .cartacts a:last-child { color:var(--g5); font-weight:500; }
+  .quick { margin-top:30px; border:1px solid var(--g3); padding:18px; display:grid; grid-template-columns:1fr 300px; gap:20px; align-items:center; }
+  .quick h3 { font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:16px; margin-bottom:4px; }
+  .quick p { color:var(--g7); font-size:14px; line-height:1.5; }
+  .quick .box { display:grid; grid-template-columns:1fr 100px; }
+  .quick .box div { border:1px solid var(--g3); height:50px; display:flex; align-items:center; padding:0 12px; font:400 14px ui-monospace,Menlo,monospace; color:var(--g5); }
+  .quick .box a { background:var(--ink); color:#fff; display:flex; align-items:center; justify-content:center; font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; font-size:12px; }
+
+  .sum { border:1px solid var(--g3); position:sticky; top:16px; }
+  .sum h2 { background:var(--ink); color:#fff; font-size:18px; padding:16px 18px; font-stretch:130%; }
+  .sum .in { padding:18px; }
+  .sum .zip { display:grid; grid-template-columns:1fr 110px; margin-bottom:6px; }
+  .sum .zip div { border:1px solid var(--g3); height:46px; display:flex; align-items:center; padding:0 12px; font-size:15px; }
+  .sum .zip a { border:2px solid var(--ink); display:flex; align-items:center; justify-content:center; font:700 13px "CF Helvetica Condensed"; letter-spacing:.05em; }
+  .sum .hint { font:400 12px "CF Helvetica Condensed"; color:var(--g5); margin-bottom:16px; }
+  .sum dl { display:grid; grid-template-columns:1fr auto; row-gap:10px; font-size:15px; padding-bottom:14px; border-bottom:1px solid var(--g3); }
+  .sum dt { color:var(--g7); } .sum dd { text-align:right; font-weight:700; }
+  .sum dd.fr { color:var(--ok); }
+  .sum .tot { display:flex; justify-content:space-between; align-items:baseline; padding:16px 0 4px; }
+  .sum .tot b { font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:16px; }
+  .sum .tot span { font-family:"TikTok Sans"; font-weight:900; font-stretch:130%; font-size:34px; letter-spacing:-.03em; }
+  .sum .vat { font:400 13px "CF Helvetica Condensed"; color:var(--g5); text-align:right; margin-bottom:16px; }
+  .sum .cp { display:grid; grid-template-columns:1fr 100px; margin-bottom:16px; }
+  .sum .cp div { border:1px solid var(--g3); height:46px; display:flex; align-items:center; padding:0 12px; color:var(--g5); font-size:15px; }
+  .sum .cp a { background:var(--ink); color:#fff; display:flex; align-items:center; justify-content:center; font:700 13px "CF Helvetica Condensed"; letter-spacing:.05em; }
+  .sum .pay { display:flex; gap:6px; justify-content:center; margin-top:14px; }
+  .sum .pay span { border:1px solid var(--g3); padding:5px 9px; font:700 11px "CF Helvetica Condensed"; letter-spacing:.05em; color:var(--g7); }
+  .sum .trust { margin-top:14px; font:400 13px "CF Helvetica Condensed"; color:var(--g7); display:grid; gap:6px; }
+  .sum .trust div::before { content:"▸ "; color:var(--red); }
+
+  .xs { padding:10px 0 60px; }
+  .xs h2 { font-size:28px; margin-bottom:6px; } .xs p.s { color:var(--g5); margin-bottom:18px; }
+  .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  .card { border:1px solid var(--g3); display:grid; grid-template-columns:110px 1fr; }
+  .card .ci { display:flex; align-items:center; justify-content:center; border-right:1px solid var(--g3); }
+  .card .ci img { max-width:84%; max-height:90px; }
+  .card .cb { padding:12px; display:flex; flex-direction:column; gap:3px; }
+  .card .t { font-weight:700; font-size:13px; line-height:1.28; }
+  .card .p { font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:18px; letter-spacing:-.02em; margin-top:4px; }
+  .card .add { margin-top:6px; font:700 12px "CF Helvetica Condensed"; letter-spacing:.05em; color:var(--red); }
+
+  /* ── ΟΛΟΚΛΗΡΩΣΗ ── */
+  .chdr { background:var(--ink); color:#fff; }
+  .chdr .wrap { display:flex; align-items:center; height:76px; padding-left:0; gap:24px; }
+  .chdr .plinth { background:var(--red); height:100%; display:flex; align-items:center; padding:0 20px 0 24px; }
+  .chdr .plinth img { height:50px; }
+  .chdr .sec { font-family:"TikTok Sans"; font-weight:800; font-stretch:125%; font-size:16px; letter-spacing:.02em; }
+  .chdr .sec::before { content:"🔒 "; }
+  .chdr .help { margin-left:auto; font:500 14px "CF Helvetica Condensed"; color:#cfcfcf; }
+  .chdr .help b { color:#fff; }
+  .chdr .back { font:700 14px "CF Helvetica Condensed"; letter-spacing:.05em; border:1px solid #444; padding:10px 14px; }
+  .co { display:grid; grid-template-columns:minmax(0,1fr) 400px; gap:36px; padding:30px 24px 56px; align-items:start; }
+  .step { border:1px solid var(--g3); margin-bottom:34px; }
+  .step > h3 { display:flex; align-items:center; gap:14px; padding:14px 18px; border-bottom:1px solid var(--g3); font-family:"TikTok Sans"; font-weight:800; font-stretch:125%; font-size:17px; }
+  .step > h3 i { font-style:normal; background:var(--red); color:#fff; width:34px; height:34px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:15px; clip-path:polygon(0 0,100% 0,calc(100% - 6px) 100%,0 100%); }
+  .step > h3 small { margin-left:auto; font:500 13px "CF Helvetica Condensed"; color:var(--red); letter-spacing:0; }
+  .step .in { padding:18px; }
+  .f2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .f4 { display:grid; grid-template-columns:110px 1fr 1fr 1fr; gap:14px; margin-top:14px; }
+  .f21 { display:grid; grid-template-columns:2fr 1fr; gap:14px; }
+  .fld label { display:block; font:700 12px "CF Helvetica Condensed"; letter-spacing:.06em; margin-bottom:6px; }
+  .fld label em { color:var(--red); font-style:normal; }
+  .fld div { border:1px solid var(--g3); height:48px; display:flex; align-items:center; padding:0 12px; font-size:15px; color:#9a9a9a; }
+  .fld div.v { color:var(--ink); border-color:var(--ink); }
+  .fld small { display:block; font:400 12px "CF Helvetica Condensed"; color:var(--g5); margin-top:5px; }
+  .ship { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .ship div { border:1px solid var(--g3); padding:14px; display:flex; flex-direction:column; gap:4px; position:relative; min-height:112px; }
+  .ship div.on { border:3px solid var(--red); padding:12px; }
+  .ship div.on::before { content:"✓"; position:absolute; right:0; top:0; background:var(--red); color:#fff; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:13px; }
+  .ship b { font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:14px; }
+  .ship span { font:400 13px "CF Helvetica Condensed"; color:var(--g5); }
+  .ship strong { margin-top:auto; font-family:"TikTok Sans"; font-weight:900; font-stretch:120%; font-size:16px; }
+  .ship strong.fr { color:var(--ok); }
+  .chk { display:flex; align-items:flex-start; gap:12px; font-size:15px; line-height:1.45; margin-top:16px; }
+  .chk i { width:22px; height:22px; border:2px solid var(--ink); flex:0 0 auto; margin-top:-1px; }
+  .chk i.on { background:var(--red); border-color:var(--red); box-shadow:inset 0 0 0 3px #fff; }
+  .inv { margin-top:14px; border-left:4px solid var(--red); background:var(--g1); padding:16px; }
+  .inv .f3 { display:grid; grid-template-columns:180px 1fr 1fr; gap:14px; }
+  .inv .fld div { background:#fff; }
+  .payopts { display:flex; gap:10px; }
+  .payopts span { border:2px solid var(--g3); padding:12px 18px; font:700 14px "CF Helvetica Condensed"; letter-spacing:.04em; }
+  .payopts span.on { background:var(--ink); border-color:var(--ink); color:#fff; }
+  .info { margin-top:14px; border-left:4px solid var(--ink); background:var(--g1); padding:12px 14px; font:400 14px/1.5 "CF Helvetica Condensed"; color:var(--g7); }
+  .ta { border:1px solid var(--g3); height:84px; padding:12px; color:#9a9a9a; font-size:15px; }
+  .mini { display:grid; gap:12px; padding-bottom:14px; border-bottom:1px solid var(--g3); margin-bottom:14px; }
+  .mini div { display:grid; grid-template-columns:64px 1fr auto; gap:12px; align-items:center; }
+  .mini .im { width:64px; height:64px; border:1px solid var(--g3); display:flex; align-items:center; justify-content:center; position:relative; }
+  .mini .im img { max-width:84%; max-height:84%; }
+  .mini .im em { position:absolute; right:-8px; top:-8px; background:var(--ink); color:#fff; width:22px; height:22px; font:700 12px "CF Helvetica Condensed"; font-style:normal; display:flex; align-items:center; justify-content:center; }
+  .mini b { font-size:13px; line-height:1.3; }
+  .mini span { font-family:"TikTok Sans"; font-weight:900; font-stretch:120%; font-size:15px; }
+
+  /* ── ΕΠΙΒΕΒΑΙΩΣΗ ── */
+  .ok { padding:44px 24px 60px; display:grid; grid-template-columns:minmax(0,1fr) 400px; gap:36px; align-items:start; }
+  .okhead { border-left:8px solid var(--red); padding:4px 0 4px 22px; margin-bottom:30px; }
+  .okhead h1 { font-size:46px; margin-bottom:10px; }
+  .okhead p { font-size:17px; color:var(--g7); line-height:1.55; }
+  .okhead .num { display:inline-block; margin-top:14px; background:var(--ink); color:#fff; padding:10px 16px; font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:20px; letter-spacing:.01em; }
+  .tl { display:grid; grid-template-columns:repeat(4,1fr); margin-bottom:34px; }
+  .tl div { border-top:6px solid var(--g3); padding-top:12px; padding-right:10px; }
+  .tl div.done { border-top-color:var(--ok); } .tl div.now { border-top-color:var(--red); }
+  .tl b { display:block; font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:14px; margin-bottom:4px; }
+  .tl span { font:400 13px "CF Helvetica Condensed"; color:var(--g5); }
+  .det { display:grid; grid-template-columns:1fr 1fr 1fr; border:1px solid var(--g3); }
+  .det div { padding:16px 18px; border-right:1px solid var(--g3); }
+  .det div:last-child { border-right:0; }
+  .det h4 { font:700 12px "CF Helvetica Condensed"; letter-spacing:.07em; color:var(--g5); margin-bottom:8px; }
+  .det p { font-size:15px; line-height:1.5; }
+  .bank { margin-top:26px; border:2px dashed var(--g3); padding:18px; }
+  .bank h3 { font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:16px; margin-bottom:8px; }
+  .bank dl { display:grid; grid-template-columns:200px 1fr; row-gap:6px; font-size:15px; margin-top:10px; }
+  .bank dt { color:var(--g5); } .bank dd { font-weight:700; }
+  .okacts { display:flex; gap:12px; margin-top:26px; }
+
+  /* ── ΚΙΝΗΤΟ ── */
+  .mob { background:var(--g1); padding:44px 0 60px; border-top:4px solid var(--ink); }
+  .mob h2 { font-size:28px; margin-bottom:6px; } .mob .s { color:var(--g5); margin-bottom:22px; max-width:780px; line-height:1.5; }
+  .phones { display:flex; gap:26px; flex-wrap:wrap; }
+  .phone { width:320px; border:10px solid var(--ink); border-radius:26px; overflow:hidden; background:#fff; height:640px; position:relative; }
+  .phone .ph { background:var(--red); height:56px; display:flex; align-items:center; }
+  .phone .ph.k { background:var(--ink); }
+  .phone .ph .pl { background:var(--ink); height:100%; display:flex; align-items:center; padding:0 10px; } .phone .ph.k .pl { background:var(--red); }
+  .phone .ph img { height:34px; }
+  .phone .ph .ic { margin-left:auto; color:#fff; display:flex; gap:14px; padding-right:12px; font-size:16px; font-family:"CF Helvetica Condensed"; font-weight:700; }
+  .phone .pad { padding:12px; }
+  .phone h3 { font-size:24px; margin-bottom:10px; }
+  .phone .free { padding:10px 12px; margin-bottom:12px; }
+  .phone .free .row { font-size:12px; margin-bottom:8px; }
+  .phone .pl1 { display:grid; grid-template-columns:76px 1fr; gap:10px; padding:10px 0; border-bottom:1px solid var(--g3); }
+  .phone .pl1 .im { width:76px; height:76px; border:1px solid var(--g3); display:flex; align-items:center; justify-content:center; } .phone .pl1 .im img { max-width:84%; max-height:84%; }
+  .phone .pl1 b { font-size:13px; line-height:1.3; display:block; }
+  .phone .pl1 .r { display:flex; justify-content:space-between; align-items:center; margin-top:8px; }
+  .phone .pl1 .qty { height:36px; grid-template-columns:30px 30px 30px; font-size:14px; }
+  .phone .pl1 .p { font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:17px; }
+  .phone .bar { position:absolute; left:0; right:0; bottom:0; background:#fff; border-top:1px solid var(--g3); }
+  .phone .bar .tt { display:flex; justify-content:space-between; align-items:baseline; padding:10px 14px 8px; }
+  .phone .bar .tt span { font:500 13px "CF Helvetica Condensed"; color:var(--g5); }
+  .phone .bar .tt b { font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:22px; }
+  .phone .bar a { background:var(--red); color:#fff; height:56px; display:flex; align-items:center; justify-content:center; font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; font-size:14px; letter-spacing:.04em; }
+  .phone .sumbar { background:var(--g1); display:flex; justify-content:space-between; padding:12px 14px; border-bottom:1px solid var(--g3); font:700 13px "CF Helvetica Condensed"; letter-spacing:.04em; }
+  .phone .sumbar b { font-family:"TikTok Sans"; font-weight:900; font-stretch:120%; font-size:16px; }
+  .phone .st { border-bottom:1px solid var(--g3); padding:12px 14px; display:flex; align-items:center; gap:10px; }
+  .phone .st i { font-style:normal; background:var(--ok); color:#fff; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:13px; flex:0 0 auto; }
+  .phone .st i.r { background:var(--red); font-family:"TikTok Sans"; font-weight:900; }
+  .phone .st i.g { background:var(--g3); color:var(--g7); font-family:"TikTok Sans"; font-weight:900; }
+  .phone .st b { font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:13px; }
+  .phone .st span { font:400 12px "CF Helvetica Condensed"; color:var(--g5); display:block; }
+  .phone .st a { margin-left:auto; font:500 12px "CF Helvetica Condensed"; color:var(--red); }
+  .phone .stbody { padding:12px 14px; border-bottom:1px solid var(--g3); }
+  .phone .stbody .payopts { flex-wrap:wrap; gap:6px; } .phone .stbody .payopts span { padding:9px 12px; font-size:13px; }
+  .phone .stbody .info { font-size:12px; padding:9px 10px; }
+</style>
+</head>
+<body>
+
+<!-- ═════════════ 1 · ΚΑΛΑΘΙ ═════════════ -->
+<div class="screen"><div class="wrap"><b>1 · ΚΑΛΑΘΙ</b><span>Ίδια λειτουργία με το eshop — γραμμές, κουπόνι, γρήγορη προσθήκη με κωδικό, μεταφορικά από ΤΚ</span><code>/kalathi</code></div></div>
+<div class="ann"><div class="wrap"><div>ΤΟ ΠΡΩΤΟ MILWAUKEE HEAVY DUTY CENTRE ΣΤΗΝ ΕΛΛΑΔΑ</div><div>ΔΩΡΕΑΝ ΑΠΟΣΤΟΛΗ ΑΝΩ ΤΩΝ 150 € · ΠΑΡΑΛΑΒΗ ΑΠΟ ΤΟ ΚΑΤΑΣΤΗΜΑ</div><div>EL · EN · IT</div></div></div>
+<header class="hdr"><div class="wrap">
+  <a class="plinth"><img src="/files/hdc-lockup-440.png" alt=""></a>
+  <nav><a>ΕΡΓΑΛΕΙΑ ΜΠΑΤΑΡΙΑΣ</a><a>ΑΞΕΣΟΥΑΡ</a><a>PACKOUT</a><a>ΧΕΙΡΟΣ</a><a>ΠΡΟΣΦΟΡΕΣ</a></nav>
+  <div class="search"><span>Κωδικός ή εργαλείο…</span><b>⚲</b></div>
+  <div class="acts"><a>♡</a><a>◯</a><a class="on">🛒<span class="n">2</span></a></div>
+</div></header>
+
+<div class="wrap cart">
+  <div>
+    <h1 class="disp">ΤΟ ΚΑΛΑΘΙ ΣΑΣ<small>2 ΠΡΟΪΟΝΤΑ</small></h1>
+    <div class="free note" data-note="Το όριο του eshop είναι 150 € ΚΑΘΑΡΗ αξία (FREE_SHIPPING_THRESHOLD_NET) = 186 € με ΦΠΑ. Για ιδιώτη πελάτη προτείνω να το γράφουμε με ΦΠΑ — θέλει δική σας απόφαση.">
+      <div class="row">ΔΩΡΕΑΝ ΜΕΤΑΦΟΡΙΚΑ<span>✓ ΕΝΕΡΓΟ</span></div>
+      <div class="bar"><i style="width:100%"></i></div>
+    </div>
+    <div class="lines" data-api="βάση hdcfront ← products (pricer02 · quantity · images[0])">
+      <div class="th"><span>ΠΡΟΪΟΝ</span><span>ΠΟΣΟΤΗΤΑ</span><span style="text-align:right">ΤΙΜΗ</span><span style="text-align:right">ΣΥΝΟΛΟ</span><span></span></div>
+      <div class="line">
+        <div class="pr"><div class="im"><span class="slant" style="background:var(--ink);color:#fff">M18 FUEL</span><img src="https://kolleris.b-cdn.net/papatheo/4933479860/primary-0-1751220334522.webp" alt=""></div>
+          <div><div class="n">Κρουστικό δραπανοκατσάβιδο M18 FPD3 — Κιτ</div><div class="c">4933479860 · M18 FPD3-502X · 2 × 5.0Ah, φορτιστής, HD Box</div><div class="a">● Σε απόθεμα — 2 τεμάχια</div><a class="sw note" data-note="Αλλαγή κιτ ↔ σκέτο μέσα στο καλάθι, χωρίς επιστροφή στη σελίδα προϊόντος. Από το ίδιο variantGroup.">Αλλαγή σε σκέτο εργαλείο (318,28 €)</a></div></div>
+        <div class="qty"><span>−</span><span>1</span><span>+</span></div>
+        <div class="u">598,92 €</div><div class="t">598,92 €</div><a class="x">✕</a>
+      </div>
+      <div class="line">
+        <div class="pr"><div class="im"><span class="slant" style="background:var(--ink);color:#fff">M18</span><img src="https://kolleris.b-cdn.net/papatheo/4932430483/primary-0-1751214102874.webp" alt=""></div>
+          <div><div class="n">Μπαταρία REDLITHIUM™ M18 B5 5.0Ah</div><div class="c">4932430483</div><div class="a">● Σε απόθεμα</div></div></div>
+        <div class="qty"><span>−</span><span>1</span><span>+</span></div>
+        <div class="u">165,42 €</div><div class="t">165,42 €</div><a class="x">✕</a>
+      </div>
+    </div>
+    <div class="cartacts"><a>ΣΥΝΕΧΕΙΑ ΑΓΟΡΩΝ</a><a>Άδειασμα καλαθιού</a></div>
+
+    <div class="quick note nb" data-note="Η «γρήγορη παραγγελία» του eshop, όπως είναι. Ο τεχνίτης που ξέρει τον κωδικό της Milwaukee (4933…) δεν ψάχνει στον κατάλογο." data-api="products {search: κωδικός} → hdcfront">
+      <div><h3>ΞΕΡΕΤΕ ΤΟΝ ΚΩΔΙΚΟ;</h3><p>Επικολλήστε κωδικούς Milwaukee με την ποσότητα — ένας σε κάθε γραμμή.</p></div>
+      <div class="box"><div>4933479859, 1</div><a>ΠΡΟΣΘΗΚΗ</a></div>
+    </div>
+  </div>
+
+  <aside class="sum">
+    <h2 class="disp">ΣΥΝΟΨΗ</h2>
+    <div class="in">
+      <div class="zip" data-api="courier/quote {postcode, βάρος}"><div>18545</div><a>ΥΠΟΛΟΓΙΣΜΟΣ</a></div>
+      <div class="hint">Ο ΤΚ ορίζει τη ζώνη ACS — ενδεικτικά μέχρι την ολοκλήρωση.</div>
+      <dl>
+        <dt>Προϊόντα (2)</dt><dd>764,34 €</dd>
+        <dt>Μεταφορικά ACS</dt><dd class="fr">ΔΩΡΕΑΝ</dd>
+      </dl>
+      <div class="tot"><b>ΣΥΝΟΛΟ</b><span>764,34 €</span></div>
+      <div class="vat">Περιλαμβάνεται ΦΠΑ 24% 147,94 €</div>
+      <div class="cp note nb" data-note="Κουπόνια και προσφορές: του eshop, στη βάση hdcfront — όχι στο HDCtool."><div>Κωδικός κουπονιού</div><a>ΕΦΑΡΜΟΓΗ</a></div>
+      <a class="btn btn-red">ΟΛΟΚΛΗΡΩΣΗ ΠΑΡΑΓΓΕΛΙΑΣ →</a>
+      <div class="pay"><span>VISA</span><span>MASTERCARD</span><span>IRIS</span><span>ΚΑΤΑΘΕΣΗ</span></div>
+      <div class="trust"><div>Ασφαλής πληρωμή μέσω Viva</div><div>Παραλαβή από το κατάστημα χωρίς χρέωση</div><div>Επιστροφή εντός 14 ημερών</div></div>
+    </div>
+  </aside>
+</div>
+
+<div class="wrap xs note nb" data-note="Προτάσεις με βάση την πλατφόρμα των προϊόντων του καλαθιού (M18) — όπως το CartCrossSell του eshop, αλλά με τον κανόνα της μπαταρίας.">
+  <h2 class="disp" data-api="similar-products → φίλτρο πλατφόρμας">ΔΟΥΛΕΥΟΥΝ ΜΕ ΤΙΣ ΜΠΑΤΑΡΙΕΣ ΣΑΣ</h2>
+  <p class="s">Σκέτα εργαλεία M18 — οι μπαταρίες του κιτ σας τα κινούν όλα.</p>
+  <div class="grid">
+    <div class="card"><div class="ci"><img src="https://kolleris.b-cdn.net/papatheo/4933492782/primary-0-1751222565411.webp" alt=""></div><div class="cb"><div class="t">Μπουλονόκλειδο 1/2″ M18 FHIW2F12-0X</div><div class="p">489,40 €</div><a class="add">+ ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+    <div class="card"><div class="ci"><img src="https://kolleris.b-cdn.net/papatheo/4933478429/primary-0-1751218639483.webp" alt=""></div><div class="cb"><div class="t">Γωνιακός τροχός M18 FSAG125XB-0X</div><div class="p">329,69 €</div><a class="add">+ ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+    <div class="card"><div class="ci"><img src="https://kolleris.b-cdn.net/papatheo/4933459729/primary-0-1751215034751.webp" alt=""></div><div class="cb"><div class="t">Μπουλονόκλειδο 3/4″ M18 ONEFHIWF34-0X</div><div class="p">466,59 €</div><a class="add">+ ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+    <div class="card"><div class="ci"><img src="https://kolleris.b-cdn.net/papatheo/4933479859/primary-0-1751220216324.webp" alt=""></div><div class="cb"><div class="t">Κρουστικό δραπανοκατσάβιδο M18 FPD3-0X</div><div class="p">318,28 €</div><a class="add">+ ΣΤΟ ΚΑΛΑΘΙ</a></div></div>
+  </div>
+</div>
+
+<!-- ═════════════ 2 · ΟΛΟΚΛΗΡΩΣΗ ═════════════ -->
+<div class="screen"><div class="wrap"><b>2 · ΟΛΟΚΛΗΡΩΣΗ ΠΑΡΑΓΓΕΛΙΑΣ</b><span>Μία σελίδα, χωρίς μενού — ο πελάτης δεν φεύγει πριν πληρώσει</span><code>/checkout</code></div></div>
+<header class="chdr note" data-note="Κεφαλίδα χωρίς μενού και αναζήτηση, όπως στα μεγάλα καταστήματα. Μόνο λογότυπο, τηλέφωνο και επιστροφή στο καλάθι."><div class="wrap">
+  <a class="plinth"><img src="/files/hdc-lockup-440.png" alt=""></a>
+  <span class="sec">ΑΣΦΑΛΗΣ ΟΛΟΚΛΗΡΩΣΗ</span>
+  <span class="help">Χρειάζεστε βοήθεια; <b>210 411 1355</b></span>
+  <a class="back">← ΚΑΛΑΘΙ</a>
+</div></header>
+
+<div class="wrap co">
+  <div>
+    <section class="step">
+      <h3><i>1</i>ΣΤΟΙΧΕΙΑ ΕΠΙΚΟΙΝΩΝΙΑΣ<small>Έχετε λογαριασμό; Σύνδεση</small></h3>
+      <div class="in"><div class="f2">
+        <div class="fld"><label>ΟΝΟΜΑ <em>*</em></label><div>Όνομα</div></div>
+        <div class="fld"><label>ΕΠΩΝΥΜΟ <em>*</em></label><div>Επώνυμο</div></div>
+        <div class="fld"><label>EMAIL <em>*</em></label><div>email@παράδειγμα.gr</div></div>
+        <div class="fld"><label>ΚΙΝΗΤΟ <em>*</em></label><div>69…</div><small>Για το SMS της ACS και την ειδοποίηση παραλαβής.</small></div>
+      </div></div>
+    </section>
+
+    <section class="step note" data-note="ΔΙΑΦΟΡΑ από το eshop: ο τρόπος παραλαβής ανεβαίνει ΠΡΙΝ τη διεύθυνση. Όποιος διαλέγει το κατάστημα δεν συμπληρώνει καθόλου διεύθυνση. Το «Έτοιμη σε 2 ώρες» θέλει επιβεβαίωση για το HDC.">
+      <h3><i>2</i>ΤΡΟΠΟΣ ΠΑΡΑΛΑΒΗΣ</h3>
+      <div class="in"><div class="ship" data-api="courier/quote {postcode, βάρος} → τιμή ανά τρόπο">
+        <div class="on"><b>ACS COURIER</b><span>Πανελλαδικά · 1–3 εργάσιμες</span><strong class="fr">ΔΩΡΕΑΝ</strong></div>
+        <div><b>ACS EXPRESS</b><span>Παράδοση έως 12:00 την επόμενη</span><strong style="font-size:13px;font-family:'CF Helvetica Condensed';font-weight:500;color:var(--g5)">τιμή από ACS για τον ΤΚ σας</strong></div>
+        <div><b>ΠΑΡΑΛΑΒΗ ΑΠΟ ΤΟ ΚΑΤΑΣΤΗΜΑ</b><span>Heavy Duty Centre · έτοιμη σε 2 ώρες</span><strong class="fr">ΔΩΡΕΑΝ</strong></div>
+      </div></div>
+    </section>
+
+    <section class="step">
+      <h3><i>3</i>ΔΙΕΥΘΥΝΣΗ ΠΑΡΑΔΟΣΗΣ</h3>
+      <div class="in">
+        <div class="f21">
+          <div class="fld"><label>ΟΔΟΣ ΚΑΙ ΑΡΙΘΜΟΣ <em>*</em></label><div>Αρχίστε να γράφετε — προτείνουμε διευθύνσεις</div></div>
+          <div class="fld"><label>ΟΡΟΦΟΣ / ΚΟΥΔΟΥΝΙ</label><div></div></div>
+        </div>
+        <div class="f4">
+          <div class="fld"><label>Τ.Κ. <em>*</em></label><div class="v">18545</div></div>
+          <div class="fld"><label>ΠΟΛΗ <em>*</em></label><div>Πόλη</div></div>
+          <div class="fld"><label>ΝΟΜΟΣ</label><div></div></div>
+          <div class="fld"><label>ΠΕΡΙΦΕΡΕΙΑ</label><div></div></div>
+        </div>
+        <div class="chk"><i class="on"></i><span><b>Θέλω τιμολόγιο</b> — χρειάζονται ΑΦΜ και επωνυμία</span></div>
+        <div class="inv" data-api="/api/customers/lookup-by-vat → ΑΑΔΕ + SoftOne TRDR">
+          <div class="f3">
+            <div class="fld"><label>ΑΦΜ <em>*</em></label><div class="v">9 ψηφία</div></div>
+            <div class="fld"><label>ΕΠΩΝΥΜΙΑ <em>*</em></label><div>συμπληρώνεται αυτόματα</div></div>
+            <div class="fld"><label>Δ.Ο.Υ.</label><div>συμπληρώνεται αυτόματα</div></div>
+          </div>
+          <div class="fld" style="margin-top:8px"><small>Γράψτε τον ΑΦΜ — επωνυμία, ΔΟΥ και διεύθυνση έρχονται από την ΑΑΔΕ. Τιμολόγιο σε ιδιώτη πελάτη, όχι λογαριασμός B2B.</small></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="step note" data-note="Ίδιοι τρόποι με το eshop: κάρτα και IRIS μέσω Viva, κατάθεση με κωδικό πληρωμής Viva. Αντικαταβολή και επί πιστώσει ΔΕΝ προσφέρονται. Ανοιχτό: ίδιος λογαριασμός Viva ή δική του πηγή για το HDC;">
+      <h3><i>4</i>ΤΡΟΠΟΣ ΠΛΗΡΩΜΗΣ</h3>
+      <div class="in">
+        <div class="payopts"><span class="on">ΚΑΡΤΑ</span><span>IRIS</span><span>ΤΡΑΠΕΖΙΚΗ ΚΑΤΑΘΕΣΗ</span></div>
+        <div class="info">Θα μεταφερθείτε στην ασφαλή σελίδα πληρωμής της Viva. Τα στοιχεία της κάρτας δεν περνούν από εμάς.</div>
+      </div>
+    </section>
+
+    <section class="step">
+      <h3><i>5</i>ΛΟΓΑΡΙΑΣΜΟΣ <span class="cond" style="font-weight:500;font-size:14px;color:var(--g5);font-stretch:100%">(προαιρετικά)</span></h3>
+      <div class="in"><div class="fld" style="max-width:420px"><label>ΚΩΔΙΚΟΣ ΠΡΟΣΒΑΣΗΣ</label><div>Τουλάχιστον 8 χαρακτήρες</div><small>Συμπληρώστε τον για να κρατήσουμε τα στοιχεία σας και το ιστορικό παραγγελιών. Κενό = παραγγελία ως επισκέπτης.</small></div></div>
+    </section>
+
+    <section class="step" style="margin-bottom:0">
+      <h3><i>6</i>ΣΧΟΛΙΑ ΚΑΙ ΟΛΟΚΛΗΡΩΣΗ</h3>
+      <div class="in">
+        <div class="fld"><label>ΣΧΟΛΙΑ ΠΑΡΑΓΓΕΛΙΑΣ</label></div>
+        <div class="ta">Οδηγίες παράδοσης, ώρες παραλαβής…</div>
+        <div class="chk"><i></i><span>Αποδέχομαι τους <u>όρους χρήσης</u> και την <u>πολιτική απορρήτου</u>.</span></div>
+        <a class="btn btn-red" style="margin-top:20px;opacity:.5" data-api="orders → orders/{n}/push → SoftOne">ΠΛΗΡΩΜΗ ΜΕ ΑΣΦΑΛΕΙΑ →</a>
+        <div class="fld"><small>Το κουμπί ενεργοποιείται μόλις αποδεχτείτε τους όρους.</small></div>
+      </div>
+    </section>
+  </div>
+
+  <aside class="sum">
+    <h2 class="disp">Η ΠΑΡΑΓΓΕΛΙΑ ΣΑΣ</h2>
+    <div class="in">
+      <div class="mini">
+        <div><div class="im"><img src="https://kolleris.b-cdn.net/papatheo/4933479860/primary-0-1751220334522.webp" alt=""><em>1</em></div><b>M18 FPD3-502X — Κιτ</b><span>598,92 €</span></div>
+        <div><div class="im"><img src="https://kolleris.b-cdn.net/papatheo/4932430483/primary-0-1751214102874.webp" alt=""><em>1</em></div><b>Μπαταρία M18 B5 5.0Ah</b><span>165,42 €</span></div>
+      </div>
+      <dl>
+        <dt>Προϊόντα</dt><dd>764,34 €</dd>
+        <dt>ACS Courier · 18545</dt><dd class="fr">ΔΩΡΕΑΝ</dd>
+      </dl>
+      <div class="tot"><b>ΣΥΝΟΛΟ</b><span>764,34 €</span></div>
+      <div class="vat">Περιλαμβάνεται ΦΠΑ 24% 147,94 €</div>
+      <div class="trust" style="margin-top:0"><div><a style="color:var(--red)">Επεξεργασία καλαθιού</a></div></div>
+    </div>
+  </aside>
+</div>
+
+<!-- ═════════════ 3 · ΕΠΙΒΕΒΑΙΩΣΗ ═════════════ -->
+<div class="screen"><div class="wrap"><b>3 · ΕΠΙΒΕΒΑΙΩΣΗ</b><span>Μετά την πληρωμή ή αμέσως για κατάθεση — ίδια σελίδα με του eshop</span><code>/checkout/epibebaiosi/HDC-20260928-0001</code></div></div>
+<div class="wrap ok">
+  <div>
+    <div class="okhead note" data-note="Πρόθεμα HDC- αντί για KOL- (ίδια μορφή: ημερομηνία + αύξων). Η σειρά παραστατικών στο SoftOne για το HDC είναι ακόμη ανοιχτή.">
+      <h1 class="disp">ΕΥΧΑΡΙΣΤΟΥΜΕ!<br>Η ΠΑΡΑΓΓΕΛΙΑ ΣΑΣ ΚΑΤΑΧΩΡΗΘΗΚΕ</h1>
+      <p>Σας στείλαμε επιβεβαίωση στο email. Θα σας ενημερώσουμε με SMS μόλις η ACS παραλάβει το δέμα.</p>
+      <span class="num">HDC-20260928-0001</span>
+    </div>
+    <div class="tl" data-api="orders/{n} · courier/operations (tracking) → webhook HDC">
+      <div class="done"><b>✓ ΚΑΤΑΧΩΡΗΘΗΚΕ</b><span>28/9 · 10:42</span></div>
+      <div class="done"><b>✓ ΠΛΗΡΩΘΗΚΕ</b><span>Κάρτα · Viva</span></div>
+      <div class="now"><b>ΣΕ ΠΡΟΕΤΟΙΜΑΣΙΑ</b><span>Στο κατάστημα</span></div>
+      <div><b>ΣΤΑΛΘΗΚΕ</b><span>Με αριθμό ACS</span></div>
+    </div>
+    <div class="det">
+      <div><h4>ΑΠΟΣΤΟΛΗ</h4><p>ACS Courier — δωρεάν<br>Διεύθυνση παράδοσης<br>18545</p></div>
+      <div><h4>ΠΛΗΡΩΜΗ</h4><p>Κάρτα μέσω Viva<br>764,34 € — εξοφλήθηκε</p></div>
+      <div class="note nb" data-note="ΝΕΟ — το eshop δεν το κάνει σήμερα. Θέλει endpoint στο HDCtool για το θεωρημένο PDF (SOSIGNQR)."><h4>ΠΑΡΑΣΤΑΤΙΚΟ</h4><p>Τιμολόγιο<br>Το θεωρημένο PDF στον λογαριασμό σας μόλις εκδοθεί</p></div>
+    </div>
+    <div class="bank note nb" data-note="Αυτό το πλαίσιο εμφανίζεται ΜΟΝΟ όταν ο πελάτης διάλεξε κατάθεση. Ο κωδικός Viva και η δέσμευση αποθέματος λήγουν μαζί (STOCK_HOLD_HOURS = 3).">
+      <h3>ΑΝ ΕΠΙΛΕΞΑΤΕ ΤΡΑΠΕΖΙΚΗ ΚΑΤΑΘΕΣΗ</h3>
+      <p style="color:var(--g7);line-height:1.5">Κρατάμε τα προϊόντα για εσάς 3 ώρες. Πληρώστε με τον κωδικό πληρωμής από το e-banking — η παραγγελία επιβεβαιώνεται αυτόματα.</p>
+      <dl><dt>Κωδικός πληρωμής Viva</dt><dd>16 ψηφία</dd><dt>Ποσό</dt><dd>764,34 €</dd><dt>Ισχύει έως</dt><dd>28/9 · 13:42</dd></dl>
+    </div>
+    <div class="okacts"><a class="btn btn-red">ΣΥΝΕΧΕΙΑ ΑΓΟΡΩΝ</a><a class="btn btn-line">ΔΗΜΙΟΥΡΓΙΑ ΛΟΓΑΡΙΑΣΜΟΥ</a></div>
+  </div>
+  <aside class="sum">
+    <h2 class="disp">ΠΡΟΪΟΝΤΑ</h2>
+    <div class="in">
+      <div class="mini">
+        <div><div class="im"><img src="https://kolleris.b-cdn.net/papatheo/4933479860/primary-0-1751220334522.webp" alt=""><em>1</em></div><b>M18 FPD3-502X — Κιτ</b><span>598,92 €</span></div>
+        <div><div class="im"><img src="https://kolleris.b-cdn.net/papatheo/4932430483/primary-0-1751214102874.webp" alt=""><em>1</em></div><b>Μπαταρία M18 B5 5.0Ah</b><span>165,42 €</span></div>
+      </div>
+      <div class="tot"><b>ΣΥΝΟΛΟ</b><span>764,34 €</span></div>
+      <div class="vat">Περιλαμβάνεται ΦΠΑ 24% 147,94 €</div>
+    </div>
+  </aside>
+</div>
+
+<!-- ═════════════ ΚΙΝΗΤΟ ═════════════ -->
+<section class="mob">
+  <div class="wrap">
+    <h2 class="disp">ΣΤΟ ΚΙΝΗΤΟ</h2>
+    <p class="s">Καλάθι με μπάρα προόδου προς τα δωρεάν μεταφορικά και σταθερό κουμπί στο κάτω μέρος. Στην ολοκλήρωση τα βήματα κλείνουν όταν συμπληρωθούν — ανοιχτό μένει μόνο το τρέχον, με «Αλλαγή» για επιστροφή.</p>
+    <div class="phones">
+      <div class="phone">
+        <div class="ph"><div class="pl"><img src="/files/hdc-lockup-440.png" alt=""></div><div class="ic">⚲ ♡ 🛒</div></div>
+        <div class="pad">
+          <h3 class="disp">ΤΟ ΚΑΛΑΘΙ ΣΑΣ</h3>
+          <div class="free"><div class="row">ΑΚΟΜΗ 86,75 € ΓΙΑ ΔΩΡΕΑΝ ΜΕΤΑΦΟΡΙΚΑ<span style="color:var(--g5)">53%</span></div><div class="bar"><i style="width:53%;background:var(--red)"></i></div></div>
+          <div class="pl1"><div class="im"><img src="https://kolleris.b-cdn.net/papatheo/4932480165/primary-0-1751219830273.webp" alt=""></div><div><b>Μπαταρία M12 HB5 HIGH OUTPUT™ 5.0Ah</b><div class="r"><div class="qty"><span>−</span><span>1</span><span>+</span></div><span class="p">99,25 €</span></div></div></div>
+        </div>
+        <div class="bar"><div class="tt"><span>Σύνολο με ΦΠΑ</span><b>99,25 €</b></div><a>ΟΛΟΚΛΗΡΩΣΗ ΠΑΡΑΓΓΕΛΙΑΣ →</a></div>
+      </div>
+      <div class="phone">
+        <div class="ph k"><div class="pl"><img src="/files/hdc-lockup-440.png" alt=""></div><div class="ic">🔒 ΑΣΦΑΛΗΣ ΟΛΟΚΛΗΡΩΣΗ</div></div>
+        <div class="sumbar">ΣΥΝΟΨΗ (2) ⌄<b>764,34 €</b></div>
+        <div class="st"><i>✓</i><div><b>ΣΤΟΙΧΕΙΑ ΕΠΙΚΟΙΝΩΝΙΑΣ</b><span>Όνομα Επώνυμο · 69…</span></div><a>Αλλαγή</a></div>
+        <div class="st"><i>✓</i><div><b>ΠΑΡΑΛΑΒΗ</b><span>ACS Courier · δωρεάν</span></div><a>Αλλαγή</a></div>
+        <div class="st"><i>✓</i><div><b>ΔΙΕΥΘΥΝΣΗ</b><span>18545 · τιμολόγιο</span></div><a>Αλλαγή</a></div>
+        <div class="st"><i class="r">4</i><div><b>ΤΡΟΠΟΣ ΠΛΗΡΩΜΗΣ</b></div></div>
+        <div class="stbody"><div class="payopts"><span class="on">ΚΑΡΤΑ</span><span>IRIS</span><span>ΚΑΤΑΘΕΣΗ</span></div><div class="info">Θα μεταφερθείτε στην ασφαλή σελίδα της Viva.</div></div>
+        <div class="st"><i class="g">5</i><div><b>ΛΟΓΑΡΙΑΣΜΟΣ</b><span>προαιρετικά</span></div></div>
+        <div class="st"><i class="g">6</i><div><b>ΣΧΟΛΙΑ ΚΑΙ ΟΡΟΙ</b></div></div>
+        <div class="bar"><div class="tt"><span>Σύνολο με ΦΠΑ</span><b>764,34 €</b></div><a>ΣΥΝΕΧΕΙΑ →</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>
