@@ -5,23 +5,17 @@
 <title>Προϊόν — M18 FPD3</title>
 <link href="https://fonts.googleapis.com/css2?family=TikTok+Sans:opsz,wdth,wght@12..36,75..150,300..900&display=swap" rel="stylesheet">
 <style>
-  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelReg.ttf) format("truetype"); font-weight:400; }
-  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelMed.ttf) format("truetype"); font-weight:500; }
-  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelBol.ttf) format("truetype"); font-weight:700; }
-  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConReg.ttf) format("truetype"); font-weight:400; }
-  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConMed.ttf) format("truetype"); font-weight:500; }
-  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConBol.ttf) format("truetype"); font-weight:700; }
   :root { --red:#DB011C; --red-d:#BD0118; --ink:#0A0A0A; --graph:#1A1A1A; --g7:#444444; --g5:#6B6B6B; --g3:#D6D6D6; --g1:#F4F4F4; --ok:#1F7A3A; --wait:#9A6700; }
   * { box-sizing:border-box; margin:0; padding:0; }
-  body { font-family:"CF Helvetica",Helvetica,Arial,sans-serif; color:var(--ink); background:#fff; font-size:15px; }
+  body { font-family:"TikTok Sans",Helvetica,Arial,sans-serif; color:var(--ink); background:#fff; font-size:15px; }
   a { color:inherit; text-decoration:none; }
   .wrap { max-width:1320px; margin:0 auto; padding:0 24px; }
   .disp { font-family:"TikTok Sans",sans-serif; font-weight:900; font-stretch:150%; letter-spacing:-0.02em; line-height:1.02; }
-  .cond { font-family:"CF Helvetica Condensed",sans-serif; }
+  .cond { font-family:"TikTok Sans",sans-serif;font-stretch:87.5%; }
   .slant { clip-path:polygon(0 0,100% 0,calc(100% - 10px) 100%,0 100%); display:inline-block; padding:4px 18px 4px 10px; font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:12px; }
   .btn { font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; font-size:13px; letter-spacing:.04em; padding:14px 24px; display:inline-flex; align-items:center; justify-content:center; border:2px solid transparent; cursor:pointer; }
   .note { position:relative; }
-  .note::after { content:attr(data-note); position:absolute; right:10px; top:10px; background:#FFF6CC; color:#5b4a00; border:1px solid #E7D27A; font:600 11px/1.35 "CF Helvetica Condensed",sans-serif; padding:5px 8px; max-width:290px; z-index:5; box-shadow:0 2px 6px rgba(0,0,0,.15); }
+  .note::after { content:attr(data-note); position:absolute; right:10px; top:10px; background:#FFF6CC; color:#5b4a00; border:1px solid #E7D27A; font:semi-condensed 600 11px/1.35 "TikTok Sans",sans-serif; padding:5px 8px; max-width:290px; z-index:5; box-shadow:0 2px 6px rgba(0,0,0,.15); }
   .note.nb::after { top:auto; bottom:10px; }
   [data-api] { position:relative; }
   [data-api]::before { content:attr(data-api); position:absolute; left:0; top:-22px; background:#0B3D91; color:#fff; font:600 11px/1 ui-monospace,Menlo,monospace; padding:5px 7px; z-index:6; white-space:nowrap; }
@@ -33,13 +27,13 @@
   .apileg .new { color:var(--red); font-weight:700; }
 
   /* ── ΚΕΦΑΛΙΔΑ (ίδια με αρχική) ── */
-  .ann { background:var(--ink); color:#fff; font:700 12px "CF Helvetica Condensed"; letter-spacing:.06em; }
+  .ann { background:var(--ink); color:#fff; font:semi-condensed 700 12px "TikTok Sans"; letter-spacing:.06em; }
   .ann .wrap { display:flex; justify-content:space-between; align-items:center; height:34px; }
   .hdr { background:var(--red); color:#fff; }
   .hdr .wrap { display:flex; align-items:stretch; height:84px; padding-left:0; }
   .hdr .plinth { background:var(--ink); display:flex; align-items:center; padding:0 22px 0 24px; margin-right:26px; }
   .hdr .plinth img { height:58px; }
-  .hdr nav { display:flex; align-items:center; gap:26px; font:700 15px "CF Helvetica Condensed"; letter-spacing:.05em; }
+  .hdr nav { display:flex; align-items:center; gap:26px; font:semi-condensed 700 15px "TikTok Sans"; letter-spacing:.05em; }
   .hdr nav a { padding:31px 0 27px; border-bottom:4px solid transparent; } .hdr nav a.on { border-bottom-color:#fff; }
   .hdr .search { margin-left:auto; align-self:center; display:flex; background:#fff; width:340px; height:44px; }
   .hdr .search span { flex:1; padding:0 14px; display:flex; align-items:center; color:var(--g5); font-size:15px; }
@@ -56,7 +50,7 @@
   .gal .th div { width:84px; height:84px; border:1px solid var(--g3); display:flex; align-items:center; justify-content:center; background:#fff; }
   .gal .th div.on { border:2px solid var(--ink); }
   .gal .th img { max-width:86%; max-height:86%; }
-  .gal .th .more { font:700 13px "CF Helvetica Condensed"; background:var(--g1); }
+  .gal .th .more { font:semi-condensed 700 13px "TikTok Sans"; background:var(--g1); }
   .gal .main { border:1px solid var(--g3); aspect-ratio:1/1; display:flex; align-items:center; justify-content:center; position:relative; }
   .gal .main img { max-width:84%; max-height:84%; }
   .gal .main .tags { position:absolute; left:0; top:16px; display:flex; flex-direction:column; gap:6px; align-items:flex-start; }
@@ -64,51 +58,51 @@
   .gal .main .arr { position:absolute; top:50%; transform:translateY(-50%); width:44px; height:44px; background:var(--red); color:#fff; display:flex; align-items:center; justify-content:center; font-size:22px; }
 
   .buy h1 { font-size:36px; font-stretch:140%; margin:12px 0 10px; }
-  .buy .codes { font:400 14px "CF Helvetica Condensed"; color:var(--g5); display:flex; gap:16px; flex-wrap:wrap; }
+  .buy .codes { font:semi-condensed 400 14px "TikTok Sans"; color:var(--g5); display:flex; gap:16px; flex-wrap:wrap; }
   .buy .codes b { color:var(--ink); font-weight:700; }
-  .buy .rv { font:500 13px "CF Helvetica Condensed"; color:var(--red); margin-top:8px; display:inline-block; border-bottom:1px solid var(--red); }
+  .buy .rv { font:semi-condensed 500 13px "TikTok Sans"; color:var(--red); margin-top:8px; display:inline-block; border-bottom:1px solid var(--red); }
   .keys { display:grid; grid-template-columns:repeat(4,1fr); border:1px solid var(--g3); margin:20px 0 22px; }
   .keys div { padding:12px 12px; border-right:1px solid var(--g3); }
   .keys div:last-child { border-right:0; }
   .keys b { display:block; font-family:"TikTok Sans"; font-weight:900; font-stretch:130%; font-size:22px; letter-spacing:-.02em; }
-  .keys span { font:500 12px "CF Helvetica Condensed"; color:var(--g5); letter-spacing:.03em; }
-  .lbl { font:700 14px "CF Helvetica Condensed"; letter-spacing:.06em; margin-bottom:10px; display:flex; justify-content:space-between; }
+  .keys span { font:semi-condensed 500 12px "TikTok Sans"; color:var(--g5); letter-spacing:.03em; }
+  .lbl { font:semi-condensed 700 14px "TikTok Sans"; letter-spacing:.06em; margin-bottom:10px; display:flex; justify-content:space-between; }
   .lbl a { color:var(--red); font-weight:500; letter-spacing:0; }
   .opts { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
   .opt { border:1px solid var(--g3); padding:14px 14px 12px; display:flex; flex-direction:column; gap:4px; position:relative; cursor:pointer; }
   .opt.on { border:3px solid var(--red); padding:12px 12px 10px; }
   .opt.on::before { content:"✓"; position:absolute; right:0; top:0; background:var(--red); color:#fff; width:24px; height:24px; display:flex; align-items:center; justify-content:center; font-size:13px; }
   .opt .n { font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:14px; }
-  .opt .m { font:400 12px "CF Helvetica Condensed"; color:var(--g5); }
-  .opt .d { font:400 13px/1.35 "CF Helvetica Condensed"; color:var(--g7); min-height:36px; }
+  .opt .m { font:semi-condensed 400 12px "TikTok Sans"; color:var(--g5); }
+  .opt .d { font:semi-condensed 400 13px/1.35 "TikTok Sans"; color:var(--g7); min-height:36px; }
   .opt .p { font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:20px; letter-spacing:-.02em; margin-top:4px; }
-  .hint { background:var(--g1); border-left:4px solid var(--ink); padding:10px 12px; font:400 14px "CF Helvetica Condensed"; margin-top:10px; }
+  .hint { background:var(--g1); border-left:4px solid var(--ink); padding:10px 12px; font:semi-condensed 400 14px "TikTok Sans"; margin-top:10px; }
   .hint b { font-weight:700; }
   .pricebox { margin-top:22px; padding-top:18px; border-top:4px solid var(--ink); }
   .pricebox .pr { font-family:"TikTok Sans"; font-weight:900; font-stretch:130%; font-size:44px; letter-spacing:-.03em; line-height:1; }
-  .pricebox .pr small { font:500 14px "CF Helvetica Condensed"; color:var(--g5); letter-spacing:0; margin-left:10px; }
-  .avail { display:flex; flex-direction:column; gap:6px; margin:14px 0 16px; font:500 15px "CF Helvetica Condensed"; }
+  .pricebox .pr small { font:semi-condensed 500 14px "TikTok Sans"; color:var(--g5); letter-spacing:0; margin-left:10px; }
+  .avail { display:flex; flex-direction:column; gap:6px; margin:14px 0 16px; font:semi-condensed 500 15px "TikTok Sans"; }
   .avail div { display:flex; align-items:center; gap:10px; }
   .avail .dot { width:10px; height:10px; border-radius:50%; flex:0 0 auto; }
   .avail span.g { color:var(--g5); font-weight:400; }
   .cta { display:grid; grid-template-columns:128px 1fr 54px; gap:10px; }
-  .qty { border:2px solid var(--ink); display:grid; grid-template-columns:40px 1fr 40px; align-items:center; text-align:center; height:54px; font:700 18px "CF Helvetica Condensed"; }
+  .qty { border:2px solid var(--ink); display:grid; grid-template-columns:40px 1fr 40px; align-items:center; text-align:center; height:54px; font:semi-condensed 700 18px "TikTok Sans"; }
   .qty span:first-child, .qty span:last-child { font-size:22px; }
   .cta .add { background:var(--red); color:#fff; height:54px; font-size:15px; }
   .cta .add:hover { background:var(--red-d); }
   .cta .fav { border:2px solid var(--ink); height:54px; display:flex; align-items:center; justify-content:center; font-size:20px; }
-  .subacts { display:flex; gap:22px; margin-top:12px; font:500 13px "CF Helvetica Condensed"; color:var(--g7); }
+  .subacts { display:flex; gap:22px; margin-top:12px; font:semi-condensed 500 13px "TikTok Sans"; color:var(--g7); }
   .subacts span::before { content:"▸ "; color:var(--red); }
   .serv { display:grid; grid-template-columns:1fr 1fr; gap:0; margin-top:22px; border:1px solid var(--g3); }
   .serv div { padding:12px 14px; border-bottom:1px solid var(--g3); }
   .serv div:nth-child(odd) { border-right:1px solid var(--g3); }
   .serv div:nth-last-child(-n+2) { border-bottom:0; }
   .serv b { display:block; font-family:"TikTok Sans"; font-weight:800; font-stretch:115%; font-size:13px; margin-bottom:3px; }
-  .serv span { font:400 13px "CF Helvetica Condensed"; color:var(--g5); }
+  .serv span { font:semi-condensed 400 13px "TikTok Sans"; color:var(--g5); }
 
   /* ── ΜΠΑΡΑ ΕΝΟΤΗΤΩΝ ── */
   .secnav { background:var(--ink); color:#fff; position:sticky; top:0; z-index:10; }
-  .secnav .wrap { display:flex; align-items:center; gap:34px; height:58px; font:700 15px "CF Helvetica Condensed"; letter-spacing:.06em; }
+  .secnav .wrap { display:flex; align-items:center; gap:34px; height:58px; font:semi-condensed 700 15px "TikTok Sans"; letter-spacing:.06em; }
   .secnav a { padding:19px 0 15px; border-bottom:4px solid transparent; } .secnav a.on { border-bottom-color:var(--red); }
   .secnav .mini { margin-left:auto; display:flex; align-items:center; gap:14px; }
   .secnav .mini b { font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:20px; letter-spacing:-.02em; }
@@ -125,12 +119,12 @@
   .ov li::before { content:""; width:12px; height:12px; background:var(--red); margin-top:4px; clip-path:polygon(0 0,100% 0,calc(100% - 4px) 100%,0 100%); }
   .ov li b { font-weight:700; }
   .ov .ph { position:relative; aspect-ratio:4/3; background:#111 url("https://www.milwaukeetool.gr/wp-content/uploads/2023/05/M18_FPD3-502X-App_21.jpg") center/cover no-repeat; }
-  .ov .ph span { position:absolute; left:0; bottom:0; background:var(--ink); color:#fff; padding:10px 14px; font:700 13px "CF Helvetica Condensed"; letter-spacing:.05em; }
+  .ov .ph span { position:absolute; left:0; bottom:0; background:var(--ink); color:#fff; padding:10px 14px; font:semi-condensed 700 13px "TikTok Sans"; letter-spacing:.05em; }
 
   /* Προδιαγραφές */
   .specs { display:grid; grid-template-columns:1fr 1fr; gap:0 40px; }
   .specs dl { display:grid; grid-template-columns:1fr auto; }
-  .specs dt, .specs dd { padding:11px 12px; border-bottom:1px solid var(--g3); font:400 15px "CF Helvetica Condensed"; }
+  .specs dt, .specs dd { padding:11px 12px; border-bottom:1px solid var(--g3); font:semi-condensed 400 15px "TikTok Sans"; }
   .specs dt { color:var(--g7); }
   .specs dd { font-weight:700; text-align:right; }
   .specs dl > :nth-child(4n+1), .specs dl > :nth-child(4n+2) { background:var(--g1); }
@@ -141,17 +135,17 @@
   .box .im { aspect-ratio:1/0.85; display:flex; align-items:center; justify-content:center; position:relative; }
   .box .im img { max-width:74%; max-height:80%; }
   .box .im .x { position:absolute; left:0; top:10px; background:var(--red); color:#fff; font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:16px; padding:3px 14px 3px 10px; clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%); }
-  .box .im.ph { background:var(--g1); font:700 13px "CF Helvetica Condensed"; color:var(--g5); letter-spacing:.05em; }
+  .box .im.ph { background:var(--g1); font:semi-condensed 700 13px "TikTok Sans"; color:var(--g5); letter-spacing:.05em; }
   .box .t { background:var(--g1); padding:10px 12px; font-weight:700; font-size:14px; line-height:1.3; flex:1; }
-  .box .t small { display:block; font:400 12px "CF Helvetica Condensed"; color:var(--g5); margin-top:3px; }
+  .box .t small { display:block; font:semi-condensed 400 12px "TikTok Sans"; color:var(--g5); margin-top:3px; }
 
   /* Έγγραφα */
   .docs { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
   .docs a { border:1px solid var(--g3); padding:16px; display:grid; grid-template-columns:46px 1fr; gap:14px; align-items:center; }
   .docs a:hover { border-color:var(--ink); }
-  .docs i { width:46px; height:54px; background:var(--ink); color:#fff; font:700 11px "CF Helvetica Condensed"; display:flex; align-items:flex-end; justify-content:center; padding-bottom:8px; font-style:normal; clip-path:polygon(0 0,70% 0,100% 22%,100% 100%,0 100%); }
+  .docs i { width:46px; height:54px; background:var(--ink); color:#fff; font:semi-condensed 700 11px "TikTok Sans"; display:flex; align-items:flex-end; justify-content:center; padding-bottom:8px; font-style:normal; clip-path:polygon(0 0,70% 0,100% 22%,100% 100%,0 100%); }
   .docs b { display:block; font-size:15px; }
-  .docs span { font:400 13px "CF Helvetica Condensed"; color:var(--g5); }
+  .docs span { font:semi-condensed 400 13px "TikTok Sans"; color:var(--g5); }
 
   /* Κριτικές */
   .rev { border:1px solid var(--g3); display:grid; grid-template-columns:1fr auto; align-items:center; gap:30px; padding:30px; }
@@ -163,7 +157,7 @@
   .xs .head { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:22px; gap:30px; }
   .xs h2 { font-size:36px; }
   .xs .head p { color:#bdbdbd; font-size:15px; margin-top:8px; }
-  .xs .head a { font:700 14px "CF Helvetica Condensed"; letter-spacing:.05em; color:#fff; border-bottom:2px solid var(--red); padding-bottom:3px; white-space:nowrap; }
+  .xs .head a { font:semi-condensed 700 14px "TikTok Sans"; letter-spacing:.05em; color:#fff; border-bottom:2px solid var(--red); padding-bottom:3px; white-space:nowrap; }
   .grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
   .card { border:1px solid var(--g3); background:#fff; color:var(--ink); display:flex; flex-direction:column; }
   .xs .card { border:0; }
@@ -172,7 +166,7 @@
   .card .ci .slant { position:absolute; left:0; top:12px; font-size:11px; }
   .card .cb { background:var(--g1); padding:12px; display:flex; flex-direction:column; gap:3px; flex:1; }
   .card .t { font-weight:700; font-size:14px; line-height:1.28; min-height:36px; }
-  .card .c { font:400 12px "CF Helvetica Condensed"; color:var(--g5); }
+  .card .c { font:semi-condensed 400 12px "TikTok Sans"; color:var(--g5); }
   .card .p { font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:21px; letter-spacing:-.02em; margin-top:6px; }
   .card .add { text-align:center; padding:11px; font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; font-size:12px; letter-spacing:.05em; background:var(--red); color:#fff; margin-top:8px; }
 
@@ -190,24 +184,24 @@
   .phone .pdots { position:absolute; bottom:10px; left:50%; transform:translateX(-50%); display:flex; gap:5px; }
   .phone .pdots i { width:18px; height:3px; background:var(--g3); } .phone .pdots i.on { background:var(--ink); }
   .phone .pb { padding:12px; }
-  .phone .pb h3 { font-size:20px; line-height:1.05; margin-bottom:4px; }
-  .phone .pb .c { font:400 12px "CF Helvetica Condensed"; color:var(--g5); margin-bottom:10px; }
+  .phone .pb h3 { font-size:17px; font-stretch:130%; line-height:1.05; margin-bottom:4px; }
+  .phone .pb .c { font:semi-condensed 400 12px "TikTok Sans"; color:var(--g5); margin-bottom:10px; }
   .phone .popts { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:10px; }
-  .phone .popts span { border:1px solid var(--g3); padding:8px; font:700 12px "CF Helvetica Condensed"; line-height:1.3; }
+  .phone .popts span { border:1px solid var(--g3); padding:8px; font:semi-condensed 700 12px "TikTok Sans"; line-height:1.3; }
   .phone .popts span b { display:block; font-family:"TikTok Sans"; font-weight:900; font-stretch:120%; font-size:14px; }
   .phone .popts span.on { border:2px solid var(--red); padding:7px; }
-  .phone .pa { font:500 13px "CF Helvetica Condensed"; color:var(--ok); }
+  .phone .pa { font:semi-condensed 500 13px "TikTok Sans"; color:var(--ok); }
   .phone .bar { position:absolute; left:0; right:0; bottom:0; display:grid; grid-template-columns:auto 1fr; border-top:1px solid var(--g3); background:#fff; }
   .phone .bar .pp { padding:0 14px; display:flex; flex-direction:column; justify-content:center; }
   .phone .bar .pp b { font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:20px; letter-spacing:-.02em; }
-  .phone .bar .pp span { font:400 11px "CF Helvetica Condensed"; color:var(--g5); }
+  .phone .bar .pp span { font:semi-condensed 400 11px "TikTok Sans"; color:var(--g5); }
   .phone .bar a { background:var(--red); color:#fff; height:60px; display:flex; align-items:center; justify-content:center; font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; font-size:14px; letter-spacing:.04em; }
   .acc { border-top:1px solid var(--g3); }
-  .acc div.h { display:flex; justify-content:space-between; align-items:center; padding:0 12px; height:52px; border-bottom:1px solid var(--g3); font:700 14px "CF Helvetica Condensed"; letter-spacing:.05em; }
+  .acc div.h { display:flex; justify-content:space-between; align-items:center; padding:0 12px; height:52px; border-bottom:1px solid var(--g3); font:semi-condensed 700 14px "TikTok Sans"; letter-spacing:.05em; }
   .acc div.h::after { content:"+"; color:var(--red); font-size:20px; }
   .acc div.h.open::after { content:"–"; }
   .acc dl { display:grid; grid-template-columns:1fr auto; padding:0 12px 6px; border-bottom:1px solid var(--g3); }
-  .acc dt, .acc dd { padding:8px 0; border-bottom:1px solid var(--g1); font:400 13px "CF Helvetica Condensed"; }
+  .acc dt, .acc dd { padding:8px 0; border-bottom:1px solid var(--g1); font:semi-condensed 400 13px "TikTok Sans"; }
   .acc dt { color:var(--g7); } .acc dd { font-weight:700; text-align:right; }
 </style>
 </head>
@@ -229,7 +223,7 @@
     <li><b>Παραγγελία:</b> <code>orders</code> → <code>orders/{n}/push</code> → SoftOne, με δική του σειρά παραστατικών για το HDC.</li>
     <li><b>Μεταφορικά:</b> <code>courier/quote</code> (ACS, μόνο μέσω HDCtool).</li>
     <li class="new">ΝΕΟ στο HDCtool: <code>GET /api/public/milwaukee-categories</code> — το δέντρο Milwaukee σήμερα το βλέπει μόνο το προσωπικό. Προσθήκη μόνο ανάγνωσης, δεν αλλάζει τίποτα στο eshop.</li>
-    <li class="new">ΝΕΟ στο HDCtool: δεύτερο webhook URL/secret για το HDC — σήμερα υπάρχει ένα (<code>ESHOP_WEBHOOK_URL</code>).</li>
+    <li class="new">ΝΕΟ στο HDCtool: συνδρομητές feed — σήμερα η ουρά έχει έναν παραλήπτη (<code>ESHOP_WEBHOOK_URL</code>). Το HDC παίρνει μόνο αλλαγές Milwaukee (spec H1–H3).</li>
   </ul>
 </div></div>
 
@@ -265,7 +259,7 @@
       <div><b>13</b><span>MM ΤΣΟΚ</span></div>
     </div>
 
-    <div class="note" data-api="products → variantGroup (για Milwaukee: ρίζα μοντέλου)" data-note="Δύο ξεχωριστοί κωδικοί στο ERP, ενωμένοι με τη ρίζα του μοντέλου (M18 FPD3). Το -0X / -502X λέει τι περιέχει. Η επιλογή αλλάζει URL, φωτογραφίες, τιμή και απόθεμα.">
+    <div class="note" data-api="υπολογίζεται στο HDC: ρίζα μοντέλου από code2 + name (spec §8.3)" data-note="Δύο ξεχωριστοί κωδικοί στο ERP, ενωμένοι με τη ρίζα του μοντέλου (M18 FPD3). Το -0X / -502X λέει τι περιέχει. Η επιλογή αλλάζει URL, φωτογραφίες, τιμή και απόθεμα.">
       <div class="lbl">ΕΠΙΛΟΓΕΣ ΕΡΓΑΛΕΙΟΥ<a>Τι σημαίνουν οι κωδικοί;</a></div>
       <div class="opts">
         <div class="opt"><span class="n">ΣΚΕΤΟ ΕΡΓΑΛΕΙΟ</span><span class="m">M18 FPD3-0X · 4933479859</span><span class="d">Σε HD Box, χωρίς μπαταρίες και φορτιστή.</span><span class="p">318,28 €</span></div>

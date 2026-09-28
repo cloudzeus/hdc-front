@@ -5,31 +5,25 @@
 <title>Αρχική — Milwaukee Heavy Duty Centre</title>
 <link href="https://fonts.googleapis.com/css2?family=TikTok+Sans:opsz,wdth,wght@12..36,75..150,300..900&display=swap" rel="stylesheet">
 <style>
-  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelReg.ttf) format("truetype"); font-weight:400; }
-  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelMed.ttf) format("truetype"); font-weight:500; }
-  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelBol.ttf) format("truetype"); font-weight:700; }
-  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConReg.ttf) format("truetype"); font-weight:400; }
-  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConMed.ttf) format("truetype"); font-weight:500; }
-  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConBol.ttf) format("truetype"); font-weight:700; }
 
   :root { --red:#DB011C; --red-d:#BD0118; --ink:#0A0A0A; --graph:#1A1A1A; --g7:#444444; --g5:#6B6B6B; --g3:#D6D6D6; --g1:#F4F4F4; --ok:#1F7A3A; --wait:#9A6700; }
   * { box-sizing:border-box; margin:0; padding:0; }
-  body { font-family:"CF Helvetica",Helvetica,Arial,sans-serif; color:var(--ink); background:#fff; font-size:15px; }
+  body { font-family:"TikTok Sans",Helvetica,Arial,sans-serif; color:var(--ink); background:#fff; font-size:15px; }
   a { color:inherit; text-decoration:none; }
   .wrap { max-width:1320px; margin:0 auto; padding:0 24px; }
   .disp { font-family:"TikTok Sans",sans-serif; font-weight:900; font-stretch:150%; letter-spacing:-0.02em; line-height:1.02; }
   .semi { font-family:"TikTok Sans",sans-serif; font-weight:800; font-stretch:120%; }
-  .cond { font-family:"CF Helvetica Condensed","CF Helvetica",sans-serif; }
+  .cond { font-family:"TikTok Sans",sans-serif;font-stretch:87.5%; }
   .slant { clip-path:polygon(0 0,100% 0,calc(100% - 10px) 100%,0 100%); display:inline-block; padding:4px 18px 4px 10px; font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:12px; }
   .btn { font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; font-size:13px; letter-spacing:.04em; padding:14px 24px; display:inline-block; border:2px solid transparent; cursor:pointer; }
   .btn-red { background:var(--red); color:#fff; } .btn-red:hover { background:var(--red-d); }
   .btn-ghost { border-color:#fff; color:#fff; }
   .btn-ink { background:var(--ink); color:#fff; }
   .note { position:relative; }
-  .note::after { content:attr(data-note); position:absolute; right:10px; bottom:10px; background:#FFF6CC; color:#5b4a00; border:1px solid #E7D27A; font:600 11px/1.35 "CF Helvetica Condensed",sans-serif; padding:5px 8px; max-width:280px; z-index:5; box-shadow:0 2px 6px rgba(0,0,0,.15); }
+  .note::after { content:attr(data-note); position:absolute; right:10px; bottom:10px; background:#FFF6CC; color:#5b4a00; border:1px solid #E7D27A; font:semi-condensed 600 11px/1.35 "TikTok Sans",sans-serif; padding:5px 8px; max-width:280px; z-index:5; box-shadow:0 2px 6px rgba(0,0,0,.15); }
 
   /* ── ΚΕΦΑΛΙΔΑ ── */
-  .ann { background:var(--ink); color:#fff; font-family:"CF Helvetica Condensed"; font-weight:700; font-size:12px; letter-spacing:.06em; }
+  .ann { background:var(--ink); color:#fff; font-family:"TikTok Sans",sans-serif;font-stretch:87.5%; font-weight:700; font-size:12px; letter-spacing:.06em; }
   .ann .wrap { display:flex; justify-content:space-between; align-items:center; height:34px; }
   .ann .mid { display:flex; gap:26px; }
   .ann .mid span::before { content:"▸ "; color:var(--red); }
@@ -38,25 +32,25 @@
   .hdr .wrap { display:flex; align-items:stretch; height:84px; padding-left:0; }
   .hdr .plinth { background:var(--ink); display:flex; align-items:center; padding:0 22px 0 24px; margin-right:26px; }
   .hdr .plinth img { height:58px; display:block; }
-  .hdr nav { display:flex; align-items:center; gap:26px; font-family:"CF Helvetica Condensed"; font-weight:700; font-size:15px; letter-spacing:.05em; }
+  .hdr nav { display:flex; align-items:center; gap:26px; font-family:"TikTok Sans",sans-serif;font-stretch:87.5%; font-weight:700; font-size:15px; letter-spacing:.05em; }
   .hdr nav a { padding:31px 0 27px; border-bottom:4px solid transparent; }
   .hdr nav a.on { border-bottom-color:#fff; }
   .hdr .search { margin-left:auto; align-self:center; display:flex; background:#fff; width:340px; height:44px; }
-  .hdr .search input { flex:1; border:0; padding:0 14px; font:15px "CF Helvetica",sans-serif; color:var(--ink); outline:none; }
+  .hdr .search input { flex:1; border:0; padding:0 14px; font:15px "TikTok Sans",sans-serif; color:var(--ink); outline:none; }
   .hdr .search button { width:48px; border:0; background:var(--ink); color:#fff; font-size:18px; }
   .hdr .acts { display:flex; align-items:center; gap:4px; margin-left:18px; }
   .hdr .acts a { width:48px; height:48px; display:flex; align-items:center; justify-content:center; position:relative; font-size:20px; }
   .hdr .acts a:hover { background:var(--red-d); }
-  .hdr .acts .n { position:absolute; top:5px; right:4px; background:var(--ink); color:#fff; font:700 11px "CF Helvetica Condensed"; min-width:18px; height:18px; display:flex; align-items:center; justify-content:center; }
+  .hdr .acts .n { position:absolute; top:5px; right:4px; background:var(--ink); color:#fff; font:semi-condensed 700 11px "TikTok Sans"; min-width:18px; height:18px; display:flex; align-items:center; justify-content:center; }
 
   /* ── ΗΡΩΑΣ ── */
   .hero { position:relative; height:560px; background:#111 url("https://www.milwaukeetool.gr/wp-content/uploads/2023/05/M18_FPD3-502X-App_21.jpg") 70% 40%/cover no-repeat; color:#fff; }
   .hero::before { content:""; position:absolute; inset:0; background:linear-gradient(90deg, rgba(10,10,10,.92) 0%, rgba(10,10,10,.78) 38%, rgba(10,10,10,.05) 72%); }
   .hero .wrap { position:relative; height:100%; display:flex; flex-direction:column; justify-content:center; gap:18px; }
-  .hero h1 { font-size:64px; max-width:660px; }
+  .hero h1 { font-size:52px; max-width:800px; }
   .hero p { font-size:18px; line-height:1.5; color:#d8d8d8; max-width:520px; }
   .hero .price { font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:34px; letter-spacing:-.02em; }
-  .hero .price small { font:500 14px "CF Helvetica Condensed"; color:#bdbdbd; letter-spacing:0; margin-left:8px; }
+  .hero .price small { font:semi-condensed 500 14px "TikTok Sans"; color:#bdbdbd; letter-spacing:0; margin-left:8px; }
   .hero .ctas { display:flex; gap:12px; }
   .hero .ctrl { position:absolute; right:24px; bottom:26px; display:flex; gap:6px; }
   .hero .ctrl span { width:46px; height:46px; background:var(--red); display:flex; align-items:center; justify-content:center; font-size:20px; }
@@ -74,19 +68,19 @@
   .plat .badge i { font-style:normal; background:#fff; color:var(--red); padding:0 8px; margin-right:6px; }
   .plat .tag { font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:18px; }
   .plat .d { font-size:14px; line-height:1.45; color:#ffe1e3; }
-  .plat .go { margin-top:auto; font-family:"CF Helvetica Condensed"; font-weight:700; font-size:13px; letter-spacing:.06em; }
+  .plat .go { margin-top:auto; font-family:"TikTok Sans",sans-serif;font-stretch:87.5%; font-weight:700; font-size:13px; letter-spacing:.06em; }
 
   /* ── ΚΑΤΗΓΟΡΙΕΣ ── */
   .sec { padding:60px 0 20px; }
   .sechead { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:22px; }
   .sechead h2 { font-size:34px; }
-  .sechead a { font-family:"CF Helvetica Condensed"; font-weight:700; font-size:14px; letter-spacing:.05em; color:var(--red); }
+  .sechead a { font-family:"TikTok Sans",sans-serif;font-stretch:87.5%; font-weight:700; font-size:14px; letter-spacing:.05em; color:var(--red); }
   .cats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
   .cat { border:1px solid var(--ink); display:flex; flex-direction:column; background:#fff; }
   .cat .im { aspect-ratio:1/0.8; display:flex; align-items:center; justify-content:center; background:var(--g1); }
   .cat .im img { max-width:78%; max-height:88%; }
   .cat .lb { background:var(--ink); color:#fff; padding:14px 14px; font-family:"TikTok Sans"; font-weight:800; font-stretch:115%; font-size:14px; line-height:1.15; min-height:62px; display:flex; align-items:center; justify-content:space-between; gap:8px; }
-  .cat .lb span { font:500 12px "CF Helvetica Condensed"; color:#aaa; white-space:nowrap; }
+  .cat .lb span { font:semi-condensed 500 12px "TikTok Sans"; color:#aaa; white-space:nowrap; }
   .cat:hover .lb { background:var(--red); } .cat:hover .lb span { color:#ffe1e3; }
 
   /* ── ΚΑΡΤΕΣ ── */
@@ -99,10 +93,10 @@
   .card .ci .fav { position:absolute; right:8px; top:8px; width:32px; height:32px; border:1px solid var(--g3); background:#fff; display:flex; align-items:center; justify-content:center; }
   .card .cb { background:var(--g1); padding:12px 12px 12px; display:flex; flex-direction:column; gap:3px; flex:1; }
   .card .t { font-weight:700; font-size:14px; line-height:1.28; min-height:36px; }
-  .card .c { font:400 12px "CF Helvetica Condensed"; color:var(--g5); }
+  .card .c { font:semi-condensed 400 12px "TikTok Sans"; color:var(--g5); }
   .card .p { font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:22px; letter-spacing:-.02em; margin-top:6px; }
-  .card .p small { font:400 11px "CF Helvetica Condensed"; color:var(--g5); letter-spacing:0; margin-left:4px; }
-  .card .a { font:500 12px "CF Helvetica Condensed"; margin:1px 0 10px; }
+  .card .p small { font:semi-condensed 400 11px "TikTok Sans"; color:var(--g5); letter-spacing:0; margin-left:4px; }
+  .card .a { font:semi-condensed 500 12px "TikTok Sans"; margin:1px 0 10px; }
   .card .add { margin-top:auto; text-align:center; padding:11px; font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; font-size:12px; letter-spacing:.05em; background:var(--red); color:#fff; }
   .card .add:hover { background:var(--red-d); }
 
@@ -131,7 +125,7 @@
   .store .facts { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin:22px 0 24px; }
   .store .facts div { background:#fff; border-left:4px solid var(--red); padding:14px 14px; }
   .store .facts b { display:block; font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:15px; margin-bottom:4px; }
-  .store .facts span { font:400 14px "CF Helvetica Condensed"; color:var(--g5); }
+  .store .facts span { font:semi-condensed 400 14px "TikTok Sans"; color:var(--g5); }
   .store .map { height:380px; background:#ddd center/cover no-repeat; position:relative; border:1px solid var(--g3); display:flex; align-items:flex-end; }
   .store .map .pin { background:var(--ink); color:#fff; padding:14px 16px; width:100%; }
   .store .map .pin b { font-family:"TikTok Sans"; font-weight:800; font-stretch:115%; }
@@ -142,7 +136,7 @@
   .nl h2 { font-size:30px; }
   .nl p { color:#ffe1e3; margin-top:6px; }
   .nl form { display:flex; width:520px; }
-  .nl input { flex:1; height:52px; border:0; padding:0 16px; font:16px "CF Helvetica",sans-serif; }
+  .nl input { flex:1; height:52px; border:0; padding:0 16px; font:16px "TikTok Sans",sans-serif; }
   .nl button { background:var(--ink); color:#fff; border:0; padding:0 22px; font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; letter-spacing:.04em; }
 
   /* ── ΥΠΟΣΕΛΙΔΟ ── */
@@ -150,12 +144,12 @@
   footer .top { display:grid; grid-template-columns:1.3fr 1fr 1fr 1fr; gap:30px; padding-bottom:36px; border-bottom:1px solid #2a2a2a; }
   footer img { height:66px; display:block; margin-bottom:16px; }
   footer h4 { font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:14px; color:#fff; margin-bottom:14px; letter-spacing:.02em; }
-  footer li { list-style:none; font:400 14px "CF Helvetica Condensed"; margin-bottom:9px; }
+  footer li { list-style:none; font:semi-condensed 400 14px "TikTok Sans"; margin-bottom:9px; }
   footer .contact { font-size:14px; line-height:1.7; }
   footer .contact b { color:#fff; }
   footer .pay { display:flex; gap:8px; margin-top:16px; }
-  footer .pay span { border:1px solid #3a3a3a; padding:6px 10px; font:700 11px "CF Helvetica Condensed"; letter-spacing:.05em; color:#bbb; }
-  footer .legal { display:flex; justify-content:space-between; gap:20px; padding-top:22px; font:400 12px "CF Helvetica Condensed"; color:#8a8a8a; line-height:1.6; }
+  footer .pay span { border:1px solid #3a3a3a; padding:6px 10px; font:semi-condensed 700 11px "TikTok Sans"; letter-spacing:.05em; color:#bbb; }
+  footer .legal { display:flex; justify-content:space-between; gap:20px; padding-top:22px; font:semi-condensed 400 12px "TikTok Sans"; color:#8a8a8a; line-height:1.6; }
   footer .legal b { color:#cfcfcf; }
 </style>
 </head>

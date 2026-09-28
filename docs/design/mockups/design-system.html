@@ -1,18 +1,12 @@
 <link href="https://fonts.googleapis.com/css2?family=TikTok+Sans:opsz,wdth,wght@12..36,75..150,300..900&display=swap" rel="stylesheet">
 <style>
-  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelReg.ttf) format("truetype"); font-weight:400; }
-  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelMed.ttf) format("truetype"); font-weight:500; }
-  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelBol.ttf) format("truetype"); font-weight:700; }
-  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConReg.ttf) format("truetype"); font-weight:400; }
-  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConMed.ttf) format("truetype"); font-weight:500; }
-  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConBol.ttf) format("truetype"); font-weight:700; }
 
   .ds { --red:#DB011C; --red-d:#BD0118; --ink:#0A0A0A; --graph:#1A1A1A; --g7:#444444; --g5:#6B6B6B; --g3:#D6D6D6; --g1:#F4F4F4; --ok:#1F7A3A; --wait:#9A6700;
-        font-family:"CF Helvetica",Helvetica,Arial,sans-serif; color:var(--ink); }
+        font-family:"TikTok Sans",Helvetica,Arial,sans-serif; color:var(--ink); }
   .ds * { box-sizing:border-box; }
   .ds .disp { font-family:"TikTok Sans",sans-serif; font-weight:900; font-stretch:150%; letter-spacing:-0.02em; line-height:1.02; }
   .ds .semi { font-family:"TikTok Sans",sans-serif; font-weight:800; font-stretch:120%; }
-  .ds .cond { font-family:"CF Helvetica Condensed","CF Helvetica",sans-serif; }
+  .ds .cond { font-family:"TikTok Sans",sans-serif;font-stretch:87.5%; }
   .ds section { border-top:4px solid var(--ink); padding:16px 0 22px; }
   .ds section > h3 { font-family:"TikTok Sans",sans-serif; font-weight:900; font-stretch:130%; font-size:20px; margin:0 0 4px; }
   .ds section > p.why { color:var(--g5); font-size:13px; margin:0 0 14px; max-width:780px; }
@@ -22,11 +16,11 @@
   .ds .sw div { border:1px solid var(--g3); }
   .ds .sw i { display:block; height:62px; }
   .ds .sw b { display:block; font-size:12px; padding:7px 8px 0; }
-  .ds .sw span { display:block; font-size:11px; color:var(--g5); padding:0 8px 8px; font-family:"CF Helvetica Condensed"; }
+  .ds .sw span { display:block; font-size:11px; color:var(--g5); padding:0 8px 8px; font-family:"TikTok Sans",sans-serif;font-stretch:87.5%; }
 
   /* τυπογραφία */
   .ds .ts { display:grid; grid-template-columns:190px 1fr; gap:6px 18px; align-items:baseline; }
-  .ds .ts .k { font-size:11px; color:var(--g5); font-family:"CF Helvetica Condensed"; line-height:1.3; }
+  .ds .ts .k { font-size:11px; color:var(--g5); font-family:"TikTok Sans",sans-serif;font-stretch:87.5%; line-height:1.3; }
 
   /* σχήματα */
   .ds .slant { clip-path:polygon(0 0,100% 0,calc(100% - 10px) 100%,0 100%); display:inline-block; padding:4px 18px 4px 10px; font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:12px; }
@@ -37,13 +31,13 @@
   .ds .b3 { border-color:var(--ink); color:var(--ink); background:#fff; }
   .ds .b4 { border-color:#fff; color:#fff; background:transparent; }
   .ds .dark { background:var(--graph); padding:14px; display:inline-flex; gap:12px; }
-  .ds .lab { font-size:10px; color:var(--g5); display:block; margin-top:4px; font-family:"CF Helvetica Condensed"; text-align:center; }
+  .ds .lab { font-size:10px; color:var(--g5); display:block; margin-top:4px; font-family:"TikTok Sans",sans-serif;font-stretch:87.5%; text-align:center; }
 
   /* πλατφόρμες */
   .ds .plat { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; max-width:560px; }
   .ds .plat div { background:var(--red); color:#fff; padding:16px 10px 14px; text-align:center; }
   .ds .plat b { display:block; font-family:"TikTok Sans"; font-weight:900; font-stretch:150%; font-size:26px; letter-spacing:-.02em; }
-  .ds .plat span { font-size:11px; letter-spacing:.06em; font-family:"CF Helvetica Condensed"; font-weight:700; }
+  .ds .plat span { font-size:11px; letter-spacing:.06em; font-family:"TikTok Sans",sans-serif;font-stretch:87.5%; font-weight:700; }
 
   /* κάρτα */
   .ds .cards { display:grid; grid-template-columns:repeat(3,230px); gap:14px; }
@@ -55,24 +49,24 @@
   .ds .card .ci .fav { position:absolute; right:8px; top:8px; width:30px; height:30px; border:1px solid var(--g3); background:#fff; display:flex; align-items:center; justify-content:center; font-size:14px; }
   .ds .card .cb { background:var(--g1); padding:10px 12px 12px; display:flex; flex-direction:column; gap:2px; flex:1; }
   .ds .card .t { font-weight:700; font-size:14px; line-height:1.25; margin:0; }
-  .ds .card .c { font-size:12px; color:var(--g5); margin:0; font-family:"CF Helvetica Condensed"; }
+  .ds .card .c { font-size:12px; color:var(--g5); margin:0; font-family:"TikTok Sans",sans-serif;font-stretch:87.5%; }
   .ds .card .p { font-family:"TikTok Sans"; font-weight:900; font-stretch:125%; font-size:22px; letter-spacing:-.02em; margin:6px 0 0; }
-  .ds .card .was { font-size:12px; color:var(--g5); text-decoration:line-through; margin-left:6px; font-family:"CF Helvetica Condensed"; }
-  .ds .card .a { font-size:12px; margin:2px 0 8px; font-family:"CF Helvetica Condensed"; font-weight:500; }
+  .ds .card .was { font-size:12px; color:var(--g5); text-decoration:line-through; margin-left:6px; font-family:"TikTok Sans",sans-serif;font-stretch:87.5%; }
+  .ds .card .a { font-size:12px; margin:2px 0 8px; font-family:"TikTok Sans",sans-serif;font-stretch:87.5%; font-weight:500; }
   .ds .card .add { margin-top:auto; text-align:center; padding:10px; font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; font-size:12px; letter-spacing:.05em; background:var(--red); color:#fff; }
 
   /* πεδία */
   .ds .field { display:flex; flex-direction:column; gap:5px; width:260px; }
-  .ds .field label { font-size:12px; font-weight:700; font-family:"CF Helvetica Condensed"; letter-spacing:.04em; }
+  .ds .field label { font-size:12px; font-weight:700; font-family:"TikTok Sans",sans-serif;font-stretch:87.5%; letter-spacing:.04em; }
   .ds .field .in { height:46px; border:1px solid var(--g3); padding:0 12px; display:flex; align-items:center; font-size:15px; color:var(--g5); }
   .ds .field .in.focus { border:2px solid var(--ink); color:var(--ink); }
   .ds .field .in.err { border:2px solid var(--red); color:var(--ink); }
-  .ds .field small { font-size:12px; color:var(--red); font-family:"CF Helvetica Condensed"; }
+  .ds .field small { font-size:12px; color:var(--red); font-family:"TikTok Sans",sans-serif;font-stretch:87.5%; }
   .ds .qty { display:inline-flex; border:1px solid var(--g3); height:46px; }
   .ds .qty span { width:44px; display:flex; align-items:center; justify-content:center; font-size:18px; }
   .ds .qty b { width:48px; display:flex; align-items:center; justify-content:center; border-left:1px solid var(--g3); border-right:1px solid var(--g3); }
   .ds .tabs { display:flex; gap:22px; border-bottom:1px solid var(--g3); }
-  .ds .tabs span { padding:10px 0; font-family:"CF Helvetica Condensed"; font-weight:700; font-size:14px; letter-spacing:.04em; color:var(--g5); }
+  .ds .tabs span { padding:10px 0; font-family:"TikTok Sans",sans-serif;font-stretch:87.5%; font-weight:700; font-size:14px; letter-spacing:.04em; color:var(--g5); }
   .ds .tabs span.on { color:var(--ink); border-bottom:4px solid var(--red); }
   .ds .crumb { font-size:13px; } .ds .crumb a { color:var(--red); } .ds .crumb i { color:var(--g5); font-style:normal; margin:0 8px; }
 
@@ -80,7 +74,7 @@
   .ds .caps { display:grid; grid-template-columns:1fr 1fr; gap:12px; max-width:780px; }
   .ds .caps div { padding:12px 14px; border:1px solid var(--g3); }
   .ds .caps .no { border-color:var(--red); }
-  .ds .caps small { display:block; font-size:11px; color:var(--g5); margin-top:6px; font-family:"CF Helvetica Condensed"; }
+  .ds .caps small { display:block; font-size:11px; color:var(--g5); margin-top:6px; font-family:"TikTok Sans",sans-serif;font-stretch:87.5%; }
 </style>
 
 <h2>Design system — «Κόκκινο εργοστάσιο»</h2>
@@ -107,17 +101,17 @@
 
 <section>
   <h3>ΤΥΠΟΓΡΑΦΙΑ</h3>
-  <p class="why">TikTok Sans φαρδιά για ό,τι «φωνάζει», CF Helvetica για ό,τι διαβάζεται, CF Helvetica Condensed για ό,τι χωράει σε στενό χώρο. Μεγέθη σε rem με clamp(): στο κινητό οι τίτλοι μικραίνουν ώστε να χωρούν σε 360px.</p>
+  <p class="why">Μία οικογένεια, τρία πλάτη: TikTok Sans φαρδιά (120–150%) για ό,τι «φωνάζει», κανονική (100%) για ό,τι διαβάζεται, στενή (87,5%) για ό,τι χωράει σε στενό χώρο. Ο άξονας οπτικού μεγέθους κρατά το μικρό κείμενο ευανάγνωστο. Μεγέθη σε rem με clamp(): στο κινητό οι τίτλοι μικραίνουν ώστε να χωρούν σε 360px.</p>
   <div class="ts">
     <div class="k">Display · TikTok Sans 900 · πλάτος 150 · 56px</div><div class="disp" style="font-size:52px">ΤΙΠΟΤΑ ΠΑΡΑ HEAVY DUTY</div>
     <div class="k">H1 · TikTok Sans 900 · 150 · 40px</div><div class="disp" style="font-size:38px">ΜΑΓΝΗΤΙΚΟ ΔΡΑΠΑΝΟ M18 FUEL™</div>
     <div class="k">H2 · TikTok Sans 900 · 140 · 28px</div><div class="disp" style="font-size:28px;font-stretch:140%">ΚΟΡΥΦΑΙΕΣ ΠΩΛΗΣΕΙΣ</div>
     <div class="k">H3 · TikTok Sans 800 · 120 · 20px</div><div class="semi" style="font-size:20px">ΠΡΟΔΙΑΓΡΑΦΕΣ</div>
     <div class="k">Τιμή · TikTok Sans 900 · 125 · 28px</div><div class="disp" style="font-size:28px;font-stretch:125%">2.120,75 €</div>
-    <div class="k">Κείμενο · CF Helvetica 400 · 16/24</div><div style="font-size:16px;line-height:1.5;color:#444;max-width:620px">Διάτρηση έως 60 mm σε χάλυβα, χωρίς καλώδιο. Οι μπαταρίες M18 δουλεύουν σε όλη την πλατφόρμα των 250+ εργαλείων.</div>
-    <div class="k">Έμφαση · CF Helvetica 700 · 14</div><div style="font-size:14px;font-weight:700">Μαγνητικό δράπανο M18 FMDP-502C</div>
-    <div class="k">Μενού · Condensed 700 · 14 · διάστιχο .04em</div><div class="cond" style="font-size:14px;font-weight:700;letter-spacing:.04em">ΕΡΓΑΛΕΙΑ ΜΠΑΤΑΡΙΑΣ · ΑΞΕΣΟΥΑΡ · PACKOUT · ΧΕΙΡΟΣ</div>
-    <div class="k">Βοηθητικό · Condensed 400 · 12</div><div class="cond" style="font-size:12px;color:#6B6B6B">Κωδ. 4933451012 · Κιτ με 2 μπαταρίες 5.0Ah</div>
+    <div class="k">Κείμενο · TikTok Sans 400 · πλάτος 100 · 16/24</div><div style="font-size:16px;line-height:1.5;color:#444;max-width:620px">Διάτρηση έως 60 mm σε χάλυβα, χωρίς καλώδιο. Οι μπαταρίες M18 δουλεύουν σε όλη την πλατφόρμα των 250+ εργαλείων.</div>
+    <div class="k">Έμφαση · TikTok Sans 700 · πλάτος 100 · 14</div><div style="font-size:14px;font-weight:700">Μαγνητικό δράπανο M18 FMDP-502C</div>
+    <div class="k">Μενού · TikTok Sans 700 · πλάτος 87,5 · 14 · διάστιχο .04em</div><div class="cond" style="font-size:14px;font-weight:700;letter-spacing:.04em">ΕΡΓΑΛΕΙΑ ΜΠΑΤΑΡΙΑΣ · ΑΞΕΣΟΥΑΡ · PACKOUT · ΧΕΙΡΟΣ</div>
+    <div class="k">Βοηθητικό · TikTok Sans 400 · πλάτος 87,5 · 12</div><div class="cond" style="font-size:12px;color:#6B6B6B">Κωδ. 4933451012 · Κιτ με 2 μπαταρίες 5.0Ah</div>
   </div>
 </section>
 

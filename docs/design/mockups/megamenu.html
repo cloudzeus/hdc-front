@@ -5,21 +5,15 @@
 <title>Mega menu</title>
 <link href="https://fonts.googleapis.com/css2?family=TikTok+Sans:opsz,wdth,wght@12..36,75..150,300..900&display=swap" rel="stylesheet">
 <style>
-  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelReg.ttf) format("truetype"); font-weight:400; }
-  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelMed.ttf) format("truetype"); font-weight:500; }
-  @font-face { font-family:"CF Helvetica"; src:url(/files/CFHelBol.ttf) format("truetype"); font-weight:700; }
-  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConReg.ttf) format("truetype"); font-weight:400; }
-  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConMed.ttf) format("truetype"); font-weight:500; }
-  @font-face { font-family:"CF Helvetica Condensed"; src:url(/files/CFHelConBol.ttf) format("truetype"); font-weight:700; }
   :root { --red:#DB011C; --red-d:#BD0118; --ink:#0A0A0A; --graph:#1A1A1A; --g7:#444444; --g5:#6B6B6B; --g3:#D6D6D6; --g1:#F4F4F4; --ok:#1F7A3A; --api:#0B3D91; --ease:cubic-bezier(.2,.8,.2,1); }
   * { box-sizing:border-box; margin:0; padding:0; }
-  body { font-family:"CF Helvetica",Helvetica,Arial,sans-serif; color:var(--ink); background:#fff; font-size:15px; }
+  body { font-family:"TikTok Sans",Helvetica,Arial,sans-serif; color:var(--ink); background:#fff; font-size:15px; }
   a, button { color:inherit; text-decoration:none; font:inherit; background:none; border:0; cursor:pointer; text-align:left; }
   .wrap { max-width:1320px; margin:0 auto; padding:0 24px; }
   .disp { font-family:"TikTok Sans",sans-serif; font-weight:900; font-stretch:150%; letter-spacing:-0.02em; line-height:1.02; }
   .slant { clip-path:polygon(0 0,100% 0,calc(100% - 10px) 100%,0 100%); display:inline-block; padding:4px 18px 4px 10px; font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:12px; }
   .note { position:relative; }
-  .note::after { content:attr(data-note); position:absolute; right:10px; top:10px; background:#FFF6CC; color:#5b4a00; border:1px solid #E7D27A; font:600 11px/1.35 "CF Helvetica Condensed",sans-serif; padding:5px 8px; max-width:300px; z-index:50; box-shadow:0 2px 6px rgba(0,0,0,.25); pointer-events:none; }
+  .note::after { content:attr(data-note); position:absolute; right:10px; top:10px; background:#FFF6CC; color:#5b4a00; border:1px solid #E7D27A; font:semi-condensed 600 11px/1.35 "TikTok Sans",sans-serif; padding:5px 8px; max-width:300px; z-index:50; box-shadow:0 2px 6px rgba(0,0,0,.25); pointer-events:none; }
   .note.nb::after { top:auto; bottom:10px; }
   [data-api] { position:relative; }
   [data-api]::before { content:attr(data-api); position:absolute; left:0; top:-22px; background:var(--api); color:#fff; font:600 11px/1 ui-monospace,Menlo,monospace; padding:5px 7px; z-index:60; white-space:nowrap; }
@@ -27,21 +21,21 @@
   .screen { background:var(--g1); border-top:4px solid var(--ink); border-bottom:1px solid var(--g3); }
   .screen .wrap { display:flex; gap:16px; height:64px; align-items:center; }
   .screen b { font-family:"TikTok Sans"; font-weight:900; font-stretch:150%; font-size:22px; letter-spacing:-.02em; }
-  .screen span { font:500 14px "CF Helvetica Condensed"; color:var(--g5); }
+  .screen span { font:semi-condensed 500 14px "TikTok Sans"; color:var(--g5); }
   .screen code { margin-left:auto; font:600 13px ui-monospace,Menlo,monospace; color:var(--g7); }
 
-  .ann { background:var(--ink); color:#fff; font:700 12px "CF Helvetica Condensed"; letter-spacing:.06em; }
+  .ann { background:var(--ink); color:#fff; font:semi-condensed 700 12px "TikTok Sans"; letter-spacing:.06em; }
   .ann .wrap { display:flex; justify-content:space-between; align-items:center; height:34px; }
   .hdr { background:var(--red); color:#fff; position:relative; z-index:40; }
   .hdr .wrap { display:flex; align-items:stretch; height:84px; padding-left:0; }
   .hdr .plinth { background:var(--ink); display:flex; align-items:center; padding:0 22px 0 24px; margin-right:18px; }
   .hdr .plinth img { height:58px; }
-  .hdr nav { display:flex; align-items:stretch; font:700 15px "CF Helvetica Condensed"; letter-spacing:.05em; }
-  .hdr nav button { display:flex; align-items:center; gap:8px; padding:0 14px; font:700 15px "CF Helvetica Condensed"; letter-spacing:.05em; color:#fff; }
+  .hdr nav { display:flex; align-items:stretch; font:semi-condensed 700 15px "TikTok Sans"; letter-spacing:.05em; }
+  .hdr nav button { display:flex; align-items:center; gap:8px; padding:0 12px; white-space:nowrap; font:semi-condensed 700 15px "TikTok Sans"; letter-spacing:.05em; color:#fff; }
   .hdr nav button i { font-style:normal; font-size:11px; transition:transform .2s var(--ease); }
   .hdr nav button.on { background:var(--ink); }
   .hdr nav button.on i { transform:rotate(180deg); }
-  .hdr .search { margin-left:auto; align-self:center; display:flex; background:#fff; width:300px; height:44px; }
+  .hdr .search { margin-left:auto; align-self:center; display:flex; background:#fff; width:250px; height:44px; }
   .hdr .search span { flex:1; padding:0 14px; display:flex; align-items:center; color:var(--g5); font-size:15px; }
   .hdr .search b { width:48px; background:var(--ink); display:flex; align-items:center; justify-content:center; }
   .hdr .acts { display:flex; align-items:center; gap:4px; margin-left:14px; font-size:20px; }
@@ -56,28 +50,28 @@
 
   .batbar { display:flex; align-items:center; gap:18px; height:96px; border-bottom:1px solid #262626; }
   .batbar .q { font-family:"TikTok Sans"; font-weight:900; font-stretch:150%; font-size:20px; letter-spacing:-.02em; line-height:1; width:190px; }
-  .batbar .q small { display:block; font:500 12px "CF Helvetica Condensed"; color:#8a8a8a; letter-spacing:.04em; margin-top:6px; font-stretch:100%; }
+  .batbar .q small { display:block; font:semi-condensed 500 12px "TikTok Sans"; color:#8a8a8a; letter-spacing:.04em; margin-top:6px; font-stretch:100%; }
   .bats { display:flex; gap:18px; }
   .bat { position:relative; width:196px; white-space:nowrap; height:56px; border:2px solid #5a5a5a; display:flex; align-items:center; justify-content:space-between; padding:0 14px; overflow:hidden; transition:border-color .2s; }
   .batwrap::after { content:""; position:absolute; right:2px; top:19px; width:8px; height:18px; background:#5a5a5a; transition:background .2s; }
   .batwrap:hover::after { background:#fff; } .batwrap:has(.bat.on)::after { background:var(--red); }
   .bat .fill { position:absolute; left:0; top:0; bottom:0; width:0; background:rgba(219,1,28,.28); transition:width .6s var(--ease); }
   .bat b { position:relative; font-family:"TikTok Sans"; font-weight:900; font-stretch:140%; font-size:20px; letter-spacing:-.03em; }
-  .bat span { position:relative; font:700 13px "CF Helvetica Condensed"; color:#aaa; }
+  .bat span { position:relative; font:semi-condensed 700 13px "TikTok Sans"; color:#aaa; }
   .bat:hover { border-color:#fff; }
   .bat.on { border-color:var(--red); background:var(--red); } .bat.on .fill { background:rgba(0,0,0,.18); } .bat.on span { color:#ffe1e3; }
   .batwrap { position:relative; padding-right:10px; }
   .batbar .tot { margin-left:auto; text-align:right; }
   .batbar .tot b { font-family:"TikTok Sans"; font-weight:900; font-stretch:130%; font-size:34px; letter-spacing:-.03em; display:block; line-height:1; }
-  .batbar .tot span { font:700 12px "CF Helvetica Condensed"; letter-spacing:.08em; color:#8a8a8a; }
+  .batbar .tot span { font:semi-condensed 700 12px "TikTok Sans"; letter-spacing:.08em; color:#8a8a8a; }
 
   .cols { display:grid; grid-template-columns:430px minmax(0,1fr) 420px; min-height:560px; }
   .roots { border-right:1px solid #262626; padding:14px 0 18px; }
-  .roots h5 { font:700 11px "CF Helvetica Condensed"; letter-spacing:.12em; color:#8a8a8a; padding:12px 24px 6px 0; }
+  .roots h5 { font:semi-condensed 700 11px "TikTok Sans"; letter-spacing:.12em; color:#8a8a8a; padding:12px 24px 6px 0; }
   .root { position:relative; display:flex; justify-content:space-between; align-items:center; gap:14px; width:100%; padding:7px 22px 7px 0; min-height:38px; }
   .root::before { content:""; position:absolute; left:-24px; right:0; top:2px; bottom:2px; background:var(--red); clip-path:polygon(0 0,100% 0,calc(100% - 14px) 100%,0 100%); transform:scaleX(0); transform-origin:left; transition:transform .22s var(--ease); }
   .root span.n { position:relative; font-family:"TikTok Sans"; font-weight:800; font-stretch:125%; font-size:15px; letter-spacing:-.005em; line-height:1.15; }
-  .root span.c { position:relative; font:700 13px "CF Helvetica Condensed"; color:#8a8a8a; font-variant-numeric:tabular-nums; }
+  .root span.c { position:relative; font:semi-condensed 700 13px "TikTok Sans"; color:#8a8a8a; font-variant-numeric:tabular-nums; }
   .root:hover::before, .root.on::before { transform:scaleX(1); }
   .root.on span.c, .root:hover span.c { color:#fff; }
   .root.uni span.n { color:#bdbdbd; }
@@ -85,11 +79,11 @@
   .groups { padding:26px 30px 24px; border-right:1px solid #262626; }
   .groups .gh { display:flex; align-items:flex-end; justify-content:space-between; gap:20px; margin-bottom:6px; }
   .groups h3 { font-size:30px; max-width:560px; }
-  .groups .meta { font:500 14px "CF Helvetica Condensed"; color:#aaa; margin-bottom:20px; }
+  .groups .meta { font:semi-condensed 500 14px "TikTok Sans"; color:#aaa; margin-bottom:20px; }
   .groups .meta b { color:#fff; }
   .groups .meta em { font-style:normal; color:#6fd08c; }
   .glist { display:grid; grid-template-columns:1fr 1fr; gap:0 28px; }
-  .g { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #262626; font:500 15px/1.25 "CF Helvetica Condensed"; letter-spacing:.02em; transition:color .15s, padding .2s var(--ease); opacity:0; animation:rise .34s var(--ease) forwards; }
+  .g { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #262626; font:semi-condensed 500 15px/1.25 "TikTok Sans"; letter-spacing:.02em; transition:color .15s, padding .2s var(--ease); opacity:0; animation:rise .34s var(--ease) forwards; }
   .g span { color:#8a8a8a; font-weight:700; font-variant-numeric:tabular-nums; }
   .g:hover, .g:focus-visible { color:var(--red); padding-left:8px; outline:none; }
   .g:hover span { color:#fff; }
@@ -106,14 +100,14 @@
   @keyframes swing { from { opacity:0; transform:translateX(60px) rotate(8deg) scale(.92); } to { opacity:1; transform:rotate(-4deg); } }
   .stage .shot img { transform:rotate(-4deg); }
   .stage .cap { position:relative; padding:0 28px 26px; }
-  .stage .cap .k { font:700 11px "CF Helvetica Condensed"; letter-spacing:.12em; color:#8a8a8a; margin-bottom:8px; }
+  .stage .cap .k { font:semi-condensed 700 11px "TikTok Sans"; letter-spacing:.12em; color:#8a8a8a; margin-bottom:8px; }
   .stage .cap h4 { font-family:"TikTok Sans"; font-weight:800; font-stretch:115%; font-size:16px; line-height:1.25; margin:8px 0 4px; min-height:40px; }
-  .stage .cap .code { font:400 13px "CF Helvetica Condensed"; color:#8a8a8a; }
+  .stage .cap .code { font:semi-condensed 400 13px "TikTok Sans"; color:#8a8a8a; }
   .stage .cap .row { display:flex; justify-content:space-between; align-items:center; margin-top:12px; }
   .stage .cap .p { font-family:"TikTok Sans"; font-weight:900; font-stretch:130%; font-size:28px; letter-spacing:-.03em; }
   .stage .cap .go { background:var(--red); padding:12px 16px; font-family:"TikTok Sans"; font-weight:800; font-stretch:110%; font-size:12px; letter-spacing:.04em; }
 
-  .strip { display:flex; align-items:center; gap:0; border-top:1px solid #262626; height:58px; font:700 14px "CF Helvetica Condensed"; letter-spacing:.06em; }
+  .strip { display:flex; align-items:center; gap:0; border-top:1px solid #262626; height:58px; font:semi-condensed 700 14px "TikTok Sans"; letter-spacing:.06em; }
   .strip a { padding:0 22px; height:100%; display:flex; align-items:center; border-right:1px solid #262626; }
   .strip a:first-child { padding-left:0; }
   .strip a:hover { color:var(--red); }
@@ -142,18 +136,18 @@
   .phone .pb { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; padding:12px; border-bottom:1px solid #262626; }
   .phone .pb span { border:2px solid #5a5a5a; height:40px; display:flex; align-items:center; justify-content:center; font-family:"TikTok Sans"; font-weight:900; font-stretch:130%; font-size:13px; }
   .phone .pb span.on { background:var(--red); border-color:var(--red); }
-  .phone h6 { font:700 10px "CF Helvetica Condensed"; letter-spacing:.12em; color:#8a8a8a; padding:12px 14px 4px; }
+  .phone h6 { font:semi-condensed 700 10px "TikTok Sans"; letter-spacing:.12em; color:#8a8a8a; padding:12px 14px 4px; }
   .phone .pr { display:flex; justify-content:space-between; align-items:center; padding:0 14px; height:46px; border-bottom:1px solid #1f1f1f; font-family:"TikTok Sans"; font-weight:800; font-stretch:120%; font-size:12.5px; }
-  .phone .pr span { font:700 12px "CF Helvetica Condensed"; color:#8a8a8a; }
+  .phone .pr span { font:semi-condensed 700 12px "TikTok Sans"; color:#8a8a8a; }
   .phone .pr span::after { content:" ›"; color:var(--red); font-size:16px; }
   .phone .pr.u { color:#bdbdbd; }
-  .phone .back { display:flex; align-items:center; gap:10px; padding:0 14px; height:46px; border-bottom:1px solid #262626; font:700 13px "CF Helvetica Condensed"; letter-spacing:.06em; color:#aaa; }
+  .phone .back { display:flex; align-items:center; gap:10px; padding:0 14px; height:46px; border-bottom:1px solid #262626; font:semi-condensed 700 13px "TikTok Sans"; letter-spacing:.06em; color:#aaa; }
   .phone .back::before { content:"‹"; color:var(--red); font-size:22px; }
   .phone .hero { position:relative; height:150px; display:flex; align-items:center; justify-content:center; overflow:hidden; border-bottom:1px solid #262626; }
   .phone .hero .big { position:absolute; font-family:"TikTok Sans"; font-weight:900; font-stretch:150%; font-size:110px; letter-spacing:-.06em; color:transparent; -webkit-text-stroke:1.5px rgba(255,255,255,.16); }
   .phone .hero img { position:relative; max-height:118px; max-width:60%; transform:rotate(-4deg); background:#fff; padding:8px; border-bottom:4px solid var(--red); box-shadow:0 12px 18px rgba(0,0,0,.6); }
   .phone .t { padding:12px 14px 4px; font-family:"TikTok Sans"; font-weight:900; font-stretch:140%; font-size:19px; line-height:1.05; }
-  .phone .gr { display:flex; justify-content:space-between; padding:0 14px; height:42px; align-items:center; border-bottom:1px solid #1f1f1f; font:500 14px "CF Helvetica Condensed"; }
+  .phone .gr { display:flex; justify-content:space-between; padding:0 14px; height:42px; align-items:center; border-bottom:1px solid #1f1f1f; font:semi-condensed 500 14px "TikTok Sans"; }
   .phone .gr span { color:#8a8a8a; font-weight:700; }
   .phone .gr.dim { color:#555; } .phone .gr.dim span { color:#444; }
 </style>
