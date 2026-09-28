@@ -7,11 +7,10 @@ import { accountStore } from "@/lib/account/account-store";
 import {
   clearCustomerSession,
   getCustomerToken,
-  getViewer,
   setCustomerSession,
 } from "@/lib/account/session";
 import { lookupVat } from "@/lib/account/vat-lookup";
-import { isValidAfm, normaliseAfm, type VatLookupResult } from "@/lib/account/vat";
+import type { VatLookupResult } from "@/lib/account/vat";
 
 /**
  * Account server actions.
@@ -95,27 +94,19 @@ const baseRegister = {
   terms: z.union([z.literal("on"), z.literal("")]).optional(),
 };
 
-const registerSchema = z.discriminatedUnion("accountType", [
-  z.object({ accountType: z.literal("individual"), ...baseRegister }),
-  z.object({
-    accountType: z.literal("company"),
-    ...baseRegister,
-    vatNumber: z.string().trim().min(1).max(32),
-    companyName: z.string().trim().min(2).max(255),
-    taxOffice: z.string().trim().max(120).optional().or(z.literal("")),
-    companyTrade: z.string().trim().max(255).optional().or(z.literal("")),
-    billLine1: z.string().trim().max(255).optional().or(z.literal("")),
-    billCity: z.string().trim().max(120).optional().or(z.literal("")),
-    billPostcode: z.string().trim().max(16).optional().or(z.literal("")),
-    erpTrdr: z.coerce.number().int().positive().optional().or(z.literal("")),
-  }),
-]);
+/**
+ * One kind of account: retail. The company (B2B) application went with the
+ * B2B area — an invoice is asked for at checkout instead, where the ΑΦΜ fills
+ * in the company. `accountType` is still accepted, and must say "individual".
+ */
+const registerSchema = z.object({
+  accountType: z.literal("individual").optional(),
+  ...baseRegister,
+});
 
 const REGISTER_ERRORS: Record<string, string> = {
   email_taken: "Υπάρχει ήδη λογαριασμός με αυτό το email.",
-  afm_taken: "Υπάρχει ήδη εταιρικός λογαριασμός με αυτό το ΑΦΜ. Ζητήστε πρόσκληση από τον διαχειριστή σας.",
   weak_password: "Ο κωδικός είναι πολύ αδύναμος.",
-  invalid_afm: "Το ΑΦΜ δεν είναι έγκυρο.",
 };
 
 export async function register(_prev: AuthState, formData: FormData): Promise<AuthState> {
@@ -145,44 +136,23 @@ export async function register(_prev: AuthState, formData: FormData): Promise<Au
 
   let result;
   try {
-    if (input.accountType === "individual") {
-      result = await accountStore.register({ accountType: "individual", ...common });
-    } else {
-      const afm = normaliseAfm(input.vatNumber);
-      // Checked here as well as in HDCtool: an invalid ΑΦΜ should cost a form
-      // error, not a round-trip and a generic failure.
-      if (!isValidAfm(afm)) {
-        return { fieldErrors: { vatNumber: "Το ΑΦΜ δεν είναι έγκυρο (9 ψηφία)" } };
-      }
-      result = await accountStore.register({
-        accountType: "company",
-        ...common,
-        afm,
-        companyName: input.companyName,
-        doy: input.taxOffice || null,
-        profession: input.companyTrade || null,
-        billAddress: input.billLine1 || null,
-        billCity: input.billCity || null,
-        billPostcode: input.billPostcode || null,
-        trdr: typeof input.erpTrdr === "number" ? input.erpTrdr : null,
-      });
-    }
+    result = await accountStore.register({ accountType: "individual", ...common });
   } catch (error) {
     return { error: backendMessage(error) };
   }
 
   if (!result.ok) {
     const message = REGISTER_ERRORS[result.error] ?? "Η εγγραφή απέτυχε.";
-    const field = result.error === "email_taken" ? "email" : result.error === "afm_taken" ? "vatNumber" : null;
+    const field = result.error === "email_taken" ? "email" : null;
     return field ? { fieldErrors: { [field]: message }, error: message } : { error: message };
   }
 
-  // A company registration must NOT sign in — it waits for approval.
+  // A retail registration always signs in; without a session, sign in by hand.
   if (result.token) {
     await setCustomerSession(result.token);
     redirect("/logariasmos");
   }
-  redirect("/eggrafi/anamoni");
+  redirect("/eisodos");
 }
 
 export async function signOut() {
@@ -217,122 +187,7 @@ export async function updateProfile(_prev: AuthState, formData: FormData): Promi
   }
 
   revalidatePath("/logariasmos");
-  revalidatePath("/b2b");
   return { error: undefined };
-}
-
-// ── Company members (B2B, owners only) ──────────────────────────────────────
-
-const inviteSchema = z.object({
-  email: z.email().max(320),
-  firstName: z.string().trim().min(1).max(120),
-  lastName: z.string().trim().min(1).max(120),
-  role: z.enum(["owner", "buyer", "viewer"]),
-  spendLimit: z.coerce.number().min(0).max(1_000_000).optional().or(z.literal("")),
-});
-
-export async function inviteMember(_prev: AuthState, formData: FormData): Promise<AuthState> {
-  const guard = await requireOwner();
-  if (!guard.ok) return guard.state;
-
-  const parsed = inviteSchema.safeParse(Object.fromEntries(formData));
-  if (!parsed.success) return { error: "Ελέγξτε τα στοιχεία της πρόσκλησης." };
-
-  try {
-    const result = await accountStore.inviteMember(guard.token, {
-      email: parsed.data.email.toLowerCase(),
-      firstName: parsed.data.firstName,
-      lastName: parsed.data.lastName,
-      role: parsed.data.role,
-      spendLimit: typeof parsed.data.spendLimit === "number" ? parsed.data.spendLimit : null,
-    });
-    if (!result.ok) {
-      return {
-        error:
-          result.error === "email_taken"
-            ? "Υπάρχει ήδη χρήστης με αυτό το email."
-            : "Δεν έχετε δικαίωμα πρόσκλησης χρηστών.",
-      };
-    }
-  } catch (error) {
-    return { error: backendMessage(error) };
-  }
-
-  revalidatePath("/b2b/xristes");
-  return {};
-}
-
-const memberUpdateSchema = z.object({
-  memberId: z.string().min(1).max(64),
-  role: z.enum(["owner", "buyer", "viewer"]).optional(),
-  spendLimit: z.coerce.number().min(0).max(1_000_000).optional().or(z.literal("")),
-  status: z.enum(["active", "suspended"]).optional(),
-});
-
-const MEMBER_ERRORS: Record<string, string> = {
-  not_found: "Ο χρήστης δεν βρέθηκε.",
-  not_allowed: "Δεν έχετε δικαίωμα για αυτή την αλλαγή.",
-  last_owner: "Πρέπει να μείνει τουλάχιστον ένας διαχειριστής στην εταιρεία.",
-};
-
-export async function updateMember(_prev: AuthState, formData: FormData): Promise<AuthState> {
-  const guard = await requireOwner();
-  if (!guard.ok) return guard.state;
-
-  const parsed = memberUpdateSchema.safeParse(Object.fromEntries(formData));
-  if (!parsed.success) return { error: "Μη έγκυρη αλλαγή." };
-
-  try {
-    const result = await accountStore.updateMember(guard.token, {
-      memberId: parsed.data.memberId,
-      role: parsed.data.role,
-      spendLimit: typeof parsed.data.spendLimit === "number" ? parsed.data.spendLimit : undefined,
-      status: parsed.data.status,
-    });
-    if (!result.ok) return { error: MEMBER_ERRORS[result.error ?? ""] ?? "Η αλλαγή απέτυχε." };
-  } catch (error) {
-    return { error: backendMessage(error) };
-  }
-
-  revalidatePath("/b2b/xristes");
-  return {};
-}
-
-export async function removeMember(_prev: AuthState, formData: FormData): Promise<AuthState> {
-  const guard = await requireOwner();
-  if (!guard.ok) return guard.state;
-
-  const memberId = String(formData.get("memberId") ?? "");
-  if (!memberId) return { error: "Μη έγκυρος χρήστης." };
-
-  try {
-    const result = await accountStore.removeMember(guard.token, memberId);
-    if (!result.ok) return { error: MEMBER_ERRORS[result.error ?? ""] ?? "Η αφαίρεση απέτυχε." };
-  } catch (error) {
-    return { error: backendMessage(error) };
-  }
-
-  revalidatePath("/b2b/xristes");
-  return {};
-}
-
-/**
- * Every member mutation re-checks the role SERVER-side.
- *
- * The B2B users screen only renders these controls for owners, but a hidden
- * button is not a permission — this is where it is actually enforced.
- */
-type OwnerGuard = { ok: true; token: string } | { ok: false; state: AuthState };
-
-async function requireOwner(): Promise<OwnerGuard> {
-  const [token, viewer] = await Promise.all([getCustomerToken(), getViewer()]);
-  if (!token || !viewer.user) {
-    return { ok: false, state: { error: "Η συνεδρία έληξε. Συνδεθείτε ξανά." } };
-  }
-  if (!viewer.can("manageUsers")) {
-    return { ok: false, state: { error: "Δεν έχετε δικαίωμα διαχείρισης χρηστών." } };
-  }
-  return { ok: true, token };
 }
 
 function backendMessage(error: unknown): string {

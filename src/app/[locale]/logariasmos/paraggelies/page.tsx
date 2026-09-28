@@ -3,16 +3,14 @@ import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { AccountChrome } from "@/components/account/AccountChrome";
 import { AccountShell } from "@/components/account/AccountShell";
-import { ReorderButton } from "@/components/account/ReorderButton";
-import { Truck } from "lucide-react";
+import { EmailProofPanel } from "@/components/account/EmailProofPanel";
+import { OrderRows } from "@/components/account/HdcAccountParts";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { requireCustomer } from "@/lib/account/guard";
+import { getAccountShellData } from "@/lib/account/dashboard";
 import { claimGuestOrders, listCustomerOrders } from "@/lib/account/orders";
 import { hasProvenEmail } from "@/lib/account/email-proof";
-import { EmailProofPanel } from "@/components/account/EmailProofPanel";
-import { formatMoney } from "@/lib/format";
-import { upGreek } from "@/lib/greek";
 
 export async function generateMetadata({
   params,
@@ -20,200 +18,67 @@ export async function generateMetadata({
   params: Promise<{ locale: Locale }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "paraggelies.page" });
-  return { title: t("titlos"), robots: { index: false, follow: false } };
+  const t = await getTranslations({ locale, namespace: "account.Hdc" });
+  return { title: t("meta_orders"), robots: { index: false, follow: false } };
 }
 
 /**
- * My orders.
+ * My orders — the rows of account.html, screen 2, for every order.
  *
- * For every customer, not only companies. The account area had a nav entry for
- * this and no page behind it, and the reason it could not be written is that
- * checkout never recorded who placed an order: the `customerId` column existed
- * and was never filled, so every order in the database was orphaned from its
- * account. It is written now, and this reads it.
- *
- * Orders placed before today still have no `customerId`, and so do orders placed
- * as a guest before registering, which is how most accounts begin. Those are
- * matched on the email address and adopted — but only once the account has
- * proven that address (`hasProvenEmail`); until then the page explains how.
- *
- * Each row opens the confirmation page, which already shows the progress steps,
- * the lines, the totals and the courier reference. A second order-detail page
- * would be the same page written twice.
+ * Orders placed as a guest before registering are matched on the email and
+ * adopted, but only once the account has proven that address
+ * (`hasProvenEmail`); until then the page explains how.
  */
 export default async function OrdersPage({
   params,
 }: {
   params: Promise<{ locale: Locale }>;
 }) {
-  const t = await getTranslations("paraggelies.page");
   const { locale } = await params;
   setRequestLocale(locale);
+  const [t, tp] = await Promise.all([getTranslations("account.Hdc"), getTranslations("paraggelies.page")]);
 
   const { user } = await requireCustomer(locale, "/logariasmos/paraggelies");
 
   // Stamp the guest orders onto the account, so the index on `customerId` can
   // answer next time instead of a case-insensitive scan on email.
   await claimGuestOrders(user.id, user.email);
-  const [orders, proven] = await Promise.all([
+  const [orders, proven, shell] = await Promise.all([
     listCustomerOrders(user.id, user.email),
     hasProvenEmail(user.email),
+    getAccountShellData(user),
   ]);
-
-  /*
-   * Resolved here rather than looked up by a key built at render time.
-   * `t(MAP[status])` cannot be checked by anything that reads the source, and
-   * the message-key test says so — which is the point of having it. Every call
-   * below is a literal, so a status that loses its translation fails the build
-   * instead of rendering its own key to a customer.
-   */
-  const statusLabel: Record<string, string> = {
-    PENDING_PAYMENT: t("status_pending_payment"),
-    CONFIRMED: t("status_confirmed"),
-    PACKING: t("status_packing"),
-    SHIPPED: t("status_shipped"),
-    DELIVERED: t("status_delivered"),
-    CANCELLED: t("status_cancelled"),
-    FAILED: t("status_failed"),
-  };
 
   return (
     <AccountChrome locale={locale}>
-      <AccountShell
-        user={user}
-        active="/logariasmos/paraggelies"
-        title={t("titlos")}
-      >
-        {/*
-          Guest orders are matched by email only once the address is proven.
-          Until then the customer is told how to prove it, in words that do
-          not reveal whether any guest orders exist.
-        */}
+      <AccountShell shell={shell} active="/logariasmos/paraggelies" title={t("nav_orders")}>
         {!proven && (
           <EmailProofPanel
             text={{
-              title: t("epivevaiosi_titlos"),
-              body: t("epivevaiosi_body", { email: user.email }),
-              steps: [t("epivevaiosi_vima_1"), t("epivevaiosi_vima_2"), t("epivevaiosi_vima_3")],
-              button: t("epivevaiosi_koumpi"),
-              sending: t("epivevaiosi_apostoli"),
-              sent: t("epivevaiosi_stalthike", { email: user.email }),
-              sentHint: t("epivevaiosi_den_irthe"),
+              title: tp("epivevaiosi_titlos"),
+              body: tp("epivevaiosi_body", { email: user.email }),
+              steps: [tp("epivevaiosi_vima_1"), tp("epivevaiosi_vima_2"), tp("epivevaiosi_vima_3")],
+              button: tp("epivevaiosi_koumpi"),
+              sending: tp("epivevaiosi_apostoli"),
+              sent: tp("epivevaiosi_stalthike", { email: user.email }),
+              sentHint: tp("epivevaiosi_den_irthe"),
             }}
           />
         )}
-        {orders.length === 0 ? (
-          /*
-           * An empty state that says what to do, not just that there is nothing.
-           * A new account with no orders is the normal first visit, not an error.
-           */
-          <div className="border border-k-line bg-k-surface-2 px-5 py-10 text-center lg:py-14">
-            <p className="text-[14px] font-semibold text-k-ink">
-              {t("kamia_paraggelia")}
-            </p>
-            <p className="mx-auto mt-2 max-w-[44ch] text-[12.5px] leading-[1.6] text-k-text-3">
-              {t("kamia_paraggelia_body")}
-            </p>
-            <Link
-              href="/proionta"
-              className="t-btn-sm mt-5 inline-block bg-k-ink px-6 py-3.5 text-white transition-colors hover:bg-k-red"
-            >
-              {upGreek(t("ston_katalogo"))} →
-            </Link>
-          </div>
-        ) : (
-          <ul className="flex flex-col gap-px border border-k-line bg-k-line">
-            {orders.map((order) => (
-              <li key={order.id} className="bg-white">
-                <Link
-                  // The guest token is what makes the confirmation page open.
-                  // It belongs to this order and this customer owns it.
-                  href={`/checkout/epibebaiosi/${order.orderNumber}?t=${order.guestToken}`}
-                  className="flex flex-col gap-3 px-4 py-4 transition-colors hover:bg-k-surface-2 sm:flex-row sm:items-center sm:gap-6 lg:px-6 lg:py-5"
-                >
-                  {/* The picture first. An order number is a string nobody
-                      memorised; the tool in the box is what they remember. */}
-                  {order.image ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={order.image}
-                      alt=""
-                      className="size-12 shrink-0 border border-k-line object-contain"
-                    />
-                  ) : (
-                    <span className="size-12 shrink-0 border border-k-line bg-k-surface-2" />
-                  )}
-
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                      <span className="font-mono text-[13px] font-semibold tabular-nums text-k-ink">
-                        {order.orderNumber}
-                      </span>
-                      <span className="t-brand-count text-k-text-4">
-                        {order.createdAt.toLocaleDateString(locale, {
-                          day: "2-digit",
-                          month: "2-digit",
-                          year: "numeric",
-                        })}
-                      </span>
-                    </div>
-                    {/* What was in it, in the customer's words rather than a count. */}
-                    <p className="mt-1 truncate text-[12.5px] text-k-text-3">
-                      {order.preview.join(", ")}
-                      {order.itemCount > order.preview.length &&
-                        ` ${t("kai_alla", { n: order.itemCount - order.preview.length })}`}
-                    </p>
-                    {/* The courier reference, where the question is asked. */}
-                    {order.voucherNo && (
-                      <p className="mt-1 flex items-center gap-1.5 text-[11.5px] text-k-text-3">
-                        <Truck className="size-3" aria-hidden />
-                        <span className="font-mono tabular-nums">
-                          ACS {order.voucherNo}
-                        </span>
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-4 sm:gap-6">
-                    <span
-                      className={`t-stat-label uppercase ${
-                        order.status === "FAILED" ||
-                        order.status === "CANCELLED"
-                          ? "text-k-text-4"
-                          : "text-k-red"
-                      }`}
-                    >
-                      {upGreek(
-                        statusLabel[order.status] ?? statusLabel.CONFIRMED,
-                      )}
-                    </span>
-                    <span className="ml-auto shrink-0 font-mono text-[13.5px] font-semibold tabular-nums text-k-ink sm:ml-0">
-                      {formatMoney(order.totalGross, locale)}
-                    </span>
-                  </div>
-                </Link>
-
-                {/*
-                  Outside the row's link, not inside it.
-                  ────────────────────────────────────────────────────────────
-                  A button nested in an anchor is invalid markup and, worse,
-                  ambiguous to use: the click target that reorders and the one
-                  that opens the order would overlap. It sits under the row on
-                  its own line, where the result panel has somewhere to open.
-                */}
-                <div className="border-t border-k-line px-4 py-2.5 lg:px-6">
-                  <ReorderButton
-                    orderNumber={order.orderNumber}
-                    token={order.guestToken}
-                    locale={locale}
-                    compact
-                  />
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+        <section className="hdc-box hdc-recent">
+          <h2 className="hdc-disp">{t("oi_paraggelies_mou")}</h2>
+          {orders.length === 0 ? (
+            <div className="hdc-empty">
+              <p>{t("kamia_paraggelia")}</p>
+              <p>{t("kamia_paraggelia_body")}</p>
+              <Link href="/katalogos" className="hdc-btn hdc-btn-red">
+                {t("ston_katalogo")}
+              </Link>
+            </div>
+          ) : (
+            <OrderRows orders={orders} locale={locale} />
+          )}
+        </section>
       </AccountShell>
     </AccountChrome>
   );

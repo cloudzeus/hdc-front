@@ -1,0 +1,1511 @@
+/*
+ * HDC customer account.
+ *
+ * Ported from docs/design/mockups/account.html — screen 1 (ΕΙΣΟΔΟΣ ΚΑΙ
+ * ΕΓΓΡΑΦΗ, .auth / .fld / .new), screen 2 (Ο ΛΟΓΑΡΙΑΣΜΟΣ ΜΟΥ, .acbar / .acc /
+ * .side / .track / .steps / .stats / .box / .kit / .ord / .chip / .two /
+ * .addr / .qa), screen 3 (ΛΕΠΤΟΜΕΡΕΙΕΣ ΠΑΡΑΓΓΕΛΙΑΣ, .od) and the two phone
+ * frames (.or, .tabs, .mtrack, .mo). The grey screen labels, yellow notes and
+ * blue data labels are annotations and are not here. Every font size is a
+ * fluid --fs-* token.
+ *
+ * Breakpoints: side nav from 1024px, a scrolling tab strip below it; from
+ * 767px down the phone frames — one column, no black bar, parcel first.
+ */
+
+@layer components {
+  .hdc-acc-page {
+    font-family: var(--hdc-font);
+    font-size: var(--fs-15);
+    line-height: normal;
+    color: var(--hdc-ink);
+    background: #fff;
+  }
+  .hdc-acc-page img {
+    display: block;
+  }
+  .hdc-acc-page :is(a, button, summary, input, select, textarea):focus-visible {
+    outline: 2px solid var(--hdc-ink);
+    outline-offset: 2px;
+  }
+  .hdc-acbar :is(a, button):focus-visible,
+  .hdc-track :is(a, button):focus-visible,
+  .hdc-auth-new :is(a, button):focus-visible {
+    outline-color: #fff;
+  }
+
+  /* ── Fields (.fld) ───────────────────────────────────────────────────── */
+  .hdc-fld {
+    display: block;
+    margin-bottom: 14px;
+  }
+  .hdc-fld-l {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-12);
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+  .hdc-fld-l a {
+    color: var(--hdc-red);
+    font-weight: 500;
+    letter-spacing: 0;
+    font-size: var(--fs-13);
+  }
+  .hdc-fld-l a:hover {
+    text-decoration: underline;
+  }
+  .hdc-fld-l .sh {
+    display: none;
+  }
+  .hdc-fld input,
+  .hdc-fld select {
+    display: block;
+    width: 100%;
+    height: 48px;
+    padding: 0 12px;
+    border: 1px solid var(--hdc-g3);
+    border-radius: 0;
+    background: #fff;
+    font: inherit;
+    font-size: var(--fs-15);
+    color: var(--hdc-ink);
+    outline: none;
+  }
+  .hdc-fld input::placeholder {
+    color: #9a9a9a;
+  }
+  .hdc-fld input:focus,
+  .hdc-fld select:focus {
+    border-color: var(--hdc-ink);
+  }
+  .hdc-fld input[readonly] {
+    background: var(--hdc-g1);
+    color: var(--hdc-g5);
+  }
+  .hdc-fld[data-error] input {
+    border-color: var(--hdc-red);
+  }
+  .hdc-fld small {
+    display: block;
+    font-stretch: 87.5%;
+    font-size: var(--fs-12);
+    color: var(--hdc-g5);
+    margin-top: 5px;
+    line-height: 1.4;
+  }
+  .hdc-fld small.err {
+    color: var(--hdc-red);
+  }
+  .hdc-fld-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 14px;
+  }
+  .hdc-check {
+    display: grid;
+    grid-template-columns: 18px 1fr;
+    gap: 10px;
+    align-items: start;
+    font-size: var(--fs-14);
+    line-height: 1.45;
+    color: var(--hdc-g7);
+    margin: 4px 0 18px;
+    cursor: pointer;
+  }
+  .hdc-check input {
+    width: 18px;
+    height: 18px;
+    margin: 1px 0 0;
+    accent-color: var(--hdc-red);
+  }
+  .hdc-check .err {
+    display: block;
+    color: var(--hdc-red);
+    font-size: var(--fs-12);
+  }
+
+  /* Messages above a form: a bar on the left, the colour AND the words. */
+  .hdc-notice {
+    border-left: 4px solid var(--hdc-red);
+    background: var(--hdc-g1);
+    padding: 10px 12px;
+    margin-bottom: 16px;
+    font-size: var(--fs-14);
+    line-height: 1.5;
+    color: var(--hdc-ink);
+  }
+  .hdc-notice[data-tone="ok"] {
+    border-left-color: var(--hdc-ok);
+  }
+
+  /* ── Sign in / register (.auth) ──────────────────────────────────────── */
+  .hdc-auth {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    margin: 40px 24px 60px;
+    border: 1px solid var(--hdc-g3);
+  }
+  .hdc-auth--two {
+    grid-template-columns: 2fr 1fr;
+  }
+  .hdc-auth--one {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .hdc-auth > section {
+    padding: 30px 28px;
+    border-right: 1px solid var(--hdc-g3);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .hdc-auth > section:last-child {
+    border-right: 0;
+  }
+  .hdc-auth h1,
+  .hdc-auth h2 {
+    font-size: var(--fs-26);
+    margin-bottom: 8px;
+  }
+  .hdc-auth p.s {
+    color: var(--hdc-g7);
+    line-height: 1.5;
+    font-size: var(--fs-15);
+    margin-bottom: 20px;
+    min-height: 46px;
+  }
+  .hdc-auth-form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .hdc-auth .hdc-btn {
+    height: 52px;
+    font-size: var(--fs-14);
+    width: 100%;
+  }
+  .hdc-auth-form > .hdc-btn,
+  .hdc-auth > section > .hdc-btn {
+    margin-top: auto;
+  }
+  .hdc-auth .alt {
+    margin-top: 16px;
+    font-size: var(--fs-14);
+    color: var(--hdc-g7);
+  }
+  .hdc-auth .alt a {
+    color: var(--hdc-red);
+    font-weight: 700;
+  }
+  .hdc-auth-new {
+    background-color: var(--hdc-graph);
+    color: #fff;
+    background-image: repeating-linear-gradient(115deg, rgba(219, 1, 28, 0.12) 0 3px, transparent 3px 26px);
+  }
+  .hdc-auth .hdc-auth-new p.s {
+    color: #cfcfcf;
+  }
+  .hdc-auth-new ul {
+    list-style: none;
+    display: grid;
+    gap: 12px;
+    margin: 0 0 26px;
+    padding: 0;
+  }
+  .hdc-auth-new li {
+    display: grid;
+    grid-template-columns: 18px 1fr;
+    gap: 10px;
+    font-size: var(--fs-15);
+    line-height: 1.45;
+  }
+  .hdc-auth-new li::before {
+    content: "";
+    width: 12px;
+    height: 12px;
+    background: var(--hdc-red);
+    margin-top: 4px;
+    clip-path: polygon(0 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
+  }
+  .hdc-auth-new li b {
+    color: #fff;
+  }
+  /* The phone's «— Ή —» and the two buttons that replace columns 2 and 3. */
+  .hdc-auth-or {
+    display: none;
+  }
+
+  /* ── Account shell (.acbar / .acc / .side) ───────────────────────────── */
+  .hdc-acbar {
+    background: var(--hdc-ink);
+    color: #fff;
+  }
+  .hdc-acbar .hdc-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    min-height: 110px;
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+  .hdc-acbar h1 {
+    font-size: var(--fs-40);
+  }
+  .hdc-acbar p {
+    font-stretch: 87.5%;
+    font-weight: 500;
+    font-size: var(--fs-14);
+    color: #aaa;
+    margin-top: 6px;
+    letter-spacing: 0.03em;
+  }
+  .hdc-acbar .out {
+    flex-shrink: 0;
+    background: transparent;
+    color: #fff;
+    font-family: inherit;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-13);
+    letter-spacing: 0.06em;
+    border: 1px solid #444;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .hdc-acbar .out:hover {
+    border-color: #fff;
+  }
+
+  .hdc-acc {
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    gap: 32px;
+    padding-top: 30px;
+    padding-bottom: 56px;
+    align-items: start;
+  }
+  .hdc-side {
+    border: 1px solid var(--hdc-g3);
+  }
+  .hdc-side a,
+  .hdc-side button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 16px;
+    height: 50px;
+    border: 0;
+    border-bottom: 1px solid var(--hdc-g3);
+    border-left: 4px solid transparent;
+    background: #fff;
+    font-family: inherit;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-14);
+    letter-spacing: 0.05em;
+    color: var(--hdc-ink);
+    text-align: left;
+    cursor: pointer;
+  }
+  .hdc-side a:hover {
+    background: var(--hdc-g1);
+  }
+  .hdc-side a span {
+    font-weight: 400;
+    color: var(--hdc-g5);
+  }
+  .hdc-side a[aria-current="page"] {
+    border-left-color: var(--hdc-red);
+    background: var(--hdc-g1);
+  }
+  .hdc-side em,
+  .hdc-tabs em {
+    font-style: normal;
+    background: var(--hdc-red);
+    color: #fff;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-10);
+    padding: 2px 6px;
+    letter-spacing: 0.06em;
+  }
+  .hdc-side form button {
+    border-bottom: 0;
+    color: var(--hdc-g5);
+  }
+  .hdc-side form button:hover {
+    color: var(--hdc-ink);
+  }
+  /* The phone's tab strip; hidden where the side nav fits. */
+  .hdc-tabs {
+    display: none;
+  }
+
+  .hdc-acc-main {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+    min-width: 0;
+  }
+
+  /* ── The parcel (.track / .steps) ────────────────────────────────────── */
+  .hdc-track {
+    position: relative;
+    background: var(--hdc-ink);
+    color: #fff;
+    padding: 20px 22px;
+  }
+  .hdc-track .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    gap: 20px;
+  }
+  .hdc-track .top b {
+    display: block;
+    font-weight: 800;
+    font-stretch: 125%;
+    font-size: var(--fs-18);
+  }
+  .hdc-track .top span {
+    font-stretch: 87.5%;
+    font-weight: 500;
+    font-size: var(--fs-14);
+    color: #aaa;
+    display: block;
+    margin-top: 4px;
+  }
+  .hdc-track .top a {
+    background: var(--hdc-red);
+    padding: 12px 18px;
+    font-weight: 800;
+    font-stretch: 110%;
+    font-size: var(--fs-12);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    transition: background-color 0.15s;
+  }
+  .hdc-track .top a:hover {
+    background: var(--hdc-red-d);
+  }
+  .hdc-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .hdc-steps li {
+    border-top: 5px solid #3a3a3a;
+    padding: 10px 12px 0 0;
+    min-width: 0;
+  }
+  .hdc-steps li[data-state="done"] {
+    border-top-color: #fff;
+  }
+  .hdc-steps li[data-state="now"] {
+    border-top-color: var(--hdc-red);
+  }
+  .hdc-steps b {
+    display: block;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-14);
+    letter-spacing: 0.05em;
+  }
+  .hdc-steps b .sh {
+    display: none;
+  }
+  .hdc-steps li > span {
+    font-stretch: 87.5%;
+    font-size: var(--fs-13);
+    color: #aaa;
+  }
+
+  /* ── Figures (.stats) ────────────────────────────────────────────────── */
+  .hdc-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border: 1px solid var(--hdc-g3);
+    margin: 0;
+  }
+  .hdc-stats > div {
+    padding: 16px 18px;
+    border-right: 1px solid var(--hdc-g3);
+    min-width: 0;
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+  }
+  .hdc-stats > div:last-child {
+    border-right: 0;
+  }
+  .hdc-stats dd {
+    display: block;
+    margin: 0;
+    font-weight: 900;
+    font-stretch: 130%;
+    font-size: var(--fs-30);
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+  .hdc-stats dt {
+    line-height: 1.5;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-12);
+    letter-spacing: 0.06em;
+    color: var(--hdc-g5);
+  }
+  .hdc-stats > div[data-hl] dd {
+    color: var(--hdc-red);
+  }
+
+  /* ── Boxes (.box) ────────────────────────────────────────────────────── */
+  .hdc-box {
+    border: 1px solid var(--hdc-g3);
+    min-width: 0;
+    container-type: inline-size;
+  }
+  .hdc-box > h2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 18px;
+    border-bottom: 4px solid var(--hdc-ink);
+    font-size: var(--fs-18);
+    font-stretch: 130%;
+  }
+  .hdc-box > h2 a {
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-13);
+    letter-spacing: 0.05em;
+    color: var(--hdc-red);
+    white-space: nowrap;
+  }
+  .hdc-box > h2 a:hover {
+    text-decoration: underline;
+  }
+  .hdc-box-body {
+    padding: 18px;
+  }
+  .hdc-empty {
+    padding: 40px 18px;
+    text-align: center;
+  }
+  .hdc-empty p {
+    font-size: var(--fs-15);
+    line-height: 1.5;
+  }
+  .hdc-empty p + p {
+    color: var(--hdc-g5);
+    font-size: var(--fs-14);
+    margin-top: 4px;
+  }
+  .hdc-empty .hdc-btn {
+    margin-top: 20px;
+  }
+  .hdc-lead {
+    font-size: var(--fs-15);
+    line-height: 1.5;
+    color: var(--hdc-g7);
+  }
+
+  /* ── My tools (.kit) ─────────────────────────────────────────────────── */
+  .hdc-kit {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+  .hdc-kit > div {
+    padding: 18px;
+    border-right: 1px solid var(--hdc-g3);
+    min-width: 0;
+  }
+  .hdc-kit > div:last-child {
+    border-right: 0;
+  }
+  .hdc-kit .pl {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    margin-bottom: 12px;
+  }
+  .hdc-kit .pl b {
+    font-weight: 900;
+    font-stretch: 150%;
+    font-size: var(--fs-34);
+    letter-spacing: -0.03em;
+  }
+  .hdc-kit .pl span {
+    font-stretch: 87.5%;
+    font-weight: 500;
+    font-size: var(--fs-14);
+    color: var(--hdc-g5);
+  }
+  .hdc-kit .own {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 0 0 14px;
+    padding: 0;
+    list-style: none;
+  }
+  .hdc-kit .own li {
+    width: 74px;
+    height: 74px;
+    border: 1px solid var(--hdc-g3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .hdc-kit .own img {
+    max-width: 84%;
+    max-height: 84%;
+    width: auto;
+    height: auto;
+  }
+  .hdc-kit .own em {
+    position: absolute;
+    right: -6px;
+    top: -6px;
+    background: var(--hdc-ink);
+    color: #fff;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-11);
+    font-style: normal;
+    min-width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+  }
+  .hdc-kit .tip {
+    border-left: 4px solid var(--hdc-red);
+    background: var(--hdc-g1);
+    padding: 10px 12px;
+    font-stretch: 87.5%;
+    font-size: var(--fs-14);
+    line-height: 1.45;
+  }
+  .hdc-kit .tip a {
+    color: var(--hdc-red);
+    font-weight: 700;
+  }
+  .hdc-kit .tip a:hover {
+    text-decoration: underline;
+  }
+
+  /* ── Order rows (.ord / phone .mo) ───────────────────────────────────── */
+  .hdc-ords {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .hdc-ord {
+    position: relative;
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr) 150px 130px;
+    grid-template-areas: "no th chip tt";
+    gap: 18px;
+    align-items: center;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--hdc-g3);
+  }
+  .hdc-ord:last-child {
+    border-bottom: 0;
+  }
+  .hdc-ord .no {
+    grid-area: no;
+    min-width: 0;
+  }
+  .hdc-ord .no a {
+    display: block;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-15);
+    letter-spacing: 0.02em;
+  }
+  .hdc-ord .no a:hover {
+    color: var(--hdc-red);
+  }
+  .hdc-ord .no span {
+    font-stretch: 87.5%;
+    font-size: var(--fs-13);
+    color: var(--hdc-g5);
+  }
+  .hdc-ord .th {
+    grid-area: th;
+    display: flex;
+    gap: 6px;
+    min-width: 0;
+  }
+  .hdc-ord .th span {
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+    border: 1px solid var(--hdc-g3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .hdc-ord .th img {
+    max-width: 84%;
+    max-height: 84%;
+    width: auto;
+    height: auto;
+  }
+  .hdc-ord .st {
+    grid-area: chip;
+  }
+  .hdc-ord .tt {
+    grid-area: tt;
+    position: relative;
+    font-weight: 900;
+    font-stretch: 125%;
+    font-size: var(--fs-19);
+    text-align: right;
+    white-space: nowrap;
+  }
+  .hdc-ord .tt .act {
+    display: block;
+    margin: 4px 0 0 auto;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: inherit;
+    font-stretch: 87.5%;
+    font-weight: 500;
+    font-size: var(--fs-12);
+    color: var(--hdc-red);
+    letter-spacing: 0.04em;
+    cursor: pointer;
+  }
+  .hdc-ord .tt .act:hover {
+    text-decoration: underline;
+  }
+  .hdc-ord .tt .act:disabled {
+    opacity: 0.6;
+  }
+
+  .hdc-chip {
+    display: inline-block;
+    padding: 5px 10px;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-12);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+  .hdc-chip[data-tone="ship"] {
+    background: #e6eef8;
+    color: #1d4e89;
+  }
+  .hdc-chip[data-tone="del"] {
+    background: #e5f2e9;
+    color: var(--hdc-ok);
+  }
+  .hdc-chip[data-tone="pay"] {
+    background: #fbf1dc;
+    color: var(--hdc-wait);
+  }
+  .hdc-chip[data-tone="conf"] {
+    background: var(--hdc-ink);
+    color: #fff;
+  }
+  .hdc-chip[data-tone="off"] {
+    background: var(--hdc-g1);
+    color: var(--hdc-g5);
+  }
+
+  /* The reorder report: stays until dismissed, opens under its button. */
+  .hdc-reorder {
+    position: relative;
+  }
+  .hdc-reorder-panel {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    z-index: 20;
+    width: min(360px, calc(100vw - 32px));
+    background: #fff;
+    border: 1px solid var(--hdc-g3);
+    border-top: 4px solid var(--hdc-ink);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    padding: 14px 16px;
+    text-align: left;
+    white-space: normal;
+    font-family: var(--hdc-font);
+    font-stretch: 100%;
+    font-weight: 400;
+    font-size: var(--fs-14);
+    line-height: 1.45;
+    letter-spacing: 0;
+    color: var(--hdc-ink);
+  }
+  .hdc-reorder-panel .x {
+    position: absolute;
+    right: 6px;
+    top: 6px;
+    width: 32px;
+    height: 32px;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    font-size: var(--fs-18);
+    color: var(--hdc-g5);
+  }
+  .hdc-reorder-panel > b {
+    display: block;
+    padding-right: 28px;
+    font-weight: 800;
+    font-stretch: 110%;
+  }
+  .hdc-reorder-panel h4 {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--hdc-g3);
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-12);
+    letter-spacing: 0.06em;
+    color: var(--hdc-g5);
+  }
+  .hdc-reorder-panel ul {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+    font-size: var(--fs-13);
+  }
+  .hdc-reorder-panel ul span {
+    color: var(--hdc-g5);
+  }
+  .hdc-reorder-panel s {
+    color: var(--hdc-g5);
+  }
+  .hdc-reorder-panel .hdc-btn {
+    margin-top: 12px;
+    width: 100%;
+  }
+  .hdc-reorder-err {
+    display: block;
+    margin-top: 6px;
+    font-size: var(--fs-12);
+    color: var(--hdc-red);
+    white-space: normal;
+    font-weight: 500;
+    font-stretch: 87.5%;
+  }
+
+  /* ── Address + quick actions (.two / .addr / .qa) ────────────────────── */
+  .hdc-two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 26px;
+  }
+  .hdc-addr {
+    padding: 18px;
+    line-height: 1.6;
+    font-size: var(--fs-15);
+  }
+  .hdc-addr b {
+    font-weight: 800;
+    font-stretch: 115%;
+    font-size: var(--fs-14);
+  }
+  .hdc-addr .more {
+    font-stretch: 87.5%;
+    color: var(--hdc-g5);
+  }
+  .hdc-qa a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 18px;
+    height: 50px;
+    border-bottom: 1px solid var(--hdc-g3);
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-14);
+    letter-spacing: 0.04em;
+  }
+  .hdc-qa a:last-child {
+    border-bottom: 0;
+  }
+  .hdc-qa a:hover {
+    background: var(--hdc-g1);
+  }
+  .hdc-qa a::after {
+    content: "→";
+    color: var(--hdc-red);
+  }
+
+  /* ── Order detail (.od) ──────────────────────────────────────────────── */
+  .hdc-od {
+    border: 1px solid var(--hdc-g3);
+    container-type: inline-size;
+  }
+  .hdc-od .h {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 18px;
+    border-bottom: 4px solid var(--hdc-ink);
+    gap: 20px;
+    align-items: center;
+  }
+  .hdc-od .h h2 {
+    font-size: var(--fs-26);
+    font-stretch: 130%;
+    overflow-wrap: anywhere;
+  }
+  .hdc-od .h p {
+    font-stretch: 87.5%;
+    font-weight: 500;
+    font-size: var(--fs-14);
+    color: var(--hdc-g5);
+    margin-top: 6px;
+  }
+  .hdc-od .acts {
+    display: flex;
+    gap: 10px;
+  }
+  .hdc-od .acts .hdc-btn {
+    height: 46px;
+    font-size: var(--fs-12);
+    padding: 0 16px;
+  }
+  .hdc-od .ln {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr) 90px 120px;
+    gap: 16px;
+    align-items: center;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--hdc-g3);
+  }
+  .hdc-od .ln .im {
+    width: 72px;
+    height: 72px;
+    border: 1px solid var(--hdc-g3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .hdc-od .ln img {
+    max-width: 84%;
+    max-height: 84%;
+    width: auto;
+    height: auto;
+  }
+  .hdc-od .ln b {
+    display: block;
+    font-size: var(--fs-15);
+    line-height: 1.35;
+  }
+  .hdc-od .ln .nm span {
+    font-stretch: 87.5%;
+    font-size: var(--fs-13);
+    color: var(--hdc-g5);
+  }
+  .hdc-od .ln .q {
+    font-stretch: 87.5%;
+    font-size: var(--fs-15);
+    color: var(--hdc-g7);
+    text-align: center;
+  }
+  .hdc-od .ln .p {
+    font-weight: 900;
+    font-stretch: 125%;
+    font-size: var(--fs-17);
+    text-align: right;
+    white-space: nowrap;
+  }
+  .hdc-od .ft {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) 260px;
+  }
+  .hdc-od .ft > div {
+    padding: 16px 18px;
+    border-right: 1px solid var(--hdc-g3);
+    font-size: var(--fs-14);
+    line-height: 1.55;
+    min-width: 0;
+  }
+  .hdc-od .ft h4 {
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-12);
+    letter-spacing: 0.07em;
+    color: var(--hdc-g5);
+    margin-bottom: 6px;
+  }
+  .hdc-od .ft .cond {
+    font-stretch: 87.5%;
+    color: var(--hdc-g5);
+  }
+  .hdc-od .ft .cond.r {
+    color: var(--hdc-red);
+  }
+  .hdc-od .ft dl {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    row-gap: 6px;
+    margin: 0;
+  }
+  .hdc-od .ft dd {
+    margin: 0;
+    text-align: right;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .hdc-od .ft dd.fr {
+    color: var(--hdc-ok);
+  }
+  .hdc-od .ft .tot {
+    font-weight: 900;
+    font-stretch: 125%;
+    font-size: var(--fs-20);
+  }
+  .hdc-od .ft > div:last-child {
+    border-right: 0;
+    background: var(--hdc-g1);
+  }
+  .hdc-back {
+    display: inline-block;
+    margin-bottom: 14px;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-13);
+    letter-spacing: 0.05em;
+    color: var(--hdc-g5);
+  }
+  .hdc-back:hover {
+    color: var(--hdc-ink);
+  }
+
+  /* ── Other account pages ─────────────────────────────────────────────── */
+  .hdc-fav-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .hdc-acc-form {
+    max-width: 560px;
+  }
+  .hdc-dl {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    margin: 0;
+    font-size: var(--fs-14);
+  }
+  .hdc-dl dt,
+  .hdc-dl dd {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--hdc-g3);
+    margin: 0;
+  }
+  .hdc-dl dt {
+    color: var(--hdc-g5);
+    font-stretch: 87.5%;
+  }
+
+  /* ── Tablet and down: the tab strip replaces the side nav ────────────── */
+  @media (max-width: 1023px) {
+    .hdc-acc {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 22px;
+      padding-top: 0;
+    }
+    .hdc-side {
+      display: none;
+    }
+    .hdc-tabs {
+      display: flex;
+      margin: 0 -24px;
+      padding: 0 12px;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+      border-bottom: 1px solid var(--hdc-g3);
+      background: #fff;
+    }
+    .hdc-tabs::-webkit-scrollbar {
+      display: none;
+    }
+    .hdc-tabs a,
+    .hdc-tabs button {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      padding: 0 12px;
+      min-height: 44px;
+      border: 0;
+      border-bottom: 3px solid transparent;
+      background: none;
+      font-family: inherit;
+      font-stretch: 87.5%;
+      font-weight: 700;
+      font-size: var(--fs-12);
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+      color: var(--hdc-ink);
+      cursor: pointer;
+    }
+    .hdc-tabs a[aria-current="page"] {
+      border-bottom-color: var(--hdc-red);
+    }
+    .hdc-tabs form button {
+      color: var(--hdc-g5);
+    }
+    .hdc-tabs em {
+      display: none;
+    }
+    .hdc-auth {
+      grid-template-columns: 1fr 1fr;
+      margin-left: 0;
+      margin-right: 0;
+    }
+    .hdc-auth > section:nth-child(2) {
+      border-right: 0;
+    }
+    .hdc-auth > .hdc-auth-new {
+      grid-column: 1 / -1;
+    }
+    .hdc-auth--two,
+    .hdc-auth--one {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .hdc-auth--two > section {
+      border-right: 0;
+    }
+    .hdc-od .ft {
+      grid-template-columns: 1fr 1fr;
+    }
+    .hdc-od .ft > div:nth-child(2) {
+      border-right: 0;
+    }
+    .hdc-od .ft > div:nth-child(-n + 2) {
+      border-bottom: 1px solid var(--hdc-g3);
+    }
+    .hdc-fav-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /* The row folds by the width of its box, not the screen. */
+  @container (max-width: 640px) {
+    .hdc-ord {
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas:
+        "no chip"
+        "th tt";
+      gap: 8px 12px;
+      padding: 12px 14px;
+    }
+    .hdc-ord .no a {
+      font-size: var(--fs-14);
+    }
+    .hdc-ord .no a::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+    }
+    .hdc-ord .no span {
+      display: none;
+    }
+    .hdc-ord .th span {
+      width: 44px;
+      height: 44px;
+    }
+    .hdc-ord .st {
+      justify-self: end;
+    }
+    .hdc-ord .tt {
+      font-size: var(--fs-17);
+    }
+    .hdc-ord .tt .act {
+      display: none;
+    }
+    .hdc-kit > div {
+      border-right: 0;
+      border-bottom: 1px solid var(--hdc-g3);
+    }
+    .hdc-kit > div:last-child {
+      border-bottom: 0;
+    }
+    .hdc-od .h {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .hdc-od .acts {
+      flex-wrap: wrap;
+    }
+    .hdc-od .acts > * {
+      flex: 1 1 140px;
+    }
+    .hdc-od .acts .hdc-btn {
+      width: 100%;
+    }
+    .hdc-od .ln {
+      grid-template-columns: 56px minmax(0, 1fr) auto;
+      grid-template-areas:
+        "im nm nm"
+        "im q p";
+      gap: 4px 12px;
+      padding: 12px 14px;
+    }
+    .hdc-od .ln .im {
+      grid-area: im;
+      width: 56px;
+      height: 56px;
+    }
+    .hdc-od .ln .nm {
+      grid-area: nm;
+    }
+    .hdc-od .ln .q {
+      grid-area: q;
+      text-align: left;
+    }
+    .hdc-od .ln .p {
+      grid-area: p;
+    }
+  }
+
+  /* ── Phone frames ────────────────────────────────────────────────────── */
+  @media (max-width: 767px) {
+    .hdc-auth,
+    .hdc-auth--two {
+      grid-template-columns: minmax(0, 1fr);
+      margin: 16px 0 40px;
+      border: 0;
+    }
+    .hdc-auth > section {
+      padding: 0;
+      border-right: 0;
+    }
+    .hdc-auth h1,
+    .hdc-auth h2 {
+      font-size: var(--fs-22);
+      margin-bottom: 6px;
+    }
+    .hdc-auth p.s {
+      font-size: var(--fs-13);
+      line-height: 1.45;
+      margin-bottom: 14px;
+      min-height: 0;
+    }
+    .hdc-auth .hdc-btn {
+      height: 48px;
+      font-size: var(--fs-13);
+    }
+    .hdc-fld input {
+      height: 44px;
+    }
+    .hdc-fld-l .lg {
+      display: none;
+    }
+    .hdc-fld-l .sh {
+      display: inline;
+    }
+    /* Sign-in: columns 2 and 3 become the two buttons under «— Ή —». */
+    .hdc-auth--three > section:not(:first-child) {
+      display: none;
+    }
+    .hdc-auth-or {
+      display: block;
+    }
+    .hdc-auth-or p {
+      text-align: center;
+      font-stretch: 87.5%;
+      font-weight: 700;
+      font-size: var(--fs-12);
+      color: var(--hdc-g5);
+      letter-spacing: 0.06em;
+      margin: 14px 0;
+    }
+    .hdc-auth-or .hdc-btn + .hdc-btn {
+      margin-top: 10px;
+    }
+    .hdc-auth--two > .hdc-auth-new {
+      margin-top: 24px;
+      padding: 22px 16px;
+    }
+    .hdc-fld-row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .hdc-acbar {
+      display: none;
+    }
+    .hdc-acc {
+      padding-top: 0;
+      padding-bottom: 40px;
+      gap: 0;
+    }
+    /* The phone frame: tabs flush to the header, the parcel right under. */
+    .hdc-acc-page .hdc-tabs {
+      margin: 0 -16px;
+      padding: 0 4px;
+    }
+    .hdc-acc-main {
+      gap: 20px;
+      padding-top: 16px;
+    }
+    .hdc-acc-main > .hdc-track {
+      order: -2;
+      margin: -16px -16px 0;
+      padding: 12px 14px;
+    }
+    /* Only with rows: an empty list keeps its box and heading, in place. */
+    .hdc-acc-main > .hdc-recent:has(.hdc-ord) {
+      order: -1;
+      margin: -16px -16px 0;
+      border: 0;
+      border-bottom: 1px solid var(--hdc-g3);
+    }
+    .hdc-acc-main:has(> .hdc-track) > .hdc-recent:has(.hdc-ord) {
+      margin-top: -20px;
+    }
+    .hdc-acc-main > .hdc-recent:has(.hdc-ord) > h2 {
+      display: none;
+    }
+    .hdc-recent .hdc-ord {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+    .hdc-recent .hdc-ord:last-child {
+      border-bottom: 0;
+    }
+    .hdc-track .top {
+      display: block;
+      margin-bottom: 0;
+    }
+    .hdc-track .top b {
+      font-size: var(--fs-14);
+      font-stretch: 120%;
+    }
+    .hdc-track .top span {
+      font-size: var(--fs-12);
+      font-weight: 400;
+      margin-top: 2px;
+    }
+    /* The ACS link becomes the whole strip. */
+    .hdc-track .top a {
+      position: static;
+      padding: 0;
+      background: none;
+      font-size: 0;
+    }
+    .hdc-track .top a::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+    }
+    .hdc-steps {
+      margin-top: 10px;
+    }
+    .hdc-steps li {
+      padding: 8px 4px 0 0;
+    }
+    .hdc-steps b {
+      font-size: var(--fs-9-5);
+      letter-spacing: 0;
+      font-stretch: 75%;
+    }
+    .hdc-steps b .lg,
+    .hdc-steps li > span {
+      display: none;
+    }
+    .hdc-steps b .sh {
+      display: inline;
+    }
+    .hdc-stats {
+      grid-template-columns: 1fr 1fr;
+    }
+    .hdc-stats > div {
+      padding: 12px 14px;
+    }
+    .hdc-stats > div:nth-child(2) {
+      border-right: 0;
+    }
+    .hdc-stats > div:nth-child(-n + 2) {
+      border-bottom: 1px solid var(--hdc-g3);
+    }
+    .hdc-stats dd {
+      font-size: var(--fs-24);
+    }
+    .hdc-box > h2 {
+      padding: 12px 14px;
+    }
+    .hdc-kit > div,
+    .hdc-addr {
+      padding: 14px;
+    }
+    .hdc-two {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 20px;
+    }
+    .hdc-od .ft {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .hdc-od .ft > div {
+      border-right: 0;
+      border-bottom: 1px solid var(--hdc-g3);
+    }
+    .hdc-od .ft > div:last-child {
+      border-bottom: 0;
+    }
+    .hdc-fav-grid {
+      gap: 10px;
+    }
+  }
+}
+
+/* The reorder button on the order confirmation (checkout.css `.hdc-ok-reorder`). */
+@layer components {
+  .hdc-ok-reorder .hdc-btn {
+    width: 100%;
+  }
+}
+
+/* Prove-your-email panel (account pages). */
+@layer components {
+  .hdc-proof {
+    border: 1px solid var(--hdc-g3);
+    border-left: 4px solid var(--hdc-red);
+    background: var(--hdc-g1);
+    padding: 16px 18px;
+    font-size: var(--fs-14);
+    line-height: 1.5;
+  }
+  .hdc-proof h2 {
+    font-weight: 800;
+    font-stretch: 120%;
+    font-size: var(--fs-16);
+    margin-bottom: 6px;
+  }
+  .hdc-proof p {
+    max-width: 70ch;
+  }
+  .hdc-proof .sub {
+    color: var(--hdc-g5);
+    margin-top: 4px;
+  }
+  .hdc-proof .err {
+    color: var(--hdc-red);
+    margin-top: 8px;
+  }
+  .hdc-proof ol {
+    margin: 8px 0 0;
+    padding-left: 20px;
+    color: var(--hdc-g7);
+    list-style: decimal;
+  }
+  .hdc-proof form {
+    margin-top: 14px;
+  }
+}
+
+/* Two columns of the sign-in box: «ξέχασα τον κωδικό» + «έχω ήδη παραγγείλει». */
+@layer components {
+  .hdc-auth--pair {
+    grid-template-columns: 1fr 1fr;
+    max-width: 920px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .hdc-auth--one {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .hdc-auth--one .hdc-btn + .hdc-btn,
+  .hdc-auth--one .hdc-notice + .hdc-btn {
+    margin-top: 10px;
+  }
+  @media (max-width: 767px) {
+    .hdc-auth--pair {
+      grid-template-columns: minmax(0, 1fr);
+      margin: 16px 0 40px;
+    }
+    .hdc-auth--pair > section + section {
+      margin-top: 28px;
+      padding-top: 24px;
+      border-top: 1px solid var(--hdc-g3);
+    }
+  }
+}
+
+@layer components {
+  .hdc-lead--box {
+    margin-bottom: 16px;
+  }
+}
+
+/* Order tracking without an account (/logariasmos/entopismos). */
+@layer components {
+  .hdc-track-page {
+    display: grid;
+    gap: 26px;
+    max-width: 860px;
+    padding-top: 30px;
+    padding-bottom: 56px;
+  }
+  .hdc-btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}
+@layer components {
+  @media (max-width: 767px) {
+    .hdc-acbar--keep {
+      display: block;
+    }
+    .hdc-acbar--keep .hdc-wrap {
+      min-height: 0;
+      padding-top: 18px;
+      padding-bottom: 18px;
+    }
+    .hdc-track-page {
+      padding-top: 20px;
+      gap: 20px;
+    }
+  }
+}
+
+/* Screen 3 stands alone: `.wrap` with 30px above, 56px below. */
+@layer components {
+  .hdc-od-page {
+    padding-top: 30px;
+    padding-bottom: 56px;
+  }
+  @media (max-width: 767px) {
+    .hdc-od-page {
+      padding-top: 16px;
+      padding-bottom: 40px;
+    }
+  }
+}
+
+@layer components {
+  .hdc-check a {
+    color: var(--hdc-red);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}

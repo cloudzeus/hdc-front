@@ -1,22 +1,24 @@
 import type { Metadata } from "next";
-import { setRequestLocale } from "next-intl/server";
-import { SiteChrome } from "@/components/chrome/SiteChrome";
-import { SiteFooter } from "@/components/chrome/SiteFooter";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { AccountChrome } from "@/components/account/AccountChrome";
 import { NewPasswordForm } from "@/components/account/EntryForms";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
-import { getMiniCart } from "@/lib/cart/cart";
-import { getCatalogueStats, getMenuTree, getRootCategories, getTopBrands } from "@/lib/catalog/queries";
 import { resolveResetToken } from "@/lib/account/password-reset";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Νέος κωδικός",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "account.Hdc" });
+  return { title: t("neos_kodikos"), robots: { index: false, follow: false } };
+}
 
-/** Set a new password. An expired link is explained, not 404'd. */
+/** A new password from a reset link — one column of the sign-in box. */
 export default async function NewPasswordPage({
   params,
 }: {
@@ -24,46 +26,32 @@ export default async function NewPasswordPage({
 }) {
   const { locale, token } = await params;
   setRequestLocale(locale);
-
-  const [resolved, menuTree, brands, stats, rootCategories, miniCart] = await Promise.all([
-    resolveResetToken(token),
-    getMenuTree(locale),
-    getTopBrands(locale),
-    getCatalogueStats(),
-    getRootCategories(locale),
-    getMiniCart(locale),
-  ]);
+  const [t, resolved] = await Promise.all([getTranslations("account.Hdc"), resolveResetToken(token)]);
 
   return (
-    <>
-      <SiteChrome locale={locale} cart={miniCart} categories={menuTree} brands={brands} stats={stats} />
-      <main id="main" className="shell-w bg-white">
-        <div className="mx-auto max-w-[440px] px-4 py-14 lg:py-20">
-          <h1 className="font-display text-[26px] leading-[1.16] t-display text-k-ink">
-            Νέος κωδικός
-          </h1>
-
-          {resolved ? (
-            <>
-              <p className="numeral mt-3 mb-7 text-[13px] text-k-text-3">{resolved.email}</p>
-              <NewPasswordForm token={token} />
-            </>
-          ) : (
-            <>
-              <p className="mt-3 mb-7 text-[13.5px] leading-[1.65] text-k-text-2">
-                Ο σύνδεσμος έληξε ή έχει ήδη χρησιμοποιηθεί. Ζητήστε καινούριο.
-              </p>
-              <Link
-                href="/eisodos/prosvasi"
-                className="t-btn inline-block bg-k-ink px-8 py-[15px] text-white transition-colors hover:bg-k-red"
-              >
-                ΝΕΟΣ ΣΥΝΔΕΣΜΟΣ
-              </Link>
-            </>
-          )}
+    <AccountChrome locale={locale}>
+      <main id="main" className="hdc-acc-page">
+        <div className="hdc-wrap">
+          <div className="hdc-auth hdc-auth--one">
+            <section>
+              <h1 className="hdc-disp">{t("neos_kodikos")}</h1>
+              {resolved ? (
+                <>
+                  <p className="s">{t("neos_kodikos_lead", { email: resolved.email })}</p>
+                  <NewPasswordForm token={token} />
+                </>
+              ) : (
+                <>
+                  <p className="s">{t("link_expired")}</p>
+                  <Link href="/eisodos/prosvasi" className="hdc-btn hdc-btn-red">
+                    {t("neos_syndesmos")}
+                  </Link>
+                </>
+              )}
+            </section>
+          </div>
         </div>
       </main>
-      <SiteFooter categories={rootCategories} />
-    </>
+    </AccountChrome>
   );
 }

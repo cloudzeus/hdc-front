@@ -5,6 +5,7 @@ import { AccountChrome } from "@/components/account/AccountChrome";
 import { AccountShell } from "@/components/account/AccountShell";
 import { AddressBook } from "@/components/account/AddressBook";
 import type { Locale } from "@/i18n/routing";
+import { getAccountShellData } from "@/lib/account/dashboard";
 import { requireCustomer } from "@/lib/account/guard";
 import { prisma } from "@/lib/prisma";
 
@@ -14,8 +15,8 @@ export async function generateMetadata({
   params: Promise<{ locale: Locale }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "dieuthynseis.page" });
-  return { title: t("titlos"), robots: { index: false, follow: false } };
+  const t = await getTranslations({ locale, namespace: "account.Hdc" });
+  return { title: t("meta_addresses"), robots: { index: false, follow: false } };
 }
 
 /**
@@ -34,11 +35,12 @@ export default async function AddressesPage({
 }: {
   params: Promise<{ locale: Locale }>;
 }) {
-  const t = await getTranslations("dieuthynseis.page");
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations("account.Hdc");
 
   const { user } = await requireCustomer(locale, "/logariasmos/dieuthynseis");
+  const shell = await getAccountShellData(user);
 
   const addresses = await prisma.customerAddress.findMany({
     where: { customerId: user.id },
@@ -63,13 +65,14 @@ export default async function AddressesPage({
 
   return (
     <AccountChrome locale={locale}>
-      <AccountShell
-        user={user}
-        active="/logariasmos/dieuthynseis"
-        title={t("titlos")}
-        lead={t("lead")}
-      >
-        <AddressBook addresses={addresses} />
+      <AccountShell shell={shell} active="/logariasmos/dieuthynseis" title={t("nav_addresses")}>
+        <section className="hdc-box">
+          <h2 className="hdc-disp">{t("oi_dieuthynseis_mou")}</h2>
+          <div className="hdc-box-body">
+            <p className="hdc-lead hdc-lead--box">{t("addresses_lead")}</p>
+            <AddressBook addresses={addresses} />
+          </div>
+        </section>
       </AccountShell>
     </AccountChrome>
   );

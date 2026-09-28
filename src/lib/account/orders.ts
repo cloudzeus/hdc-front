@@ -1,6 +1,12 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
 import { hasProvenEmail } from "@/lib/account/email-proof";
+import {
+  customerOrderWhere,
+  ORDER_ROW_SELECT,
+  toOrderRow,
+  type OrderRowData,
+} from "@/lib/account/dashboard";
 
 /**
  * A customer's own orders.
@@ -21,74 +27,110 @@ import { hasProvenEmail } from "@/lib/account/email-proof";
  * their address first.
  */
 
-export type AccountOrder = {
-  id: string;
+/** The orders page: every order, newest first, as rows. */
+export async function listCustomerOrders(
+  customerId: string,
+  email: string,
+): Promise<OrderRowData[]> {
+  const orders = await prisma.order.findMany({
+    where: await customerOrderWhere(customerId, email),
+    orderBy: { createdAt: "desc" },
+    // Bounded. An account with hundreds of orders needs paging, not a longer
+    // page, and nobody has hundreds yet.
+    take: 50,
+    select: ORDER_ROW_SELECT,
+  });
+  return orders.map(toOrderRow);
+}
+
+/** Everything the order page (account.html, screen 3) shows. */
+export type AccountOrderDetail = {
   orderNumber: string;
   guestToken: string;
   status: string;
   paymentStatus: string;
   paymentMethod: string;
   shippingMethod: string;
-  totalGross: number;
   createdAt: Date;
-  itemCount: number;
-  /** First few product names, for a line the customer can recognise. */
-  preview: string[];
-  /** The first product's picture — what somebody actually recognises. */
-  image: string | null;
-  /**
-   * The courier reference, when the parcel exists.
-   *
-   * Shown on the row rather than only inside the order: "has it shipped" is the
-   * question this list is scanned for, and a customer who has to open three
-   * orders to find out has been made to do the software's work.
-   */
-  voucherNo: string | null;
+  paidAt: Date | null;
+  shippedAt: Date | null;
+  deliveredAt: Date | null;
+  shipLine1: string;
+  shipLine2: string | null;
+  shipPostcode: string;
+  shipCity: string;
+  acsVoucherNo: string | null;
+  wantsInvoice: boolean;
+  companyName: string | null;
+  vatNumber: string | null;
+  /** The document number SoftOne gave it — «ΠΑΡΚ000123» — once issued. */
+  documentNo: string | null;
+  subtotalGross: number;
+  shippingGross: number;
+  paymentFeeGross: number;
+  vatAmount: number;
+  totalGross: number;
+  lines: Array<{
+    id: string;
+    name: string;
+    sku: string;
+    quantity: number;
+    lineGross: number;
+    imageUrl: string | null;
+    vatRate: number;
+  }>;
 };
 
-export async function listCustomerOrders(
+/**
+ * One of the customer's own orders, or null — which the page turns into a 404,
+ * so an order number that belongs to somebody else looks exactly like one that
+ * does not exist.
+ */
+export async function getCustomerOrder(
   customerId: string,
   email: string,
-): Promise<AccountOrder[]> {
-  const proven = await hasProvenEmail(email);
-  const orders = await prisma.order.findMany({
-    where: proven
-      ? { OR: [{ customerId }, { email: { equals: email, mode: "insensitive" } }] }
-      : { customerId },
-    orderBy: { createdAt: "desc" },
-    // Bounded. An account with hundreds of orders needs paging, not a longer
-    // page, and nobody has hundreds yet.
-    take: 50,
-    select: {
-      id: true,
-      orderNumber: true,
-      guestToken: true,
-      status: true,
-      paymentStatus: true,
-      paymentMethod: true,
-      shippingMethod: true,
-      totalGross: true,
-      createdAt: true,
-      acsVoucherNo: true,
-      lines: { select: { name: true, quantity: true, imageUrl: true } },
-    },
+  orderNumber: string,
+): Promise<AccountOrderDetail | null> {
+  const order = await prisma.order.findFirst({
+    where: { AND: [{ orderNumber }, await customerOrderWhere(customerId, email)] },
+    include: { lines: true },
   });
-
-  return orders.map((order) => ({
-    id: order.id,
+  if (!order) return null;
+  return {
     orderNumber: order.orderNumber,
     guestToken: order.guestToken,
     status: order.status,
     paymentStatus: order.paymentStatus,
     paymentMethod: order.paymentMethod,
     shippingMethod: order.shippingMethod,
-    totalGross: Number(order.totalGross),
     createdAt: order.createdAt,
-    itemCount: order.lines.reduce((sum, line) => sum + line.quantity, 0),
-    preview: order.lines.slice(0, 3).map((line) => line.name),
-    image: order.lines.find((l) => l.imageUrl)?.imageUrl ?? null,
-    voucherNo: order.acsVoucherNo,
-  }));
+    paidAt: order.paidAt,
+    shippedAt: order.shippedAt,
+    deliveredAt: order.deliveredAt,
+    shipLine1: order.shipLine1,
+    shipLine2: order.shipLine2,
+    shipPostcode: order.shipPostcode,
+    shipCity: order.shipCity,
+    acsVoucherNo: order.acsVoucherNo,
+    wantsInvoice: order.wantsInvoice,
+    companyName: order.companyName,
+    vatNumber: order.vatNumber,
+    documentNo: order.erpFincode,
+    subtotalGross: Number(order.subtotalGross),
+    shippingGross: Number(order.shippingGross),
+    paymentFeeGross: Number(order.paymentFeeGross),
+    vatAmount: Number(order.vatAmount),
+    totalGross: Number(order.totalGross),
+    lines: order.lines.map((line) => ({
+      id: line.id,
+      name: line.name,
+      sku: line.sku,
+      quantity: line.quantity,
+      lineGross: Number(line.lineGross),
+      imageUrl: line.imageUrl,
+      vatRate: Number(line.vatRate),
+    })),
+  };
 }
 
 /**

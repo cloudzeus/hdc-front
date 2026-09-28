@@ -25,7 +25,8 @@ export function mailUrls(overrides: { viewOnline?: string; preferences?: string 
     /** Το προφίλ. Στο κατάστημα λέγεται «λογαριασμός», όχι «account». */
     account: `${o}/logariasmos`,
     orders: `${o}/logariasmos/paraggelies`,
-    b2b: `${o}/b2b`,
+    /** The B2B area is gone; old templates that still link here land on the account. */
+    b2b: `${o}/logariasmos`,
     contact: `${o}/epikoinonia`,
     terms: `${o}/oroi-chrisis`,
     privacy: `${o}/aporrito`,

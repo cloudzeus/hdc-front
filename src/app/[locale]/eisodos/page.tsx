@@ -4,10 +4,11 @@ import { redirect } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { AccountChrome } from "@/components/account/AccountChrome";
 import { SignInForm } from "@/components/account/AuthForms";
+import { Benefits } from "@/components/account/Benefits";
+import { ClaimAccountForm } from "@/components/account/EntryForms";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getCustomerSession } from "@/lib/account/session";
-import { upGreek } from "@/lib/greek";
 
 export async function generateMetadata({
   params,
@@ -17,18 +18,21 @@ export async function generateMetadata({
   const { locale } = await params;
   // Explicit locale: `setRequestLocale` belongs to the render pass, and
   // metadata is generated outside it.
-  const t = await getTranslations({ locale, namespace: "eisodos.page" });
+  const t = await getTranslations({ locale, namespace: "account.Hdc" });
   return {
-    title: t("titlos_syndesi"),
+    title: t("meta_signin"),
     robots: { index: false, follow: false },
   };
 }
 
 /**
- * Sign in.
+ * Sign in — account.html, screen 1: three ways in, one box. Sign in; «ΕΧΩ ΗΔΗ
+ * ΠΑΡΑΓΓΕΙΛΕΙ» for a guest who wants to see an order (a link goes to the
+ * email); «ΝΕΟΣ ΠΕΛΑΤΗΣ» for a retail account. No company application — an
+ * invoice is asked for at checkout.
  *
- * Deliberately does NOT explain which of email or password was wrong, and does
- * not say whether an account exists — the action returns one message for both.
+ * The sign-in never says which of email or password was wrong, nor whether an
+ * account exists; the action returns one message for both.
  */
 export default async function SignInPage({
   params,
@@ -37,7 +41,7 @@ export default async function SignInPage({
   params: Promise<{ locale: Locale }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const t = await getTranslations("eisodos.page");
+  const t = await getTranslations("account.Hdc");
   const { locale } = await params;
   setRequestLocale(locale);
 
@@ -45,95 +49,50 @@ export default async function SignInPage({
   if (session.state === "signed-in") redirect("/logariasmos");
 
   const raw = await searchParams;
-  const redirectTo =
-    typeof raw.redirect === "string" ? raw.redirect : undefined;
+  const redirectTo = typeof raw.redirect === "string" ? raw.redirect : undefined;
 
   return (
     <AccountChrome locale={locale}>
-      <main id="main">
-        <div className="shell-x bg-k-ink-deep">
-          <nav
-            aria-label="Breadcrumb"
-            className="t-util flex h-11 items-center gap-2.5 text-white/45"
-          >
-            <Link href="/" className="text-white/60 hover:text-white">
-              {upGreek(t("archiki"))}
-            </Link>
-            <span className="text-k-red">/</span>
-            <span className="text-white">{upGreek(t("syndesi"))}</span>
-          </nav>
-          <div className="pt-2.5 pb-7">
-            <h1 className="font-display text-[22px] leading-[1.16] t-display text-white lg:text-[30px]">
-              {upGreek(t("syndesi"))}
-            </h1>
-            <p className="mt-3.5 max-w-[560px] text-[13px] leading-[1.68] text-white/60 lg:text-sm">
-              {t("paraggelies_eggyiseis_kai_dieythynseis_se")}
-            </p>
-          </div>
-        </div>
-
-        <div className="shell-w bg-white lg:grid lg:grid-cols-[1fr_420px] lg:items-start">
-          <div className="min-w-0 px-4 py-8 lg:px-10 lg:py-12">
-            <div className="max-w-md">
+      <main id="main" className="hdc-acc-page">
+        <div className="hdc-wrap">
+          <div className="hdc-auth hdc-auth--three">
+            <section aria-labelledby="auth-signin">
+              <h1 id="auth-signin" className="hdc-disp">
+                {t("syndesi")}
+              </h1>
+              <p className="s">{t("syndesi_lead")}</p>
               <SignInForm redirectTo={redirectTo} />
+              {/* The phone: columns 2 and 3 become two buttons. */}
+              <div className="hdc-auth-or">
+                <p>{t("i")}</p>
+                <Link href="/eisodos/prosvasi#paraggelia" className="hdc-btn hdc-btn-line">
+                  {t("echo_idi_paraggeilei")}
+                </Link>
+                <Link href="/eggrafi" className="hdc-btn hdc-btn-ink">
+                  {t("dimiourgia_logariasmou")}
+                </Link>
+              </div>
+            </section>
 
-              {/*
-                Both ways back in, on the page where somebody discovers they
-                cannot get in. A forgotten password and "I bought as a guest and
-                want an account" feel like one problem to whoever is stuck, so
-                they lead to one page that asks which it is.
-              */}
-              <p className="mt-5 text-[13px] leading-[1.6] text-k-text-3">
-                <Link
-                  href="/eisodos/prosvasi"
-                  className="text-k-ink underline-offset-2 hover:underline"
-                >
-                  Ξεχάσατε τον κωδικό σας;
-                </Link>
-                {" · "}
-                <Link
-                  href="/eisodos/prosvasi"
-                  className="text-k-ink underline-offset-2 hover:underline"
-                >
-                  Έχετε παραγγείλει χωρίς λογαριασμό;
-                </Link>
-              </p>
-            </div>
+            <section aria-labelledby="auth-guest">
+              <h2 id="auth-guest" className="hdc-disp">
+                {t("echo_idi_paraggeilei")}
+              </h2>
+              <p className="s">{t("guest_lead")}</p>
+              <ClaimAccountForm />
+            </section>
+
+            <section className="hdc-auth-new" aria-labelledby="auth-new">
+              <h2 id="auth-new" className="hdc-disp">
+                {t("neos_pelatis")}
+              </h2>
+              <p className="s">{t("new_lead")}</p>
+              <Benefits />
+              <Link href="/eggrafi" className="hdc-btn hdc-btn-red">
+                {t("dimiourgia_logariasmou")}
+              </Link>
+            </section>
           </div>
-
-          <aside className="border-t border-k-line bg-k-surface-2 px-4 py-8 lg:border-t-0 lg:border-l lg:px-8 lg:py-12">
-            <p className="t-eyebrow text-k-red">
-              {upGreek(t("etairikos_logariasmos"))}
-            </p>
-            <p className="font-display t-display mt-2.5 text-[18px] leading-[1.28] text-k-ink">
-              {upGreek(t("agorazete_gia_etaireia"))}
-            </p>
-            <ul className="mt-4 flex flex-col gap-2.5">
-              {[
-                t("times_synergati_se_olo_ton"),
-                t("pliromi_epi_pistosei_kai_timologio"),
-                t("polloi_christes_me_roloys_kai"),
-                t("istoriko_paraggelion_olis_tis_etaireias"),
-              ].map((item) => (
-                <li
-                  key={item}
-                  className="flex items-start gap-2.5 text-[12.5px] leading-[1.55] text-k-text-2"
-                >
-                  <span
-                    aria-hidden
-                    className="mt-1.5 block h-1.5 w-1.5 shrink-0 bg-k-red"
-                  />
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <Link
-              href="/eggrafi"
-              className="t-btn-sm mt-6 inline-block border-[1.5px] border-k-ink px-7 py-3.5 text-k-ink transition-colors hover:bg-k-ink hover:text-white"
-            >
-              {upGreek(t("aitisi_b2b"))} →
-            </Link>
-          </aside>
         </div>
       </main>
     </AccountChrome>

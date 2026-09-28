@@ -2,15 +2,21 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { AccountChrome } from "@/components/account/AccountChrome";
 import { AccountShell } from "@/components/account/AccountShell";
-import { ProductCard } from "@/components/product/ProductCard";
+import { HdcProductCard } from "@/components/product/HdcProductCard";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { requireCustomer } from "@/lib/account/guard";
 import { prisma } from "@/lib/prisma";
-import { upGreek } from "@/lib/greek";
+import { getAccountShellData } from "@/lib/account/dashboard";
 
-export async function generateMetadata(): Promise<Metadata> {
-  return { title: "Αγαπημένα", robots: { index: false, follow: false } };
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "account.Hdc" });
+  return { title: t("meta_favourites"), robots: { index: false, follow: false } };
 }
 
 /**
@@ -31,8 +37,9 @@ export default async function FavouritesPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  await getTranslations("logariasmos.page");
+  const t = await getTranslations("account.Hdc");
   const { user } = await requireCustomer(locale, "/logariasmos/agapimena");
+  const shell = await getAccountShellData(user);
 
   const rows = await prisma.favourite.findMany({
     where: { customerId: user.id, product: { isActive: true } },
@@ -119,38 +126,26 @@ export default async function FavouritesPage({
 
   return (
     <AccountChrome locale={locale}>
-      <AccountShell
-        user={user}
-        active="/logariasmos/agapimena"
-        title="Αγαπημένα"
-        lead="Προϊόντα που κρατήσατε για αργότερα. Οι τιμές και η διαθεσιμότητα είναι σημερινές."
-      >
+      <AccountShell shell={shell} active="/logariasmos/agapimena" title={t("nav_favourites")}>
         {products.length === 0 ? (
-          /* Άδεια οθόνη με έξοδο, όχι με λύπηση: ο πελάτης δεν έκανε λάθος που
-             δεν έχει αποθηκεύσει τίποτα ακόμη. */
-          <div className="border border-k-line bg-white px-6 py-12 text-center">
-            <p className="text-[14px] text-k-ink">
-              Δεν έχετε αποθηκεύσει προϊόντα.
-            </p>
-            <p className="mt-1.5 text-[12.5px] leading-[1.6] text-k-text-3">
-              Πατήστε την καρδιά σε οποιοδήποτε προϊόν για να το κρατήσετε εδώ.
-            </p>
-            <Link
-              href="/katalogos"
-              className="font-sans mt-5 inline-block bg-k-ink-deep px-7 py-3 text-[13px] font-bold tracking-[0.08em] text-white transition-colors hover:bg-k-ink"
-            >
-              {upGreek("Δείτε τον κατάλογο")}
-            </Link>
-          </div>
+          /* An empty screen with a way out, not an apology: nobody did anything
+             wrong by not having saved anything yet. */
+          <section className="hdc-box">
+            <h2 className="hdc-disp">{t("nav_favourites")}</h2>
+            <div className="hdc-empty">
+              <p>{t("fav_empty")}</p>
+              <p>{t("fav_empty_body")}</p>
+              <Link href="/katalogos" className="hdc-btn hdc-btn-red">
+                {t("ston_katalogo")}
+              </Link>
+            </div>
+          </section>
         ) : (
           <>
-            <p className="mb-3 text-[12px] text-k-text-3">
-              <span className="numeral">{products.length}</span>{" "}
-              {products.length === 1 ? "προϊόν" : "προϊόντα"}
-            </p>
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+            <p className="hdc-lead">{t("fav_lead", { count: products.length })}</p>
+            <div className="hdc-fav-grid">
               {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <HdcProductCard key={product.id} product={product} />
               ))}
             </div>
           </>

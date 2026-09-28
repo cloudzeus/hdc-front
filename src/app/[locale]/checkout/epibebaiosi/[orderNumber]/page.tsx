@@ -181,7 +181,7 @@ export default async function ConfirmationPage({ params, searchParams }: PagePro
                 orderNumber={order.orderNumber}
                 token={order.guestToken}
                 locale={locale}
-                compact
+                variant="line"
               />
             </div>
           }
