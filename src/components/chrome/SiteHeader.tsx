@@ -35,10 +35,13 @@ export function SiteHeader({
   categories: MenuCategory[];
 }) {
   const t = useTranslations("chrome.SiteHeader");
-  const nav = resolveHdcNav(categories).map((item) => ({
+  const resolved = resolveHdcNav(categories);
+  const nav = resolved.map((item) => ({
     href: item.href,
     label: t(`nav_${item.key}`),
   }));
+  // The search panel's PACKOUT chip goes where the menu's PACKOUT link goes.
+  const packoutHref = resolved.find((item) => item.key === "packout")?.href ?? "/anazitisi?q=PACKOUT";
 
   const lockup = (height: number) => (
     <Link href="/" className="hdc-plinth" aria-label={t("archiki")} prefetch={false}>
@@ -60,8 +63,8 @@ export function SiteHeader({
       <MobileHeader
         home={lockup(34)}
         searchLabel={t("anazitisi")}
-        closeLabel={t("kleisimo_anazitisis")}
-        search={<SearchSuggest locale={locale} variant="mobile" />}
+        locale={locale}
+        packoutHref={packoutHref}
         actions={
           <>
             <Link
@@ -86,7 +89,7 @@ export function SiteHeader({
           <HeaderNav label={t("kyria_ploigisi")} items={nav} />
 
           <div className="hdc-hdr-search">
-            <SearchSuggest locale={locale} />
+            <SearchSuggest locale={locale} packoutHref={packoutHref} />
           </div>
 
           <div className="hdc-acts">

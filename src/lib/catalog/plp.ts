@@ -7,7 +7,7 @@ import { sharedCatalogue } from "@/lib/catalog/shared-cache";
 import type { Locale } from "@/i18n/routing";
 import { nameWithoutSize } from "@/lib/catalog/variant-name";
 import { scopeKeyOf } from "@/lib/compare/options";
-import { searchKey } from "@/lib/greek";
+import { searchWhere } from "@/lib/catalog/search-query";
 import { DEFAULT_VAT_RATE } from "@/lib/format";
 import {
   contentCounts,
@@ -359,10 +359,14 @@ function buildWhere(
    * written «ΔΡΑΠΑΝΟΚΑΤΣΑΒΙΔΟ ΚΡΟΥΣΤΙΚΟ» — half the catalogue is written that
    * way round, and the phrase found 8 of 13.
    */
+  /*
+   * Each word is also accepted in its other spellings — a Greek «Μ18», a
+   * glued «m18fpd3», «FPD-3» — the same reading the header dropdown uses, so
+   * «see all N results» lands on N (search-query.ts).
+   */
   if (params.q) {
-    for (const word of new Set(searchKey(params.q).split(" ").filter(Boolean))) {
-      and.push({ searchKey: { contains: word } });
-    }
+    const words = searchWhere(params.q);
+    if (words) and.push(...words.AND);
   }
 
   return { AND: and };

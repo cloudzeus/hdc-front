@@ -1,77 +1,86 @@
 "use client";
 
-import { useLocale } from "next-intl";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
-import { useRouter } from "@/i18n/navigation";
-import type { SuggestResult } from "@/lib/catalog/suggest-types";
-import { SUGGEST_DEBOUNCE_MS, SUGGEST_MIN_LENGTH } from "@/lib/catalog/suggest-options";
+import { AddToCartButton } from "@/components/cart/AddToCartButton";
+import { Link, useRouter } from "@/i18n/navigation";
+import {
+  highlightParts,
+  pushRecent,
+  RECENT_SEARCHES_KEY,
+  RECENT_SEARCHES_MAX,
+} from "@/lib/catalog/search-query";
+import {
+  platformLabel,
+  SUGGEST_DEBOUNCE_MS,
+  SUGGEST_MIN_LENGTH,
+  SUGGEST_PLATFORMS,
+} from "@/lib/catalog/suggest-options";
+import {
+  EMPTY_SUGGEST,
+  type SuggestModel,
+  type SuggestResult,
+  type SuggestTile,
+  type SuggestVariant,
+} from "@/lib/catalog/suggest-types";
 import { formatPrice } from "@/lib/format";
 import { upGreek } from "@/lib/greek";
-import { showsExactQty } from "@/lib/stock-display";
+import { displayName } from "@/lib/milwaukee/display";
 
 /**
- * Search-as-you-type.
+ * Search-as-you-type (search.html §1 and the phone frames).
  *
  * A typeahead cannot be server-rendered — it reacts to keystrokes — so this is
- * the one place a client island is the whole feature. It is kept thin: it owns
- * the input, a debounce, an abort controller and a highlight index, and every
- * row it draws is data the server produced.
+ * the one place a client island is the whole feature. Every row it draws is
+ * data the server produced (`/api/suggest`); this owns the input, a debounce,
+ * an abort controller, the highlight index and the per-device recent list.
  *
- * Behaviour worth knowing:
- *  - 180ms debounce with the in-flight request aborted on the next keystroke,
- *    so a fast typist never gets an older answer landing after a newer one
- *  - the response is keyed by its own query, so a late reply for "τρυ" cannot
- *    overwrite the results for "τρυπανι"
- *  - an exact code match gets its own row at the top, because someone pasting
- *    an SKU is not browsing
- *  - full keyboard: ↑ ↓ through every row, Enter to open, Esc to close, and
- *    the whole thing is a combobox so a screen reader is told how many results
- *    arrived
+ *  - desktop: the header box widens to 520px with an ink ring, the page behind
+ *    dims, and a 980px two-column panel drops from the header's bottom edge,
+ *    right-aligned to the box
+ *  - mobile: rendered inside the full-screen panel `MobileHeader` opens — a
+ *    red bar with the field and ΑΚΥΡΟ, the same sections stacked below
+ *
+ * Races: the response is stored WITH the query it answers and read back only
+ * while the two agree, so a late reply for "fp" can never overwrite "fpd3".
+ * Keyboard: ↑ ↓ through every row, Enter opens, Esc closes.
  */
 export function SearchSuggest({
   locale,
   variant = "desktop",
+  packoutHref = "/anazitisi?q=PACKOUT",
+  onClose,
 }: {
   locale: string;
-  /**
-   * `desktop` = the white 340px box inside the red header; `mobile` = the full
-   * width field under the phone header, which sits on white and so carries its
-   * own black edge.
-   */
   variant?: "desktop" | "mobile";
+  /** Where the PACKOUT chip goes — the header resolves it from the menu. */
+  packoutHref?: string;
+  /** Mobile: closes the full-screen panel (ΑΚΥΡΟ, Esc, after navigating). */
+  onClose?: () => void;
 }) {
   const t = useTranslations("chrome.SearchSuggest");
   const router = useRouter();
   const listId = useId();
+  const desktop = variant === "desktop";
 
   const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false);
-
-  /*
-   * The highlight is stored together with the query it belongs to, and read
-   * back only when the two still agree. New results therefore reset it during
-   * render, with no effect and no cascading re-render — the same shape as
-   * `entry` below, for the same reason.
-   */
+  // The mobile panel is only mounted while open.
+  const [open, setOpen] = useState(!desktop);
   const [mark, setMark] = useState<{ q: string; index: number }>({ q: "", index: -1 });
-
-  /*
-   * The response is stored WITH the query it answers, and both `data` and
-   * `loading` are derived from that during render.
-   *
-   * This is what makes the race impossible rather than merely unlikely: a late
-   * reply for "τρυ" landing after the user has typed "τρυπανι" simply does not
-   * match the current query, so it is ignored — no comparison, no sequence
-   * number, no clearing state from inside an effect (which React now flags as
-   * a cascading render, and rightly).
-   */
   const [entry, setEntry] = useState<{ q: string; result: SuggestResult } | null>(null);
+  // Read on first focus (desktop, server-rendered) or at mount (the phone
+  // panel only ever mounts in the browser, after a tap).
+  const [recent, setRecent] = useState<string[] | null>(() => (desktop ? null : readRecent()));
+  const [popular, setPopular] = useState<SuggestTile[] | null>(null);
+  const [width, setWidth] = useState<number | null>(null);
 
   const trimmed = query.trim();
-  const data = entry?.q === trimmed ? entry.result : null;
-  const loading = trimmed.length >= SUGGEST_MIN_LENGTH && data == null;
+  const typed = trimmed.length >= SUGGEST_MIN_LENGTH;
+  const fresh = entry?.q === trimmed ? entry.result : null;
+  // While the next answer is on its way the last one stays up: no flicker.
+  const data = typed ? (fresh ?? entry?.result ?? null) : null;
+  const loading = typed && fresh == null;
   const cursor = mark.q === trimmed ? mark.index : -1;
   const setCursor = (next: number | ((i: number) => number)) =>
     setMark((m) => {
@@ -80,35 +89,41 @@ export function SearchSuggest({
     });
 
   const root = useRef<HTMLDivElement | null>(null);
+  const form = useRef<HTMLFormElement | null>(null);
   const input = useRef<HTMLInputElement | null>(null);
 
-  /*
-   * Every row the arrow keys can land on, flattened in visual order. Deriving
-   * it during render rather than storing it means the cursor can never point
-   * at a row that is no longer on screen.
-   */
-  const rows = useMemo(() => {
-    if (!data) return [] as Array<{ href: string; label: string }>;
-    const out: Array<{ href: string; label: string }> = [];
-    if (data.exact) out.push({ href: `/proion/${data.exact.slug}`, label: data.exact.name });
-    for (const p of data.products) out.push({ href: `/proion/${p.slug}`, label: p.name });
-    for (const c of data.categories) out.push({ href: `/katalogos/${c.slug}`, label: c.name });
-    for (const b of data.brands) out.push({ href: `/brands/${b.slug}`, label: b.name });
-    if (data.totalProducts > 0) {
-      out.push({
-        href: `/anazitisi?q=${encodeURIComponent(data.query)}`,
-        label: t("ola_ta_apotelesmata", { totalProducts: data.totalProducts }),
-      });
+  // ── Recent searches: this browser only, and never fatal ────────────────
+  const loadRecent = () => {
+    if (recent == null) setRecent(readRecent());
+  };
+  const saveRecent = (next: string[]) => {
+    setRecent(next);
+    try {
+      window.localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(next));
+    } catch {
+      /* private mode, full quota: the list simply is not kept */
     }
-    return out;
-  }, [data]);
+  };
+  const remember = (q: string) => {
+    if (q.trim().length >= SUGGEST_MIN_LENGTH) saveRecent(pushRecent(recent ?? [], q));
+  };
+
+  // ── Empty focus: recent (local) and popular (fetched once) ─────────────
+  useEffect(() => {
+    if (!open || popular != null) return;
+    const controller = new AbortController();
+    fetch(`/api/suggest?popular=1&locale=${locale}`, { signal: controller.signal })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((body: { popular?: SuggestTile[] }) => setPopular(body.popular ?? []))
+      .catch((error) => {
+        if (error.name !== "AbortError") setPopular([]);
+      });
+    return () => controller.abort();
+  }, [open, popular, locale]);
 
   // ── Fetch, debounced and abortable ──────────────────────────────────────
   useEffect(() => {
-    // Nothing to fetch, and nothing to clear — `data` is derived, so a short
-    // query stops matching the stored entry on its own.
-    if (trimmed.length < SUGGEST_MIN_LENGTH || data != null) return;
-
+    if (!typed || fresh != null) return;
     const controller = new AbortController();
     const timer = setTimeout(() => {
       fetch(`/api/suggest?q=${encodeURIComponent(trimmed)}&locale=${locale}`, {
@@ -118,470 +133,861 @@ export function SearchSuggest({
         .then((result: SuggestResult) => setEntry({ q: trimmed, result }))
         .catch((error) => {
           // An empty result for this query beats spinning forever.
-          if (error.name !== "AbortError") {
-            setEntry({
-              q: trimmed,
-              result: {
-                query: trimmed,
-                exact: null,
-                products: [],
-                categories: [],
-                brands: [],
-                totalProducts: 0,
-              },
-            });
-          }
+          if (error.name !== "AbortError") setEntry({ q: trimmed, result: EMPTY_SUGGEST(trimmed) });
         });
     }, SUGGEST_DEBOUNCE_MS);
-
     return () => {
       clearTimeout(timer);
       controller.abort();
     };
-  }, [trimmed, data, locale]);
+  }, [trimmed, typed, fresh, locale]);
 
-  // ── Close on outside click ──────────────────────────────────────────────
+  // ── Desktop: close on outside click, size the panel ─────────────────────
   useEffect(() => {
-    if (!open) return;
+    if (!open || !desktop) return;
     const onDown = (event: MouseEvent) => {
       if (!root.current?.contains(event.target as Node)) setOpen(false);
     };
+    /* 980px, right-aligned to the box — narrower only when the window is. */
+    const measure = () => {
+      const right = form.current?.getBoundingClientRect().right ?? 0;
+      setWidth(Math.max(320, Math.min(980, Math.round(right) - 24)));
+    };
+    measure();
     document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
-  }, [open]);
+    window.addEventListener("resize", measure);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      window.removeEventListener("resize", measure);
+    };
+  }, [open, desktop]);
 
-  const go = useCallback(
-    (href: string) => {
+  const close = useCallback(() => {
+    setMark({ q: "", index: -1 });
+    if (desktop) {
       setOpen(false);
-      // `setMark`, not the derived `setCursor` — the latter closes over
-      // `trimmed` and would make this callback stale on every keystroke.
-      setMark({ q: "", index: -1 });
       input.current?.blur();
-      router.push(href);
-    },
-    [router],
-  );
+    } else {
+      onClose?.();
+    }
+  }, [desktop, onClose]);
+
+  const go = (href: string, remembered = trimmed) => {
+    remember(remembered);
+    close();
+    router.push(href);
+  };
+
+  const searchHref = (q: string, platform?: string) => {
+    const params = new URLSearchParams({ q });
+    if (platform) params.set("platform", platform);
+    return `/anazitisi?${params.toString()}`;
+  };
+
+  /*
+   * Every row the arrow keys can land on, in visual order. Derived during
+   * render, so the cursor can never point at a row that is gone.
+   */
+  type Item = { key: string; href: string; remember?: string };
+  const items = useMemo<Item[]>(() => {
+    const out: Item[] = [];
+    if (!typed) {
+      for (const q of recent ?? []) out.push({ key: `recent:${q}`, href: searchHref(q), remember: q });
+      for (const p of (popular ?? []).slice(0, desktop ? 4 : 3))
+        out.push({ key: `pop:${p.id}`, href: `/proion/${p.slug}` });
+      return out;
+    }
+    if (!data) return out;
+    if (data.exact) out.push({ key: "exact", href: `/proion/${data.exact.slug}` });
+    for (const s of data.siblings) out.push({ key: `sib:${s.slug}`, href: `/proion/${s.slug}` });
+    for (const m of data.models) out.push({ key: `model:${m.root}`, href: `/proion/${m.slug}` });
+    for (const a of data.accessories) out.push({ key: `acc:${a.id}`, href: `/proion/${a.slug}` });
+    for (const r of data.didYouMean) out.push({ key: `dym:${r}`, href: searchHref(r), remember: r });
+    for (const c of data.categories) out.push({ key: `cat:${c.slug}`, href: `/katalogos/${c.slug}` });
+    if (data.totalProducts > 0) out.push({ key: "all", href: searchHref(data.query) });
+    return out;
+  }, [typed, data, recent, popular, desktop]);
+
+  const indexOf = (key: string) => items.findIndex((i) => i.key === key);
+  const option = (key: string) => {
+    const i = indexOf(key);
+    return {
+      id: `${listId}-${i}`,
+      role: "option" as const,
+      "aria-selected": cursor === i,
+      "data-active": cursor === i ? ("true" as const) : undefined,
+      onMouseEnter: () => setCursor(i),
+    };
+  };
+
+  // Keep the highlighted row in view (the phone panel and a short window scroll).
+  useEffect(() => {
+    if (cursor < 0) return;
+    document.getElementById(`${listId}-${cursor}`)?.scrollIntoView({ block: "nearest" });
+  }, [cursor, listId]);
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Escape") {
-      setOpen(false);
-      setCursor(-1);
+      event.preventDefault();
+      close();
       return;
     }
-    if (!open || rows.length === 0) return;
-
+    if (!open) setOpen(true);
+    if (items.length === 0) return;
     if (event.key === "ArrowDown") {
       event.preventDefault();
-      setCursor((i) => (i + 1) % rows.length);
+      setCursor((i) => (i + 1) % items.length);
     } else if (event.key === "ArrowUp") {
       event.preventDefault();
-      setCursor((i) => (i - 1 + rows.length) % rows.length);
-    } else if (event.key === "Enter" && cursor >= 0) {
-      // Only intercept Enter when a row is highlighted — otherwise the form
-      // submits to the results page, which is what Enter should do by default.
+      setCursor((i) => (i <= 0 ? items.length - 1 : i - 1));
+    } else if (event.key === "Enter" && cursor >= 0 && items[cursor]) {
+      // Only with a row highlighted — otherwise Enter submits to the results.
       event.preventDefault();
-      go(rows[cursor].href);
+      const item = items[cursor];
+      go(item.href, item.remember ?? trimmed);
     }
   };
 
-  const showPanel = open && trimmed.length >= SUGGEST_MIN_LENGTH;
-  const isEmpty = data != null && rows.length === 0 && !loading;
-  const desktop = variant === "desktop";
+  const removeRecent = (q: string) => saveRecent((recent ?? []).filter((x) => x !== q));
 
-  return (
-    <div ref={root} className="relative min-w-0 flex-1">
-      <form
-        role="search"
-        aria-label={t("anazitisi_proionton")}
-        /*
-         * `action="/anazitisi"` sent an English visitor to the Greek page.
-         *
-         * With `localePrefix: "as-needed"` the unprefixed path IS the Greek
-         * route, so a plain form action can only ever submit to Greek. The
-         * locale-aware router is already imported here for the suggestions; the
-         * form has to go through it too.
-         *
-         * `action` stays as the no-JavaScript fallback — Greek results beat no
-         * results — and the handler takes over whenever JavaScript is running.
-         */
-        action="/anazitisi"
-        onSubmit={(event) => {
-          event.preventDefault();
-          const form = new FormData(event.currentTarget);
-          const query = String(form.get("q") ?? "").trim();
-          if (!query) return;
-          const params = new URLSearchParams({ q: query });
-          setOpen(false);
-          router.push(`/anazitisi?${params.toString()}`);
+  const showPanel = open;
+  const placeholder = desktop ? t("hdc_placeholder") : t("placeholder_mobile");
+
+  const field = (
+    <form
+      ref={form}
+      role="search"
+      aria-label={t("anazitisi_proionton")}
+      /*
+       * `action` is the no-JavaScript fallback (the Greek results page); with
+       * JavaScript the locale-aware router takes over, so an English visitor
+       * stays in English.
+       */
+      action="/anazitisi"
+      onSubmit={(event) => {
+        event.preventDefault();
+        if (!trimmed) return;
+        go(searchHref(trimmed));
+      }}
+      className={desktop ? "hdc-search" : "hdc-msg-field"}
+    >
+      <label htmlFor={`q-${variant}`} className="sr-only">
+        {t("anazitisi")}
+      </label>
+      <input
+        ref={input}
+        id={`q-${variant}`}
+        name="q"
+        type="search"
+        enterKeyHint="search"
+        data-search-input
+        role="combobox"
+        aria-expanded={showPanel}
+        aria-controls={listId}
+        aria-autocomplete="list"
+        aria-activedescendant={cursor >= 0 ? `${listId}-${cursor}` : undefined}
+        autoComplete="off"
+        autoFocus={!desktop}
+        value={query}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setOpen(true);
         }}
-        className={desktop ? "hdc-search" : "hdc-search hdc-search-mobile"}
-      >
-        <label htmlFor={`q-${variant}`} className="sr-only">
-          {t("anazitisi")}
-        </label>
-        <input
-          ref={input}
-          id={`q-${variant}`}
-          name="q"
-          data-search-input
-          role="combobox"
-          aria-expanded={showPanel}
-          aria-controls={listId}
-          aria-autocomplete="list"
-          aria-activedescendant={cursor >= 0 ? `${listId}-${cursor}` : undefined}
-          autoComplete="off"
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setOpen(true);
-          }}
-          onFocus={() => setOpen(true)}
-          onKeyDown={onKeyDown}
-          placeholder={t("hdc_placeholder")}
-        />
-
+        onFocus={() => {
+          setOpen(true);
+          loadRecent();
+        }}
+        onKeyDown={onKeyDown}
+        placeholder={placeholder}
+      />
+      {desktop && (
         <button type="submit" aria-label={t("anazitisi")}>
-          <svg
-            aria-hidden
-            width={18}
-            height={18}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#fff"
-            strokeWidth="2.4"
-          >
+          <svg aria-hidden width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4">
             <circle cx="10.5" cy="10.5" r="7" />
             <line x1="15.8" y1="15.8" x2="22" y2="22" />
           </svg>
         </button>
-      </form>
+      )}
+    </form>
+  );
 
-      {/* Announced separately so a screen reader hears the count, not the rows. */}
-      <span aria-live="polite" className="sr-only">
-        {data && !loading
-          ? t("apotelesmata_gia", { totalProducts: data.totalProducts, query: data.query })
-          : ""}
-      </span>
+  const body = (
+    <Panel
+      layout={variant}
+      t={t}
+      listId={listId}
+      typed={typed}
+      data={data}
+      loading={loading}
+      recent={recent ?? []}
+      popular={popular}
+      packoutHref={packoutHref}
+      option={option}
+      go={go}
+      searchHref={searchHref}
+      removeRecent={removeRecent}
+      pickQuery={(q) => {
+        setQuery(q);
+        input.current?.focus();
+      }}
+    />
+  );
 
-      {showPanel && (
-        <div
-          id={listId}
-          role="listbox"
-          aria-label={t("protaseis_anazitisis")}
-          className={`absolute z-50 max-h-[70vh] overflow-y-auto border-2 border-k-ink bg-white shadow-[0_18px_40px_rgba(0,0,0,.18)] ${
-            // Desktop: drops to the header's bottom edge (the 44px box sits
-            // 20px above it) and is wider than the box, right-aligned to it.
-            desktop
-              ? "top-[calc(100%+20px)] right-0 w-[min(560px,calc(100vw-48px))]"
-              : "inset-x-0 top-[calc(100%+6px)]"
-          }`}
-        >
-          {loading && !data && <SuggestSkeleton />}
+  const live = (
+    <span aria-live="polite" className="sr-only">
+      {data && !loading ? t("apotelesmata_gia", { totalProducts: data.totalProducts, query: data.query }) : ""}
+    </span>
+  );
 
-          {isEmpty && (
-            <div className="px-5 py-8 text-center">
-              <p className="text-[13.5px] font-semibold text-k-ink">
-                {t("den_vrethike_kati_gia")}{query.trim()}»
-              </p>
-              <p className="mx-auto mt-2 max-w-sm text-[12.5px] leading-[1.6] text-k-text-3">
-                {t("dokimaste_ton_kodiko_toy_kataskeyasti")}
-              </p>
-            </div>
-          )}
-
-          {data && rows.length > 0 && (
-            <>
-              {data.exact && (
-                <Section label={t("akrivis_kodikos")}>
-                  <ProductRow
-                    id={`${listId}-0`}
-                    product={data.exact}
-                    query={data.query}
-                    active={cursor === 0}
-                    exact
-                    onSelect={() => go(`/proion/${data.exact!.slug}`)}
-                    onHover={() => setCursor(0)}
-                  />
-                </Section>
-              )}
-
-              {data.products.length > 0 && (
-                <Section label={t("proionta")}>
-                  {data.products.map((product, index) => {
-                    const i = (data.exact ? 1 : 0) + index;
-                    return (
-                      <ProductRow
-                        key={product.id}
-                        id={`${listId}-${i}`}
-                        product={product}
-                        query={data.query}
-                        active={cursor === i}
-                        onSelect={() => go(`/proion/${product.slug}`)}
-                        onHover={() => setCursor(i)}
-                      />
-                    );
-                  })}
-                </Section>
-              )}
-
-              {data.categories.length > 0 && (
-                <Section label={t("katigories")}>
-                  {data.categories.map((category, index) => {
-                    const i = (data.exact ? 1 : 0) + data.products.length + index;
-                    return (
-                      <TaxonomyRow
-                        key={category.slug}
-                        id={`${listId}-${i}`}
-                        name={category.name}
-                        count={category.count}
-                        query={data.query}
-                        active={cursor === i}
-                        onSelect={() => go(`/katalogos/${category.slug}`)}
-                        onHover={() => setCursor(i)}
-                      />
-                    );
-                  })}
-                </Section>
-              )}
-
-              {data.brands.length > 0 && (
-                <Section label="Brands">
-                  {data.brands.map((brand, index) => {
-                    const i =
-                      (data.exact ? 1 : 0) +
-                      data.products.length +
-                      data.categories.length +
-                      index;
-                    return (
-                      <TaxonomyRow
-                        key={brand.slug}
-                        id={`${listId}-${i}`}
-                        name={brand.name}
-                        count={brand.count}
-                        logo={brand.logo}
-                        query={data.query}
-                        active={cursor === i}
-                        onSelect={() => go(`/brands/${brand.slug}`)}
-                        onHover={() => setCursor(i)}
-                      />
-                    );
-                  })}
-                </Section>
-              )}
-
-              {data.totalProducts > 0 && (
-                <button
-                  type="button"
-                  id={`${listId}-${rows.length - 1}`}
-                  role="option"
-                  aria-selected={cursor === rows.length - 1}
-                  onMouseEnter={() => setCursor(rows.length - 1)}
-                  onClick={() => go(`/anazitisi?q=${encodeURIComponent(data.query)}`)}
-                  className={`t-card-cta flex w-full cursor-pointer items-center justify-between gap-3 border-t border-k-line px-4 py-3.5 text-left transition-colors ${
-                    cursor === rows.length - 1
-                      ? "bg-k-ink text-white"
-                      : "bg-k-surface-2 text-k-ink hover:bg-k-ink hover:text-white"
-                  }`}
-                >
-                  {upGreek(t("ola_ta_apotelesmata_2", { totalProducts: data.totalProducts }))}
-                  <span aria-hidden>→</span>
-                </button>
-              )}
-            </>
-          )}
+  if (!desktop) {
+    return (
+      <div ref={root} className="hdc-msg" role="dialog" aria-modal="true" aria-label={t("anazitisi")}>
+        <div className="hdc-msg-bar">
+          {field}
+          <button type="button" className="hdc-msg-cancel" onClick={close}>
+            {upGreek(t("akyro"))}
+          </button>
         </div>
+        {live}
+        <div id={listId} role="listbox" aria-label={t("protaseis_anazitisis")} className="hdc-msg-body">
+          {body}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div ref={root} className="hdc-sg" data-open={showPanel ? "true" : undefined}>
+      {field}
+      {live}
+      {showPanel && (
+        <>
+          <div className="hdc-sg-dim" aria-hidden onMouseDown={close} />
+          <div
+            id={listId}
+            role="listbox"
+            aria-label={t("protaseis_anazitisis")}
+            aria-busy={loading || undefined}
+            className="hdc-sg-dd"
+            style={width ? { width } : undefined}
+          >
+            {body}
+          </div>
+          <p className="hdc-sg-kbd" aria-hidden>
+            {t("kbd_nav")} <b>↑</b>
+            <b>↓</b> · {t("kbd_open")} <b>Enter</b> · {t("kbd_close")} <b>Esc</b>
+          </p>
+        </>
       )}
     </div>
   );
 }
 
-function Section({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="border-b border-k-line last:border-b-0">
-      <p className="t-account-label bg-k-surface-2 px-4 py-2 text-k-text-4">
-        {upGreek(label)}
-      </p>
-      {children}
-    </div>
-  );
+function readRecent(): string[] {
+  try {
+    const raw = window.localStorage.getItem(RECENT_SEARCHES_KEY);
+    const list = raw ? (JSON.parse(raw) as unknown) : [];
+    return Array.isArray(list)
+      ? list.filter((x): x is string => typeof x === "string").slice(0, RECENT_SEARCHES_MAX)
+      : [];
+  } catch {
+    return [];
+  }
 }
 
-function ProductRow({
-  id,
-  product,
-  query,
-  active,
-  exact = false,
-  onSelect,
-  onHover,
-}: {
+type T = ReturnType<typeof useTranslations<"chrome.SearchSuggest">>;
+type OptionProps = (key: string) => {
   id: string;
-  product: import("@/lib/catalog/suggest-types").SuggestProduct;
-  query: string;
-  active: boolean;
-  exact?: boolean;
-  onSelect: () => void;
-  onHover: () => void;
+  role: "option";
+  "aria-selected": boolean;
+  "data-active": "true" | undefined;
+  onMouseEnter: () => void;
+};
+
+/** The panel's content — two columns on desktop, stacked on the phone. */
+function Panel({
+  layout,
+  t,
+  typed,
+  data,
+  loading,
+  recent,
+  popular,
+  packoutHref,
+  option,
+  go,
+  searchHref,
+  removeRecent,
+  pickQuery,
+}: {
+  layout: "desktop" | "mobile";
+  t: T;
+  listId: string;
+  typed: boolean;
+  data: SuggestResult | null;
+  loading: boolean;
+  recent: string[];
+  popular: SuggestTile[] | null;
+  packoutHref: string;
+  option: OptionProps;
+  go: (href: string, remembered?: string) => void;
+  searchHref: (q: string, platform?: string) => string;
+  removeRecent: (q: string) => void;
+  pickQuery: (q: string) => void;
 }) {
   const locale = useLocale();
-  const t = useTranslations("chrome.SearchSuggest");
-  return (
-    <button
-      type="button"
-      id={id}
-      role="option"
-      aria-selected={active}
-      onMouseEnter={onHover}
-      onClick={onSelect}
-      className={`flex w-full cursor-pointer items-center gap-3.5 px-4 py-2.5 text-left transition-colors ${
-        active ? "bg-k-surface-2" : "bg-white"
-      }`}
-    >
-      <span
-        className={`flex h-11 w-11 shrink-0 items-center justify-center border bg-white p-1 ${
-          exact ? "border-k-red" : "border-k-line"
-        }`}
-      >
-        {product.image ? (
-          <Image
-            src={product.image}
-            alt=""
-            width={64}
-            height={64}
-            className="h-full w-full object-contain"
-          />
+  const desktop = layout === "desktop";
+  const price = (net: number | null, vatRate: number) =>
+    net != null ? formatPrice(net, locale, { vatRate }) : "—";
+
+  // ── Empty focus ─────────────────────────────────────────────────────────
+  if (!typed) {
+    const recentBlock = recent.length > 0 && (
+      <section>
+        <h4 className="hdc-sg-h">{upGreek(t("prosfates"))}</h4>
+        <div className="hdc-sg-recent">
+          {recent.map((q) => (
+            <div key={q} className="hdc-sg-recent-row" {...option(`recent:${q}`)}>
+              <a
+                href={searchHref(q)}
+                tabIndex={-1}
+                onClick={(e) => {
+                  e.preventDefault();
+                  go(searchHref(q), q);
+                }}
+              >
+                {q}
+              </a>
+              <button
+                type="button"
+                aria-label={t("afairesi", { query: q })}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => removeRecent(q)}
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+    const platformBlock = (
+      <section>
+        <h4 className="hdc-sg-h">{upGreek(t("platformes"))}</h4>
+        <div className="hdc-sg-chips">
+          {SUGGEST_PLATFORMS.map((p) => (
+            <Link
+              key={p}
+              href={searchHref(platformLabel(p))}
+              onClick={(e) => {
+                e.preventDefault();
+                go(searchHref(platformLabel(p)), "");
+              }}
+            >
+              {platformLabel(p)}
+            </Link>
+          ))}
+          <Link
+            href={packoutHref}
+            onClick={(e) => {
+              e.preventDefault();
+              go(packoutHref, "");
+            }}
+          >
+            PACKOUT
+          </Link>
+        </div>
+      </section>
+    );
+    const shown = (popular ?? []).slice(0, desktop ? 4 : 3);
+    const popularBlock = shown.length > 0 && (
+      <section>
+        <h4 className="hdc-sg-h">{upGreek(t("dimofili"))}</h4>
+        {desktop ? (
+          <div className="hdc-sg-acc">
+            {shown.map((p) => (
+              <Tile key={p.id} tile={p} tokens={[]} price={price} option={option(`pop:${p.id}`)} go={go} />
+            ))}
+          </div>
         ) : (
-          <span className="t-brand-count text-k-text-5">—</span>
-        )}
-      </span>
-
-      <span className="min-w-0 flex-1">
-        <span className="flex items-baseline gap-2">
-          {product.brandName && (
-            <span className="t-card-brand shrink-0 text-k-red">{product.brandName}</span>
-          )}
-          <span className="t-card-sku truncate text-k-text-5">
-            <Highlight text={product.sku} query={query} />
-          </span>
-        </span>
-        <span className="mt-0.5 block truncate text-[12.5px] leading-[1.35] font-medium text-k-ink">
-          <Highlight text={product.name} query={query} />
-        </span>
-      </span>
-
-      <span className="shrink-0 text-right">
-        <span className="block font-mono text-[13px] font-semibold text-k-ink">
-          {product.priceNet != null
-            ? formatPrice(product.priceNet, locale, { vatRate: product.vatRate })
-            : "—"}
-        </span>
-        <span
-          className={`t-brand-count mt-0.5 flex items-center justify-end gap-1.5 ${
-            product.inStock ? "text-k-green" : "text-k-text-4"
-          }`}
-        >
-          <span aria-hidden className="rounded-pill block h-1.5 w-1.5 bg-current" />
-          {product.inStock
-            ? showsExactQty(product.qty)
-              ? `${product.qty} ${upGreek(t("tem"))}`
-              : upGreek(t("diathesimo"))
-            : upGreek(t("katopin"))}
-        </span>
-      </span>
-    </button>
-  );
-}
-
-function TaxonomyRow({
-  id,
-  name,
-  count,
-  logo,
-  query,
-  active,
-  onSelect,
-  onHover,
-}: {
-  id: string;
-  name: string;
-  count: number;
-  logo?: string | null;
-  query: string;
-  active: boolean;
-  onSelect: () => void;
-  onHover: () => void;
-}) {
-  const locale = useLocale();
-  return (
-    <button
-      type="button"
-      id={id}
-      role="option"
-      aria-selected={active}
-      onMouseEnter={onHover}
-      onClick={onSelect}
-      className={`flex w-full cursor-pointer items-center gap-3.5 px-4 py-2.5 text-left transition-colors ${
-        active ? "bg-k-surface-2" : "bg-white"
-      }`}
-    >
-      {logo !== undefined && (
-        <span className="flex h-8 w-11 shrink-0 items-center justify-center">
-          {logo ? (
-            <Image
-              src={logo}
-              alt=""
-              width={64}
-              height={64}
-              className="h-7 w-7 object-contain"
+          shown.map((p) => (
+            <Mini
+              key={p.id}
+              href={`/proion/${p.slug}`}
+              image={p.image}
+              title={p.name}
+              price={price(p.priceNet, p.vatRate)}
+              option={option(`pop:${p.id}`)}
+              go={go}
             />
-          ) : null}
-        </span>
+          ))
+        )}
+      </section>
+    );
+
+    if (!desktop) {
+      return (
+        <div className="hdc-sg-stack">
+          {recentBlock}
+          {platformBlock}
+          {popularBlock}
+        </div>
+      );
+    }
+    return (
+      <div className="hdc-sg-grid">
+        <div className="hdc-sg-l">
+          {recentBlock}
+          {popularBlock}
+          {!recentBlock && !popularBlock && <p className="hdc-sg-hint">{t("grigora_text")}</p>}
+        </div>
+        <div className="hdc-sg-r">
+          {platformBlock}
+          <QuickHint t={t} />
+        </div>
+      </div>
+    );
+  }
+
+  // ── Typed, first answer still on its way ─────────────────────────────────
+  if (!data) {
+    return (
+      <div className={desktop ? "hdc-sg-grid" : "hdc-sg-stack"}>
+        <div className="hdc-sg-l">
+          <SuggestSkeleton />
+        </div>
+      </div>
+    );
+  }
+
+  const { tokens } = data;
+  const nothing = data.totalProducts === 0 && !data.exact;
+
+  const exactBlock = data.exact && (
+    <section>
+      <h4 className="hdc-sg-h">{upGreek(t("akrivis_kodikos"))}</h4>
+      <div className="hdc-sg-exact" {...option("exact")}>
+        <Link
+          href={`/proion/${data.exact.slug}`}
+          className="hdc-sg-exact-main"
+          tabIndex={-1}
+          onClick={(e) => {
+            e.preventDefault();
+            go(`/proion/${data.exact!.slug}`);
+          }}
+        >
+          <span className="hdc-sg-img hdc-sg-img--90">
+            {data.exact.image ? <Image src={data.exact.image} alt="" width={120} height={120} /> : null}
+          </span>
+          <span>
+            <b>{displayName(data.exact.name, data.exact.mpn)}</b>
+            <small>
+              <mark>{data.exact.sku}</mark>
+              {data.exact.variant && ` · ${contentLabel(t, data.exact.variant, true)}`}
+            </small>
+            <span className="hdc-sg-price">{price(data.exact.priceNet, data.exact.vatRate)}</span>
+            <Availability t={t} inStock={data.exact.inStock} />
+          </span>
+        </Link>
+        <QtyAdd t={t} productId={data.exact.id} disabled={data.exact.priceNet == null} />
+      </div>
+    </section>
+  );
+
+  const siblingsBlock = data.siblings.length > 0 && (
+    <section>
+      <h4 className="hdc-sg-h">{upGreek(t("to_idio_montelo"))}</h4>
+      {data.siblings.map((s) => (
+        <Mini
+          key={s.slug}
+          href={`/proion/${s.slug}`}
+          image={s.image}
+          title={`${s.code} — ${contentLabel(t, s.variant, true)}`}
+          price={price(s.variant.priceNet, s.variant.vatRate)}
+          option={option(`sib:${s.slug}`)}
+          go={go}
+        />
+      ))}
+    </section>
+  );
+
+  const modelsBlock = data.models.length > 0 && (
+    <section>
+      <h4 className="hdc-sg-h">
+        {upGreek(t("modela"))}
+        <span>{data.models.length}</span>
+      </h4>
+      <div>
+        {data.models.map((model, i) => (
+          <ModelRow
+            key={model.root}
+            t={t}
+            model={model}
+            tokens={tokens}
+            first={i === 0}
+            price={price}
+            option={option(`model:${model.root}`)}
+            go={go}
+          />
+        ))}
+      </div>
+    </section>
+  );
+
+  const accessoriesBlock = data.accessories.length > 0 && (
+    <section>
+      <h4 className="hdc-sg-h">
+        {upGreek(t("axesouar"))}
+        <span>{data.accessories.length}</span>
+      </h4>
+      {desktop ? (
+        <div className="hdc-sg-acc">
+          {data.accessories.map((a) => (
+            <Tile key={a.id} tile={a} tokens={tokens} price={price} option={option(`acc:${a.id}`)} go={go} />
+          ))}
+        </div>
+      ) : (
+        data.accessories.map((a) => (
+          <Mini
+            key={a.id}
+            href={`/proion/${a.slug}`}
+            image={a.image}
+            title={<Marked text={a.name} tokens={tokens} />}
+            price={price(a.priceNet, a.vatRate)}
+            option={option(`acc:${a.id}`)}
+            go={go}
+          />
+        ))
       )}
-      <span className="min-w-0 flex-1 truncate text-[12.5px] font-medium text-k-ink">
-        <Highlight text={name} query={query} />
-      </span>
-      <span className="t-brand-count shrink-0 font-mono text-k-text-4">
-        {count.toLocaleString(locale)}
-      </span>
-    </button>
+    </section>
+  );
+
+  const nothingBlock = nothing && !loading && (
+    <section className="hdc-sg-none">
+      <p className="hdc-sg-none-t">{upGreek(t("den_vrikame", { query: data.query }))}</p>
+      <p>{t("den_vrikame_text")}</p>
+      {data.didYouMean.length > 0 && (
+        <>
+          <h4 className="hdc-sg-h">{upGreek(t("mipos_ennoeite"))}</h4>
+          <div className="hdc-sg-chips">
+            {data.didYouMean.map((r, i) => (
+              <button
+                key={r}
+                type="button"
+                className={i === 0 ? "is-red" : undefined}
+                {...option(`dym:${r}`)}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => pickQuery(r)}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </section>
+  );
+
+  const categoriesBlock = data.categories.length > 0 && (
+    <section>
+      <h4 className="hdc-sg-h">{upGreek(t("katigories"))}</h4>
+      <div>
+        {data.categories.map((c) => (
+          <Link
+            key={c.slug}
+            href={`/katalogos/${c.slug}`}
+            className="hdc-sg-row"
+            tabIndex={-1}
+            {...option(`cat:${c.slug}`)}
+            onClick={(e) => {
+              e.preventDefault();
+              go(`/katalogos/${c.slug}`);
+            }}
+          >
+            <Marked text={c.name} tokens={tokens} />
+            <span aria-hidden>›</span>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+
+  const platformsBlock = data.platforms.length > 0 && (
+    <section>
+      <h4 className="hdc-sg-h">{upGreek(t("platforma"))}</h4>
+      <div className="hdc-sg-chips">
+        {data.platforms.map((p) => (
+          <Link
+            key={p}
+            href={searchHref(data.query, p)}
+            tabIndex={-1}
+            onClick={(e) => {
+              e.preventDefault();
+              go(searchHref(data.query, p));
+            }}
+          >
+            {platformLabel(p)}
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+
+  const allBar = data.totalProducts > 0 && (
+    <Link
+      href={searchHref(data.query)}
+      className="hdc-sg-all"
+      tabIndex={-1}
+      {...option("all")}
+      onClick={(e) => {
+        e.preventDefault();
+        go(searchHref(data.query));
+      }}
+    >
+      {upGreek(t("ola_gia", { query: data.query }))} →
+      <span>{t("n_proionta", { count: data.totalProducts })}</span>
+    </Link>
+  );
+
+  if (!desktop) {
+    return (
+      <div className="hdc-sg-stack" aria-busy={loading || undefined}>
+        {exactBlock}
+        {siblingsBlock}
+        {modelsBlock}
+        {accessoriesBlock}
+        {nothingBlock}
+        {categoriesBlock}
+        {platformsBlock}
+        {allBar}
+      </div>
+    );
+  }
+
+  return (
+    <div className="hdc-sg-grid">
+      <div className="hdc-sg-l">
+        {exactBlock}
+        {siblingsBlock}
+        {modelsBlock}
+        {accessoriesBlock}
+        {nothingBlock}
+      </div>
+      <div className="hdc-sg-r">
+        {categoriesBlock}
+        {platformsBlock}
+        <QuickHint t={t} />
+      </div>
+      {allBar}
+    </div>
   );
 }
 
-/**
- * Bolds the matched run.
- *
- * Plain `indexOf` on the lower-cased strings, not `searchKey`: the normaliser
- * strips accents and changes length, so its offsets would not line up with the
- * text actually on screen and the highlight would drift.
- */
-function Highlight({ text, query }: { text: string; query: string }) {
-  const needle = query.trim().toLowerCase();
-  if (!needle) return <>{text}</>;
+function QuickHint({ t }: { t: T }) {
+  return (
+    <section>
+      <h4 className="hdc-sg-h">{upGreek(t("grigora"))}</h4>
+      <p className="hdc-sg-hint">{t("grigora_text")}</p>
+    </section>
+  );
+}
 
-  const at = text.toLowerCase().indexOf(needle);
-  if (at < 0) return <>{text}</>;
+/** "Σκέτο" / "Κιτ 2 × 5.0Ah" — what tells the variants of one model apart. */
+function contentLabel(t: T, v: SuggestVariant, long = false): string {
+  if (v.content === "bare") return long ? t("sketo_ergaleio") : t("sketo");
+  if (v.kit) return t("kit_mpataries", { count: v.kit.batteries, ah: v.kit.ah.toFixed(1) });
+  return v.suffix ? t("kit_suffix", { suffix: v.suffix }) : t("kit");
+}
 
+function Availability({ t, inStock }: { t: T; inStock: boolean }) {
+  return (
+    <span className={`hdc-sg-avail ${inStock ? "is-ok" : "is-wait"}`}>
+      ● {inStock ? t("se_apothema") : t("ergasimes")}
+    </span>
+  );
+}
+
+function Marked({ text, tokens }: { text: string; tokens: string[][] }) {
+  const parts = highlightParts(text, tokens);
   return (
     <>
-      {text.slice(0, at)}
-      <mark className="bg-k-red/15 text-inherit">{text.slice(at, at + needle.length)}</mark>
-      {text.slice(at + needle.length)}
+      {parts.map((part, i) => (part.hit ? <mark key={i}>{part.text}</mark> : <span key={i}>{part.text}</span>))}
     </>
+  );
+}
+
+function ModelRow({
+  t,
+  model,
+  tokens,
+  first,
+  price,
+  option,
+  go,
+}: {
+  t: T;
+  model: SuggestModel;
+  tokens: string[][];
+  first: boolean;
+  price: (net: number | null, vatRate: number) => string;
+  option: ReturnType<OptionProps>;
+  go: (href: string) => void;
+}) {
+  const href = `/proion/${model.slug}`;
+  return (
+    <div
+      className={`hdc-sg-model${first ? " is-first" : ""}`}
+      {...option}
+      onClick={() => go(href)}
+    >
+      <span className="hdc-sg-img">
+        {model.image ? <Image src={model.image} alt="" width={96} height={96} /> : null}
+      </span>
+      <span className="hdc-sg-model-main">
+        <Link
+          href={href}
+          className="hdc-sg-model-n"
+          tabIndex={-1}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            go(href);
+          }}
+        >
+          {model.tag && <span className="hdc-slant">{model.tag}</span>}
+          <Marked text={model.root} tokens={tokens} />
+        </Link>
+        <span className="hdc-sg-model-v">
+          {model.variants.map((v) => (
+            <Link
+              key={v.id}
+              href={`/proion/${v.slug}`}
+              tabIndex={-1}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                go(`/proion/${v.slug}`);
+              }}
+            >
+              {contentLabel(t, v)}
+              <b>{price(v.priceNet, v.vatRate)}</b>
+            </Link>
+          ))}
+        </span>
+      </span>
+      <Availability t={t} inStock={model.inStock} />
+    </div>
+  );
+}
+
+function Tile({
+  tile,
+  tokens,
+  price,
+  option,
+  go,
+}: {
+  tile: SuggestTile;
+  tokens: string[][];
+  price: (net: number | null, vatRate: number) => string;
+  option: ReturnType<OptionProps>;
+  go: (href: string) => void;
+}) {
+  const href = `/proion/${tile.slug}`;
+  return (
+    <Link
+      href={href}
+      className="hdc-sg-tile"
+      tabIndex={-1}
+      {...option}
+      onClick={(e) => {
+        e.preventDefault();
+        go(href);
+      }}
+    >
+      <span className="hdc-sg-tile-im">
+        {tile.image ? <Image src={tile.image} alt="" width={96} height={96} /> : null}
+      </span>
+      <b>
+        <Marked text={tile.name} tokens={tokens} />
+      </b>
+      <span>{price(tile.priceNet, tile.vatRate)}</span>
+    </Link>
+  );
+}
+
+function Mini({
+  href,
+  image,
+  title,
+  price,
+  option,
+  go,
+}: {
+  href: string;
+  image: string | null;
+  title: React.ReactNode;
+  price: string;
+  option: ReturnType<OptionProps>;
+  go: (href: string) => void;
+}) {
+  return (
+    <Link
+      href={href}
+      className="hdc-sg-mini"
+      tabIndex={-1}
+      {...option}
+      onClick={(e) => {
+        e.preventDefault();
+        go(href);
+      }}
+    >
+      <span className="hdc-sg-img hdc-sg-img--56">
+        {image ? <Image src={image} alt="" width={80} height={80} /> : null}
+      </span>
+      <b>{title}</b>
+      <span>{price}</span>
+    </Link>
+  );
+}
+
+/** − 1 + and ΣΤΟ ΚΑΛΑΘΙ: the exact hit goes in the basket without opening it. */
+function QtyAdd({ t, productId, disabled }: { t: T; productId: string; disabled: boolean }) {
+  const [qty, setQty] = useState(1);
+  return (
+    <div className="hdc-sg-qa" onClick={(e) => e.stopPropagation()}>
+      <div className="hdc-sg-qty" role="group" aria-label={t("posotita")}>
+        <button
+          type="button"
+          aria-label={t("ligotera")}
+          disabled={qty <= 1}
+          onClick={() => setQty((q) => Math.max(1, q - 1))}
+        >
+          −
+        </button>
+        <span aria-live="polite">{qty}</span>
+        <button
+          type="button"
+          aria-label={t("perissotera")}
+          disabled={qty >= 99}
+          onClick={() => setQty((q) => Math.min(99, q + 1))}
+        >
+          +
+        </button>
+      </div>
+      <AddToCartButton productId={productId} quantity={qty} disabled={disabled} className="hdc-sg-add" />
+    </div>
   );
 }
 
 function SuggestSkeleton() {
   return (
-    <div className="p-4">
+    <div className="hdc-sg-skel" aria-hidden>
       {[0, 1, 2].map((i) => (
-        <div key={i} className="flex items-center gap-3.5 py-2.5">
-          <span className="block h-11 w-11 shrink-0 animate-pulse bg-k-surface-3" />
-          <span className="min-w-0 flex-1 space-y-1.5">
-            <span className="block h-2.5 w-24 animate-pulse bg-k-surface-3" />
-            <span className="block h-3 w-2/3 animate-pulse bg-k-surface-3" />
-          </span>
-          <span className="block h-4 w-16 shrink-0 animate-pulse bg-k-surface-3" />
-        </div>
+        <span key={i}>
+          <i />
+          <i />
+        </span>
       ))}
     </div>
   );

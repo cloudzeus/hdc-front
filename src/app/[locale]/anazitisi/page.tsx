@@ -1,4 +1,3 @@
-import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
 import { alternatesFor } from "@/lib/seo/urls";
@@ -16,10 +15,11 @@ import type { Locale } from "@/i18n/routing";
 import { getMiniCart } from "@/lib/cart/cart";
 import { platformsPresent } from "@/lib/catalog/hdc-filters";
 import { getPlpData, getPlpSummary, parsePlpParams } from "@/lib/catalog/plp";
-import { findByExactCode } from "@/lib/catalog/suggest";
+import { findByExactCode, getDidYouMean } from "@/lib/catalog/suggest";
 import { SUGGEST_MIN_LENGTH } from "@/lib/catalog/suggest-options";
 import {
   getCatalogueStats,
+  getFeaturedProducts,
   getMenuTree,
   getRootCategories,
   getTopBrands,
@@ -33,6 +33,8 @@ import { formatPrice } from "@/lib/format";
 import { upGreek } from "@/lib/greek";
 import { displayName } from "@/lib/milwaukee/display";
 import { SHOP } from "@/config/shop";
+import { HdcProductCard } from "@/components/product/HdcProductCard";
+import type { ProductCardData } from "@/lib/catalog/queries";
 import { showsExactQty } from "@/lib/stock-display";
 import { Zone } from "@/components/zones/Zone";
 
@@ -134,6 +136,13 @@ export default async function SearchPage({ params, searchParams }: PageProps) {
      distinct models (bare tool and kits of one model count once), platforms. */
   const found = summary?.platforms.all ?? 0;
 
+  /* Nothing at all (search.html §3): the closest models and what sells — only
+     fetched when they are going to be shown. */
+  const zero = searchable && found === 0 && !exact;
+  const [didYouMean, popular] = zero
+    ? await Promise.all([getDidYouMean(query), getFeaturedProducts(locale, 5, 2, true)])
+    : [[], []];
+
   return (
     <QuickViewProvider locale={locale}>
       <SiteChrome
@@ -147,7 +156,7 @@ export default async function SearchPage({ params, searchParams }: PageProps) {
       <main id="main" className="hdc-plp-page">
         <Zone id="search.top" locale={locale} />
 
-        {searchable ? (
+        {zero ? null : searchable ? (
           <HdcSearchBand
             query={query}
             total={found}
@@ -229,7 +238,7 @@ export default async function SearchPage({ params, searchParams }: PageProps) {
             compareStateFor={compareStateFor}
           />
         ) : (
-          searchable && <NoResults query={query} />
+          zero && <NoResults query={query} didYouMean={didYouMean} popular={popular} />
         )}
         <Zone id="search.bottom" locale={locale} />
       </main>
@@ -241,54 +250,84 @@ export default async function SearchPage({ params, searchParams }: PageProps) {
 }
 
 /**
- * Zero results.
+ * Zero results (search.html §3).
  *
- * A dead end with "0 αποτελέσματα" is the worst screen in a shop. Every route
- * out of it is concrete: what to try, where to browse, and a phone number.
+ * Never an empty page — always a way on: the closest models in the catalogue
+ * (pg_trgm similarity on the model root, not a guess), what to try, a person
+ * to ask with the query already in the message, and what other customers buy.
  */
-function NoResults({ query }: { query: string }) {
-  const t = useTranslations("anazitisi.page");
-  const tips = [
-    {
-      title: t("dokimaste_ton_kodiko_toy_kataskeyasti"),
-      body: t("psachnoyme_se_kodiko_kolleris_kodiko"),
-    },
-    {
-      title: t("ligoteres_lexeis"),
-      body: t("trypani_mpeton_8_trypani_8"),
-    },
-    {
-      title: t("dokimaste_latinika_i_ellinika"),
-      body: t("ta_brands_einai_katachorimena_latinika"),
-    },
-    {
-      title: t("psaxte_ston_katalogo"),
-      body: t("23_katigories_me_filtra_se"),
-    },
-  ];
+async function NoResults({
+  query,
+  didYouMean,
+  popular,
+}: {
+  query: string;
+  didYouMean: string[];
+  popular: ProductCardData[];
+}) {
+  const t = await getTranslations("anazitisi.page");
+  const b = (chunks: React.ReactNode) => <b>{chunks}</b>;
+  const ask = `/epikoinonia?${new URLSearchParams({ q: query }).toString()}`;
 
   return (
-    <section className="hdc-wrap hdc-zero">
-      <h2 className="hdc-disp">
-        {upGreek(t("den_vrethike_kati_gia", { query: query }))}
-      </h2>
-      <p>{t("pithanon_na_to_echoyme_kai")}</p>
-      <ul>
-        {tips.map((tip) => (
-          <li key={tip.title}>
-            <b>{tip.title}</b>
-            <span>{tip.body}</span>
-          </li>
-        ))}
-      </ul>
-      <div className="hdc-zero-actions">
-        <Link href="/katalogos" className="hdc-btn hdc-btn-red">
-          {upGreek(t("ston_katalogo"))} →
-        </Link>
-        <a href={`tel:${SHOP.contact.phoneE164}`} className="hdc-btn hdc-btn-line">
-          {SHOP.contact.phone}
-        </a>
-      </div>
-    </section>
+    <>
+      <section className="hdc-wrap hdc-zero2">
+        <div>
+          <h1 className="hdc-disp">{upGreek(t("den_vrikame_tipota", { query }))}</h1>
+          <p className="hdc-zero2-lead">{t("zero_keimeno")}</p>
+
+          {didYouMean.length > 0 && (
+            <div className="hdc-zero2-dym">
+              <h2>{upGreek(t("mipos_ennoeite"))}</h2>
+              <div className="hdc-sg-chips">
+                {didYouMean.map((root, i) => (
+                  <Link
+                    key={root}
+                    href={`/anazitisi?${new URLSearchParams({ q: root }).toString()}`}
+                    className={i === 0 ? "is-red" : undefined}
+                  >
+                    {root}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <ul className="hdc-zero2-tips">
+            <li>
+              <span>{t.rich("tip_kodikos", { b })}</span>
+            </li>
+            <li>
+              <span>{t.rich("tip_amerikanikoi", { b })}</span>
+            </li>
+            <li>
+              <span>{t("tip_ligoteres")}</span>
+            </li>
+          </ul>
+        </div>
+
+        <aside className="hdc-ask">
+          <h2 className="hdc-disp">{upGreek(t("rotiste"))}</h2>
+          <p>{t("rotiste_keimeno")}</p>
+          <a href={`tel:${SHOP.contact.phoneE164}`} className="hdc-ask-ph">
+            {SHOP.contact.phone}
+          </a>
+          <Link href={ask} className="hdc-btn hdc-btn-red">
+            {upGreek(t("steilte_minyma"))}
+          </Link>
+        </aside>
+      </section>
+
+      {popular.length > 0 && (
+        <section className="hdc-wrap hdc-pop">
+          <h2 className="hdc-disp">{upGreek(t("agorazoun"))}</h2>
+          <div className="hdc-cards">
+            {popular.map((product) => (
+              <HdcProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </section>
+      )}
+    </>
   );
 }

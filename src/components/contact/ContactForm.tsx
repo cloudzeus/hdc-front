@@ -38,11 +38,14 @@ export function ContactForm({
   locale,
   pagePath,
   defaultSubject,
+  defaultMessage,
 }: {
   locale: string;
   pagePath?: string;
   /** Pre-filled subject — «Ερώτηση για το προϊόν …» from a product page. */
   defaultSubject?: string;
+  /** Pre-filled message — the query, from a search that found nothing. */
+  defaultMessage?: string;
 }) {
   const t = useTranslations("contact.ContactForm");
   const [state, action, pending] = useActionState<ContactState, FormData>(submitContact, {});
@@ -145,6 +148,7 @@ export function ContactForm({
           name="message"
           rows={6}
           required
+          defaultValue={defaultMessage}
           placeholder={t(`topic_${topic}_placeholder`)}
           aria-invalid={state.fieldErrors?.message ? true : undefined}
           className={`t-input w-full resize-y border px-3.5 py-3 leading-[1.6] text-k-ink outline-none focus:border-k-ink ${

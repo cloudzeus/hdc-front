@@ -1,40 +1,52 @@
 "use client";
 
-import { Search, X } from "lucide-react";
-import { useEffect, useId, useRef, useState } from "react";
+import { Search } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { SearchSuggest } from "@/components/chrome/SearchSuggest";
 
 /**
  * The phone header (mockup `.phone .ph`): red 56px bar, the lockup on its black
  * plinth, and ⚲ ♡ 🛒 on the right — plus the menu button, which the mockup
  * leaves implicit.
  *
- * The only state here is whether the search row is open. Everything inside
- * (logo, favourites link, mini-cart, drawer, search field) is rendered by the
- * server and passed in as slots, so this island owns one boolean and nothing
- * else.
+ * ⚲ opens search FULL-SCREEN (search.html, «ΣΤΟ ΚΙΝΗΤΟ»): a red bar with the
+ * field and ΑΚΥΡΟ over the whole viewport, the page underneath locked so the
+ * phone's own scroll cannot drag it. The panel is mounted only while open, so
+ * each search starts clean and the popular list is fetched on first use.
  */
 export function MobileHeader({
   home,
   actions,
-  search,
   searchLabel,
-  closeLabel,
+  locale,
+  packoutHref,
 }: {
   home: React.ReactNode;
   actions: React.ReactNode;
-  search: React.ReactNode;
   searchLabel: string;
-  closeLabel: string;
+  locale: string;
+  packoutHref: string;
 }) {
   const [open, setOpen] = useState(false);
-  const panelId = useId();
-  const panel = useRef<HTMLDivElement | null>(null);
+  const trigger = useRef<HTMLButtonElement | null>(null);
 
-  // Opening the row means "I want to type": put the caret in the field.
+  // Body scroll locked while the panel covers the page; restored exactly.
   useEffect(() => {
     if (!open) return;
-    panel.current?.querySelector<HTMLInputElement>("[data-search-input]")?.focus();
+    const html = document.documentElement;
+    const before = { html: html.style.overflow, body: document.body.style.overflow };
+    html.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+    return () => {
+      html.style.overflow = before.html;
+      document.body.style.overflow = before.body;
+    };
   }, [open]);
+
+  const close = () => {
+    setOpen(false);
+    trigger.current?.focus();
+  };
 
   return (
     <div className="lg:hidden">
@@ -42,12 +54,13 @@ export function MobileHeader({
         {home}
         <div className="hdc-mhdr-icons">
           <button
+            ref={trigger}
             type="button"
             className="hdc-act"
             aria-label={searchLabel}
             aria-expanded={open}
-            aria-controls={panelId}
-            onClick={() => setOpen((v) => !v)}
+            aria-haspopup="dialog"
+            onClick={() => setOpen(true)}
           >
             <Search aria-hidden strokeWidth={2.2} />
           </button>
@@ -55,17 +68,9 @@ export function MobileHeader({
         </div>
       </div>
 
-      <div ref={panel} id={panelId} hidden={!open} className="hdc-msearch">
-        {search}
-        <button
-          type="button"
-          className="hdc-msearch-close"
-          aria-label={closeLabel}
-          onClick={() => setOpen(false)}
-        >
-          <X aria-hidden size={22} />
-        </button>
-      </div>
+      {open && (
+        <SearchSuggest locale={locale} variant="mobile" packoutHref={packoutHref} onClose={close} />
+      )}
     </div>
   );
 }

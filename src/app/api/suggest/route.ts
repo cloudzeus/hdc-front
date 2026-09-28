@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getSuggestions, SUGGEST_MIN_LENGTH } from "@/lib/catalog/suggest";
+import { getPopularTiles, getSuggestions, SUGGEST_MIN_LENGTH } from "@/lib/catalog/suggest";
+import { EMPTY_SUGGEST } from "@/lib/catalog/suggest-types";
 import { routing, type Locale } from "@/i18n/routing";
 
 /**
@@ -12,6 +13,9 @@ import { routing, type Locale } from "@/i18n/routing";
  * The catalogue changes once a day, so the same query is worth caching for a
  * minute at the edge — a shop-floor customer typing "τρυπανι" letter by letter
  * generates seven requests whose answers are stable.
+ *
+ * `?popular=1` answers the empty-focus state instead («ΔΗΜΟΦΙΛΗ»): fetched
+ * only when someone clicks into an empty field, so no page pays for it.
  */
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
@@ -22,15 +26,21 @@ export async function GET(request: NextRequest) {
     ? (requested as Locale)
     : routing.defaultLocale;
 
+  if (params.get("popular") === "1") {
+    try {
+      const popular = await getPopularTiles(locale, 5);
+      return NextResponse.json(
+        { popular },
+        { headers: { "Cache-Control": "private, max-age=300" } },
+      );
+    } catch (error) {
+      console.error("[suggest:popular]", error);
+      return NextResponse.json({ popular: [] });
+    }
+  }
+
   if (query.length < SUGGEST_MIN_LENGTH) {
-    return NextResponse.json({
-      query,
-      exact: null,
-      products: [],
-      categories: [],
-      brands: [],
-      totalProducts: 0,
-    });
+    return NextResponse.json(EMPTY_SUGGEST(query));
   }
 
   try {

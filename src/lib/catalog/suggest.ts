@@ -3,31 +3,58 @@ import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import type { Locale } from "@/i18n/routing";
 import { searchKey } from "@/lib/greek";
-import type { SuggestResult, SuggestProduct } from "@/lib/catalog/suggest-types";
+import { displayName } from "@/lib/milwaukee/display";
+import { parseModel } from "@/lib/milwaukee/model";
+import { getFeaturedProducts } from "@/lib/catalog/queries";
 import {
+  didYouMeanText,
+  groupByModel,
+  queryTokens,
+  rankSimilarRoots,
+  searchWhere,
+  variantOf,
+  type ModelVariantRow,
+} from "@/lib/catalog/search-query";
+import {
+  EMPTY_SUGGEST,
+  type SuggestProduct,
+  type SuggestResult,
+  type SuggestSibling,
+  type SuggestTaxonomy,
+  type SuggestTile,
+} from "@/lib/catalog/suggest-types";
+import {
+  SUGGEST_ACCESSORY_LIMIT as ACCESSORY_LIMIT,
+  SUGGEST_CATEGORY_LIMIT as CATEGORY_LIMIT,
+  SUGGEST_DID_YOU_MEAN_LIMIT as DID_YOU_MEAN_LIMIT,
   SUGGEST_MIN_LENGTH as MIN_LENGTH,
-  SUGGEST_PRODUCT_LIMIT as PRODUCT_LIMIT,
-  SUGGEST_TAXONOMY_LIMIT as TAXONOMY_LIMIT,
+  SUGGEST_MODEL_LIMIT as MODEL_LIMIT,
+  SUGGEST_PLATFORMS,
 } from "@/lib/catalog/suggest-options";
 
 /**
- * Search-as-you-type.
+ * Search-as-you-type (search.html §1, spec §8.6).
  *
  * A DELIBERATELY separate query from the results page. The listing needs
- * facets, counts, sorting and pagination; a dropdown needs six rows in under
- * 100ms. Reusing `getPlpData` here would mean running nine facet aggregations
- * per keystroke.
+ * facets, counts, sorting and pagination; a dropdown needs a handful of rows
+ * in under 100ms. Reusing `getPlpData` here would mean running nine facet
+ * aggregations per keystroke.
  *
- * Ranking, in order:
- *   1. exact code — someone pasting an SKU wants that SKU, not the best fuzzy
- *      match for its digits, and on a trade catalogue this is the commonest
- *      search there is
- *   2. products whose normalised key contains the normalised query
- *   3. categories and brands, so "milwaukee" offers the brand page rather than
- *      only the first six of its 139 products
+ * What the dropdown shows, in order:
+ *   1. exact code — someone pasting an SKU / EAN wants that SKU, with its
+ *      model's other variants beside it
+ *   2. ΜΟΝΤΕΛΑ — the matches grouped by model root: «fpd» is 14 products but
+ *      three rows, each with its bare tool and kits as chips
+ *   3. ΑΞΕΣΟΥΑΡ ΚΑΙ ΑΝΤΑΛΛΑΚΤΙΚΑ — the matches with no model root
+ *   4. categories and platforms the matches belong to
  *
- * `searchKey` strips accents, case and final sigma on both sides, so "κνιπεξ"
- * matches ΚΝΙΠΕΞ and "wera" matches Wera.
+ * Matching is `search-query.ts`: every word in any order, each in all of its
+ * spellings (Greek «Μ18», glued «m18fpd3», «FPD-3»), over the stored
+ * `searchKey` and its trigram index — the same reading as the results page,
+ * so the "all N results" bar lands on N.
+ *
+ * Two round-trips: everything that depends only on the query in parallel,
+ * then the full variants of the winning models and the category names.
  */
 
 export { SUGGEST_MIN_LENGTH } from "@/lib/catalog/suggest-options";
@@ -54,6 +81,32 @@ const CARD = {
   translations: { select: { locale: true, name: true } },
 } as const;
 
+const VARIANT = {
+  ...CARD,
+  modelRoot: true,
+  modelContent: true,
+  platform: true,
+  erpInsertedAt: true,
+} as const;
+
+const codeCandidates = (query: string) => [
+  ...new Set([query, query.toUpperCase(), query.replace(/\s/g, "")]),
+];
+
+/**
+ * CODE / EAN / MPN equal to the query. 97 EANs arrive from the ERP with a
+ * stray space around them, so a padded spelling is accepted too — still an
+ * indexed equality, never a LIKE.
+ */
+function exactCodeWhere(query: string) {
+  const plain = codeCandidates(query);
+  const padded = [...plain, ...plain.flatMap((c) => [`${c} `, ` ${c}`])];
+  return {
+    isActive: true,
+    OR: [{ code: { in: plain } }, { code1: { in: padded } }, { code2: { in: padded } }],
+  };
+}
+
 /**
  * A product whose CODE / EAN / MPN is exactly the query.
  *
@@ -67,150 +120,335 @@ export const findByExactCode = cache(
     const query = rawQuery.trim().slice(0, 64);
     if (query.length < MIN_LENGTH) return null;
 
-    const candidates = [query, query.toUpperCase(), query.replace(/\s/g, "")];
-    const [row, brands] = await Promise.all([
-      prisma.product.findFirst({
-        where: {
-          isActive: true,
-          OR: [
-            { code: { in: candidates } },
-            { code1: { in: candidates } },
-            { code2: { in: candidates } },
-          ],
-        },
-        select: CARD,
-      }),
-      prisma.brand.findMany({
-        where: { mtrmark: { not: null } },
-        select: { mtrmark: true, nameEl: true, nameEn: true, nameIt: true },
-      }),
-    ]);
-    if (!row) return null;
-
-    const names = new Map(brands.map((b) => [b.mtrmark!, pick(b, locale)]));
-    return {
-      id: row.id,
-      slug: row.slug,
-      name: row.translations.find((t) => t.locale === locale)?.name?.trim() || row.name,
-      sku: row.code,
-      mpn: row.code2 || null,
-      brandName: row.mtrmark != null ? (names.get(row.mtrmark) ?? null) : null,
-      image: row.images[0]?.url ?? null,
-      priceNet: num(row.priceNet),
-      vatRate: num(row.vatRate) ?? 24,
-      inStock: row.inStock,
-      qty: num(row.qty) ?? 0,
-    };
+    const row = await prisma.product.findFirst({ where: exactCodeWhere(query), select: CARD });
+    return row ? toProduct(row, locale) : null;
   },
 );
+
+type CardRow = {
+  id: string;
+  slug: string;
+  name: string;
+  code: string;
+  code2: string;
+  priceNet: unknown;
+  vatRate: unknown;
+  qty: unknown;
+  inStock: boolean;
+  images: { url: string }[];
+  translations: { locale: string; name: string }[];
+};
+
+/** The translated name — unless it is a placeholder HDCtool left mid-run. */
+const localName = (row: CardRow, locale: Locale) => {
+  const name = row.translations.find((t) => t.locale === locale)?.name?.trim();
+  return name && !/^PROCESSING_/.test(name) ? name : row.name;
+};
+
+function toProduct(row: CardRow, locale: Locale): SuggestProduct {
+  return {
+    id: row.id,
+    slug: row.slug,
+    name: localName(row, locale),
+    sku: row.code2 || row.code,
+    mpn: row.code2 || null,
+    // A Milwaukee-only shop: the brand says nothing.
+    brandName: null,
+    image: row.images[0]?.url ?? null,
+    priceNet: num(row.priceNet),
+    vatRate: num(row.vatRate) ?? 24,
+    inStock: row.inStock,
+    qty: num(row.qty) ?? 0,
+  };
+}
+
+function toTile(row: CardRow, locale: Locale): SuggestTile {
+  return {
+    id: row.id,
+    slug: row.slug,
+    name: displayName(localName(row, locale), row.code2),
+    sku: row.code2 || row.code,
+    image: row.images[0]?.url ?? null,
+    priceNet: num(row.priceNet),
+    vatRate: num(row.vatRate) ?? 24,
+    inStock: row.inStock,
+  };
+}
+
+function toVariantRow(
+  row: CardRow & {
+    modelRoot: string | null;
+    modelContent: string | null;
+    platform: string | null;
+    erpInsertedAt: Date | null;
+  },
+): ModelVariantRow {
+  return {
+    id: row.id,
+    slug: row.slug,
+    // The ERP name, not the translation: the model code is read from it.
+    name: row.name,
+    sku: row.code2 || row.code,
+    modelRoot: row.modelRoot ?? "",
+    platform: row.platform,
+    modelContent: row.modelContent,
+    image: row.images[0]?.url ?? null,
+    priceNet: num(row.priceNet),
+    vatRate: num(row.vatRate) ?? 24,
+    inStock: row.inStock,
+    qty: num(row.qty) ?? 0,
+    insertedAt: row.erpInsertedAt?.getTime() ?? 0,
+  };
+}
+
+/** ERP catch-all subgroups say nothing; their group says more. */
+const GENERIC = new Set(["λοιπα", "διαφορα", "γενικα", "αλλα", "miscellaneous"]);
 
 export async function getSuggestions(
   rawQuery: string,
   locale: Locale,
 ): Promise<SuggestResult> {
   const query = rawQuery.trim().slice(0, 64);
-  const empty: SuggestResult = {
-    query,
-    exact: null,
-    products: [],
-    categories: [],
-    brands: [],
-    totalProducts: 0,
-  };
-
+  const empty = EMPTY_SUGGEST(query);
   if (query.length < MIN_LENGTH) return empty;
 
-  const key = searchKey(query);
-  const codeCandidates = [query, query.toUpperCase(), query.replace(/\s/g, "")];
+  const words = searchWhere(query);
+  if (!words) return empty;
+  const tokens = queryTokens(query);
+  const match = { AND: [{ isActive: true }, ...words.AND] };
 
-  /*
-   * All six queries in ONE round-trip.
-   *
-   * The brand-name lookup used to run AFTER the others, because it depended on
-   * the mtrmark values they returned — a second round-trip to a Postgres that
-   * is 60ms away, on every keystroke. There are only ~151 brands, so fetching
-   * the lot in parallel and looking up locally is strictly cheaper than being
-   * clever about which ones are needed.
-   */
-  const [exactRow, rows, total, categoryRows, brandRows, allBrands] = await Promise.all([
-    // Exact code — indexed equality, so this costs nothing even when it misses.
-    prisma.product.findFirst({
-      where: {
-        isActive: true,
-        OR: [
-          { code: { in: codeCandidates } },
-          { code1: { in: codeCandidates } },
-          { code2: { in: codeCandidates } },
-        ],
-      },
-      select: CARD,
-    }),
-    prisma.product.findMany({
-      where: { isActive: true, searchKey: { contains: key } },
-      // In stock first: suggesting something we cannot ship is a wasted row.
-      orderBy: [{ inStock: "desc" }, { qty: "desc" }],
-      take: PRODUCT_LIMIT + 1,
-      select: CARD,
-    }),
-    prisma.product.count({ where: { isActive: true, searchKey: { contains: key } } }),
-    prisma.category.findMany({
-      where: { productCount: { gt: 0 }, nameEl: { contains: query, mode: "insensitive" } },
-      orderBy: { productCount: "desc" },
-      take: TAXONOMY_LIMIT,
-      select: { slug: true, nameEl: true, nameEn: true, nameIt: true, productCount: true },
-    }),
-    prisma.brand.findMany({
-      where: { productCount: { gt: 0 }, nameEl: { contains: query, mode: "insensitive" } },
-      orderBy: { productCount: "desc" },
-      take: TAXONOMY_LIMIT,
-      select: { slug: true, nameEl: true, nameEn: true, nameIt: true, logo: true, productCount: true },
-    }),
-    prisma.brand.findMany({
-      where: { mtrmark: { not: null } },
-      select: { mtrmark: true, nameEl: true, nameEn: true, nameIt: true },
-    }),
+  // ── Round-trip 1: everything that depends only on the query ─────────────
+  const [exactRow, modelRows, accessoryRows, total, byClass, byPlatform, namedCategories] =
+    await Promise.all([
+      // Exact code — indexed equality, so this costs nothing even when it misses.
+      prisma.product.findFirst({ where: exactCodeWhere(query), select: VARIANT }),
+      // Just enough of every model match to rank the roots.
+      prisma.product.findMany({
+        where: { AND: [match, { modelRoot: { not: null } }] },
+        select: {
+          id: true,
+          slug: true,
+          name: true,
+          modelRoot: true,
+          modelContent: true,
+          platform: true,
+          inStock: true,
+          erpInsertedAt: true,
+        },
+        take: 600,
+      }),
+      prisma.product.findMany({
+        where: { AND: [match, { modelRoot: null }] },
+        // In stock first: suggesting something we cannot ship is a wasted tile.
+        orderBy: [{ inStock: "desc" }, { qty: "desc" }, { mtrl: "desc" }],
+        take: ACCESSORY_LIMIT,
+        select: CARD,
+      }),
+      prisma.product.count({ where: match }),
+      prisma.product.groupBy({
+        by: ["cccSubgroup2", "mtrgroup"],
+        where: match,
+        _count: { _all: true },
+      }),
+      prisma.product.groupBy({ by: ["platform"], where: match, _count: { _all: true } }),
+      prisma.category.findMany({
+        where: { productCount: { gt: 0 }, nameEl: { contains: query, mode: "insensitive" } },
+        orderBy: { productCount: "desc" },
+        take: CATEGORY_LIMIT,
+        select: { slug: true, nameEl: true, nameEn: true, nameIt: true, productCount: true },
+      }),
+    ]);
+
+  const ranked = groupByModel(
+    modelRows.map((row) => ({
+      id: row.id,
+      slug: row.slug,
+      name: row.name,
+      sku: "",
+      modelRoot: row.modelRoot!,
+      platform: row.platform,
+      modelContent: row.modelContent,
+      image: null,
+      priceNet: null,
+      vatRate: 24,
+      inStock: row.inStock,
+      qty: 0,
+      insertedAt: row.erpInsertedAt?.getTime() ?? 0,
+    })),
+    tokens,
+  );
+  const exactRoot = exactRow?.modelRoot ?? null;
+  // The exact hit's own model is already shown, as «ΤΟ ΙΔΙΟ ΜΟΝΤΕΛΟ».
+  const topRoots = ranked
+    .filter((g) => g.root !== exactRoot)
+    .slice(0, MODEL_LIMIT)
+    .map((g) => g.root);
+  const roots = [...new Set([...topRoots, ...(exactRoot ? [exactRoot] : [])])];
+
+  /* Category of the matches: the subgroup, or its group when the subgroup is a
+     catch-all («ΛΟΙΠΑ»). Counted per resulting category. */
+  const classes = [...byClass].sort((a, b) => b._count._all - a._count._all).slice(0, 12);
+  const subCodes = [...new Set(classes.map((c) => c.cccSubgroup2).filter((c): c is number => c != null))];
+  const groupCodes = [...new Set(classes.map((c) => c.mtrgroup).filter((c): c is number => c != null))];
+
+  // ── Round-trip 2: the winning models in full, the category names ────────
+  const [variantRows, categoryRows, similar] = await Promise.all([
+    roots.length
+      ? prisma.product.findMany({
+          where: { isActive: true, modelRoot: { in: roots } },
+          select: VARIANT,
+        })
+      : Promise.resolve([]),
+    subCodes.length || groupCodes.length
+      ? prisma.category.findMany({
+          where: {
+            productCount: { gt: 0 },
+            OR: [
+              { erpType: "SUBGROUP", erpCode: { in: subCodes.map(String) } },
+              { erpType: "GROUP", erpCode: { in: groupCodes.map(String) } },
+            ],
+          },
+          select: {
+            slug: true,
+            erpType: true,
+            erpCode: true,
+            nameEl: true,
+            nameEn: true,
+            nameIt: true,
+            productCount: true,
+          },
+        })
+      : Promise.resolve([]),
+    total === 0 && !exactRow ? similarRoots(query) : Promise.resolve([]),
   ]);
 
-  const brandNames = new Map(allBrands.map((b) => [b.mtrmark!, pick(b, locale)]));
+  // Models, in the order round-trip 1 ranked them.
+  const full = groupByModel(variantRows.map(toVariantRow), tokens);
+  const models = topRoots
+    .map((root) => full.find((g) => g.root === root))
+    .filter((g) => g != null);
 
-  const toProduct = (row: (typeof rows)[number]): SuggestProduct => ({
-    id: row.id,
-    slug: row.slug,
-    name: row.translations.find((t) => t.locale === locale)?.name?.trim() || row.name,
-    sku: row.code,
-    mpn: row.code2 || null,
-    brandName: row.mtrmark != null ? (brandNames.get(row.mtrmark) ?? null) : null,
-    image: row.images[0]?.url ?? null,
-    priceNet: num(row.priceNet),
-    vatRate: num(row.vatRate) ?? 24,
-    inStock: row.inStock,
-    qty: num(row.qty) ?? 0,
-  });
+  // Exact hit and «ΤΟ ΙΔΙΟ ΜΟΝΤΕΛΟ».
+  let exact: SuggestResult["exact"] = null;
+  let siblings: SuggestSibling[] = [];
+  if (exactRow) {
+    const variant = exactRow.modelRoot ? variantOf(toVariantRow(exactRow)) : null;
+    exact = { ...toProduct(exactRow, locale), variant };
+    if (exactRoot) {
+      siblings = variantRows
+        .filter((row) => row.modelRoot === exactRoot && row.id !== exactRow.id)
+        .map((row) => {
+          const vr = toVariantRow(row);
+          return {
+            slug: row.slug,
+            code: parseModel(row.name)?.code ?? exactRoot,
+            image: vr.image,
+            variant: variantOf(vr),
+          };
+        })
+        .sort((a, b) => (a.variant.priceNet ?? Infinity) - (b.variant.priceNet ?? Infinity));
+    }
+  }
 
-  const exact = exactRow ? toProduct(exactRow) : null;
+  // Categories: named ones first (the query IS a category), then the ones the
+  // matches sit in, by how many of them.
+  const bySub = new Map(
+    categoryRows.filter((c) => c.erpType === "SUBGROUP").map((c) => [c.erpCode, c]),
+  );
+  const byGroup = new Map(
+    categoryRows.filter((c) => c.erpType === "GROUP").map((c) => [c.erpCode, c]),
+  );
+  const counted = new Map<string, SuggestTaxonomy>();
+  for (const c of classes) {
+    const sub = c.cccSubgroup2 != null ? bySub.get(String(c.cccSubgroup2)) : undefined;
+    const node =
+      sub && !GENERIC.has(searchKey(sub.nameEl))
+        ? sub
+        : c.mtrgroup != null
+          ? byGroup.get(String(c.mtrgroup))
+          : undefined;
+    if (!node) continue;
+    const prev = counted.get(node.slug);
+    if (prev) prev.count += c._count._all;
+    else counted.set(node.slug, { slug: node.slug, name: pick(node, locale), count: c._count._all });
+  }
+  const categories: SuggestTaxonomy[] = [];
+  for (const c of [
+    ...namedCategories.map((c) => ({ slug: c.slug, name: pick(c, locale), count: c.productCount })),
+    ...[...counted.values()].sort((a, b) => b.count - a.count),
+  ]) {
+    if (categories.length >= CATEGORY_LIMIT) break;
+    if (!categories.some((x) => x.slug === c.slug)) categories.push(c);
+  }
+
+  const present = new Set(
+    byPlatform.filter((p) => p.platform && p._count._all > 0).map((p) => p.platform!),
+  );
 
   return {
     query,
+    tokens,
     exact,
-    // The exact hit gets its own row above the list; repeating it there would
-    // spend one of six slots saying the same thing twice.
-    products: rows
-      .filter((row) => row.id !== exact?.id)
-      .slice(0, PRODUCT_LIMIT)
-      .map(toProduct),
-    categories: categoryRows.map((c) => ({
-      slug: c.slug,
-      name: pick(c, locale),
-      count: c.productCount,
-    })),
-    brands: brandRows.map((b) => ({
-      slug: b.slug,
-      name: pick(b, locale),
-      logo: b.logo,
-      count: b.productCount,
-    })),
+    siblings,
+    models,
+    accessories: accessoryRows.map((row) => toTile(row, locale)),
+    categories,
+    platforms: SUGGEST_PLATFORMS.filter((p) => present.has(p)),
+    didYouMean: similar,
     totalProducts: total,
   };
+}
+
+/**
+ * «ΜΗΠΩΣ ΕΝΝΟΕΙΤΕ»: the model roots closest to what was typed, by pg_trgm
+ * character similarity on the root — not a guess, and not a spelling list.
+ */
+async function similarRoots(query: string): Promise<string[]> {
+  const text = didYouMeanText(query);
+  if (!text) return [];
+  const rows = await prisma.$queryRaw<
+    Array<{ root: string; sim: number; count: number; inStock: boolean }>
+  >`
+    SELECT "modelRoot" AS root,
+           similarity("modelRoot", ${text})::float8 AS sim,
+           count(*)::int AS count,
+           bool_or("inStock") AS "inStock"
+      FROM products
+     WHERE "isActive" AND "modelRoot" IS NOT NULL
+       AND similarity("modelRoot", ${text}) > 0.2
+     GROUP BY "modelRoot"
+     ORDER BY sim DESC
+     LIMIT 20`;
+  return rankSimilarRoots(rows, DID_YOU_MEAN_LIMIT);
+}
+
+/** The did-you-mean chips for the zero-results page. */
+export const getDidYouMean = cache(async (query: string): Promise<string[]> => {
+  try {
+    return await similarRoots(query.trim().slice(0, 64));
+  } catch (error) {
+    // A missing pg_trgm must cost the chips, never the page.
+    console.warn("[search] did-you-mean unavailable:", (error as Error).message);
+    return [];
+  }
+});
+
+/**
+ * «ΔΗΜΟΦΙΛΗ» / «ΑΥΤΑ ΑΓΟΡΑΖΟΥΝ ΟΙ ΠΕΛΑΤΕΣ ΜΑΣ»: the same source as the home
+ * page's best sellers, so the three lists never disagree.
+ */
+export async function getPopularTiles(locale: Locale, limit = 5): Promise<SuggestTile[]> {
+  const products = await getFeaturedProducts(locale, limit, 2, true);
+  return products.slice(0, limit).map((p) => ({
+    id: p.id,
+    slug: p.slug,
+    name: displayName(p.name, p.sku),
+    sku: p.sku,
+    image: p.image,
+    priceNet: p.priceNet,
+    vatRate: p.vatRate,
+    inStock: p.inStock,
+  }));
 }
 
 function pick(

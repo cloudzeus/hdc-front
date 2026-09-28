@@ -260,14 +260,6 @@
     outline: 2px solid #fff;
     outline-offset: -4px;
   }
-  /* The phone version sits on white, so it needs its own edge. */
-  .hdc-search-mobile {
-    border: 2px solid var(--hdc-ink);
-  }
-  .hdc-search-mobile:focus-within {
-    outline-color: var(--hdc-red);
-  }
-
   /* ── Phone header (.phone .ph) ───────────────────────────────────────── */
   .hdc-mhdr {
     background: var(--hdc-red);
@@ -301,31 +293,6 @@
     top: 3px;
     right: 2px;
   }
-  .hdc-msearch {
-    background: #fff;
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--hdc-g3);
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
-  .hdc-msearch-close {
-    width: 44px;
-    height: 44px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 0;
-    background: transparent;
-    color: var(--hdc-ink);
-    cursor: pointer;
-  }
-  .hdc-msearch-close:focus-visible {
-    outline: 2px solid var(--hdc-ink);
-    outline-offset: -2px;
-  }
-
   /* ── Mobile menu: a black drawer ─────────────────────────────────────── */
   .hdc-mmenu {
     position: absolute;

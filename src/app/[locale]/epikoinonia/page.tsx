@@ -68,11 +68,21 @@ export default async function ContactPage({
 
   /* «Ερώτηση για το προϊόν» on a product page lands here with the code in
      `?product=`; it pre-fills the subject. Only a plain code is accepted. */
-  const productParam = (await searchParams).product;
+  const raw = await searchParams;
+  const productParam = raw.product;
   const productCode =
     typeof productParam === "string" && /^[A-Za-z0-9 ._-]{1,64}$/.test(productParam)
       ? productParam.trim()
       : null;
+  /* «ΣΤΕΙΛΤΕ ΜΑΣ ΜΗΝΥΜΑ» on a search with no results lands here with the query
+     in `?q=`; it pre-fills the subject and the message. Plain text only. */
+  const searchParam = typeof raw.q === "string" ? raw.q : "";
+  const searchedFor =
+    searchParam
+      .replace(/[\u0000-\u001f\u007f<>]/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 64) || null;
 
   const [menuTree, brands, stats, rootCategories, miniCart] = await Promise.all(
     [
@@ -297,7 +307,16 @@ export default async function ContactPage({
                     locale={locale}
                     pagePath="/epikoinonia"
                     defaultSubject={
-                      productCode ? t("erotisi_gia_proion", { code: productCode }) : undefined
+                      productCode
+                        ? t("erotisi_gia_proion", { code: productCode })
+                        : searchedFor
+                          ? t("anazitisi_thema", { query: searchedFor })
+                          : undefined
+                    }
+                    defaultMessage={
+                      !productCode && searchedFor
+                        ? t("anazitisi_minyma", { query: searchedFor })
+                        : undefined
                     }
                   />
                 </div>
