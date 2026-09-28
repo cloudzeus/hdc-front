@@ -262,6 +262,13 @@ model Product {
   override     ProductOverride?
   cartLines    CartLine[]
 
+  /// Milwaukee rules (spec §8), computed at sync from the name.
+  platform     String? @db.VarChar(8)   // "M12" | "M18" | "MX" | null = fits every platform
+  modelRoot    String? @db.VarChar(64)  // "M18 FPD3" — bare tool and kits share it
+  modelContent String? @db.VarChar(8)   // "bare" | "kit"
+  isFuel       Boolean @default(false)
+  isOneKey     Boolean @default(false)
+
   // Facet + listing indexes — every PLP query shape.
   @@index([isActive, mtrcategory, mtrgroup, cccSubgroup2])
   @@index([isActive, mtrmark])
@@ -274,6 +281,8 @@ model Product {
   @@index([isActive, isNew, erpInsertedAt])
   @@index([isActive, firstListedAt])
   @@index([erpUpdatedAt])
+  @@index([platform])
+  @@index([modelRoot])
   @@map("products")
 }
 

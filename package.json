@@ -15,6 +15,7 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "reconcile:catalog": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env scripts/reconcile-catalog.ts",
+    "backfill:milwaukee": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env scripts/backfill-milwaukee-fields.ts",
     "emails:build": "node emails/build.mjs",
     "emails:docs": "node emails/docs-gen.mjs",
     "emails:upload": "node emails/mailgun/upload-templates.mjs"

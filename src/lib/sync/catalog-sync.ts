@@ -11,6 +11,7 @@ import {
   type SpecRow,
 } from "./product-children";
 import { DEFAULT_VAT_RATE } from "@/lib/format";
+import { milwaukeeFields } from "@/lib/milwaukee/product-fields";
 import { isShopProduct } from "@/lib/sync/shop-filter";
 import {
   hdctool,
@@ -768,6 +769,7 @@ async function upsertProduct(
     erpInsertedAt: p.insDate ? new Date(p.insDate) : null,
     erpUpdatedAt: p.updDate ? new Date(p.updDate) : null,
     syncedAt: new Date(),
+    ...milwaukeeFields(name),
   };
 
   // `searchKey` is stored normalised so query-time matching is a plain equality
