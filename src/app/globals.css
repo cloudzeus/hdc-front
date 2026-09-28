@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "../styles/hdc/tokens.css";
 @import "./typography.css";
 
 /*
@@ -35,14 +36,20 @@
    * Μικρό κείμενο σε κόκκινο φόντο θέλει το hover ως ΦΟΝΤΟ: λευκό πάνω στο
    * #EA3E39 είναι 4.0:1, που περνά μόνο για bold uppercase ≥14px.
    */
-  --color-k-red: #ea3e39;
+  /*
+   * HDC remap (Milwaukee palette, docs/design/mockups/design-system.html).
+   * The k-* NAMES stay so the pages not yet rewritten follow the new palette
+   * without a mass rename; only the values below changed. The Kolleris notes
+   * above describe the old values and are kept for history.
+   */
+  --color-k-red: #db011c;
   /* Το ίδιο κόκκινο, ένα σκαλί βαθύτερα. Δύο ρόλοι, όχι ένας: hover σε γεμάτο
      κουμπί, ΚΑΙ φόντο για λευκό κείμενο κάτω από 14px — ένα σήμα 9.5px πάνω
      στο #EA3E39 δεν περνά AA, πάνω σε αυτό περνά. */
-  --color-k-red-600: #d9332e;
+  --color-k-red-600: #bd0118;
   --color-k-red-hover: var(--color-k-red-600);
   /** Το βαθύ κόκκινο των promo banner (gradient με το k-red). */
-  --color-k-red-deep: #b3170d;
+  --color-k-red-deep: #bd0118;
 
   /* ── Χρυσό ──
    *
@@ -50,18 +57,19 @@
    * `k-gold` για σκούρο φόντο, `k-gold-ink` για ανοιχτό — το ίδιο κίτρινο πάνω
    * σε λευκό δεν διαβάζεται.
    */
-  --color-k-gold: #e8b542;
-  --color-k-gold-ink: #b3831f;
-  --color-k-gold-tint: #f7f0df;
-  --color-k-gold-line: #e6d9b8;
+  /* HDC has no gold: accents become Milwaukee red, tints and lines grey. */
+  --color-k-gold: #db011c;
+  --color-k-gold-ink: #bd0118;
+  --color-k-gold-tint: #f4f4f4;
+  --color-k-gold-line: #d6d6d6;
 
   /* ── Ink & text ── */
-  --color-k-ink: #1a1b1e;
-  --color-k-ink-deep: #101113;
+  --color-k-ink: #0a0a0a;
+  --color-k-ink-deep: #0a0a0a;
   /** Το μαύρο του utility bar και του footer — απόλυτο, όχι σχεδόν. */
   --color-k-black: #000000;
   /** Η επιφάνεια του header: σκούρο αλλά όχι μαύρο, ώστε να ξεχωρίζει από το bar. */
-  --color-k-header: #17181b;
+  --color-k-header: #0a0a0a;
   --color-k-header-line: #26282c;
   /** Το βυθισμένο πεδίο αναζήτησης μέσα στο σκούρο header. */
   --color-k-header-well: #0c0d0f;
@@ -103,7 +111,8 @@
    * φαίνεται βρόμικο, και ήταν το πρώτο πράγμα που χάλασε όταν κράτησα τις
    * παλιές τιμές.
    */
-  --color-k-page: #f4f3f0;
+  /* HDC: white pages; sections that need a tone use #f4f4f4 (--hdc-g1). */
+  --color-k-page: #ffffff;
   --color-k-surface: #ffffff;
   --color-k-line: #e4e1da;
   --color-k-line-2: #d8d4cc;
@@ -120,15 +129,18 @@
 
   /* ── Type ── */
   /*
-   * Οι οικογένειες, με τα ονόματα που δηλώνουν τα πακέτα `@fontsource-variable`.
-   * Έπαιρναν τιμή από κλάσεις του `next/font` πάνω στο <html>· τώρα είναι
-   * σταθερές, και ό,τι διαβάζει τα `--font-*-face` συνεχίζει να δουλεύει.
+   * HDC: μία οικογένεια παντού — TikTok Sans (το `@fontsource-variable/
+   * tiktok-sans/standard.css` στο root layout). Τα τρία `--font-*-face`
+   * κρατιούνται ως ονόματα γιατί τα διαβάζουν το typography.css και δεκάδες
+   * components· δείχνουν όλα στην ίδια οικογένεια. Το πλάτος (φαρδύ για
+   * τίτλους, στενό για ετικέτες) το δίνει το `font-stretch`, όχι άλλη
+   * γραμματοσειρά. Η mono πέφτει σε ui-monospace μόνο αν λείψει η TikTok Sans.
    */
-  --font-display-face: "Roboto Flex Variable";
-  --font-sans-face: "Inter Variable";
-  --font-mono-face: "JetBrains Mono Variable";
+  --font-display-face: "TikTok Sans Variable", "TikTok Sans";
+  --font-sans-face: "TikTok Sans Variable", "TikTok Sans";
+  --font-mono-face: "TikTok Sans Variable", "TikTok Sans";
 
-  --font-display: var(--font-display-face), "Arial Black", var(--font-sans-face), sans-serif;
+  --font-display: var(--font-display-face), system-ui, sans-serif;
   --font-sans: var(--font-sans-face), system-ui, sans-serif;
   --font-mono: var(--font-mono-face), ui-monospace, monospace;
 
