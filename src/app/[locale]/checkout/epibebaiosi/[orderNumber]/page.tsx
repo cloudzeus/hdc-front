@@ -1,0 +1,458 @@
+import { getTranslations } from "next-intl/server";
+import type { Metadata } from "next";
+import Image from "next/image";
+import { notFound } from "next/navigation";
+import { setRequestLocale } from "next-intl/server";
+import { SiteChrome } from "@/components/chrome/SiteChrome";
+import { SiteFooter } from "@/components/chrome/SiteFooter";
+import { ReorderButton } from "@/components/account/ReorderButton";
+import { Link } from "@/i18n/navigation";
+import type { Locale } from "@/i18n/routing";
+import { getMiniCart } from "@/lib/cart/cart";
+import {
+  getCatalogueStats,
+  getMenuTree,
+  getRootCategories,
+  getTopBrands,
+} from "@/lib/catalog/queries";
+import { formatMoney } from "@/lib/format";
+import { paymentPageUrl } from "@/lib/payment/viva";
+import { isValidGtin } from "@/lib/feeds/google-merchant";
+import { GoogleReviewsOptIn } from "@/components/seo/GoogleReviewsOptIn";
+import { estimatedDeliveryDate } from "@/lib/seo/google-reviews";
+import { upGreek } from "@/lib/greek";
+import { holdHours } from "@/lib/orders/hold";
+import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  // Explicit locale: `setRequestLocale` belongs to the render pass, and
+  // metadata is generated outside it.
+  const t = await getTranslations({ locale, namespace: "epibebaiosi.page" });
+  return {
+    title: t("titlos_i_paraggelia_sas"),
+    robots: { index: false, follow: false },
+  };
+}
+
+type PageProps = {
+  params: Promise<{ locale: Locale; orderNumber: string }>;
+  searchParams: Promise<{ t?: string; s?: string }>;
+};
+
+/** `label` is a message key, resolved at the render site. */
+const STEPS = [
+  { key: "PENDING_PAYMENT", label: "vima_katachorithike" },
+  { key: "CONFIRMED", label: "vima_epivevaiothike" },
+  { key: "SHIPPED", label: "vima_apestali" },
+  { key: "DELIVERED", label: "vima_paradothike" },
+] as const;
+
+export default async function ConfirmationPage({ params, searchParams }: PageProps) {
+  const t = await getTranslations("epibebaiosi.page");
+  const { locale, orderNumber } = await params;
+  // Named on destructuring: the URL contract stays `?t=…`, but `t` alone is
+  // both meaningless for a security token and the name every translator uses.
+  const { t: guestToken } = await searchParams;
+  setRequestLocale(locale);
+
+  const [order, miniCart, menuTree, brands, stats, rootCategories] = await Promise.all([
+    prisma.order.findUnique({ where: { orderNumber }, include: { lines: true } }),
+    getMiniCart(locale),
+    getMenuTree(locale),
+    getTopBrands(locale),
+    getCatalogueStats(),
+    getRootCategories(locale),
+  ]);
+
+  /*
+   * The guest token is what makes this page private. Without it an order number
+   * — which is sequential and therefore guessable — would expose a stranger's
+   * name, address and phone. Accounts (Phase 6) will add a second way in.
+   */
+  if (!order || !guestToken || guestToken !== order.guestToken) notFound();
+
+  const currentStep = STEPS.findIndex((s) => s.key === order.status);
+  const stepIndex = currentStep === -1 ? 0 : currentStep;
+  const quote = order.shippingQuote as
+    | { zoneLabel?: string; chargeableKg?: number; etaDays?: string }
+    | null;
+
+  const awaitingPayment = order.paymentStatus === "PENDING";
+
+  /*
+   * The payment code for a bank transfer.
+   *
+   * Quoting it on the transfer is what lets the deposit be matched to this
+   * order automatically instead of by hand from a statement line. Shown only
+   * while the money is still outstanding; once paid it is noise.
+   *
+   * Absent when Viva could not be reached at checkout, which is not an error
+   * here: the order stands, and the fallback is the order number, which is
+   * what the customer quoted before this existed.
+   */
+  const depositCode =
+    order.paymentMethod === "bank" && awaitingPayment ? order.vivaOrderCode : null;
+
+  /*
+   * The same link Viva emails.
+   *
+   * Every payment order here is created with `paymentNotification: true`, so
+   * Viva sends the customer a payment notification with this link in it. It is
+   * repeated on the page because an email is a thing people close, filter or
+   * never receive, and the alternative is a code with nowhere to type it.
+   *
+   * The page behind it offers whatever the account has enabled, Pay By Bank
+   * included where it is available.
+   */
+  const payUrl = depositCode ? paymentPageUrl(depositCode) : null;
+
+  /*
+   * GTINs for the Google Customer Reviews opt-in, which uses them to tie the
+   * survey to specific products.
+   *
+   * Looked up rather than read off the order: `OrderLine` is a deliberate
+   * snapshot that never re-reads the catalogue, and a GTIN was never part of
+   * it. Optional in Google's schema, so a delisted product simply contributes
+   * nothing — and only codes that survive their own check digit are sent, the
+   * same rule the Merchant Center feed applies.
+   */
+  const orderedMtrl = order.lines
+    .map((line) => line.mtrl)
+    .filter((mtrl): mtrl is number => mtrl != null);
+
+  const gtins = orderedMtrl.length
+    ? (
+        await prisma.product.findMany({
+          where: { mtrl: { in: orderedMtrl } },
+          select: { code1: true },
+        })
+      )
+        .map((p) => p.code1)
+        .filter(isValidGtin)
+        .map((code) => code.replace(/\D/g, ""))
+    : [];
+
+  return (
+    <>
+      <SiteChrome
+        locale={locale}
+        cart={miniCart}
+        categories={menuTree}
+        brands={brands}
+        stats={stats}
+      />
+
+      {/*
+        Asks the customer's permission for Google to email them a survey about
+        this order, around the time it should have arrived. Their answers are
+        what the seller rating in search results is built from.
+
+        Not shown while payment is outstanding: an order that may never be paid
+        is not one to schedule a delivery survey for.
+      */}
+      {!awaitingPayment && (
+        <GoogleReviewsOptIn
+          orderId={order.orderNumber}
+          email={order.email}
+          deliveryCountry={order.shipCountry}
+          estimatedDeliveryDate={estimatedDeliveryDate(
+            order.createdAt,
+            quote?.etaDays,
+            order.shippingMethod,
+          )}
+          gtins={gtins}
+        />
+      )}
+
+      <main id="main">
+        <div className="shell-x bg-k-ink-deep py-10 lg:py-14">
+          <p className="t-eyebrow mb-3.5 text-k-red">
+            {awaitingPayment
+              ? upGreek(t("anamoni_pliromis"))
+              : upGreek(t("eycharistoyme_gia_tin_paraggelia"))}
+          </p>
+          <h1 className="font-display text-[26px] leading-[1.14] t-display text-white lg:text-[34px]">
+            {awaitingPayment
+              ? upGreek(t("i_paraggelia_sas_kratithike"))
+              : upGreek(t("i_paraggelia_sas_katachorithike"))}
+          </h1>
+          <p className="mt-4 flex flex-wrap items-center gap-3">
+            <span className="t-account-label text-white/50">{upGreek(t("arithmos"))}</span>
+            <span className="border border-white/20 px-3 py-2 font-mono text-[15px] font-semibold text-white">
+              {order.orderNumber}
+            </span>
+          </p>
+          <p className="mt-4 max-w-[560px] text-[13.5px] leading-[1.65] text-white/60">
+            {t("steilame_epivevaiosi_sto")} {order.email}.
+            {awaitingPayment &&
+              t("molis_oloklirothei_i_pliromi_i")}
+          </p>
+        </div>
+
+        {depositCode && (
+          <div className="border-b border-k-line bg-k-surface-2">
+            <div className="shell-x py-6 lg:py-7">
+              <div className="flex flex-col gap-4 border-l-[3px] border-k-red bg-white px-5 py-5 sm:flex-row sm:items-center sm:justify-between lg:px-6">
+                <div className="min-w-0">
+                  <p className="text-[13px] font-semibold text-k-ink">
+                    {t("kodikos_pliromis_titlos")}
+                  </p>
+                  <p className="mt-1.5 max-w-[52ch] text-[12.5px] leading-[1.6] text-k-text-2">
+                    {t("kodikos_pliromis_odigia")}
+                  </p>
+                  {/*
+                    The window THIS order was given, measured from its own
+                    stamps rather than from the constant. This page, the email
+                    and the checkout promise all have to say one number, and
+                    the only way three places agree is if none of them decides
+                    it — and an order placed under an older policy keeps saying
+                    what its customer was actually promised.
+                  */}
+                  {order.reservedUntil && (
+                    <p className="mt-2 text-[12.5px] leading-[1.6] text-k-ink">
+                      {t("kratame_ta_proionta_eos", {
+                        hours: holdHours(order.createdAt, order.reservedUntil),
+                      })}
+                    </p>
+                  )}
+                </div>
+                <div className="flex shrink-0 flex-col items-start gap-2.5 sm:items-end">
+                  {/* Tabular figures: a reference that is going to be copied by
+                      hand should not have digits of different widths. */}
+                  <p className="border border-k-ink px-4 py-3 font-mono text-[18px] font-semibold tracking-[0.08em] tabular-nums text-k-ink">
+                    {depositCode}
+                  </p>
+                  {payUrl && (
+                    <a
+                      href={payUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="t-btn-sm bg-k-ink px-5 py-2.5 text-white transition-colors hover:bg-k-red"
+                    >
+                      {upGreek(t("pliroste_online"))} →
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tracking */}
+        <div className="grid gap-px border-b border-k-line bg-k-line sm:grid-cols-4">
+          {STEPS.map((step, index) => {
+            const done = index <= stepIndex && order.status !== "FAILED";
+            return (
+              <div key={step.key} className="bg-white px-4 py-5">
+                <span
+                  className={`t-cat-num ${done ? "text-k-red" : "text-k-text-5"}`}
+                >
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <p
+                  className={`mt-2 text-[12.5px] font-semibold ${
+                    done ? "text-k-ink" : "text-k-text-4"
+                  }`}
+                >
+                  {t(step.label)}
+                </p>
+                <span
+                  className={`mt-2.5 block h-1 ${done ? "bg-k-red" : "bg-k-line"}`}
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="shell-w lg:grid lg:grid-cols-[1fr_400px] lg:items-start">
+          <div className="min-w-0 border-k-line px-4 py-8 lg:border-r lg:px-10">
+            {/* Details */}
+            <div className="grid gap-px border border-k-line bg-k-line sm:grid-cols-2">
+              <Block title={t("paradosi")}>
+                {order.firstName} {order.lastName}
+                <br />
+                {order.shipLine1}
+                {order.shipLine2 && <>, {order.shipLine2}</>}
+                <br />
+                {order.shipPostcode} {order.shipCity}
+                <br />
+                {order.phone}
+              </Block>
+
+              <Block title={t("timologisi")}>
+                {order.wantsInvoice ? (
+                  <>
+                    {order.companyName}
+                    <br />
+                    {t("afm")} {order.vatNumber}
+                    {order.taxOffice && <> {t("doy")} {order.taxOffice}</>}
+                  </>
+                ) : (
+                  <>{t("apodeixi_lianikis")}</>
+                )}
+              </Block>
+
+              <Block title={t("apostoli")}>
+                {order.shippingMethod === "pickup"
+                  ? t("paralavi_apo_peiraia")
+                  : `ACS · ${quote?.zoneLabel ?? "—"}`}
+                {quote?.chargeableKg != null && (
+                  <>
+                    <br />
+                    {quote.chargeableKg} {t("kg_chreosimo_varos")}
+                  </>
+                )}
+                {quote?.etaDays && (
+                  <>
+                    <br />
+                    {quote.etaDays} {t("ergasimes")}
+                  </>
+                )}
+              </Block>
+
+              <Block title={t("pliromi")}>
+                {
+                  {
+                    card: t("karta_viva_wallet"),
+                    iris: "IRIS",
+                    bank: t("trapeziki_katathesi"),
+                    // Kept although the method is no longer offered: this map renders orders that
+  // were already placed, and a missing entry would show a raw "cod".
+  cod: t("antikatavoli"),
+                  }[order.paymentMethod] ?? order.paymentMethod
+                }
+                <br />
+                {
+                  {
+                    PENDING: t("se_anamoni"),
+                    PAID: t("exoflithike"),
+                    FAILED: t("apetyche"),
+                    REFUNDED: t("epistrafike"),
+                    ON_DELIVERY: t("kata_tin_paradosi"),
+                  }[order.paymentStatus]
+                }
+              </Block>
+            </div>
+
+            {order.notes && (
+              <p className="mt-5 border-l-[3px] border-k-line-2 bg-k-surface-2 px-4 py-3 text-[12.5px] text-k-text-2">
+                <span className="t-account-label mb-1 block text-k-text-4">
+                  {upGreek(t("scholia"))}
+                </span>
+                {order.notes}
+              </p>
+            )}
+
+            {/* Items */}
+            <h2 className="t-footer-col mt-8 mb-3 text-k-text-4">{upGreek(t("proionta"))}</h2>
+            <div className="border border-k-line">
+              {order.lines.map((line) => (
+                <div
+                  key={line.id}
+                  className="flex items-center gap-4 border-b border-k-line-3 px-4 py-3.5 last:border-0"
+                >
+                  <span className="relative flex h-14 w-14 shrink-0 items-center justify-center border border-k-line bg-k-surface-2 p-1">
+                    {line.imageUrl && (
+                      <Image
+                        src={line.imageUrl}
+                        alt=""
+                        width={56}
+                        height={56}
+                        className="max-h-full max-w-full object-contain"
+                      />
+                    )}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="t-card-brand block text-k-red">{line.brand ?? "—"}</span>
+                    <span className="mt-0.5 block text-[12.5px] font-semibold text-k-ink">
+                      {line.name}
+                    </span>
+                    <span className="t-card-sku mt-0.5 block text-k-text-4">
+                      {line.sku} · {line.quantity} {t("tem")}
+                    </span>
+                  </span>
+                  <span className="shrink-0 font-mono text-[14px] font-semibold text-k-ink">
+                    {formatMoney(Number(line.lineGross), locale)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Totals */}
+          <aside className="px-4 py-8 lg:px-8">
+            <div className="bg-k-ink px-5 py-6">
+              <dl className="flex flex-col gap-2.5">
+                {[
+                  { k: t("kathari_axia"), v: formatMoney(Number(order.subtotalNet), locale) },
+                  {
+                    k: t("metaforika"),
+                    v:
+                      Number(order.shippingGross) === 0
+                        ? upGreek(t("dorean"))
+                        : formatMoney(Number(order.shippingGross), locale),
+                  },
+                  { k: t("fpa"), v: formatMoney(Number(order.vatAmount), locale) },
+                ].map((row) => (
+                  <div key={row.k} className="flex items-baseline justify-between gap-4">
+                    <dt className="text-[12.5px] text-white/55">{row.k}</dt>
+                    <dd className="font-mono text-[13px] font-medium text-white">{row.v}</dd>
+                  </div>
+                ))}
+              </dl>
+              <div className="mt-4 flex items-end justify-between gap-4 border-t border-white/16 pt-4">
+                <p className="t-footer-col text-white/50">{upGreek(t("synolo"))}</p>
+                <p className="font-mono text-[30px] leading-none font-semibold tracking-[-0.03em] text-white">
+                  {formatMoney(Number(order.totalGross), locale)}
+                </p>
+              </div>
+            </div>
+
+            <Link
+              href="/katalogos"
+              className="t-btn-sm mt-4 flex h-12 items-center justify-center border-[1.5px] border-k-ink text-k-ink transition-colors hover:bg-k-ink hover:text-white"
+            >
+              {upGreek(t("synechiste_tis_agores"))} →
+            </Link>
+
+            {/*
+              Reorder from the order itself.
+              ──────────────────────────────────────────────────────────────
+              This page is where a customer lands when they open an old order,
+              and it is the only order view a customer who never registered
+              can reach — the `?t=` token in the link is what authorises it.
+              Leaving the button on the account list alone would give the
+              feature to registered customers only, which is backwards: the
+              guest is the one with no order history to search.
+            */}
+            <div className="mt-3">
+              <ReorderButton
+                orderNumber={order.orderNumber}
+                token={order.guestToken}
+                locale={locale}
+              />
+            </div>
+          </aside>
+        </div>
+      </main>
+
+      <SiteFooter categories={rootCategories} />
+    </>
+  );
+}
+
+function Block({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="bg-white px-4 py-4">
+      <p className="t-account-label mb-2 text-k-text-4">{upGreek(title)}</p>
+      <p className="text-[12.5px] leading-[1.6] text-k-ink">{children}</p>
+    </div>
+  );
+}

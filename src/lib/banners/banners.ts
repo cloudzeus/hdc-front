@@ -1,0 +1,427 @@
+import "server-only";
+import { cache } from "react";
+import { prisma } from "@/lib/prisma";
+import {
+  bannerState,
+  validateGrid,
+  type BannerContent,
+  type BannerView,
+  type GridCell,
+  type GridTemplateView,
+  type OfferView,
+} from "@/lib/banners/contract";
+
+/**
+ * Reading and writing banners.
+ *
+ * Discriminated results rather than exceptions, like the zone layer: every one
+ * of these can fail for a reason an operator needs to read, and a thrown error
+ * loses the reason on the way to the screen.
+ */
+
+export type Result<T = undefined> =
+  | ({ ok: true } & (T extends undefined ? object : { data: T }))
+  | { ok: false; error: string };
+
+const ok = <T>(data?: T) => ({ ok: true as const, data: data as T });
+const fail = (error: string) => ({ ok: false as const, error });
+
+/* ───────────────────────── Templates ───────────────────────── */
+
+function toTemplateView(row: {
+  id: string;
+  name: string;
+  columns: number;
+  rows: number;
+  aspect: string | null;
+  cells: unknown;
+}): GridTemplateView {
+  const geometry = (row.cells ?? {}) as { cells?: GridCell[] };
+  return {
+    id: row.id,
+    name: row.name,
+    columns: row.columns,
+    rows: row.rows,
+    aspect: row.aspect,
+    cells: geometry.cells ?? [],
+  };
+}
+
+export async function listTemplates(): Promise<GridTemplateView[]> {
+  const rows = await prisma.gridTemplate.findMany({ orderBy: { updatedAt: "desc" } });
+  return rows.map(toTemplateView);
+}
+
+export async function getTemplate(id: string): Promise<GridTemplateView | null> {
+  const row = await prisma.gridTemplate.findUnique({ where: { id } });
+  return row ? toTemplateView(row) : null;
+}
+
+/**
+ * Create or update a template.
+ *
+ * Geometry is validated before it is written, and the validator's message is
+ * returned verbatim — it already names the offending cells, and rewording it
+ * here would only make it vaguer.
+ */
+export async function saveTemplate(
+  input: {
+    id?: string;
+    name: string;
+    columns: number;
+    rows: number;
+    cells: GridCell[];
+    aspect?: string | null;
+  },
+  actor: string,
+): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
+  const name = input.name.trim();
+  if (!name) return fail("Το πλέγμα χρειάζεται όνομα.");
+
+  const check = validateGrid(input.cells, input.columns, input.rows);
+  if (!check.ok) return check;
+
+  const data = {
+    name: name.slice(0, 80),
+    columns: input.columns,
+    rows: input.rows,
+    cells: { cells: input.cells } as never,
+    aspect: input.aspect?.trim() || null,
+    updatedBy: actor.slice(0, 120),
+  };
+
+  const row = input.id
+    ? await prisma.gridTemplate.update({ where: { id: input.id }, data, select: { id: true } })
+    : await prisma.gridTemplate.create({ data, select: { id: true } });
+
+  return { ok: true, id: row.id };
+}
+
+/**
+ * How many banners are drawn on each template.
+ *
+ * The list shows it because deletion is refused for a template in use, and
+ * learning that only after pressing delete is a worse way to find out.
+ */
+export async function templateUsage(): Promise<Map<string, number>> {
+  const rows = await prisma.banner.groupBy({ by: ["templateId"], _count: { _all: true } });
+  return new Map(rows.map((r) => [r.templateId, r._count._all]));
+}
+
+/**
+ * A template in use cannot be deleted.
+ *
+ * Cascading would silently empty every banner drawn on it. Reporting the count
+ * lets somebody go and look at what they were about to destroy.
+ */
+export async function deleteTemplate(id: string): Promise<Result> {
+  const used = await prisma.banner.count({ where: { templateId: id } });
+  if (used > 0) {
+    return fail(
+      `Το πλέγμα χρησιμοποιείται από ${used} ${used === 1 ? "banner" : "banners"}. Διαγράψτε τα πρώτα.`,
+    );
+  }
+  await prisma.gridTemplate.delete({ where: { id } });
+  return { ok: true };
+}
+
+/* ───────────────────────── Banners ───────────────────────── */
+
+const asContent = (value: unknown): BannerContent | null => {
+  if (!value || typeof value !== "object") return null;
+  const c = value as BannerContent;
+  return c.cells ? c : null;
+};
+
+export type BannerSummary = {
+  id: string;
+  name: string;
+  templateName: string;
+  state: BannerView["state"];
+  placements: string[];
+  updatedAt: Date;
+};
+
+export async function listBanners(): Promise<BannerSummary[]> {
+  const rows = await prisma.banner.findMany({
+    orderBy: { updatedAt: "desc" },
+    include: { template: { select: { name: true } }, placements: { select: { zone: true } } },
+  });
+  return rows.map((b) => ({
+    id: b.id,
+    name: b.name,
+    templateName: b.template.name,
+    state: bannerState(asContent(b.draft), asContent(b.published)),
+    placements: b.placements.map((p) => p.zone),
+    updatedAt: b.updatedAt,
+  }));
+}
+
+export async function getBanner(id: string): Promise<BannerView | null> {
+  const row = await prisma.banner.findUnique({
+    where: { id },
+    include: { template: true, placements: { select: { zone: true } } },
+  });
+  if (!row) return null;
+
+  const draft = asContent(row.draft);
+  const published = asContent(row.published);
+
+  return {
+    id: row.id,
+    name: row.name,
+    template: toTemplateView(row.template),
+    draft,
+    published,
+    publishedAt: row.publishedAt?.toISOString() ?? null,
+    publishedBy: row.publishedBy,
+    state: bannerState(draft, published),
+    placements: row.placements.map((p) => p.zone),
+  };
+}
+
+export async function createBanner(
+  name: string,
+  templateId: string,
+  actor: string,
+): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
+  const trimmed = name.trim();
+  if (!trimmed) return fail("Το banner χρειάζεται όνομα.");
+
+  const template = await prisma.gridTemplate.findUnique({
+    where: { id: templateId },
+    select: { id: true },
+  });
+  if (!template) return fail("Το πλέγμα δεν βρέθηκε.");
+
+  const row = await prisma.banner.create({
+    data: {
+      name: trimmed.slice(0, 80),
+      templateId,
+      // An empty draft rather than null, so the editor has something to write
+      // into and `bannerState` reads "draft" from the first save rather than
+      // "empty" for a banner somebody has already started.
+      draft: { cells: {} } as never,
+      updatedBy: actor.slice(0, 120),
+    },
+    select: { id: true },
+  });
+  return { ok: true, id: row.id };
+}
+
+/**
+ * Ένα αντίγραφο, για να μη χτίζεται δύο φορές η ίδια σύνθεση.
+ *
+ * ── Τι αντιγράφεται ────────────────────────────────────────────────────────
+ *
+ * Το πλέγμα και η ΣΥΝΘΕΣΗ — δηλαδή όλη η δουλειά. Ως πρόχειρο, ακόμη κι όταν
+ * η πηγή ήταν δημοσιευμένη: ο λόγος που κάποιος βγάζει αντίγραφο είναι για να
+ * αλλάξει κάτι, και ένα αντίγραφο που μπαίνει ζωντανό ταυτόχρονα με το
+ * πρωτότυπο δείχνει δύο φορές το ίδιο πράγμα μέχρι να προλάβει να το πειράξει.
+ *
+ * Παίρνει το δημοσιευμένο περιεχόμενο αν υπάρχει, αλλιώς το πρόχειρο: το
+ * δημοσιευμένο είναι αυτό που ο συντάκτης ΒΛΕΠΕΙ όταν πατά «αντίγραφο», ενώ
+ * το πρόχειρο μπορεί να είναι μια μισοτελειωμένη δοκιμή.
+ *
+ * ── Τι ΔΕΝ αντιγράφεται ────────────────────────────────────────────────────
+ *
+ * Οι τοποθετήσεις. Μια ζώνη κρατά ένα banner (`zone` είναι το κλειδί), οπότε
+ * ένα αντίγραφο που κληρονομούσε τις θέσεις θα ΠΕΤΑΓΕ το πρωτότυπο έξω από
+ * αυτές — αντιγραφή που σβήνει το πρωτότυπο δεν είναι αντιγραφή. Ο συντάκτης
+ * διαλέγει θέσεις μετά, όσες θέλει.
+ */
+export async function duplicateBanner(
+  id: string,
+  actor: string,
+): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
+  const source = await prisma.banner.findUnique({
+    where: { id },
+    select: { name: true, templateId: true, draft: true, published: true },
+  });
+  if (!source) return fail("Το banner δεν βρέθηκε.");
+
+  const content = (source.published ?? source.draft ?? { cells: {} }) as never;
+
+  const row = await prisma.banner.create({
+    data: {
+      /* Το «80» είναι το όριο της στήλης· κόβεται το ΟΝΟΜΑ και μετά μπαίνει το
+         επίθημα, αλλιώς ένα μακρύ όνομα θα έχανε ακριβώς την ένδειξη που λέει
+         ότι πρόκειται για αντίγραφο. */
+      name: `${source.name.slice(0, 71)} (αντίγραφο)`,
+      templateId: source.templateId,
+      draft: content,
+      published: undefined,
+      updatedBy: actor.slice(0, 120),
+    },
+    select: { id: true },
+  });
+  return { ok: true, id: row.id };
+}
+
+export async function renameBanner(id: string, name: string, actor: string): Promise<Result> {
+  const trimmed = name.trim();
+  if (!trimmed) return fail("Το banner χρειάζεται όνομα.");
+  await prisma.banner.update({
+    where: { id },
+    data: { name: trimmed.slice(0, 80), updatedBy: actor.slice(0, 120) },
+  });
+  return { ok: true };
+}
+
+export async function saveDraft(id: string, content: BannerContent, actor: string): Promise<Result> {
+  await prisma.banner.update({
+    where: { id },
+    data: { draft: content as never, updatedBy: actor.slice(0, 120) },
+  });
+  return { ok: true };
+}
+
+/**
+ * Publish: the draft becomes what the storefront renders.
+ *
+ * Refuses an empty draft. Publishing nothing over something live is almost
+ * always a mistake, and the one time it is not, un-assigning the zone says it
+ * more clearly.
+ */
+export async function publish(
+  id: string,
+  actor: string,
+): Promise<{ ok: true; zones: string[] } | { ok: false; error: string }> {
+  const row = await prisma.banner.findUnique({
+    where: { id },
+    include: { placements: { select: { zone: true } } },
+  });
+  if (!row) return fail("Το banner δεν βρέθηκε.");
+
+  const draft = asContent(row.draft);
+  if (!draft || Object.keys(draft.cells).length === 0) {
+    return fail("Το πρόχειρο είναι άδειο — δεν υπάρχει τίποτα να δημοσιευτεί.");
+  }
+
+  await prisma.banner.update({
+    where: { id },
+    data: {
+      published: draft as never,
+      publishedAt: new Date(),
+      publishedBy: actor.slice(0, 120),
+      updatedBy: actor.slice(0, 120),
+    },
+  });
+
+  return { ok: true, zones: row.placements.map((p) => p.zone) };
+}
+
+/** Throw the draft away and start again from what is live. */
+export async function discardDraft(id: string, actor: string): Promise<Result> {
+  const row = await prisma.banner.findUnique({ where: { id }, select: { published: true } });
+  if (!row) return fail("Το banner δεν βρέθηκε.");
+  await prisma.banner.update({
+    where: { id },
+    data: { draft: (row.published ?? { widgets: {} }) as never, updatedBy: actor.slice(0, 120) },
+  });
+  return { ok: true };
+}
+
+export async function deleteBanner(id: string): Promise<Result> {
+  // Placements cascade, so a deleted banner takes its assignments with it and
+  // the zones fall back to whatever they rendered before.
+  await prisma.banner.delete({ where: { id } });
+  return { ok: true };
+}
+
+/* ──────────────────────── Placement ──────────────────────── */
+
+/**
+ * Every zone that already has a banner, and which one.
+ *
+ * The editor shows it before you assign: a zone holds exactly one banner, so
+ * assigning to a taken zone replaces what is there, and that should be a
+ * decision rather than a surprise.
+ */
+export async function listPlacements(): Promise<Record<string, { id: string; name: string }>> {
+  const rows = await prisma.bannerPlacement.findMany({
+    include: { banner: { select: { id: true, name: true } } },
+  });
+  return Object.fromEntries(rows.map((p) => [p.zone, { id: p.banner.id, name: p.banner.name }]));
+}
+
+export async function assignBanner(zone: string, bannerId: string): Promise<Result> {
+  await prisma.bannerPlacement.upsert({
+    where: { zone },
+    create: { zone, bannerId },
+    update: { bannerId },
+  });
+  return { ok: true };
+}
+
+export async function unassignZone(zone: string): Promise<Result> {
+  await prisma.bannerPlacement.deleteMany({ where: { zone } });
+  return { ok: true };
+}
+
+/* ──────────────────────── Storefront ──────────────────────── */
+
+/**
+ * What a zone should render, if a banner has been published into it.
+ *
+ * One query for every placement, cached per request: a page renders several
+ * zones and a query each would put it back on a round-trip per region.
+ *
+ * Returns null unless the banner has actually been PUBLISHED. A draft is not
+ * something the storefront has any business showing.
+ */
+const loadPublished = cache(
+  async (): Promise<Map<string, { template: GridTemplateView; content: BannerContent }>> => {
+    const rows = await prisma.bannerPlacement.findMany({
+      include: { banner: { include: { template: true } } },
+    });
+    const map = new Map<string, { template: GridTemplateView; content: BannerContent }>();
+    for (const row of rows) {
+      const content = asContent(row.banner.published);
+      if (!content || Object.keys(content.cells).length === 0) continue;
+      map.set(row.zone, { template: toTemplateView(row.banner.template), content });
+    }
+    return map;
+  },
+);
+
+export async function getPublishedBanner(zone: string) {
+  return (await loadPublished()).get(zone) ?? null;
+}
+
+/* ────────────────────────── Offers ────────────────────────── */
+
+export type { OfferView };
+
+/**
+ * Offers for the widget picker.
+ *
+ * Expired ones are excluded: binding a banner to a campaign that ended last
+ * month is a mistake the picker can simply not offer. Writing offers lives in
+ * `lib/offers` — this is the read the banner editor needs and nothing more.
+ */
+export async function searchOffersForPicker(query: string): Promise<OfferView[]> {
+  const q = query.trim();
+  const rows = await prisma.offer.findMany({
+    where: {
+      isActive: true,
+      OR: [{ endsAt: null }, { endsAt: { gt: new Date() } }],
+      ...(q.length >= 2 ? { titleEl: { contains: q, mode: "insensitive" } } : {}),
+    },
+    orderBy: { updatedAt: "desc" },
+    take: 30,
+  });
+
+  return rows.map((row) => ({
+    id: row.id,
+    slug: row.slug,
+    title: row.titleEl,
+    badge: row.badge,
+    href: row.href,
+    image: row.image,
+    imageWide: row.imageWide,
+    startsAt: row.startsAt,
+    endsAt: row.endsAt,
+    isActive: row.isActive,
+  }));
+}

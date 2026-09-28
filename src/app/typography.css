@@ -1,0 +1,618 @@
+/*
+ * Kolleris type scale — transcribed 1:1 from the design handoff.
+ *
+ * The handoff specifies two breakpoints only: Mobile 390 and Desktop 1440.
+ * Each class below carries the mobile values, with the desktop values applied
+ * at `min-width: 1024px`. Where the handoff gives one value it applies to both.
+ *
+ * Every rule sets family + weight + size + line-height + letter-spacing
+ * together. Splitting them across Tailwind utilities is how the first pass
+ * drifted: the sizes were right but the weights defaulted to 400, which is what
+ * made the page read differently from the mockup.
+ *
+ * Source: "Kolleris Eshop Homepage.dc.html" — desktop option 1a, mobile 1c.
+ */
+
+@layer components {
+  /* ── Utility bar ───────────────────────────────────────────────── */
+  .t-util {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 500;
+    font-size: 9.5px;
+    line-height: 1;
+    letter-spacing: 0.08em;
+  }
+  @media (min-width: 1024px) {
+    .t-util {
+      font-size: 10.5px;
+      letter-spacing: 0.09em;
+    }
+  }
+
+  .t-lang {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 600;
+    font-size: 10px;
+    line-height: 1;
+    letter-spacing: 0.07em;
+  }
+
+  /* ── Header ────────────────────────────────────────────────────── */
+  .t-search-cat {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+  }
+
+  .t-input {
+    font-family: var(--font-sans-face), system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 13px;
+  }
+  @media (min-width: 1024px) {
+    .t-input {
+      font-size: 14px;
+    }
+  }
+
+  .t-account-label {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 500;
+    font-size: 9.5px;
+    line-height: 1;
+    letter-spacing: 0.1em;
+  }
+
+  .t-account-value {
+    font-family: var(--font-sans-face), system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 12.5px;
+    line-height: 1;
+  }
+
+  /* ── Navigation ────────────────────────────────────────────────── */
+  /*
+   * Η πλοήγηση του redesign: στενή, κεφαλαία, με ανοιχτό γράμμα.
+   *
+   * Roboto Condensed στα 14px χωράει «ΟΛΕΣ ΟΙ ΚΑΤΗΓΟΡΙΕΣ» σε λιγότερο πλάτος
+   * απ' όσο η προηγούμενη Plex Sans στα 11,5 — γι' αυτό μπόρεσαν να μπουν και
+   * τα brands δίπλα στις σελίδες, που ήταν το ζητούμενο του design.
+   */
+  .t-nav-cond {
+    font-family: var(--font-display-face), var(--font-sans-face), sans-serif;
+    font-weight: 700;
+    font-size: 12.5px;
+    letter-spacing: 0.08em;
+    line-height: 1;
+  }
+
+  .t-nav {
+    font-family: var(--font-sans-face), system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 11.5px;
+    letter-spacing: 0.07em;
+  }
+
+  .t-nav-strong {
+    font-family: var(--font-sans-face), system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 11.5px;
+    letter-spacing: 0.07em;
+  }
+
+  .t-nav-sub {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 500;
+    font-size: 10.5px;
+    letter-spacing: 0.07em;
+  }
+
+  /* ── Headings ──────────────────────────────────────────────────── */
+  .t-eyebrow {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 500;
+    font-size: 9.5px;
+    line-height: 1;
+    letter-spacing: 0.14em;
+  }
+  @media (min-width: 1024px) {
+    .t-eyebrow {
+      font-size: 10.5px;
+    }
+  }
+
+  /*
+   * Οι διαστάσεις ξαναρυθμίστηκαν μετά την αλλαγή γραμματοσειράς.
+   *
+   * Με Roboto Condensed 500 τα 44px ήταν μια στενή, ελαφριά γραμμή. Με Roboto
+   * Flex 900 σε 125% πλάτος το ίδιο νούμερο είναι πολύ περισσότερο μελάνι:
+   * το μέγεθος δεν μεταφέρεται αυτούσιο όταν αλλάζει το βάρος και το πλάτος.
+   *
+   * `clamp` αντί για media query: το design system ορίζει h1 σε clamp(40px,
+   * 6vw, 56px) και ο τίτλος κλιμακώνεται συνεχώς αντί να πηδά στα 1024px.
+   * Το άνω όριο κρατιέται στα 48px και όχι στα 56 — ο τίτλος του hero ζει σε
+   * μισή στήλη, όχι σε πλήρες πλάτος, και στα 56 έσπαγε σε τέσσερις γραμμές.
+   */
+  /*
+   * Η μεταχείριση τίτλου, χωρίς μέγεθος.
+   *
+   * Το design system ορίζει κάθε επικεφαλίδα ως display: βάρος 900, tracking
+   * −0.03em, extended πλάτος. Οι `t-h1`/`t-h2` το φέρνουν μαζί με τα δικά τους
+   * μεγέθη, αλλά οι τίτλοι σελίδων ορίζουν το μέγεθός τους inline — και έμεναν
+   * σε βάρος 500, δηλαδή η ίδια γραμματοσειρά αποδιδόταν διαφορετικά ανά
+   * σελίδα. Αυτή η κλάση δίνει τη μεταχείριση και αφήνει το μέγεθος στο σημείο
+   * που το ξέρει.
+   */
+  .t-display {
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    font-stretch: 125%;
+  }
+
+  .t-h1 {
+    font-family: var(--font-display-face), var(--font-sans-face), sans-serif;
+    font-weight: 900;
+    font-size: clamp(26px, 4.2vw, 48px);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    font-stretch: 125%;
+  }
+
+  /* Το design system ορίζει h2 σε clamp(32px, 4.5vw, 40px). Το άνω όριο μένει
+     στα 32: οι επικεφαλίδες ενοτήτων εδώ κάθονται δίπλα σε συνδέσμους «όλα →»
+     στην ίδια γραμμή, και στα 40 τους έσπρωχναν κάτω. */
+  .t-h2 {
+    font-family: var(--font-display-face), var(--font-sans-face), sans-serif;
+    font-weight: 900;
+    font-size: clamp(20px, 2.9vw, 32px);
+    line-height: 1.06;
+    letter-spacing: -0.03em;
+    font-stretch: 125%;
+  }
+
+  /* About section heading — 26px on desktop, not 29px. */
+  /* Η επικεφαλίδα της ενότητας «η εταιρεία» — ένα σκαλί κάτω από τις υπόλοιπες. */
+  .t-h2-about {
+    font-family: var(--font-display-face), var(--font-sans-face), sans-serif;
+    font-weight: 900;
+    font-size: clamp(20px, 2.6vw, 28px);
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    font-stretch: 125%;
+  }
+
+  /*
+   * Το βάρος 500 ήταν της Roboto Condensed, και έμεινε πίσω.
+   * ─────────────────────────────────────────────────────────────────────────
+   * Όταν η γραμματοσειρά τίτλων έγινε Roboto Flex 900 σε 125% πλάτος,
+   * ξαναρυθμίστηκαν οι `t-h1`/`t-h2` και ξεχάστηκαν οι υπόλοιπες. Το
+   * αποτέλεσμα ήταν δύο διαφορετικές επικεφαλίδες στην ίδια σελίδα: ο τίτλος
+   * της ενότητας βαρύς και πλατύς, ο τίτλος του πλακιδίου δίπλα του λεπτός
+   * και στενός — ίδια οικογένεια, ορατά άλλη γραμματοσειρά.
+   */
+  .t-tile-title {
+    font-family: var(--font-display-face), var(--font-sans-face), sans-serif;
+    font-weight: 900;
+    font-size: 15px;
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+    font-stretch: 125%;
+  }
+  @media (min-width: 1024px) {
+    .t-tile-title {
+      font-size: 18px;
+    }
+  }
+
+  /* ── Body copy ─────────────────────────────────────────────────── */
+  .t-lead {
+    font-family: var(--font-sans-face), system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+  @media (min-width: 1024px) {
+    .t-lead {
+      font-size: 16px;
+      line-height: 1.6;
+    }
+  }
+
+  .t-body {
+    font-family: var(--font-sans-face), system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  @media (min-width: 1024px) {
+    .t-body {
+      font-size: 15px;
+      line-height: 1.68;
+    }
+  }
+
+  .t-body-sm {
+    font-family: var(--font-sans-face), system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+
+  /* ── Links & buttons ───────────────────────────────────────────── */
+  .t-link-mono {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 600;
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+  }
+  @media (min-width: 1024px) {
+    .t-link-mono {
+      font-size: 11px;
+    }
+  }
+
+  .t-btn {
+    font-family: var(--font-sans-face), system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.09em;
+  }
+
+  .t-btn-outline {
+    font-family: var(--font-sans-face), system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.09em;
+  }
+
+  .t-btn-sm {
+    font-family: var(--font-sans-face), system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.09em;
+  }
+  @media (min-width: 1024px) {
+    .t-btn-sm {
+      font-size: 11.5px;
+    }
+  }
+
+  /* ── Badges ────────────────────────────────────────────────────── */
+  .t-badge {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 700;
+    font-size: 8.5px;
+    line-height: 1;
+    letter-spacing: 0.07em;
+  }
+  @media (min-width: 1024px) {
+    .t-badge {
+      font-size: 9.5px;
+      letter-spacing: 0.1em;
+    }
+  }
+
+  /* ── Stat strip ────────────────────────────────────────────────── */
+  .t-stat-num {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  @media (min-width: 1024px) {
+    .t-stat-num {
+      font-size: 34px;
+    }
+  }
+
+  .t-stat-label {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 500;
+    font-size: 9px;
+    line-height: 1.4;
+    letter-spacing: 0.07em;
+  }
+  @media (min-width: 1024px) {
+    .t-stat-label {
+      font-size: 10.5px;
+      line-height: 1.45;
+      letter-spacing: 0.08em;
+    }
+  }
+
+  /* ── Category tile ─────────────────────────────────────────────── */
+  .t-cat-num {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 600;
+    font-size: 9.5px;
+    letter-spacing: 0.08em;
+  }
+  @media (min-width: 1024px) {
+    .t-cat-num {
+      font-size: 10.5px;
+    }
+  }
+
+  .t-cat-count {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 500;
+    font-size: 9.5px;
+  }
+  @media (min-width: 1024px) {
+    .t-cat-count {
+      font-size: 10.5px;
+    }
+  }
+
+  .t-cat-name {
+    font-family: var(--font-sans-face), system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    line-height: 1.3;
+    letter-spacing: 0.03em;
+  }
+  @media (min-width: 1024px) {
+    .t-cat-name {
+      font-size: 13px;
+    }
+  }
+
+  .t-cat-subs {
+    font-family: var(--font-sans-face), system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 11.5px;
+  }
+
+  /* ── Product card ──────────────────────────────────────────────── */
+  .t-card-brand {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 700;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+  }
+  @media (min-width: 1024px) {
+    .t-card-brand {
+      font-size: 10px;
+    }
+  }
+
+  .t-card-sku {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 400;
+    font-size: 10px;
+  }
+
+  .t-card-name {
+    font-family: var(--font-sans-face), system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 11.5px;
+    line-height: 1.35;
+  }
+  @media (min-width: 1024px) {
+    .t-card-name {
+      font-size: 13px;
+      line-height: 1.4;
+    }
+  }
+
+  .t-card-stock {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 500;
+    font-size: 9.5px;
+    letter-spacing: 0.06em;
+  }
+  @media (min-width: 1024px) {
+    .t-card-stock {
+      font-size: 10.5px;
+    }
+  }
+
+  .t-card-was {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 400;
+    font-size: 10.5px;
+  }
+  @media (min-width: 1024px) {
+    .t-card-was {
+      font-size: 11.5px;
+    }
+  }
+
+  .t-card-price {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 600;
+    font-size: 17px;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+  @media (min-width: 1024px) {
+    .t-card-price {
+      font-size: 21px;
+    }
+  }
+
+  .t-card-vat {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 400;
+    font-size: 8.5px;
+    letter-spacing: 0.06em;
+  }
+  @media (min-width: 1024px) {
+    .t-card-vat {
+      font-size: 9.5px;
+    }
+  }
+
+  .t-card-cta {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.07em;
+  }
+  @media (min-width: 1024px) {
+    .t-card-cta {
+      font-size: 10.5px;
+    }
+  }
+
+  /* ── Brand wall ────────────────────────────────────────────────── */
+  /*
+   * Το όνομα μάρκας είναι ΕΤΙΚΕΤΑ, όχι επικεφαλίδα.
+   * ─────────────────────────────────────────────────────────────────────────
+   * Κάθεται στα 11px κάτω από ένα λογότυπο, δίπλα σε ένα πλήθος κωδικών —
+   * ακριβώς ό,τι είναι και το `t-cat-name`, που είναι σε Inter 700. Ήταν όμως
+   * στη γραμματοσειρά ΤΙΤΛΩΝ με βάρος 500, δηλαδή στο βάρος της Roboto
+   * Condensed που έφυγε.
+   *
+   * Δεν παίρνει τη μεταχείριση τίτλου: 900 σε 125% πλάτος στα 11px κάτω από
+   * ένα λογότυπο ανταγωνίζεται το ίδιο το λογότυπο. Πάει εκεί που ανήκει, στη
+   * γραμματοσειρά κειμένου, ώστε η γραμματοσειρά τίτλων να σημαίνει τίτλος
+   * παντού και μόνο αυτό.
+   */
+  .t-brand-name {
+    font-family: var(--font-sans-face), system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+  }
+
+  .t-brand-count {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 400;
+    font-size: 9px;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── Reviews ───────────────────────────────────────────────────── */
+  .t-review-rating {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 600;
+    font-size: 44px;
+    line-height: 1;
+  }
+  @media (min-width: 1024px) {
+    .t-review-rating {
+      font-size: 62px;
+    }
+  }
+
+  .t-review-text {
+    font-family: var(--font-sans-face), system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  @media (min-width: 1024px) {
+    .t-review-text {
+      font-size: 13.5px;
+      line-height: 1.65;
+    }
+  }
+
+  .t-review-name {
+    font-family: var(--font-sans-face), system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+  }
+
+  .t-review-role {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 400;
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── About USPs ────────────────────────────────────────────────── */
+  .t-usp-title {
+    font-family: var(--font-sans-face), system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 13.5px;
+  }
+
+  .t-usp-body {
+    font-family: var(--font-sans-face), system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  /* ── Newsletter ────────────────────────────────────────────────── */
+  /* Ίδια περίπτωση με το `t-tile-title`: βάρος της παλιάς γραμματοσειράς. */
+  .t-news-title {
+    font-family: var(--font-display-face), var(--font-sans-face), sans-serif;
+    font-weight: 900;
+    font-size: 15px;
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+    font-stretch: 125%;
+  }
+  @media (min-width: 1024px) {
+    .t-news-title {
+      font-size: 19px;
+    }
+  }
+
+  .t-news-body {
+    font-family: var(--font-sans-face), system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 13.5px;
+  }
+
+  /* ── Footer ────────────────────────────────────────────────────── */
+  .t-footer-tag {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 400;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+  }
+  @media (min-width: 1024px) {
+    .t-footer-tag {
+      font-size: 11px;
+    }
+  }
+
+  .t-footer-col {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+  }
+  @media (min-width: 1024px) {
+    .t-footer-col {
+      letter-spacing: 0.12em;
+    }
+  }
+
+  .t-footer-link {
+    font-family: var(--font-sans-face), system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 13px;
+  }
+
+  .t-footer-legal {
+    font-family: var(--font-sans-face), system-ui, sans-serif;
+    font-weight: 400;
+    font-size: 11px;
+    line-height: 1.6;
+  }
+  @media (min-width: 1024px) {
+    .t-footer-legal {
+      font-size: 11.5px;
+    }
+  }
+
+  .t-social {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 600;
+    font-size: 10.5px;
+  }
+
+  .t-pay {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-weight: 600;
+    font-size: 8.5px;
+    letter-spacing: 0.07em;
+  }
+}

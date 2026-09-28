@@ -1,0 +1,1227 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "./typography.css";
+
+/*
+ * Kolleris design tokens.
+ *
+ * Tailwind 4.1 is CSS-first — these replace the `tailwind.config.ts` extension
+ * shown in the development spec. Same values, different mechanism; there is no
+ * JS config file to edit.
+ *
+ * Rule: border-radius is 0 everywhere. `rounded-pill` is the only opt-in,
+ * reserved for dots and status badges.
+ */
+@theme {
+  /* ── Brand ──
+   *
+   * Redesign Αυγούστου 2026. Το κόκκινο έπεσε από #ff3333 σε #e8362a: το πρώτο
+   * είναι καθαρό κόκκινο οθόνης και «τσιρίζει» δίπλα στο ζεστό υπόβαθρο του νέου
+   * design· το δεύτερο έχει λίγο πορτοκαλί μέσα του και κάθεται. Το hover πάει
+   * ΠΡΟΣ ΤΑ ΠΑΝΩ (#ff4b3e) αντί προς τα κάτω — ένα κουμπί που σκουραίνει στο
+   * hover διαβάζεται σαν απενεργοποιημένο.
+   */
+  /*
+   * Ένα κόκκινο, από το logo kit.
+   * ───────────────────────────────────────────────────────────────────────────
+   * Κυκλοφορούσαν τέσσερα: #EA3E39 στο logo, #FF3333 στην υπογραφή email,
+   * #E60000 στο kolleris.com και #E8362A εδώ. Το Kolleris Design System v1.0
+   * τα συγκλίνει στο PANTONE 032 C — το κόκκινο του ίδιου του σήματος.
+   *
+   * Το hover δεν είναι πια φωτεινότερο αλλά ΒΑΘΥΤΕΡΟ. Το #FF4B3E έδινε 3.4:1
+   * με λευκό κείμενο, δηλαδή ένα κουμπί που γινόταν λιγότερο ευανάγνωστο τη
+   * στιγμή που το στοχεύεις. Το #D9332E δίνει 4.7:1 (AA).
+   *
+   * Μικρό κείμενο σε κόκκινο φόντο θέλει το hover ως ΦΟΝΤΟ: λευκό πάνω στο
+   * #EA3E39 είναι 4.0:1, που περνά μόνο για bold uppercase ≥14px.
+   */
+  --color-k-red: #ea3e39;
+  /* Το ίδιο κόκκινο, ένα σκαλί βαθύτερα. Δύο ρόλοι, όχι ένας: hover σε γεμάτο
+     κουμπί, ΚΑΙ φόντο για λευκό κείμενο κάτω από 14px — ένα σήμα 9.5px πάνω
+     στο #EA3E39 δεν περνά AA, πάνω σε αυτό περνά. */
+  --color-k-red-600: #d9332e;
+  --color-k-red-hover: var(--color-k-red-600);
+  /** Το βαθύ κόκκινο των promo banner (gradient με το k-red). */
+  --color-k-red-deep: #b3170d;
+
+  /* ── Χρυσό ──
+   *
+   * Ο δεύτερος τόνος του design: eyebrow labels, B2B, αστέρια αξιολογήσεων.
+   * `k-gold` για σκούρο φόντο, `k-gold-ink` για ανοιχτό — το ίδιο κίτρινο πάνω
+   * σε λευκό δεν διαβάζεται.
+   */
+  --color-k-gold: #e8b542;
+  --color-k-gold-ink: #b3831f;
+  --color-k-gold-tint: #f7f0df;
+  --color-k-gold-line: #e6d9b8;
+
+  /* ── Ink & text ── */
+  --color-k-ink: #1a1b1e;
+  --color-k-ink-deep: #101113;
+  /** Το μαύρο του utility bar και του footer — απόλυτο, όχι σχεδόν. */
+  --color-k-black: #000000;
+  /** Η επιφάνεια του header: σκούρο αλλά όχι μαύρο, ώστε να ξεχωρίζει από το bar. */
+  --color-k-header: #17181b;
+  --color-k-header-line: #26282c;
+  /** Το βυθισμένο πεδίο αναζήτησης μέσα στο σκούρο header. */
+  --color-k-header-well: #0c0d0f;
+  --color-k-header-well-line: #33363b;
+  /* Κείμενο πάνω σε σκούρο. */
+  --color-k-on-dark: #f2f1ee;
+  --color-k-on-dark-2: #c9cdd2;
+  --color-k-on-dark-3: #9aa0a6;
+  --color-k-on-dark-4: #61666d;
+  --color-k-text-2: #55555a;
+  --color-k-text-3: #6e6e73;
+  /*
+   * `text-4` carries the main navigation, the account and cart labels and most
+   * small metadata — 144 places. At #8a8a8e it measured 3.44:1 on white, under
+   * the 4.5:1 WCAG AA floor for text this size (9.5-10.5px). #76767a is the
+   * LIGHTEST grey that clears it, so the hierarchy against `text-3` (5.07:1)
+   * survives while the labels become readable.
+   */
+  --color-k-text-4: #76767a;
+  /*
+   * These two do not clear AA — 2.37:1 and 2.06:1 — and 41 of the 43 `text-5`
+   * uses are small text on white (product SKUs, struck-through prices, the VAT
+   * note). Fixing them by darkening is not possible without collapsing them
+   * into `text-4`: the window between 4.5:1 and `text-3`'s 5.07:1 is a single
+   * shade wide. Merging the two roles is a palette decision, not a fix, so it
+   * is written down here rather than made quietly.
+   */
+  --color-k-text-5: #a8a8ad;
+  --color-k-text-6: #b4b4b9;
+
+  /* ── Lines & surfaces ──
+   *
+   * Ζεστά, όχι ουδέτερα. Το design βάζει τη σελίδα σε #f4f3f0 και τις κάρτες σε
+   * καθαρό λευκό: το αντίθετο από το συνηθισμένο «λευκή σελίδα, γκρι κάρτες».
+   * Έτσι κάθε κάρτα προϊόντος σηκώνεται μόνη της χωρίς σκιά, και οι φωτογραφίες
+   * προϊόντων — που έχουν λευκό φόντο — κουμπώνουν χωρίς ορατό περίγραμμα.
+   *
+   * Οι γραμμές είναι επίσης ζεστές (#e4e1da). Ψυχρό γκρι πάνω σε ζεστό μπεζ
+   * φαίνεται βρόμικο, και ήταν το πρώτο πράγμα που χάλασε όταν κράτησα τις
+   * παλιές τιμές.
+   */
+  --color-k-page: #f4f3f0;
+  --color-k-surface: #ffffff;
+  --color-k-line: #e4e1da;
+  --color-k-line-2: #d8d4cc;
+  --color-k-line-3: #efede8;
+  --color-k-surface-2: #faf9f6;
+  --color-k-surface-3: #f4f3f0;
+  --color-k-line-strong: #c9c4bb;
+
+  /* ── Status ── */
+  --color-k-green: #1f9254;
+  --color-k-green-2: #4ecb71;
+  --color-k-amber: #b5811a;
+  --color-k-blue: #1f5f8b;
+
+  /* ── Type ── */
+  /*
+   * Οι οικογένειες, με τα ονόματα που δηλώνουν τα πακέτα `@fontsource-variable`.
+   * Έπαιρναν τιμή από κλάσεις του `next/font` πάνω στο <html>· τώρα είναι
+   * σταθερές, και ό,τι διαβάζει τα `--font-*-face` συνεχίζει να δουλεύει.
+   */
+  --font-display-face: "Roboto Flex Variable";
+  --font-sans-face: "Inter Variable";
+  --font-mono-face: "JetBrains Mono Variable";
+
+  --font-display: var(--font-display-face), "Arial Black", var(--font-sans-face), sans-serif;
+  --font-sans: var(--font-sans-face), system-ui, sans-serif;
+  --font-mono: var(--font-mono-face), ui-monospace, monospace;
+
+  /*
+   * Maximum CONTENT width — not page width.
+   *
+   * Every band stays full-bleed: the dark breadcrumb strips, the stat grid, the
+   * red newsletter bar and the footer all still run edge to edge on a 3840px
+   * monitor. What stops growing is the text and the grids inside them, so a
+   * wide display gets more page rather than a stretched one.
+   *
+   * The handoff is a 1440px canvas with 40px gutters. 2500 is the client's
+   * call: roughly a 2560 monitor edge to edge, which is where the layout was
+   * breaking before there was any cap at all.
+   */
+  --shell-max: 2500px;
+
+  /* ── Radius: zero is the rule ── */
+  --radius-none: 0px;
+  --radius-pill: 9999px;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   shadcn/ui token bridge
+   ─────────────────────────────────────────────────────────────────────────
+   The ui/ primitives are shadcn components, which reference --primary,
+   --muted, --border and friends. Rather than carry a second palette, each one
+   is mapped onto the Kolleris token it should mean, so a colour is changed in
+   exactly one place above and every component follows.
+
+   --radius is 0. Kolleris has no rounded corners anywhere; shadcn defaults to
+   0.625rem, and leaving that would put soft edges on the admin that exist
+   nowhere else on the site.
+   ───────────────────────────────────────────────────────────────────────── */
+:root {
+  --radius: 0px;
+
+  --background: #ffffff;
+  --foreground: var(--color-k-ink);
+
+  --card: #ffffff;
+  --card-foreground: var(--color-k-ink);
+  --popover: #ffffff;
+  --popover-foreground: var(--color-k-ink);
+
+  /* Kolleris red. Used for the one primary action per screen, nothing else. */
+  --primary: var(--color-k-red);
+  --primary-foreground: #ffffff;
+
+  --secondary: var(--color-k-surface-3);
+  --secondary-foreground: var(--color-k-ink);
+
+  --muted: var(--color-k-surface-2);
+  --muted-foreground: var(--color-k-text-3);
+
+  --accent: var(--color-k-surface-3);
+  --accent-foreground: var(--color-k-ink);
+
+  --destructive: var(--color-k-red-hover);
+  --destructive-foreground: #ffffff;
+
+  --border: var(--color-k-line);
+  --input: var(--color-k-line-2);
+  /* Focus ring: ink rather than red, so the focus state is never mistaken for
+     a destructive one. */
+  --ring: var(--color-k-ink);
+}
+
+@theme inline {
+  /* The whole radius scale collapses to zero. shadcn components reach for
+     rounded-sm/md/lg/xl by default; without this they would keep Tailwind's
+     defaults and put soft edges on the admin that exist nowhere else on the
+     site. rounded-full is left alone — it is what makes a switch a switch. */
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+
+@layer base {
+  /*
+   * Kill Tailwind's default rounding globally rather than remembering to write
+   * `rounded-none` on every element.
+   */
+  *,
+  ::before,
+  ::after {
+    border-radius: 0;
+  }
+
+  .rounded-pill,
+  .rounded-full {
+    border-radius: 9999px;
+  }
+
+  /*
+   * Το extended πλάτος των τίτλων.
+   * ───────────────────────────────────────────────────────────────────────────
+   * Το design system ζητά GT America Extended, με ανοιχτό fallback τη Roboto
+   * Flex σε wdth 125–150. Η Roboto Flex είναι μεταβλητή: χωρίς `font-stretch`
+   * ο άξονας μένει στο 100% και αποδίδεται σαν οποιαδήποτε άλλη grotesque —
+   * δηλαδή φορτώνει η σωστή γραμματοσειρά και δείχνει λάθος.
+   *
+   * 125%: το κάτω άκρο του εύρους. Οι ελληνικοί κεφαλαίοι τίτλοι είναι ήδη
+   * μακριοί, και το 150% θα τους έσπαγε σε τρεις γραμμές στο κινητό.
+   */
+  .prose-kolleris h2,
+  .prose-kolleris h3 {
+    font-stretch: 125%;
+    letter-spacing: -0.03em;
+  }
+
+  html {
+    /* Read by CategoryRail / sticky offsets — SiteHeader updates it on scroll.
+       Never hardcode the header height. */
+    --header-h: 88px;
+
+    /* Height of the sticky compare toolbar — the product row pins beneath it. */
+    --compare-toolbar-h: 52px;
+    scroll-padding-top: var(--header-h);
+
+    /*
+     * Η αυλάκωση της μπάρας κύλισης κρατιέται πάντα ανοιχτή.
+     * ─────────────────────────────────────────────────────────────────────────
+     * Χωρίς αυτό, κάθε φορά που κάτι κλειδώνει την κύλιση (γκαλερί προϊόντος,
+     * quick view, επιλογέας κατηγορίας, το παράθυρο των αγαπημένων) η μπάρα
+     * εξαφανίζεται, η σελίδα πλαταίνει 15px και το sticky header τιναζόταν —
+     * και ξανά πίσω στο κλείσιμο. Το ίδιο συνέβαινε και στην πλοήγηση από
+     * κοντή σελίδα σε μακριά.
+     *
+     * Δεσμεύοντας τον χώρο μόνιμα, το πλάτος δεν αλλάζει ποτέ: το κλείδωμα
+     * γίνεται αόρατο και η μετάβαση μεταξύ σελίδων ησυχάζει.
+     */
+    scrollbar-gutter: stable;
+  }
+  @media (min-width: 1024px) {
+    html {
+      --compare-toolbar-h: 58px;
+    }
+  }
+
+  /*
+   * Η σελίδα είναι ζεστό μπεζ, ΟΧΙ λευκό — και οι κάρτες μέσα της είναι λευκές.
+   *
+   * Είναι η αντιστροφή του συνηθισμένου «λευκή σελίδα, γκρι κάρτες», και ο λόγος
+   * είναι πρακτικός: οι φωτογραφίες προϊόντων έχουν λευκό φόντο. Πάνω σε λευκή
+   * σελίδα η κάρτα εξαφανίζεται και χρειάζεται σκιά ή περίγραμμα για να σταθεί·
+   * πάνω σε #f4f3f0 σηκώνεται μόνη της και το προϊόν κόβεται καθαρά.
+   */
+  /* admin surface */
+  body:has([data-admin-shell]) {
+    background: #ffffff;
+  }
+
+  body {
+    background: var(--color-k-page);
+    color: var(--color-k-ink);
+    font-family: var(--font-sans);
+  }
+
+  /*
+   * The storefront shell. Full width by design — the cap lives on the CONTENT
+   * (`.shell-x` / `.shell-w`), never on the page, so section backgrounds keep
+   * running edge to edge.
+   *
+   * Storefront only: `/admin` is a different tree with its own density.
+   */
+  .page-shell {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    width: 100%;
+    background: #ffffff;
+  }
+
+  /*
+   * Content gutter that also caps content width.
+   *
+   * `padding-inline: max(gutter, (100% - cap) / 2)` does the job of a centred
+   * wrapper without one: below the cap it is a plain gutter, above it the
+   * padding grows so the content stays centred at exactly `--shell-max`.
+   *
+   * Doing it with padding rather than a `<div>` is the whole point — the dark
+   * bands, the red newsletter strip and the footer still run edge to edge while
+   * their text lines up with everything else on the page.
+   */
+  .shell-x {
+    padding-inline: 1rem;
+  }
+  @media (min-width: 1024px) {
+    .shell-x {
+      padding-inline: max(2.5rem, calc((100% - var(--shell-max)) / 2));
+    }
+  }
+
+  /*
+   * Cap for elements that already carry their own gutter on the inside — the
+   * two-column page grids (cart, checkout, PDP, PLP) and the stat strip.
+   *
+   * Capped at `--shell-max` PLUS the two 40px gutters, so their inner content
+   * lands on exactly the same line as every `.shell-x` band above and below.
+   */
+  .shell-w {
+    margin-inline: auto;
+    width: 100%;
+    max-width: calc(var(--shell-max) + 5rem);
+  }
+
+  /* Numerals are always monospaced — prices, SKUs, quantities, counts. */
+  .numeral {
+    font-family: var(--font-mono-face), ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/*
+ * ─── Section rhythm ────────────────────────────────────────────────────────
+ *
+ * The page was reading as one undifferentiated sheet of white: the product
+ * description and the related-products rail sat on almost the same surface,
+ * with nothing between them, so nobody could tell where one ended.
+ *
+ * The fix is a rule, not a palette. Three surfaces, and NEVER two adjacent
+ * bands on the same one:
+ *
+ *   .band-base   white          — primary content
+ *   .band-alt    surface-2      — supporting content, with a hairline grid
+ *   .band-ink    ink-deep       — punctuation: heroes, breadcrumbs, footer
+ *
+ * Depth comes from hairlines and a red keyline, not shadows — this design has
+ * `border-radius: 0` everywhere and soft shadows would fight it.
+ */
+@layer components {
+  .band-base {
+    background: #ffffff;
+  }
+
+  .band-alt {
+    background: var(--color-k-surface-2);
+  }
+
+  .band-ink {
+    background: var(--color-k-ink-deep);
+    color: #fff;
+  }
+
+  /*
+   * Engineering-drawing grid.
+   *
+   * Blueprint texture for the DARK bands only. On white it read as a table —
+   * at 5% on #fff the lines are the strongest thing in a section of 13px grey
+   * text, so instead of giving the surface depth it looked like a rendering
+   * fault. Light bands get their separation from real surface changes and the
+   * section head, which is what was actually missing.
+   */
+  .band-grid {
+    position: relative;
+    isolation: isolate;
+  }
+  .band-ink.band-grid::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 72px 72px;
+    /* Fades downward so the grid never meets the band's own bottom edge. */
+    mask-image: linear-gradient(to bottom, #000 0%, transparent 78%);
+  }
+
+  /*
+   * Hazard stripe. Already the signature on the price box; promoted to a
+   * utility so the same 7px rule can punctuate a section start.
+   */
+  .rule-hazard {
+    height: 7px;
+    background: repeating-linear-gradient(135deg, #ff3333 0 9px, #1a1a1c 9px 18px);
+  }
+
+  /* Thin red keyline that opens a section head. */
+  .rule-accent {
+    height: 2px;
+    width: 34px;
+    background: var(--color-k-red);
+  }
+}
+
+/*
+ * ─── Sticky header ─────────────────────────────────────────────────────────
+ *
+ * `HeaderShell` flips `data-condensed`; everything below is the reaction. All
+ * of it is CSS so scrolling costs no React render — see the component for why
+ * that matters with a 24-category mega-menu inside.
+ *
+ * The utility bar collapses by max-height rather than `display:none` so it can
+ * animate, and the search row loses 32px of height, not its contents: a header
+ * that reflows its own children while you scroll past it reads as broken.
+ */
+@layer components {
+  .site-header {
+    background: #ffffff;
+    transition: box-shadow 220ms ease;
+  }
+  .site-header[data-condensed="true"] {
+    box-shadow: 0 6px 20px rgba(16, 16, 18, 0.09);
+  }
+
+  .site-header .header-utility {
+    overflow: hidden;
+    max-height: 40px;
+    transition:
+      max-height 240ms ease,
+      opacity 180ms ease;
+  }
+  .site-header[data-condensed="true"] .header-utility {
+    max-height: 0;
+    opacity: 0;
+  }
+
+  .site-header .header-main {
+    transition: height 240ms ease;
+  }
+  .site-header .header-logo {
+    transition: width 240ms ease;
+  }
+
+  @media (min-width: 1024px) {
+    .site-header[data-condensed="true"] .header-main {
+      height: 64px;
+    }
+    .site-header[data-condensed="true"] .header-logo {
+      width: 118px;
+    }
+  }
+
+  /*
+   * The search field is the primary tool on a 5.305-code catalogue, so it gets
+   * a real focus treatment rather than the browser default outline the rest of
+   * the border-heavy design would swallow.
+   */
+  .search-shell:focus-within {
+    box-shadow: 0 0 0 3px rgba(255, 51, 51, 0.16);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-header,
+    .site-header .header-utility,
+    .site-header .header-main,
+    .site-header .header-logo {
+      transition: none;
+    }
+  }
+}
+
+/*
+ * ─── One container for the product page ────────────────────────────────────
+ *
+ * The PDP had bands aligning to three different things at once: the product
+ * block to `shell-x` (40px gutter), the specs strip and dealer band to
+ * `shell-w` (no gutter, so they ran to the very edge of the screen), and the
+ * technical section to `shell-x` again. Three left edges on one page.
+ *
+ * `.pdp-band` is the full-bleed wrapper — background and borders run edge to
+ * edge — and `.pdp-inner` is the single column everything inside lines up to.
+ * A buy box does not read better at 1100px and neither does a product photo,
+ * so the column caps well below the shell.
+ */
+@layer components {
+  .pdp-band {
+    padding-inline: 1rem;
+  }
+  @media (min-width: 1024px) {
+    .pdp-band {
+      padding-inline: max(2.5rem, calc((100% - 1440px) / 2));
+    }
+  }
+
+  .pdp-inner {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 1440px;
+  }
+}
+
+/*
+ * ─── Filter sidebar scrollbar ──────────────────────────────────────────────
+ *
+ * The sidebar is a fixed-height scroll region, and the platform scrollbar drew
+ * a 15px grey slab down the middle of the page — the widest vertical element in
+ * the whole layout, sitting between the filters and the grid.
+ *
+ * Thin, in the design's own line colour, and only inked while the region is
+ * hovered or focused. It stays a real scrollbar: `scrollbar-width: none` would
+ * hide the one affordance telling anyone there is more below.
+ */
+@layer components {
+  .scroll-slim {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color 200ms ease;
+  }
+  .scroll-slim:hover,
+  .scroll-slim:focus-within {
+    scrollbar-color: var(--color-k-line-2) transparent;
+  }
+
+  .scroll-slim::-webkit-scrollbar {
+    width: 6px;
+  }
+  .scroll-slim::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scroll-slim::-webkit-scrollbar-thumb {
+    background: transparent;
+    transition: background 200ms ease;
+  }
+  .scroll-slim:hover::-webkit-scrollbar-thumb,
+  .scroll-slim:focus-within::-webkit-scrollbar-thumb {
+    background: var(--color-k-line-2);
+  }
+  .scroll-slim:hover::-webkit-scrollbar-thumb:hover {
+    background: var(--color-k-text-5);
+  }
+
+  /*
+   * Scrolls, shows nothing.
+   *
+   * For rails that already carry arrows: the scrollbar is a second control for
+   * the same job, and `scroll-slim` reveals it on hover — so pointing at a
+   * thumbnail made a bar appear next to it. Keyboard and wheel scrolling are
+   * untouched; only the painted bar goes.
+   */
+  .scroll-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scroll-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/*
+ * ─── Article body ──────────────────────────────────────────────────────────
+ *
+ * HDCtool's editor emits plain HTML with no classes, so the styling has to
+ * come from the parent. Scoped to `.prose-kolleris` rather than applied
+ * globally — the rest of the site is composed from utilities, and loose
+ * element selectors would leak into every page that renders a `<p>`.
+ */
+@layer components {
+  .prose-kolleris {
+    color: var(--color-k-text-2);
+    font-size: 14.5px;
+    line-height: 1.8;
+  }
+  .prose-kolleris > * + * {
+    margin-top: 1.15em;
+  }
+  .prose-kolleris h2,
+  .prose-kolleris h3 {
+    font-family: var(--font-display);
+    color: var(--color-k-ink);
+    line-height: 1.25;
+    margin-top: 2em;
+  }
+  .prose-kolleris h2 {
+    font-size: 22px;
+  }
+  .prose-kolleris h3 {
+    font-size: 17px;
+  }
+  .prose-kolleris a {
+    color: var(--color-k-ink);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: var(--color-k-red);
+  }
+  .prose-kolleris a:hover {
+    color: var(--color-k-red);
+  }
+  .prose-kolleris strong {
+    color: var(--color-k-ink);
+    font-weight: 600;
+  }
+  .prose-kolleris ul,
+  .prose-kolleris ol {
+    padding-left: 1.4em;
+  }
+  .prose-kolleris ul {
+    list-style: disc;
+  }
+  .prose-kolleris ol {
+    list-style: decimal;
+  }
+  .prose-kolleris li + li {
+    margin-top: 0.4em;
+  }
+  .prose-kolleris img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+  .prose-kolleris blockquote {
+    border-left: 3px solid var(--color-k-red);
+    padding-left: 1.2em;
+    color: var(--color-k-ink);
+    font-size: 16px;
+  }
+  .prose-kolleris table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .prose-kolleris th,
+  .prose-kolleris td {
+    border-bottom: 1px solid var(--color-k-line);
+    padding: 0.6em 0.8em;
+    text-align: left;
+  }
+  .prose-kolleris code {
+    font-family: var(--font-mono);
+    font-size: 0.92em;
+    background: var(--color-k-surface-3);
+    padding: 0.1em 0.35em;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Zone widget entrances
+   ─────────────────────────────────────────────────────────────────────────
+   One-shot entrances for widget text, chosen per widget in the page builder.
+   CSS rather than a motion library: these animate a few elements once, and a
+   runtime would cost more than it moves.
+
+   Applied under `motion-safe:` at the call site, so prefers-reduced-motion
+   disables them with no second code path.
+   ───────────────────────────────────────────────────────────────────────── */
+@keyframes zone-fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes zone-slide-in {
+  from { opacity: 0; transform: translateX(-22px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes zone-zoom {
+  from { opacity: 0; transform: scale(.965); }
+  to   { opacity: 1; transform: none; }
+}
+/* Wipes the text in from the left. `clip-path` rather than width so the line
+   never reflows mid-animation. */
+@keyframes zone-reveal {
+  from { opacity: 0; clip-path: inset(0 100% 0 0); }
+  to   { opacity: 1; clip-path: inset(0 0 0 0); }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Banner grid
+   ─────────────────────────────────────────────────────────────────────────
+   A container query, not a media query. The preview modal renders the banner
+   at a fixed 390 / 768 / 1440 inside a desktop window; a media query would
+   read the window and show the desktop layout at every setting, which is the
+   one thing a responsive preview must not do.
+
+   Below the threshold the grid collapses to a single column in cell order —
+   a twelve-column layout at 390px is unreadable, and the order cells were
+   drawn in is the only ordering the template carries.
+   ───────────────────────────────────────────────────────────────────────── */
+/*
+ * A banner is a band, and a band is full-bleed.
+ * ─────────────────────────────────────────────────────────────────────────────
+ * The reviews strip, the red CTA and the footer all run their background to the
+ * edge of the screen and inset only the text inside them. The banner is the
+ * same kind of element, except its content IS its background, so it takes the
+ * full width and nothing else.
+ *
+ * Constraining it looked like the right call twice and was wrong twice. Given
+ * the content gutter it sat 40px narrower than every band around it; given the
+ * site's width cap it narrowed on wide screens while its neighbours stayed
+ * edge to edge. Either way it became the one element on the page that floated,
+ * which reads as a broken card rather than a section.
+ *
+ * `--shell-max` still caps everything it should: `.shell-x` and `.shell-w`
+ * cap the CONTENT inside every band, which is where a width limit belongs.
+ */
+/*
+ * Το banner έχει το ίδιο πλάτος με το header.
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Έτρεχε από άκρη σε άκρη ενώ όλη η σελίδα σταματά στο `--shell-max`, οπότε σε
+ * πλατιά οθόνη ήταν το μόνο στοιχείο που έβγαινε έξω από τη γραμμή — και,
+ * παίρνοντας το ύψος από την αναλογία του, μεγάλωνε ασύστολα.
+ *
+ * Δύο επίπεδα, γιατί το καθένα κάνει κάτι που το άλλο δεν μπορεί:
+ *
+ *   `.banner-frame` — πλήρες πλάτος, κρατά το μαύρο. Αν το μαύρο έμπαινε στο
+ *   φραγμένο, θα σταματούσε στην άκρη του banner αντί να γεμίζει τη λωρίδα.
+ *
+ *   `.banner-shell` — το φράξιμο ΚΑΙ ο container των container queries. Αν το
+ *   `container-type` έμενε στο πλήρους πλάτους στοιχείο, τα κελιά θα μετρούσαν
+ *   ολόκληρη την οθόνη και θα διάλεγαν διάταξη για χώρο που δεν έχουν.
+ *
+ * Οι αναλογίες δεν αλλάζουν: το ύψος βγαίνει από το πλάτος όπως πάντα, απλώς
+ * το πλάτος σταματά εκεί που σταματούν και τα υπόλοιπα.
+ */
+.banner-frame {
+  background: #000000;
+  /* ΤΟ ΙΔΙΟ περιθώριο με το `.shell-x`, όχι μόνο το ίδιο ταβάνι πλάτους: το
+     header σταματά 40px πριν την άκρη, οπότε ένα banner που φτάνει ως την άκρη
+     είναι 80px φαρδύτερο και η στοίχιση σπάει σε κάθε οθόνη κάτω από 2500px —
+     δηλαδή σε κάθε πραγματική οθόνη. Το padding βάφεται μαύρο μαζί. */
+  padding-inline: 1rem;
+}
+@media (min-width: 1024px) {
+  .banner-frame {
+    padding-inline: max(2.5rem, calc((100% - var(--shell-max)) / 2));
+  }
+}
+.banner-shell {
+  container-type: inline-size;
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--shell-max);
+}
+/*
+ * Η βάση της τυπογραφίας ενός κελιού.
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Όλοι οι ρόλοι είναι πολλαπλάσιά της — υπέρτιτλος 0,7· σώμα 1· παλιά τιμή
+ * 0,8· τιμή 1,55· τίτλος 2,4· μέγεθος 3,9 — οπότε οι αναλογίες κρατούν σε κάθε
+ * πλάτος κελιού. Πριν, κάθε ρόλος είχε δικό του `clamp()` και όλα συγκλίναν
+ * στα δάπεδά τους μόλις στένευε το κελί: σε 207px ο τίτλος έβγαινε 14,7px και
+ * η τιμή 15px, δηλαδή ο τίτλος ΜΙΚΡΟΤΕΡΟΣ από την τιμή.
+ *
+ * Στο `.bn-clip` και όχι στο `.banner-grid`: το κελί είναι ο container, και
+ * μια σύνθεση αποδίδεται και εκτός πλέγματος — στον καμβά του συντάκτη και στη
+ * γκαλερί παραλλαγών. Εκεί το `cqw` δεν είχε πού να λυθεί.
+ */
+.bn-clip {
+  /* `--bn-fit` το γράφει το `FitCell` όταν κάτι δεν χωράει: ένας συντελεστής
+     για ΟΛΟ το κελί, ώστε να μικραίνουν όλα μαζί και να κρατούν οι αναλογίες.
+     Χωρίς αυτό μίκραινε μόνο ο τίτλος — το μόνο που τυλίγεται — και έβγαινε
+     μικρότερος από την τιμή. */
+  --bn-fit: 1;
+  --bn-type: calc(clamp(10px, 3.5cqw, 20px) * var(--bn-fit));
+}
+
+/*
+ * Προεπισκόπηση κίνησης στη γκαλερί παραλλαγών.
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Η συνταγή κίνησης ορίζει ΣΕΙΡΑ — υπέρτιτλος, τίτλος, κείμενο, τιμή — και η
+ * σειρά είναι αόρατη σε ακίνητη μικρογραφία. Με το ποντίκι πάνω, το κελί την
+ * ξαναπαίζει, οπότε ο συντάκτης διαλέγει βλέποντας και όχι διαβάζοντας.
+ *
+ * Καθαρό CSS και όχι το νησί κίνησης: είκοσι μικρογραφίες θα σήμαιναν είκοσι
+ * GSAP timelines για μια προεπισκόπηση που κρατά μισό δευτερόλεπτο. Ο
+ * χρονισμός έρχεται από τις ίδιες μεταβλητές που γράφει το `layerStyle`, άρα
+ * η προεπισκόπηση δείχνει την ΠΡΑΓΜΑΤΙΚΗ σειρά, όχι μια δική της.
+ */
+@keyframes bn-preview-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14%);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes bn-preview-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.bn-preview:hover [data-anim] {
+  animation: bn-preview-rise var(--bn-dur, 600ms) cubic-bezier(0.22, 0.7, 0.2, 1)
+    var(--bn-delay, 0ms) both;
+}
+/* Το φόντο και οι εικόνες δεν ανεβαίνουν — μια φωτογραφία που γλιστράει
+   αφήνει λευκή λωρίδα στην άκρη του κελιού. */
+.bn-preview:hover [data-anim="fade"],
+.bn-preview:hover img[data-anim],
+.bn-preview:hover video[data-anim] {
+  animation-name: bn-preview-fade;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bn-preview:hover [data-anim] {
+    animation: none;
+  }
+}
+
+.banner-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px;
+  /*
+   * Το πλαίσιο γύρω από το πλέγμα.
+   * ───────────────────────────────────────────────────────────────────────────
+   * Κάθε άλλο πλέγμα του καταστήματος — κατηγορίες, προϊόντα, κάρτες — γράφεται
+   * `border border-k-line bg-k-line gap-px`: τα κενά ΚΑΙ η περίμετρος στην ίδια
+   * γραμμή του ίδιου χρώματος. Το banner είχε μόνο τα κενά, οπότε τα κελιά
+   * χωρίζονταν μεταξύ τους αλλά η λωρίδα ακουμπούσε τη σελίδα χωρίς άκρη —
+   * ορατά διαφορετική από ό,τι κάθεται από πάνω και από κάτω της.
+   */
+  /* `outline` και όχι `border`: το outline σχεδιάζεται ΕΞΩ από το κουτί, οπότε
+     δεν παίρνει ούτε ένα pixel από τα κελιά. Με border, τα κελιά είναι
+     full-bleed βίντεο και εικόνες — η γραμμή έπεφτε ΠΑΝΩ στο υλικό τους και
+     έκοβε την άκρη κάθε πλάνου. */
+  outline: 1px solid var(--color-k-line);
+  outline-offset: 0;
+}
+.banner-grid > * {
+  min-height: 13rem;
+}
+/*
+ * Σε μία στήλη, το κελί παίρνει το σχήμα του υλικού του.
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Κάτω από 44rem τα κελιά στοιβάζονται και το καθένα έπαιρνε 13rem — ένα
+ * αυθαίρετο ύψος που δεν έχει σχέση με το τι υπάρχει μέσα. Ένα κατακόρυφο
+ * βίντεο 4:5 σε μια λωρίδα 390×208 έχανε τα δύο τρίτα του, ακριβώς εκεί που
+ * κάθεται το κείμενο. Με την αναλογία του αρχείου το ύψος βγαίνει από το
+ * πλάτος της συσκευής, όποιο κι αν είναι, και τίποτα δεν κόβεται.
+ *
+ * Το δάπεδο πρέπει να υποχωρήσει· `min-height` νικά το `aspect-ratio`, οπότε
+ * χωρίς αυτό ένα φαρδύ πανοραμικό θα κολλούσε στα 13rem και θα κοβόταν πάλι.
+ */
+.banner-grid > [style*="--bn-cell-aspect"] {
+  aspect-ratio: var(--bn-cell-aspect);
+  min-height: 0;
+}
+@container (min-width: 44rem) {
+  .banner-grid {
+    grid-template-columns: repeat(var(--bn-cols), minmax(0, 1fr));
+    grid-template-rows: repeat(var(--bn-rows), minmax(0, 1fr));
+    aspect-ratio: var(--bn-aspect);
+    /*
+     * Pinned, or the ceiling eats the width.
+     * ───────────────────────────────────────────────────────────────────────
+     * A box with `aspect-ratio` and an auto width resolves a `max-height` by
+     * SHRINKING — 450px against 21/9 gives a 1050px-wide banner in a 1715px
+     * zone, left-aligned, with 665px of white beside it. Stating the width
+     * makes the ratio yield instead: the banner keeps the full width of its
+     * zone and the rows get shorter, which is what capping a height means.
+     * The cells keep their proportions to each other either way; it is the
+     * banner's overall ratio that gives.
+     */
+    width: 100%;
+    /* A template with no aspect ratio has `aspect-ratio: auto`, so its height
+       would come from its content — and an empty cell has none. This is what
+       gives a row its height in that case, and a floor in every other. */
+    /* Never taller than the template asks for. `aspect-ratio` reads height off
+       width, so without this a 21/9 hero on a 2560px screen is 1100px tall and
+       the catalogue starts below the fold. Unset templates get 9999px, which is
+       no ceiling in practice. */
+    max-height: var(--bn-max-h, 9999px);
+    /* The floor yields to it. `min-height` beats `max-height` in CSS, so a
+       six-row template asked to cap at 200px would sit at 312px and look like
+       the setting was ignored — an explicit ceiling has to win over a default
+       floor. */
+    /*
+     * 13rem is the floor, whatever the row count.
+     * ─────────────────────────────────────────────────────────────────────
+     * `rows * 3.25rem` alone assumes a tall template. A ONE-row grid with no
+     * aspect ratio got 52px — a hairline strip, not a banner — because the
+     * cells hold absolutely-positioned layers and contribute no height of
+     * their own. 13rem is already this stylesheet's answer to "a cell with no
+     * intrinsic height" (the single-column rule above), so the grid branch
+     * uses the same number instead of collapsing. A six-row template still
+     * resolves to 312px, unchanged; only the short ones move.
+     */
+    min-height: min(max(var(--bn-min-h, 13rem), calc(var(--bn-rows) * 3.25rem)), var(--bn-max-h, 9999px));
+  }
+  .banner-grid > * {
+    grid-column: var(--bn-col);
+    grid-row: var(--bn-row);
+    min-height: 0;
+    /* Σε πλέγμα το ύψος το ορίζουν οι γραμμές· η αναλογία του κελιού θα
+       πάλευε μαζί τους και θα άφηνε κενά. Ισχύει μόνο στη μία στήλη. */
+    aspect-ratio: auto;
+  }
+}
+
+/*
+ * One arrangement per width band, chosen by arithmetic.
+ * ─────────────────────────────────────────────────────────────────────────────
+ * `resolveBands` decides, from the template's shape, its aspect ratio and the
+ * banner's height ceiling — all known before render, so nothing measures and
+ * nothing flickers. Each band restates the arrangement in full rather than
+ * patching the one before it, so reading any single block tells you what that
+ * width does.
+ *
+ *   grid — the template as drawn
+ *   row  — every cell side by side, each as wide as the columns it spans
+ *
+ * Stacking is not one of the choices: below 704px the grid collapses to one
+ * column anyway, and above it a stacked cell is just its 13rem floor, which is
+ * shorter than the same cell in the template.
+ */
+@container (min-width: 44rem) {
+  .banner-grid[data-b-tablet="grid"] {
+    grid-template-columns: repeat(var(--bn-cols), minmax(0, 1fr));
+    grid-template-rows: repeat(var(--bn-rows), minmax(0, 1fr));
+    /* Restated, not inherited: a narrower band may have been `stack`,
+       which turns these off. Every band says everything it can change. */
+    aspect-ratio: var(--bn-aspect);
+    max-height: var(--bn-max-h, 9999px);
+    min-height: min(max(var(--bn-min-h, 13rem), calc(var(--bn-rows) * 3.25rem)), var(--bn-max-h, 9999px));
+  }
+  .banner-grid[data-b-tablet="grid"] > * {
+    grid-column: var(--bn-col);
+    grid-row: var(--bn-row);
+  }
+
+  .banner-grid[data-b-tablet="row"] {
+    grid-template-columns: repeat(var(--bn-span-total), minmax(0, 1fr));
+    grid-template-rows: minmax(0, 1fr);
+    /* Restated, not inherited: a narrower band may have been `stack`,
+       which turns these off. Every band says everything it can change. */
+    aspect-ratio: var(--bn-aspect);
+    max-height: var(--bn-max-h, 9999px);
+    min-height: min(max(var(--bn-min-h, 13rem), calc(var(--bn-rows) * 3.25rem)), var(--bn-max-h, 9999px));
+  }
+  .banner-grid[data-b-tablet="row"] > * {
+    grid-column: span var(--bn-w);
+    grid-row: 1;
+  }
+
+}
+
+@container (min-width: 64rem) {
+  .banner-grid[data-b-desktop="grid"] {
+    grid-template-columns: repeat(var(--bn-cols), minmax(0, 1fr));
+    grid-template-rows: repeat(var(--bn-rows), minmax(0, 1fr));
+    /* Restated, not inherited: a narrower band may have been `stack`,
+       which turns these off. Every band says everything it can change. */
+    aspect-ratio: var(--bn-aspect);
+    max-height: var(--bn-max-h, 9999px);
+    min-height: min(max(var(--bn-min-h, 13rem), calc(var(--bn-rows) * 3.25rem)), var(--bn-max-h, 9999px));
+  }
+  .banner-grid[data-b-desktop="grid"] > * {
+    grid-column: var(--bn-col);
+    grid-row: var(--bn-row);
+  }
+
+  .banner-grid[data-b-desktop="row"] {
+    grid-template-columns: repeat(var(--bn-span-total), minmax(0, 1fr));
+    grid-template-rows: minmax(0, 1fr);
+    /* Restated, not inherited: a narrower band may have been `stack`,
+       which turns these off. Every band says everything it can change. */
+    aspect-ratio: var(--bn-aspect);
+    max-height: var(--bn-max-h, 9999px);
+    min-height: min(max(var(--bn-min-h, 13rem), calc(var(--bn-rows) * 3.25rem)), var(--bn-max-h, 9999px));
+  }
+  .banner-grid[data-b-desktop="row"] > * {
+    grid-column: span var(--bn-w);
+    grid-row: 1;
+  }
+
+}
+
+@container (min-width: 88rem) {
+  .banner-grid[data-b-wide="grid"] {
+    grid-template-columns: repeat(var(--bn-cols), minmax(0, 1fr));
+    grid-template-rows: repeat(var(--bn-rows), minmax(0, 1fr));
+    /* Restated, not inherited: a narrower band may have been `stack`,
+       which turns these off. Every band says everything it can change. */
+    aspect-ratio: var(--bn-aspect);
+    max-height: var(--bn-max-h, 9999px);
+    min-height: min(max(var(--bn-min-h, 13rem), calc(var(--bn-rows) * 3.25rem)), var(--bn-max-h, 9999px));
+  }
+  .banner-grid[data-b-wide="grid"] > * {
+    grid-column: var(--bn-col);
+    grid-row: var(--bn-row);
+  }
+
+  .banner-grid[data-b-wide="row"] {
+    grid-template-columns: repeat(var(--bn-span-total), minmax(0, 1fr));
+    grid-template-rows: minmax(0, 1fr);
+    /* Restated, not inherited: a narrower band may have been `stack`,
+       which turns these off. Every band says everything it can change. */
+    aspect-ratio: var(--bn-aspect);
+    max-height: var(--bn-max-h, 9999px);
+    min-height: min(max(var(--bn-min-h, 13rem), calc(var(--bn-rows) * 3.25rem)), var(--bn-max-h, 9999px));
+  }
+  .banner-grid[data-b-wide="row"] > * {
+    grid-column: span var(--bn-w);
+    grid-row: 1;
+  }
+
+}
+
+@container (min-width: 120rem) {
+  .banner-grid[data-b-ultra="grid"] {
+    grid-template-columns: repeat(var(--bn-cols), minmax(0, 1fr));
+    grid-template-rows: repeat(var(--bn-rows), minmax(0, 1fr));
+    /* Restated, not inherited: a narrower band may have been `stack`,
+       which turns these off. Every band says everything it can change. */
+    aspect-ratio: var(--bn-aspect);
+    max-height: var(--bn-max-h, 9999px);
+    min-height: min(max(var(--bn-min-h, 13rem), calc(var(--bn-rows) * 3.25rem)), var(--bn-max-h, 9999px));
+  }
+  .banner-grid[data-b-ultra="grid"] > * {
+    grid-column: var(--bn-col);
+    grid-row: var(--bn-row);
+  }
+
+  .banner-grid[data-b-ultra="row"] {
+    grid-template-columns: repeat(var(--bn-span-total), minmax(0, 1fr));
+    grid-template-rows: minmax(0, 1fr);
+    /* Restated, not inherited: a narrower band may have been `stack`,
+       which turns these off. Every band says everything it can change. */
+    aspect-ratio: var(--bn-aspect);
+    max-height: var(--bn-max-h, 9999px);
+    min-height: min(max(var(--bn-min-h, 13rem), calc(var(--bn-rows) * 3.25rem)), var(--bn-max-h, 9999px));
+  }
+  .banner-grid[data-b-ultra="row"] > * {
+    grid-column: span var(--bn-w);
+    grid-row: 1;
+  }
+
+}
+
+/* A slow drift on a banner background. Purely decorative, so it stops dead for
+   anyone who asked for less motion. */
+@keyframes banner-ken-burns {
+  from { transform: scale(1); }
+  to   { transform: scale(1.12); }
+}
+.banner-ken-burns {
+  animation: banner-ken-burns 18s ease-out both alternate infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .banner-ken-burns { animation: none; }
+}
+
+/* A cell the template drops on narrow screens. Base rule hides it; the
+   container query above restores it, so "hidden" only ever means "hidden while
+   collapsed". */
+.banner-grid > .bn-mobile-hidden {
+  display: none;
+}
+@container (min-width: 44rem) {
+  .banner-grid > .bn-mobile-hidden {
+    display: block;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Product ticker
+   ─────────────────────────────────────────────────────────────────────────
+   Every slide is in the markup; one carries `data-active`. The script only
+   moves that attribute, so the resting state is server-rendered and a failed
+   hydration leaves the first product on screen rather than an empty box.
+   ───────────────────────────────────────────────────────────────────────── */
+.banner-ticker {
+  container-type: inline-size;
+}
+.banner-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+.banner-slide[data-active] {
+  opacity: 1;
+}
+.banner-ticker[data-effect="slide"] .banner-slide {
+  transform: translateY(12%);
+}
+.banner-ticker[data-effect="slide"] .banner-slide[data-active] {
+  transform: none;
+}
+.banner-slide-caption {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.6em;
+  font-size: max(10px, 5cqw);
+  line-height: 1.3;
+}
+/* The swap still happens — the point is the products, not the movement — but
+   nothing slides or fades for anyone who asked for less of it. */
+@media (prefers-reduced-motion: reduce) {
+  .banner-slide {
+    transition: none;
+    transform: none !important;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Offer widgets
+   ─────────────────────────────────────────────────────────────────────────
+   One-shot entrances plus the marquee's endless track. Applied under
+   `motion-safe:` at the call site, so prefers-reduced-motion removes them with
+   no second code path — including the marquee, which is the one somebody with
+   vestibular sensitivity would notice first.
+   ───────────────────────────────────────────────────────────────────────── */
+@keyframes offer-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes offer-pop {
+  from { opacity: 0; transform: scale(.7) rotate(-4deg); }
+  to   { opacity: 1; transform: none; }
+}
+/* Exactly half: the second copy of the track sits where the first started, so
+   the reset is invisible. */
+@keyframes offer-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Scroll reveal, without a library
+   ─────────────────────────────────────────────────────────────────────────────
+   `animation-timeline: view()` runs the whole thing on the compositor: no
+   IntersectionObserver, no scroll listener, no React state, and nothing added
+   to the bundle. Browsers without support simply show the content, which is the
+   correct fallback for a page whose job is a phone number.
+
+   Only `opacity` and `transform` are animated, so it cannot cost layout.
+   ───────────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal-rise linear both;
+      animation-timeline: view();
+      /* Finished by the time the element is a third of the way up the screen —
+         content that is still fading in when you are reading it is worse than
+         content that never moved. */
+      animation-range: entry 0% cover 32%;
+    }
+  }
+}
+
+@keyframes reveal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
+ * The open sign.
+ *
+ * Pulses only while the shop is actually open, because that is the one thing on
+ * the page that is true right now and changes by itself. A dot that pulsed at
+ * 22:00 next to the word "Κλειστά" would be decoration; this is state.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .live-dot {
+    animation: live-pulse 2.4s ease-in-out infinite;
+  }
+}
+
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.82); }
+}

@@ -1,0 +1,369 @@
+import { getTranslations } from "next-intl/server";
+import { logoScaleStyle } from "@/lib/catalog/brand-logo";
+import { pageMeta } from "@/lib/seo/urls";
+import type { Metadata } from "next";
+import Image from "next/image";
+import { setRequestLocale } from "next-intl/server";
+import { BrandSearchGrid } from "@/components/brands/BrandSearchGrid";
+import { SiteChrome } from "@/components/chrome/SiteChrome";
+import { SiteFooter } from "@/components/chrome/SiteFooter";
+import { Link } from "@/i18n/navigation";
+import { breadcrumbJsonLd } from "@/lib/seo/structured-data";
+import type { Locale } from "@/i18n/routing";
+import { getMiniCart } from "@/lib/cart/cart";
+import {
+  getBrandSpecialties,
+  getBrandsIndex,
+  getBrandsStats,
+} from "@/lib/catalog/brands";
+import { collectionJsonLd } from "@/lib/seo/structured-data";
+import {
+  getCatalogueStats,
+  getMenuTree,
+  getRootCategories,
+  getTopBrands,
+} from "@/lib/catalog/queries";
+import { upGreek } from "@/lib/greek";
+import { Zone } from "@/components/zones/Zone";
+
+/* Dynamic: the header renders the visitor's own cart from the session cookie. */
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "brands.page" });
+  const { brandCount, productCount } = await getBrandsStats();
+  const title = "Brands";
+  const description = t("brands_me_kodikoys_se_apothema", {
+    brandCount: brandCount,
+    n: productCount.toLocaleString(locale),
+  });
+  return {
+    /* Canonical, γλώσσες και Open Graph μαζί: το `openGraph` κληρονομείται
+       ολόκληρο από όποια σελίδα δεν ορίζει δικό της, οπότε 12 από 16 σελίδες
+       μοιράζονταν με τον τίτλο της αρχικής. */
+    ...pageMeta({ path: "/brands", locale, title, description }),
+    title,
+    description,
+  };
+}
+
+export default async function BrandsPage({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}) {
+  const t = await getTranslations("brands.page");
+  const { locale } = await params;
+  setRequestLocale(locale);
+
+  const [
+    brands,
+    specialties,
+    brandStats,
+    menuTree,
+    topBrands,
+    stats,
+    rootCategories,
+    miniCart,
+  ] = await Promise.all([
+    getBrandsIndex(locale),
+    getBrandSpecialties(locale),
+    getBrandsStats(),
+    getMenuTree(locale),
+    getTopBrands(locale),
+    getCatalogueStats(),
+    getRootCategories(locale),
+    getMiniCart(locale),
+  ]);
+
+  const featured = brands.slice(0, 8);
+
+  const kpis = [
+    { v: String(brandStats.brandCount), k: t("brands_me_energa_proionta") },
+    {
+      v: String(brandStats.inStockBrandCount),
+      k: t("brands_me_apothema_tora"),
+    },
+    {
+      v: brandStats.productCount.toLocaleString(locale),
+      k: t("kodikoi_ston_katalogo"),
+    },
+    { v: "1978", k: t("apo_to_proto_mas_symvolaio") },
+  ];
+
+  /*
+   * Η σελίδα δηλώνεται ως λίστα μαρκών.
+   *
+   * Έδινε μόνο το καθολικό `HardwareStore` + `WebSite`: ποιο είναι το
+   * κατάστημα, τίποτα για το τι δείχνει η σελίδα. Ένα μοντέλο που ρωτιέται
+   * «ποιες μάρκες έχει ο Κολλέρης» έπρεπε να μαντέψει από το κείμενο.
+   */
+  const collectionLd = collectionJsonLd(
+    {
+      name: "Brands",
+      path: "/brands",
+      items: brands.map((brand) => ({
+        name: brand.name,
+        path: `/brands/${brand.slug}`,
+      })),
+    },
+    locale,
+  );
+
+  /* Το μονοπάτι που ζωγραφίζει η μηχανή κάτω από το αποτέλεσμα, αντί για
+     τη γυμνή διεύθυνση. Υπήρχε μόνο σε κατηγορία και προϊόν. */
+  const crumbsLd = breadcrumbJsonLd(
+    [{ name: "Brands", path: "/brands" }],
+    locale,
+  );
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbsLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionLd) }}
+      />
+      <SiteChrome
+        locale={locale}
+        cart={miniCart}
+        categories={menuTree}
+        brands={topBrands}
+        stats={stats}
+      />
+
+      <main id="main">
+        <Zone id="brands.top" locale={locale} />
+        <Zone id="brands.bottom" locale={locale} />
+        {/* Hero */}
+        <div className="relative overflow-hidden bg-k-ink-deep">
+          <span
+            aria-hidden
+            className="font-display pointer-events-none absolute -top-10 right-8 hidden text-[210px] leading-none font-extralight tracking-[-0.03em] text-white/[0.04] lg:block"
+          >
+            {brandStats.brandCount}
+          </span>
+
+          <div className="shell-x relative">
+            <nav
+              aria-label="Breadcrumb"
+              className="t-util flex h-11 items-center gap-2.5 text-white/45"
+            >
+              <Link href="/" className="text-white/60 hover:text-white">
+                {upGreek(t("archiki"))}
+              </Link>
+              <span className="text-k-red">/</span>
+              <span className="text-white">BRANDS</span>
+            </nav>
+
+            <div className="grid items-end gap-8 pt-3.5 pb-10 lg:grid-cols-[1fr_440px] lg:gap-14">
+              <div>
+                <p className="t-eyebrow mb-4 flex items-center gap-[11px] text-k-red">
+                  <span className="hidden h-[1.5px] w-[26px] bg-k-red lg:block" />
+                  EXCLUSIVE PARTNERSHIPS
+                </p>
+                <h1 className="font-display text-[26px] leading-[1.14] t-display text-white lg:text-[36px]">
+                  {upGreek(t("ta_brands_poy"))}
+                  <br />
+                  {upGreek(t("antiprosopeyoyme"))}
+                </h1>
+                <p className="t-body mt-4 max-w-[620px] text-white/60">
+                  {t("apo_to_1978_synergazomaste_apeytheias")}
+                </p>
+              </div>
+
+              <dl className="grid grid-cols-2 gap-px border border-white/12 bg-white/12">
+                {kpis.map((kpi) => (
+                  <div key={kpi.k} className="bg-k-ink-deep px-5 py-4">
+                    <dd className="font-mono text-[22px] leading-none font-semibold text-white">
+                      {kpi.v}
+                    </dd>
+                    <dt className="t-brand-count mt-2 leading-[1.4] text-white/45">
+                      {kpi.k}
+                    </dt>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </div>
+        </div>
+
+        {/* Featured */}
+        <section className="shell-x border-b border-k-line bg-white py-8 lg:pt-14 lg:pb-15">
+          <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between lg:gap-8">
+            <div>
+              <p className="t-eyebrow mb-3 text-k-red">
+                {upGreek(t("episimes_antiprosopeyseis"))}
+              </p>
+              <h2 className="t-h2 text-k-ink">
+                {upGreek(
+                  t("ta_brands_poy_mas_zitate", { length: featured.length }),
+                )}
+              </h2>
+            </div>
+            <p className="t-body-sm max-w-[360px] text-k-text-3 lg:text-right">
+              {t("gia_ayta_kratame_to_megalytero")}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-px border border-k-line bg-k-line lg:grid-cols-4">
+            {featured.map((brand, index) => {
+              /*
+               * Οι κάρτες είναι όλες λευκές. Ο ρυθμός μένει στο σήμα.
+               * ─────────────────────────────────────────────────────────────
+               * Εναλλάσσονταν λευκή/μαύρη, και η μαύρη διάβαζε τα λογότυπα
+               * μόνο επειδή τα γύριζε σε λευκή σιλουέτα με `brightness-0
+               * invert`. Χωρίς αυτό — που έσπαγε δέκα λογότυπα με συμπαγές
+               * φόντο — μια σκούρα κάρτα δεν μπορεί να φιλοξενήσει ξένα σήματα:
+               * τα σκουρόχρωμα (Facom, DeWalt, Stanley, KARNASCH) χάνονται.
+               *
+               * Το λευκό πλακίδιο πίσω από το λογότυπο ήταν το μπάλωμα, και
+               * φαινόταν ακριβώς σαν μπάλωμα. Η κάρτα γίνεται λευκή και ο
+               * ρυθμός κρατιέται από το κόκκινο σήμα «ΑΝΤΙΠΡΟΣΩΠΕΙΑ» — κείμενο
+               * δικό μας, που μπορούμε να χρωματίσουμε όπως θέλουμε.
+               *
+               * Ίδια λογική με το μενού, όπου κάθε κελί είναι λευκό.
+               */
+              const accent = index % 2 === 1;
+              return (
+                <Link
+                  key={brand.id}
+                  href={`/brands/${brand.slug}`}
+                  className="group flex min-h-[210px] flex-col bg-white p-5 outline-1 -outline-offset-1 outline-transparent transition-[outline-color,background-color] hover:bg-k-surface-2 hover:outline-k-red"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <span
+                      className={`t-badge px-1.5 py-1 ${
+                        accent
+                          ? "bg-k-red text-white"
+                          : "bg-k-surface-3 text-k-text-3"
+                      }`}
+                    >
+                      {upGreek(t("antiprosopeia"))}
+                    </span>
+                    <span className="t-cat-num text-k-text-5">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-1 items-center justify-center py-6">
+                    {brand.logo ? (
+                      <Image
+                        src={brand.logo}
+                        alt={brand.name}
+                        width={200}
+                        height={200}
+                        style={logoScaleStyle(brand.slug)}
+                        className="block h-20 w-20 object-contain"
+                      />
+                    ) : (
+                      <span className="font-display t-display text-lg text-k-ink">
+                        {brand.name}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-baseline justify-between gap-3 border-t border-k-line pt-3.5">
+                    <div>
+                      <p className="font-mono text-[17px] leading-none font-semibold text-k-ink">
+                        {brand.productCount.toLocaleString(locale)}
+                      </p>
+                      <p className="t-brand-count mt-1.5 text-k-text-4">
+                        {upGreek(t("kodikoi_se_apothema"))}
+                      </p>
+                    </div>
+                    <span className="text-lg text-k-ink transition-transform group-hover:translate-x-1 group-hover:text-k-red">
+                      →
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+
+        <Zone id="brands.middle" locale={locale} />
+
+        {/* All in-stock brands + search */}
+        <section className="shell-x bg-white pb-10 lg:pb-14">
+          <div className="-mx-4 lg:-mx-10">
+            <BrandSearchGrid brands={brands} />
+          </div>
+        </section>
+
+        {/* By specialty */}
+        {specialties.length > 0 && (
+          <section className="shell-x border-y border-k-line bg-k-surface-3 py-10 lg:py-13">
+            <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <p className="t-eyebrow mb-3 text-k-red">
+                  {upGreek(t("ana_eidikotita"))}
+                </p>
+                <h2 className="t-h2 text-k-ink">
+                  {upGreek(t("poio_brand_gia_poia_doyleia"))}
+                </h2>
+              </div>
+              <Link
+                href="/katalogos"
+                className="t-link-mono self-start border-b-[1.5px] border-k-red pb-[3px] text-k-ink hover:text-k-red"
+              >
+                {upGreek(t("olos_o_katalogos"))} →
+              </Link>
+            </div>
+
+            <div className="grid gap-px border border-k-line bg-k-line sm:grid-cols-2 lg:grid-cols-4">
+              {specialties.map((group) => (
+                <div key={group.categorySlug} className="bg-white p-5 lg:p-6">
+                  {group.categoryImage ? (
+                    <Image
+                      src={group.categoryImage}
+                      alt=""
+                      width={52}
+                      height={52}
+                      className="block h-[26px] w-[26px] object-contain"
+                    />
+                  ) : (
+                    <span className="block h-[26px] w-[26px] bg-k-surface-3" />
+                  )}
+
+                  <Link
+                    href={`/katalogos/${group.categorySlug}`}
+                    className="mt-4 block text-[12.5px] font-bold tracking-[0.04em] text-k-ink hover:text-k-red"
+                  >
+                    {upGreek(group.categoryName)}
+                  </Link>
+                  <p className="mt-1.5 text-[12px] leading-[1.6] text-k-text-3">
+                    {group.productCount.toLocaleString(locale)}{" "}
+                    {t("kodikoi_apo")} {group.brands.length} brands.
+                  </p>
+
+                  <div className="mt-3.5 flex flex-wrap gap-1.5">
+                    {group.brands.map((brand) => (
+                      <Link
+                        key={brand.slug}
+                        href={`/brands/${brand.slug}`}
+                        className="bg-k-surface-3 px-2 py-1.5 text-[10px] font-semibold tracking-[0.05em] text-k-text-2 transition-colors hover:bg-k-ink hover:text-white"
+                      >
+                        {brand.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+      </main>
+
+      <SiteFooter categories={rootCategories} />
+    </>
+  );
+}

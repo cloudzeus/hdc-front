@@ -1,0 +1,369 @@
+import { getTranslations } from "next-intl/server";
+import { pageMeta } from "@/lib/seo/urls";
+import { brandPageJsonLd } from "@/lib/seo/structured-data";
+import { brandFaq } from "@/lib/seo/category-copy";
+import { faqJsonLd } from "@/lib/seo/product-faq";
+import type { Metadata } from "next";
+import Image from "next/image";
+import { notFound } from "next/navigation";
+import { setRequestLocale } from "next-intl/server";
+import { SiteChrome } from "@/components/chrome/SiteChrome";
+import { SiteFooter } from "@/components/chrome/SiteFooter";
+import { FilterSidebar } from "@/components/plp/FilterSidebar";
+import { Pagination } from "@/components/plp/Pagination";
+import { PlpToolbar } from "@/components/plp/PlpToolbar";
+import { ProductCard } from "@/components/product/ProductCard";
+import { CompareTray } from "@/components/compare/CompareTray";
+import { CountUp } from "@/components/ui/CountUp";
+import { logoScaleStyle } from "@/lib/catalog/brand-logo";
+import { QuickViewProvider } from "@/components/product/QuickViewProvider";
+import { Link } from "@/i18n/navigation";
+import { breadcrumbJsonLd } from "@/lib/seo/structured-data";
+import type { Locale } from "@/i18n/routing";
+import { getMiniCart } from "@/lib/cart/cart";
+import {
+  COMPARE_MAX,
+  getCompareSelection,
+  getCompareTray,
+} from "@/lib/compare/compare";
+import { getBrandBySlug } from "@/lib/catalog/brands";
+import { getPlpData, parsePlpParams } from "@/lib/catalog/plp";
+import {
+  getCatalogueStats,
+  getMenuTree,
+  getRootCategories,
+  getTopBrands,
+} from "@/lib/catalog/queries";
+import { upGreek } from "@/lib/greek";
+import { Zone } from "@/components/zones/Zone";
+
+type PageProps = {
+  params: Promise<{ locale: Locale; slug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { slug, locale } = await params;
+  // Explicit locale: `setRequestLocale` belongs to the render pass, and metadata
+  // is generated outside it.
+  const t = await getTranslations({ locale, namespace: "brands.page" });
+  const brand = await getBrandBySlug(slug, locale);
+  if (!brand) return {};
+  const title = brand.name;
+  const description = t("kodikoi_se_apothema_episimi_antiprosopeysi", {
+    n: brand.productCount.toLocaleString(locale),
+    name: brand.name,
+  });
+  return {
+    /* Canonical, γλώσσες και Open Graph μαζί: το `openGraph` κληρονομείται
+       ολόκληρο από όποια σελίδα δεν ορίζει δικό της, οπότε 12 από 16 σελίδες
+       μοιράζονταν με τον τίτλο της αρχικής. */
+    ...pageMeta({ path: `/brands/${slug}`, locale, title, description }),
+    title,
+    description,
+  };
+}
+
+export default async function BrandPage({ params, searchParams }: PageProps) {
+  const t = await getTranslations("brands.page");
+  const { locale, slug } = await params;
+  setRequestLocale(locale);
+
+  const raw = await searchParams;
+  const plpParams = parsePlpParams(raw, { brandScopeSlug: slug });
+
+  const [
+    brand,
+    data,
+    menuTree,
+    topBrands,
+    stats,
+    rootCategories,
+    miniCart,
+    compareSelection,
+    compareTray,
+  ] = await Promise.all([
+    getBrandBySlug(slug, locale),
+    getPlpData(plpParams, locale),
+    getMenuTree(locale),
+    getTopBrands(locale),
+    getCatalogueStats(),
+    getRootCategories(locale),
+    getMiniCart(locale),
+    getCompareSelection(),
+    getCompareTray(locale),
+  ]);
+
+  if (!brand || !data) notFound();
+
+  const perRow = Number(raw.perRow) || 4;
+  const gridCols =
+    perRow === 2
+      ? "sm:grid-cols-2"
+      : perRow === 3
+        ? "sm:grid-cols-2 lg:grid-cols-3"
+        : perRow === 5
+          ? "sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5"
+          : "sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
+
+  /*
+   * Whether each card's compare box is ticked, and whether it may be ticked at
+   * all. Computed here on the server from the selection cookie so the grid
+   * greys out picks the action would refuse — a different classification, or a
+   * fifth product — instead of letting the customer find out by clicking.
+   */
+  const compareStateFor = (slug: string, scopeKey?: string | null) => {
+    const selected = compareSelection.slugs.includes(slug);
+    return {
+      selected,
+      disabled:
+        !selected &&
+        (compareSelection.slugs.length >= COMPARE_MAX ||
+          (compareSelection.scopeKey != null &&
+            scopeKey !== compareSelection.scopeKey)),
+    };
+  };
+
+  /*
+   * Η μάρκα ως ΟΝΤΟΤΗΤΑ, όχι ως λέξη μέσα σε σελίδα.
+   *
+   * «BOSCH» είναι οντότητα που η μηχανή ήδη γνωρίζει. Το `Brand` συνδέει
+   * ΑΥΤΗ τη σελίδα με ΕΚΕΙΝΗ την οντότητα — αυτό είναι η διαφορά ανάμεσα σε
+   * «μια σελίδα που αναφέρει τη λέξη Bosch» και «ο διανομέας της Bosch στον
+   * Πειραιά». Και τα προϊόντα της τρέχουσας σελίδας, ώστε να υπάρχει κάτι
+   * παραθέσιμο όταν κάποιος ρωτήσει τι κρατάει το κατάστημα από τη μάρκα.
+   */
+  /*
+   * Οι δύο ερωτήσεις που κρίνουν την αγορά επαγγελματικού εργαλείου —
+   * «είστε επίσημος αντιπρόσωπος;» και «πότε θα το πάρω;» — απαντημένες σε
+   * δομή και όχι μόνο σε τρέχον κείμενο. Μόνο στα ελληνικά: το κείμενο είναι
+   * γραμμένο, όχι μεταφρασμένο, και μια αγγλική σελίδα με ελληνικό FAQ είναι
+   * χειρότερη από μια χωρίς.
+   */
+  const faqLd =
+    locale === "el"
+      ? faqJsonLd(
+          brandFaq({
+            name: brand.name,
+            total: brand.productCount,
+            inStock: brand.inStockCount,
+            categories: data.facets.subcategories.map((sub) => sub.label),
+          }),
+        )
+      : undefined;
+
+  const brandLd = brandPageJsonLd(
+    {
+      name: brand.name,
+      description: t("kodikoi_se_apothema_episimi_antiprosopeysi", {
+        n: brand.productCount.toLocaleString(locale),
+        name: brand.name,
+      }),
+      slug,
+      logo: brand.logo,
+      products: data.products.map((product) => ({
+        name: product.name,
+        slug: product.slug,
+      })),
+    },
+    locale,
+  );
+
+  /* Το μονοπάτι που ζωγραφίζει η μηχανή κάτω από το αποτέλεσμα, αντί για
+     τη γυμνή διεύθυνση. Υπήρχε μόνο σε κατηγορία και προϊόν. */
+  const crumbsLd = breadcrumbJsonLd(
+    [
+      { name: "Brands", path: "/brands" },
+      { name: brand.name, path: `/brands/${slug}` },
+    ],
+    locale,
+  );
+
+  return (
+    <QuickViewProvider locale={locale}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbsLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(brandLd) }}
+      />
+      {faqLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+        />
+      )}
+      <SiteChrome
+        locale={locale}
+        cart={miniCart}
+        categories={menuTree}
+        brands={topBrands}
+        stats={stats}
+        featured={data.products[0] ?? null}
+      />
+
+      <main id="main">
+        <Zone id="brand.top" locale={locale} />
+        <Zone id="brand.bottom" locale={locale} />
+        <div className="shell-x bg-k-ink-deep">
+          <nav
+            aria-label="Breadcrumb"
+            className="t-util flex h-11 items-center gap-2.5 text-white/45"
+          >
+            <Link href="/" className="text-white/60 hover:text-white">
+              {upGreek(t("archiki"))}
+            </Link>
+            <span className="text-k-red">/</span>
+            <Link href="/brands" className="text-white/60 hover:text-white">
+              BRANDS
+            </Link>
+            <span className="text-k-red">/</span>
+            <span className="truncate text-white">{upGreek(brand.name)}</span>
+          </nav>
+
+          <div className="flex flex-col gap-6 pt-2.5 pb-8 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
+            <div className="flex items-center gap-5">
+              {brand.logo && (
+                <span className="flex h-20 w-20 shrink-0 items-center justify-center bg-white p-2.5 lg:h-24 lg:w-24">
+                  <Image
+                    src={brand.logo}
+                    alt={brand.name}
+                    width={200}
+                    height={200}
+                    style={logoScaleStyle(slug)}
+                    className="h-full w-full object-contain"
+                  />
+                </span>
+              )}
+              <div className="min-w-0">
+                <p className="t-eyebrow mb-2 text-k-red">
+                  {upGreek(t("episimi_antiprosopeysi"))}
+                </p>
+                <h1 className="font-display text-[24px] leading-[1.14] t-display text-white lg:text-[32px]">
+                  {upGreek(brand.name)}
+                </h1>
+              </div>
+            </div>
+
+            <dl className="grid grid-cols-2 gap-px border border-white/12 bg-white/12 lg:shrink-0">
+              {[
+                { n: brand.productCount, k: t("kodikoi_ston_katalogo") },
+                { n: brand.inStockCount, k: t("se_amesi_diathesimotita") },
+              ].map((kpi) => (
+                <div key={kpi.k} className="bg-k-ink-deep px-5 py-4">
+                  <dd className="font-mono text-[22px] leading-none font-semibold text-white">
+                    {/* Το μέγεθος ΕΙΝΑΙ το επιχείρημα αυτής της σελίδας: 9.436
+                        κωδικοί μιας μάρκας δεν διαβάζονται ως αριθμός αλλά ως
+                        απόδειξη. Η καταμέτρηση τραβά το βλέμμα εκεί. */}
+                    <CountUp value={kpi.n} locale={locale} />
+                  </dd>
+                  <dt className="t-brand-count mt-2 leading-[1.4] text-white/45">
+                    {kpi.k}
+                  </dt>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          {/* Category coverage for this brand — the subcategory facet, but full
+              width and up top, since a brand page is browsed by category. */}
+          {data.facets.subcategories.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 border-t border-white/10 py-5">
+              {data.facets.subcategories.map((sub) => (
+                <Link
+                  key={sub.slug}
+                  href={`/brands/${slug}?sub=${sub.slug}`}
+                  scroll={false}
+                  className={`group/chip flex items-center gap-1.5 border px-2.5 py-1.5 text-[10px] font-semibold tracking-[0.02em] transition-colors duration-200 ${
+                    sub.active
+                      ? "border-k-red bg-k-red text-white"
+                      : "border-white/15 text-white/60 hover:border-k-red hover:bg-k-red hover:text-white"
+                  }`}
+                >
+                  {upGreek(sub.label)}
+                  {/*
+                    Ο αριθμός σε χρυσό, όπως η «ΑΙΤΗΣΗ ΛΟΓΑΡΙΑΣΜΟΥ» στην πάνω
+                    γραμμή — το ίδιο κίτρινο για σκούρο φόντο, και βαρύ ώστε να
+                    διαβάζεται στα 10px. Στο ενεργό chip γίνεται λευκός: πάνω
+                    στο κόκκινο ο χρυσός χάνει την αντίθεσή του.
+                  */}
+                  <span
+                    className={`t-brand-count font-bold transition-colors duration-200 ${
+                      sub.active
+                        ? "text-white"
+                        : "text-k-gold group-hover/chip:text-white"
+                    }`}
+                  >
+                    {sub.count}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <Zone id="brand.middle" locale={locale} />
+
+        <PlpToolbar
+          total={data.total}
+          facets={data.facets}
+          perRow={perRow}
+          basePath={`/brands/${slug}`}
+          params={raw}
+        />
+
+        <div className="shell-w bg-white lg:grid lg:grid-cols-[326px_1fr] lg:items-start">
+          <FilterSidebar
+            locale={locale}
+            facets={data.facets}
+            basePath={`/brands/${slug}`}
+            params={raw}
+            className="hidden max-h-[calc(100vh-var(--header-h))] flex-col overflow-hidden lg:sticky lg:top-[var(--header-h)] lg:flex"
+          />
+
+          <div className="min-w-0 border-k-line px-4 py-6 lg:border-l lg:px-10 lg:pt-6 lg:pb-10">
+            {data.products.length === 0 ? (
+              <div className="flex flex-col items-center justify-center border border-k-line bg-k-surface-2 px-6 py-20 text-center">
+                <p className="font-display t-display text-lg text-k-ink">
+                  {upGreek(t("kanena_proion_me_ayta_ta"))}
+                </p>
+                <Link
+                  href={`/brands/${slug}`}
+                  className="t-btn-sm mt-6 border-[1.5px] border-k-ink px-7 py-3 text-k-ink transition-colors hover:bg-k-ink hover:text-white"
+                >
+                  {upGreek(t("katharismos_filtron"))}
+                </Link>
+              </div>
+            ) : (
+              <>
+                <div className={`grid grid-cols-2 gap-3 lg:gap-4 ${gridCols}`}>
+                  {data.products.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      compare={compareStateFor(product.slug, product.scopeKey)}
+                    />
+                  ))}
+                </div>
+
+                <Pagination
+                  page={data.page}
+                  totalPages={data.totalPages}
+                  basePath={`/brands/${slug}`}
+                  params={raw}
+                />
+              </>
+            )}
+          </div>
+        </div>
+      </main>
+
+      <SiteFooter categories={rootCategories} />
+      <CompareTray tray={compareTray} />
+    </QuickViewProvider>
+  );
+}
