@@ -11,6 +11,7 @@ import {
   type SpecRow,
 } from "./product-children";
 import { DEFAULT_VAT_RATE } from "@/lib/format";
+import { isShopProduct } from "@/lib/sync/shop-filter";
 import {
   hdctool,
   HDCTOOL_MAX_LIMIT,
@@ -993,13 +994,21 @@ export async function syncProducts(
         page: 1,
       });
 
-      for (const p of response.products) {
+      // HDCtool's product walk carries every brand; this shop writes only
+      // Milwaukee (`isShopProduct`). Filtering here, before the brand-mark
+      // learning below and before the write, keeps every other brand out of
+      // both — and out of `seen`, so anything non-Milwaukee is de-listed by
+      // the sweep at the end of this walk exactly as if HDCtool had never
+      // listed it.
+      const shopProducts = response.products.filter(isShopProduct);
+
+      for (const p of shopProducts) {
         if (p.brand?.id && p.brand.mtrmark != null) {
           brandMtrmark.set(p.brand.id, p.brand.mtrmark);
         }
       }
 
-      const chunk = await writeProductChunk(response.products, taken);
+      const chunk = await writeProductChunk(shopProducts, taken);
       processed += chunk.processed;
       created += chunk.created;
       updated += chunk.updated;
@@ -1188,7 +1197,11 @@ export async function syncProductsByMtrl(mtrls: number[]): Promise<TargetedSyncR
       );
     }
 
-    const written = await writeProductChunk(response.products, taken);
+    // Only Milwaukee is written. A requested id that HDCtool still returns but
+    // that is not Milwaukee (a wrong id, or a brand this shop never sells)
+    // then simply never lands in `seen` below — it is treated exactly like a
+    // ghost id: de-listed if it exists here, otherwise nothing happens.
+    const written = await writeProductChunk(response.products.filter(isShopProduct), taken);
     processed += written.processed;
     created += written.created;
     updated += written.updated;
