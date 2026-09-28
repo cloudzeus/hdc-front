@@ -1,242 +1,392 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useActionState, useState, useTransition } from "react";
+import { useActionState, useRef, useState, useTransition } from "react";
 import { CompanyVatFields } from "@/components/account/CompanyVatFields";
-import { placeOrder, type CheckoutState } from "@/lib/checkout/actions";
-import { PAYMENT_METHODS, SHIPPING_METHODS } from "@/lib/cart/options";
-import { setCartOptions } from "@/lib/cart/actions";
 import { AddressAutocomplete } from "@/components/checkout/AddressAutocomplete";
+import { Link } from "@/i18n/navigation";
+import { setCartOptions, setDeliveryPostcode } from "@/lib/cart/actions";
+import { PAYMENT_METHODS, SHIPPING_METHODS } from "@/lib/cart/options";
+import { placeOrder, type CheckoutState } from "@/lib/checkout/actions";
 import { STOCK_HOLD_HOURS } from "@/lib/orders/hold";
-import { upGreek } from "@/lib/greek";
 
 /**
- * Checkout form.
+ * The HDC checkout form (checkout.html, screen 2 and the second phone frame).
  *
- * A single `<form>` posting to one server action, so it works without
- * JavaScript. The client parts are only the two disclosures — invoice fields
- * and card notice — and the submit-disabled-until-terms affordance. Every rule
- * they express is enforced again in the action, because a hidden field is not
- * a validation.
+ * One `<form>` posting to one server action, as before. Six numbered steps in
+ * the mockup's order: contact, pickup method, delivery address, payment,
+ * account (guests only), notes and terms. The pickup method comes BEFORE the
+ * address, and choosing the shop hides the address altogether — its fields sit
+ * in a disabled fieldset, so they are neither submitted nor validated, and the
+ * server (`checkoutSchema`) does not ask for them on a pickup order. The
+ * invoice option is not part of the address: with pickup it moves under the
+ * pickup tiles and stays available.
+ *
+ * Desktop shows every step open. Phones show one: completed steps fold into a
+ * «✓ … Αλλαγή» row and the fixed bar at the bottom moves on step by step,
+ * checking the open step's fields first.
+ *
+ * Every rule expressed here is enforced again in the action; a disabled button
+ * is an affordance, not a control.
  */
+
+type StepKey = "contact" | "shipping" | "address" | "payment" | "account" | "notes";
+
+export type ShippingOption = {
+  id: string;
+  title: string;
+  /** Mixed case, for the folded phone row: «ACS Courier · δωρεάν». */
+  label: string;
+  meta: string;
+  /** Formatted price, «ΔΩΡΕΑΝ», or null when it needs a postcode first. */
+  price: string | null;
+  free: boolean;
+};
+
+type Prefill = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  shipLine1: string;
+  shipLine2: string;
+  shipCity: string;
+  shipPostcode: string;
+  shipRegion: string;
+  shipAdminRegion: string;
+};
+
 export function CheckoutForm({
   locale,
   postcode,
-  isPartner = false,
   signedIn = false,
   prefill,
   shippingMethod,
   paymentMethod,
+  shippingOptions,
+  total,
 }: {
   locale: string;
+  /** The postcode the quotes were priced for (cookie or saved address). */
   postcode: string;
-  isPartner?: boolean;
-  /** Somebody with an account does not need to be offered one. */
+  /** Somebody with an account is not offered another one. */
   signedIn?: boolean;
-  /**
-   * What we already know about a signed-in customer.
-   *
-   * Their name and email come from the account; the address from whichever one
-   * they marked as default. Prefilled rather than locked: the account holder is
-   * not always the recipient — a site foreman, a spouse, a different branch —
-   * and a checkout that cannot be corrected is a checkout somebody abandons.
-   */
-  prefill?: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    shipLine1: string;
-    shipLine2: string;
-    shipCity: string;
-    shipPostcode: string;
-    shipRegion: string;
-    shipAdminRegion: string;
-  } | null;
-  /** What the basket page already recorded. Seeds the controls below. */
+  /** What we already know about a signed-in customer — seeds, never locks. */
+  prefill?: Prefill | null;
+  /** What the basket recorded. Seeds the controls below. */
   shippingMethod: string;
   paymentMethod: string;
+  shippingOptions: ShippingOption[];
+  /** VAT-inclusive total, formatted — for the phone's bottom bar. */
+  total: string;
 }) {
-  const t = useTranslations("checkout.CheckoutForm");
+  const t = useTranslations("checkout.Hdc");
   const [state, action, pending] = useActionState<CheckoutState, FormData>(placeOrder, {});
-  const [wantsInvoice, setWantsInvoice] = useState(false);
-  /*
-   * Seeded from the cart, not from a hardcoded default.
-   *
-   * These used to start at "courier" and "card" whatever the customer had
-   * chosen one page earlier, so picking bank transfer in the basket and
-   * arriving here showed card again. It read as the site changing its mind.
-   */
+  const form = useRef<HTMLFormElement>(null);
   const [shipping, setShipping] = useState<string>(shippingMethod);
   const [payment, setPayment] = useState<string>(paymentMethod);
+  const [wantsInvoice, setWantsInvoice] = useState(false);
   const [terms, setTerms] = useState(false);
   const [, startTransition] = useTransition();
+  const lastPostcode = useRef(postcode);
+  const postcodeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const pickup = shipping === "pickup";
+  const isOnline = payment === "card" || payment === "iris";
+
+  const steps: StepKey[] = [
+    "contact",
+    "shipping",
+    ...(pickup ? [] : (["address"] as const)),
+    "payment",
+    ...(signedIn ? [] : (["account"] as const)),
+    "notes",
+  ];
+  const numberOf = (key: StepKey) => steps.indexOf(key) + 1;
+
+  // Phones: the one open step. Desktop CSS ignores it.
+  const [open, setOpen] = useState<StepKey>("contact");
+  const openIndex = Math.max(0, steps.indexOf(open));
+  const stateOf = (key: StepKey) => {
+    const i = steps.indexOf(key);
+    return i < openIndex ? "done" : i === openIndex ? "open" : "todo";
+  };
+
+  // What the folded rows say — read from the form, not duplicated in state.
+  const [values, setValues] = useState<Record<string, string>>({});
+  const readValues = () => {
+    if (!form.current) return;
+    const data = new FormData(form.current);
+    const next: Record<string, string> = {};
+    for (const [k, v] of data.entries()) if (typeof v === "string") next[k] = v;
+    setValues(next);
+  };
 
   /*
-   * Written back to the cart on every change.
-   *
-   * The order summary beside this form is server-rendered from the cart row, so
-   * without this the two disagree: the form says "collect from the shop" and
-   * the panel next to it still charges for a courier. Persisting re-renders the
-   * summary from the same source the action prices against.
+   * Written back to the cart on every change, as before: the summary beside
+   * the form is server-rendered from the cart row, and a form that says
+   * «collect from the shop» next to a panel still charging a courier is the
+   * disagreement this prevents. The action prices from what is submitted
+   * regardless.
    */
-  const remember = (patch: { shippingMethod?: string; paymentMethod?: string }) => {
+  const remember = (patch: { shippingMethod?: string; paymentMethod?: string }) =>
     startTransition(async () => {
       await setCartOptions(patch);
     });
+
+  /* A complete Τ.Κ. re-prices the tiles and the summary for its ACS zone. */
+  const onPostcode = (value: string) => {
+    const clean = value.replace(/\s/g, "");
+    if (!/^\d{5}$/.test(clean) || clean === lastPostcode.current) return;
+    if (postcodeTimer.current) clearTimeout(postcodeTimer.current);
+    postcodeTimer.current = setTimeout(() => {
+      lastPostcode.current = clean;
+      startTransition(async () => {
+        await setDeliveryPostcode({ postcode: clean });
+      });
+    }, 400);
   };
 
-  const payments = PAYMENT_METHODS.filter((m) => !m.partnerOnly || isPartner);
+  /** Phones: check the open step's own fields, then open the next one. */
+  const next = () => {
+    const section = form.current?.querySelector<HTMLElement>(`[data-step="${open}"]`);
+    const controls = section
+      ? Array.from(
+          section.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(
+            "input:not([type=hidden]), textarea",
+          ),
+        )
+      : [];
+    const invalid = controls.find((c) => !c.disabled && !c.checkValidity());
+    if (invalid) {
+      invalid.reportValidity();
+      return;
+    }
+    readValues();
+    const following = steps[openIndex + 1];
+    if (following) {
+      setOpen(following);
+      requestAnimationFrame(() =>
+        form.current
+          ?.querySelector(`[data-step="${following}"]`)
+          ?.scrollIntoView({ block: "start", behavior: "smooth" }),
+      );
+    }
+  };
+
+  /*
+   * A submit with an invalid field in a folded step: the browser cannot focus
+   * a hidden control and would refuse silently. Open that step first, then let
+   * it say what is wrong.
+   */
+  const guardSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const f = form.current;
+    if (!f || f.checkValidity()) return;
+    e.preventDefault();
+    const invalid = f.querySelector<HTMLInputElement>(":invalid:not(fieldset)");
+    const key = invalid?.closest<HTMLElement>("[data-step]")?.dataset.step as StepKey | undefined;
+    if (key) setOpen(key);
+    requestAnimationFrame(() => invalid?.reportValidity());
+  };
+
+  const shipTitle = shippingOptions.find((o) => o.id === shipping);
+  const payLabel = (id: string) =>
+    id === "card" ? t("pay_card") : id === "iris" ? "IRIS" : t("pay_bank");
+  const payLabelShort = (id: string) =>
+    id === "card" ? t("pay_card") : id === "iris" ? "IRIS" : t("pay_bank_short");
+
+  const summaries: Record<StepKey, string> = {
+    contact: [
+      [values.firstName, values.lastName].filter(Boolean).join(" "),
+      values.phone,
+    ]
+      .filter(Boolean)
+      .join(" · "),
+    shipping: [
+      shipTitle?.label,
+      shipTitle?.free ? t("dorean_mikra") : shipTitle?.price,
+      pickup && wantsInvoice ? t("timologio") : null,
+    ]
+      .filter(Boolean)
+      .join(" · "),
+    address: [
+      [values.shipPostcode, values.shipCity].filter(Boolean).join(" "),
+      wantsInvoice ? t("timologio") : null,
+    ]
+      .filter(Boolean)
+      .join(" · "),
+    payment: payLabel(payment),
+    account: values.password ? t("me_logariasmo") : t("os_episkeptis"),
+    notes: "",
+  };
+
+  const invoiceBlock = (
+    <div className="hdc-co-invoice">
+      <label className="hdc-chk">
+        <input
+          type="checkbox"
+          name="wantsInvoice"
+          checked={wantsInvoice}
+          onChange={(e) => setWantsInvoice(e.target.checked)}
+        />
+        <i aria-hidden />
+        <span>
+          <b>{t("thelo_timologio")}</b> — {t("thelo_timologio_sub")}
+        </span>
+      </label>
+      {wantsInvoice && (
+        <div className="hdc-co-inv">
+          <CompanyVatFields variant="hdc" required fieldErrors={state.fieldErrors} />
+        </div>
+      )}
+    </div>
+  );
+
+  const submitLabel = pending
+    ? t("ginetai_katachorisi")
+    : isOnline
+      ? `${t("pliromi_me_asfaleia")} →`
+      : `${t("oloklirosi_paraggelias")} →`;
 
   return (
-    <form action={action} className="flex flex-col gap-8">
+    <form
+      ref={form}
+      action={action}
+      className="hdc-co-form"
+      onChange={(e) => {
+        const target = e.target as unknown as HTMLInputElement;
+        if (target.name === "shipPostcode") onPostcode(target.value);
+        readValues();
+      }}
+    >
       <input type="hidden" name="locale" value={locale} />
 
       {state.error && (
-        <p
-          role="alert"
-          className="border-l-[3px] border-k-red bg-k-red/8 px-4 py-3 text-[13px] text-k-ink"
-        >
+        <p role="alert" className="hdc-co-error">
           {state.error}
         </p>
       )}
 
-      <Step n="01" title={t("stoicheia_epikoinonias")}>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label={t("onoma")} name="firstName" defaultValue={prefill?.firstName} error={state.fieldErrors?.firstName} required />
-          <Field label={t("eponymo")} name="lastName" defaultValue={prefill?.lastName} error={state.fieldErrors?.lastName} required />
-          <Field
-            label="Email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            defaultValue={prefill?.email}
-            error={state.fieldErrors?.email}
-            required
-          />
-          <Field
-            label={t("kinito")}
-            name="phone"
-            type="tel"
-            autoComplete="tel"
-            defaultValue={prefill?.phone}
-            error={state.fieldErrors?.phone}
-            required
-          />
+      <Step
+        k="contact"
+        n={numberOf("contact")}
+        state={stateOf("contact")}
+        title={t("s_contact")}
+        summary={summaries.contact}
+        onEdit={() => setOpen("contact")}
+        changeLabel={t("allagi")}
+        aside={
+          !signedIn && (
+            <Link href={{ pathname: "/eisodos", query: { redirectTo: "/checkout" } }}>
+              {t("echete_logariasmo")}
+            </Link>
+          )
+        }
+      >
+        <div className="f2">
+          <Field label={t("onoma")} name="firstName" autoComplete="given-name" placeholder={t("onoma_ph")} defaultValue={prefill?.firstName} error={state.fieldErrors?.firstName} required />
+          <Field label={t("eponymo")} name="lastName" autoComplete="family-name" placeholder={t("eponymo_ph")} defaultValue={prefill?.lastName} error={state.fieldErrors?.lastName} required />
+          <Field label="EMAIL" name="email" type="email" autoComplete="email" placeholder={t("email_ph")} defaultValue={prefill?.email} error={state.fieldErrors?.email} required />
+          <Field label={t("kinito")} name="phone" type="tel" autoComplete="tel" placeholder="69…" defaultValue={prefill?.phone} error={state.fieldErrors?.phone} required help={t("kinito_help")} />
         </div>
       </Step>
 
-      <Step n="02" title={t("dieythynsi_paradosis")}>
-        {/*
-          Street and floor on one row, the four locality fields on the next —
-          the same shape as the account's address book, because it is the same
-          address. Two forms that ask for one thing in two arrangements make the
-          second one feel like a different question.
-        */}
-        <div className="grid gap-4 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-          {/* Suggestions fill the postcode as well, which is the field that
-              decides the ACS zone and the one customers most often get wrong. */}
-          <AddressAutocomplete
-            label={t("odos_kai_arithmos")}
-            name="shipLine1"
-            defaultValue={prefill?.shipLine1}
-            error={state.fieldErrors?.shipLine1}
-            required
-          />
-          <Field label={t("orofos_koydoyni")} name="shipLine2" defaultValue={prefill?.shipLine2} autoComplete="address-line2" />
+      <Step
+        k="shipping"
+        n={numberOf("shipping")}
+        state={stateOf("shipping")}
+        title={t("s_shipping")}
+        summary={summaries.shipping}
+        onEdit={() => setOpen("shipping")}
+        changeLabel={t("allagi")}
+      >
+        <div className="hdc-ship" role="radiogroup" aria-label={t("s_shipping")}>
+          {SHIPPING_METHODS.map((method) => {
+            const option = shippingOptions.find((o) => o.id === method.id);
+            const on = shipping === method.id;
+            return (
+              <label key={method.id} className={on ? "on" : undefined}>
+                <input
+                  type="radio"
+                  name="shippingMethod"
+                  value={method.id}
+                  checked={on}
+                  onChange={() => {
+                    setShipping(method.id);
+                    remember({ shippingMethod: method.id });
+                  }}
+                />
+                <b>{option?.title ?? method.label}</b>
+                <span>{option?.meta ?? method.meta}</span>
+                {option?.price ? (
+                  <strong className={option.free ? "fr" : undefined}>{option.price}</strong>
+                ) : (
+                  <strong className="ask">{t("timi_apo_acs")}</strong>
+                )}
+              </label>
+            );
+          })}
         </div>
+        {pickup && invoiceBlock}
+      </Step>
 
-        {/* Νομός and περιφέρεια are two administrative levels, so one field
-            could only ever hold one of them. Both are filled by a suggestion. */}
-        <div className="mt-4 grid gap-4 sm:grid-cols-[110px_minmax(0,1fr)] lg:grid-cols-[110px_repeat(3,minmax(0,1fr))]">
-          <Field
-            label={t("t_k")}
-            name="shipPostcode"
-            autoComplete="postal-code"
-            defaultValue={prefill?.shipPostcode || postcode}
-            error={state.fieldErrors?.shipPostcode}
-            required
-            help={t("kathorizei_ti_zoni_acs_kai")}
-          />
-          <Field
-            label={t("poli")}
-            name="shipCity"
-            autoComplete="address-level2"
-            defaultValue={prefill?.shipCity}
-            error={state.fieldErrors?.shipCity}
-            required
-          />
-          <Field label={t("nomos")} name="shipRegion" defaultValue={prefill?.shipRegion} autoComplete="address-level1" />
-          <Field label={t("perifereia")} name="shipAdminRegion" defaultValue={prefill?.shipAdminRegion} />
-        </div>
-
-        <label className="mt-5 flex cursor-pointer items-center gap-3">
-          <input
-            type="checkbox"
-            name="wantsInvoice"
-            checked={wantsInvoice}
-            onChange={(e) => setWantsInvoice(e.target.checked)}
-            className="h-4 w-4 accent-k-red"
-          />
-          <span className="text-[13px] font-semibold text-k-ink">
-            {t("thelo_timologio_chreiazontai_afm_kai")}
-          </span>
-        </label>
-
-        {wantsInvoice && (
-          <div className="mt-4 border-l-[3px] border-k-red bg-k-surface-2 p-4">
-            {/* ΑΦΜ drives the rest: HDCtool resolves it against its own
-                customers, then SoftOne, then the AADE registry. */}
-            <CompanyVatFields required fieldErrors={state.fieldErrors} />
+      {/*
+        Hidden AND disabled for pickup: a disabled fieldset takes its fields out
+        of the submission and out of validation, and keeps what was typed for
+        whoever switches back to a courier.
+      */}
+      <Step
+        k="address"
+        n={numberOf("address")}
+        state={stateOf("address")}
+        title={t("s_address")}
+        summary={summaries.address}
+        onEdit={() => setOpen("address")}
+        changeLabel={t("allagi")}
+        hidden={pickup}
+      >
+        <fieldset disabled={pickup}>
+          <div className="f21">
+            <AddressAutocomplete
+              variant="hdc"
+              label={t("odos")}
+              name="shipLine1"
+              defaultValue={prefill?.shipLine1}
+              error={state.fieldErrors?.shipLine1}
+              required
+            />
+            <Field label={t("orofos")} name="shipLine2" defaultValue={prefill?.shipLine2} autoComplete="address-line2" />
           </div>
-        )}
+          <div className="f4">
+            <Field
+              label={t("tk")}
+              name="shipPostcode"
+              autoComplete="postal-code"
+              inputMode="numeric"
+              defaultValue={prefill?.shipPostcode || postcode}
+              error={state.fieldErrors?.shipPostcode}
+              required
+            />
+            <Field label={t("poli")} name="shipCity" autoComplete="address-level2" placeholder={t("poli_ph")} defaultValue={prefill?.shipCity} error={state.fieldErrors?.shipCity} required />
+            <Field label={t("nomos")} name="shipRegion" autoComplete="address-level1" defaultValue={prefill?.shipRegion} />
+            <Field label={t("perifereia")} name="shipAdminRegion" defaultValue={prefill?.shipAdminRegion} />
+          </div>
+        </fieldset>
+        {!pickup && invoiceBlock}
       </Step>
 
-      <Step n="03" title={t("tropos_apostolis")}>
-        <div className="flex flex-col gap-px border border-k-line bg-k-line">
-          {SHIPPING_METHODS.map((method) => (
-            <label
-              key={method.id}
-              className={`flex cursor-pointer items-center gap-3 px-4 py-3.5 ${
-                shipping === method.id ? "bg-k-surface-2" : "bg-white"
-              }`}
-            >
-              <input
-                type="radio"
-                name="shippingMethod"
-                value={method.id}
-                checked={shipping === method.id}
-                onChange={() => {
-                  setShipping(method.id);
-                  remember({ shippingMethod: method.id });
-                }}
-                className="h-4 w-4 accent-k-red"
-              />
-              <span className="min-w-0 flex-1">
-                <span className="block text-[12.5px] font-semibold text-k-ink">
-                  {method.label}
-                </span>
-                <span className="mt-0.5 block text-[11.5px] text-k-text-4">{method.meta}</span>
-              </span>
-            </label>
-          ))}
-        </div>
-        <p className="mt-2.5 text-[11.5px] text-k-text-4">
-          {t("to_kostos_ypologizetai_apo_to")}
-        </p>
-      </Step>
-
-      <Step n="04" title={t("tropos_pliromis")}>
-        <div className="flex flex-wrap gap-2">
-          {payments.map((method) => (
-            <label
-              key={method.id}
-              className={`flex cursor-pointer items-center gap-2 border px-3.5 py-2.5 text-[12px] font-semibold transition-colors ${
-                payment === method.id
-                  ? "border-k-ink bg-k-ink text-white"
-                  : "border-k-line-2 text-k-text-2 hover:border-k-ink"
-              }`}
-            >
+      <Step
+        k="payment"
+        n={numberOf("payment")}
+        state={stateOf("payment")}
+        title={t("s_payment")}
+        summary={summaries.payment}
+        onEdit={() => setOpen("payment")}
+        changeLabel={t("allagi")}
+      >
+        <div className="hdc-payopts" role="radiogroup" aria-label={t("s_payment")}>
+          {PAYMENT_METHODS.filter((m) => !m.partnerOnly).map((method) => (
+            <label key={method.id} className={payment === method.id ? "on" : undefined}>
               <input
                 type="radio"
                 name="paymentMethod"
@@ -246,122 +396,177 @@ export function CheckoutForm({
                   setPayment(method.id);
                   remember({ paymentMethod: method.id });
                 }}
-                className="sr-only"
               />
-              {method.label}
+              <span className="long">{payLabel(method.id)}</span>
+              <span className="short">{payLabelShort(method.id)}</span>
             </label>
           ))}
         </div>
-
-        {(payment === "card" || payment === "iris") && (
-          <p className="mt-3 border-l-[3px] border-k-ink bg-k-surface-2 px-4 py-3 text-[12px] leading-[1.55] text-k-text-2">
-            {t("tha_metafertheite_stin_asfali_selida")}
-          </p>
-        )}
-        {payment === "bank" && (
-          <p className="mt-3 border-l-[3px] border-k-ink bg-k-surface-2 px-4 py-3 text-[12px] leading-[1.55] text-k-text-2">
-            {/* The number comes from the constant the checkout enforces, not
-                from the sentence. A hardcoded «3 ώρες» here is a promise that
-                keeps being made after somebody changes the policy. */}
-            {t("tha_lavete_ta_stoicheia_katathesis", { hours: STOCK_HOLD_HOURS })}
-          </p>
-        )}
+        <p className="hdc-info">
+          {payment === "card"
+            ? t("info_card")
+            : payment === "iris"
+              ? t("info_iris")
+              : /* The hours come from the constant the checkout enforces. */
+                t("info_bank", { hours: STOCK_HOLD_HOURS })}
+        </p>
       </Step>
 
-      {/*
-        An account, offered rather than imposed.
-        ─────────────────────────────────────────────────────────────────────
-        Everything a registration needs has already been typed a few fields
-        above. What was missing was consent and a password, and this is both —
-        one optional box. Left empty, the order stays a guest order and nothing
-        is created; a link can still be requested later from /eisodos.
-
-        Not shown to somebody already signed in: they have an account.
-      */}
       {!signedIn && (
-        <Step n="04b" title={upGreek(t("logariasmos_proairetika"))}>
-          <label className="block">
-            <span className="t-account-label mb-1.5 block text-k-text-4">
-              {upGreek(t("kodikos_prosvasis"))}
-            </span>
-            <input
-              type="password"
+        <Step
+          k="account"
+          n={numberOf("account")}
+          state={stateOf("account")}
+          title={t("s_account")}
+          titleNote={t("proairetika")}
+          summary={summaries.account}
+          onEdit={() => setOpen("account")}
+          changeLabel={t("allagi")}
+        >
+          <div className="narrow">
+            <Field
+              label={t("kodikos")}
               name="password"
+              type="password"
               autoComplete="new-password"
               minLength={8}
-              placeholder={t("toylachiston_8_charaktires")}
-              className="t-input w-full border border-k-line-2 px-3.5 py-3 text-k-ink outline-none focus:border-k-ink"
+              placeholder={t("kodikos_ph")}
+              help={t("kodikos_help")}
+              error={state.fieldErrors?.password}
             />
-            <span className="mt-1.5 block text-[12px] leading-[1.5] text-k-text-3">
-              {t("symplirose_kodiko_gia_logariasmo")}
-            </span>
-          </label>
+          </div>
         </Step>
       )}
 
-      <Step n="05" title={t("scholia_kai_oloklirosi")}>
-        <label className="block">
-          <span className="t-account-label mb-1.5 block text-k-text-4">
-            {upGreek(t("scholia_paraggelias"))}
-          </span>
-          <textarea
-            name="notes"
-            rows={3}
-            placeholder={t("odigies_paradosis_ores_paralavis")}
-            className="t-input w-full border border-k-line-2 px-3.5 py-3 text-k-ink outline-none focus:border-k-ink"
-          />
+      <Step
+        k="notes"
+        n={numberOf("notes")}
+        state={stateOf("notes")}
+        title={t("s_notes")}
+        titleShort={t("s_notes_short")}
+        summary=""
+        onEdit={() => setOpen("notes")}
+        changeLabel={t("allagi")}
+        last
+      >
+        <label className="hdc-fld">
+          <span className="lbl">{t("scholia")}</span>
+          <textarea name="notes" rows={3} placeholder={t("scholia_ph")} />
         </label>
 
-        <label className="mt-4 flex cursor-pointer items-start gap-3">
+        <label className="hdc-chk">
           <input
             type="checkbox"
             name="terms"
             checked={terms}
             onChange={(e) => setTerms(e.target.checked)}
-            className="mt-0.5 h-4 w-4 accent-k-red"
           />
-          <span className="text-[12.5px] leading-[1.55] text-k-text-2">
-            {t("apodechomai_toys_oroys_chrisis_kai")}
+          <i aria-hidden />
+          <span>
+            {t.rich("apodechomai", {
+              terms: (chunks) => (
+                <Link href="/oroi-chrisis" target="_blank">
+                  {chunks}
+                </Link>
+              ),
+              privacy: (chunks) => (
+                <Link href="/aporrito" target="_blank">
+                  {chunks}
+                </Link>
+              ),
+            })}
           </span>
         </label>
-        {state.fieldErrors?.terms && (
-          <p className="mt-1.5 text-[11.5px] text-k-red">{t("apaiteitai_apodochi_ton_oron")}</p>
-        )}
+        {state.fieldErrors?.terms && <p className="hdc-co-ferr">{t("apaiteitai_apodochi")}</p>}
 
         <button
           type="submit"
           disabled={!terms || pending}
-          className="t-btn mt-6 flex h-14 w-full items-center justify-center bg-k-red text-white transition-colors hover:bg-k-red-hover disabled:opacity-50"
+          onClick={guardSubmit}
+          className="hdc-btn hdc-btn-red hdc-btn-lg hdc-co-submit"
         >
-          {pending
-            ? upGreek(t("ginetai_katachorisi"))
-            : payment === "card" || payment === "iris"
-              ? `${upGreek(t("pliromi_me_asfaleia"))} →`
-              : `${upGreek(t("oloklirosi_paraggelias"))} →`}
+          {submitLabel}
         </button>
+        {!terms && <p className="hdc-co-note">{t("energopoieitai")}</p>}
       </Step>
+
+      {/* Phones: the total and the next step, always under the thumb. */}
+      <div className="hdc-mbar hdc-co-mbar">
+        <div className="tt">
+          <span>{t("synolo_me_fpa")}</span>
+          <b>{total}</b>
+        </div>
+        {open === "notes" ? (
+          <button
+            type="submit"
+            className="go"
+            disabled={!terms || pending}
+            onClick={guardSubmit}
+          >
+            {submitLabel}
+          </button>
+        ) : (
+          <button type="button" className="go" onClick={next}>
+            {t("synecheia")} →
+          </button>
+        )}
+      </div>
     </form>
   );
 }
 
 function Step({
+  k,
   n,
+  state,
   title,
+  titleShort,
+  titleNote,
+  summary,
+  onEdit,
+  changeLabel,
+  aside,
+  hidden,
+  last,
   children,
 }: {
-  n: string;
+  k: StepKey;
+  n: number;
+  state: "done" | "open" | "todo";
   title: string;
+  /** A shorter heading for the folded phone row. */
+  titleShort?: string;
+  titleNote?: string;
+  summary: string;
+  onEdit: () => void;
+  changeLabel: string;
+  aside?: React.ReactNode;
+  hidden?: boolean;
+  last?: boolean;
   children: React.ReactNode;
 }) {
   return (
-    <section>
-      <h2 className="mb-4 flex items-center gap-3">
-        <span className="t-cat-num text-k-red">{n}</span>
-        <span className="text-[13px] font-bold tracking-[0.06em] text-k-ink">
-          {upGreek(title)}
+    <section
+      className={last ? "hdc-step last" : "hdc-step"}
+      data-step={k}
+      data-state={state}
+      hidden={hidden}
+      aria-labelledby={`step-${k}`}
+    >
+      <h3 id={`step-${k}`}>
+        <i>{state === "done" ? <span className="ck">✓</span> : null}<span className="nm">{n}</span></i>
+        <span className="tl">
+          <span className="full">{title}</span>
+          {titleShort && <span className="short">{titleShort}</span>}
+          {titleNote && <span className="note"> ({titleNote})</span>}
+          {summary && <span className="sm">{summary}</span>}
         </span>
-      </h2>
-      {children}
+        {aside && <small>{aside}</small>}
+        <button type="button" className="chg" onClick={onEdit}>
+          {changeLabel}
+        </button>
+      </h3>
+      <div className="in">{children}</div>
     </section>
   );
 }
@@ -375,6 +580,9 @@ function Field({
   defaultValue,
   error,
   help,
+  placeholder,
+  inputMode,
+  minLength,
 }: {
   label: string;
   name: string;
@@ -384,12 +592,15 @@ function Field({
   defaultValue?: string;
   error?: string;
   help?: string;
+  placeholder?: string;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+  minLength?: number;
 }) {
   return (
-    <label className="block">
-      <span className="t-account-label mb-1.5 block text-k-text-4">
-        {upGreek(label)}
-        {required && <span className="ml-1 text-k-red">*</span>}
+    <label className="hdc-fld">
+      <span className="lbl">
+        {label}
+        {required && <em> *</em>}
       </span>
       <input
         name={name}
@@ -397,15 +608,15 @@ function Field({
         required={required}
         autoComplete={autoComplete}
         defaultValue={defaultValue}
+        // A blank placeholder still lets CSS tell an empty field from a filled
+        // one (`:placeholder-shown`), which is what paints a filled field ink.
+        placeholder={placeholder ?? " "}
+        inputMode={inputMode}
+        minLength={minLength}
         aria-invalid={error ? true : undefined}
-        className={`t-input h-12 w-full border px-3.5 text-k-ink outline-none focus:border-k-ink ${
-          error ? "border-k-red" : "border-k-line-2"
-        }`}
+        className={error ? "bad" : undefined}
       />
-      {error && <span className="mt-1 block text-[11px] text-k-red">{error}</span>}
-      {help && !error && (
-        <span className="mt-1 block text-[11px] text-k-text-4">{help}</span>
-      )}
+      {error ? <span className="err">{error}</span> : help ? <small>{help}</small> : null}
     </label>
   );
 }

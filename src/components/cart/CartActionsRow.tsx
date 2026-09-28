@@ -4,10 +4,9 @@ import { useTranslations } from "next-intl";
 import { useTransition } from "react";
 import { Link } from "@/i18n/navigation";
 import { clearCart } from "@/lib/cart/actions";
-import { upGreek } from "@/lib/greek";
 
 /**
- * "Continue shopping" / "Empty cart".
+ * «← ΣΥΝΕΧΕΙΑ ΑΓΟΡΩΝ» / «Άδειασμα καλαθιού» (checkout.html `.cartacts`).
  *
  * Emptying asks first — it is the one action here that cannot be undone, and a
  * misclick loses a basket someone spent ten minutes assembling.
@@ -17,12 +16,9 @@ export function CartActionsRow() {
   const [pending, startTransition] = useTransition();
 
   return (
-    <div className="flex flex-col gap-3 border-b border-k-line px-4 py-6 sm:flex-row sm:items-center sm:justify-between lg:px-10">
-      <Link
-        href="/katalogos"
-        className="t-link-mono flex items-center gap-2 text-k-ink hover:text-k-red"
-      >
-        ‹ {upGreek(t("synechiste_tis_agores"))}
+    <div className="hdc-cart-acts">
+      <Link href="/katalogos" className="back">
+        {t("synecheia_agoron")}
       </Link>
 
       <button
@@ -34,9 +30,9 @@ export function CartActionsRow() {
             await clearCart();
           });
         }}
-        className="t-link-mono self-start text-k-text-4 transition-colors hover:text-k-red disabled:opacity-50"
+        className="clear"
       >
-        ✕ {upGreek(t("adeiasma_kalathioy"))}
+        {t("adeiasma_kalathioy")}
       </button>
     </div>
   );

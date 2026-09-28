@@ -1,25 +1,30 @@
 import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
-import Image from "next/image";
 import { setRequestLocale } from "next-intl/server";
 import { CartActionsRow } from "@/components/cart/CartActionsRow";
-import { CartCrossSell } from "@/components/cart/CartCrossSell";
-import { CartLineRow } from "@/components/cart/CartLineRow";
-import { CartSummaryPanel } from "@/components/cart/CartSummaryPanel";
 import { QuickOrderPaste } from "@/components/cart/QuickOrderPaste";
+import { HdcCartCrossSell } from "@/components/cart/hdc/HdcCartCrossSell";
+import { HdcCartLine, type HdcCartLineView } from "@/components/cart/hdc/HdcCartLine";
+import { HdcCartSummary } from "@/components/cart/hdc/HdcCartSummary";
 import { SiteChrome } from "@/components/chrome/SiteChrome";
 import { SiteFooter } from "@/components/chrome/SiteFooter";
+import { Zone } from "@/components/zones/Zone";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
-import { getMiniCart, getCart, getCartCrossSell } from "@/lib/cart/cart";
+import { getCart, getDeliveryPostcode, getMiniCart } from "@/lib/cart/cart";
+import { getCartLineExtras, getHdcCrossSell } from "@/lib/cart/hdc-cart";
+import { freeShippingProgress } from "@/lib/cart/options";
 import {
   getCatalogueStats,
   getMenuTree,
   getRootCategories,
   getTopBrands,
 } from "@/lib/catalog/queries";
-import { upGreek } from "@/lib/greek";
-import { Zone } from "@/components/zones/Zone";
+import { formatMoney, formatPrice } from "@/lib/format";
+import { displayName, platformTag } from "@/lib/milwaukee/display";
+import { parseModel } from "@/lib/milwaukee/model";
+import { ahLabel, pdpTitle } from "@/lib/milwaukee/pdp";
+import { showsExactQty } from "@/lib/stock-display";
 
 /** Always fresh: a cached cart is a wrong cart. */
 export const dynamic = "force-dynamic";
@@ -32,34 +37,43 @@ export async function generateMetadata({
   const { locale } = await params;
   // Explicit locale: `setRequestLocale` belongs to the render pass, and
   // metadata is generated outside it.
-  const t = await getTranslations({ locale, namespace: "kalathi.page" });
+  const t = await getTranslations({ locale, namespace: "cart.Hdc" });
   return {
-    title: t("titlos_to_kalathi_sas"),
+    title: t("meta_title"),
     robots: { index: false, follow: false },
   };
 }
 
+/**
+ * The cart — checkout.html, screen 1 (desktop) and the first phone frame.
+ *
+ * Same cart as before underneath: lines, quantities, the ACS quote from the
+ * postcode, the coupon box, quick add by code, the free-shipping rule. What is
+ * new is HDC's: the kit ↔ bare swap on a line and the cross-sell by battery
+ * platform.
+ */
 export default async function CartPage({
   params,
 }: {
   params: Promise<{ locale: Locale }>;
 }) {
-  const t = await getTranslations("kalathi.page");
+  const t = await getTranslations("cart.Hdc");
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const cart = await getCart(locale);
+  const postcode = await getDeliveryPostcode();
+  const cart = await getCart(locale, postcode);
   const lines = cart?.lines ?? [];
   const isEmpty = lines.length === 0;
 
-  const [crossSell, menuTree, brands, stats, rootCategories, miniCart] =
+  const [extras, crossSell, menuTree, brands, stats, rootCategories, miniCart] =
     await Promise.all([
       isEmpty
-        ? Promise.resolve([])
-        : getCartCrossSell(
-            locale,
-            lines.map((l) => l.productId),
-          ),
+        ? Promise.resolve({ swaps: {}, contents: {} } as Awaited<ReturnType<typeof getCartLineExtras>>)
+        : getCartLineExtras(locale, lines),
+      isEmpty
+        ? Promise.resolve({ platforms: [] as string[], items: [] })
+        : getHdcCrossSell(locale, lines),
       getMenuTree(locale),
       getTopBrands(locale),
       getCatalogueStats(),
@@ -67,11 +81,91 @@ export default async function CartPage({
       getMiniCart(locale),
     ]);
 
-  const steps = [
-    { n: "01", label: t("kalathi"), active: true },
-    { n: "02", label: t("stoicheia"), active: false },
-    { n: "03", label: t("pliromi"), active: false },
-  ];
+  const money = (n: number) => formatMoney(n, locale);
+
+  const lineViews: HdcCartLineView[] = lines.map((line) => {
+    const model = parseModel(line.name);
+    const kit = extras.contents[line.id];
+    const contents: string[] = [];
+    if (kit?.batteries)
+      contents.push(
+        t("kit_batteries", { count: kit.batteries.count, ah: ahLabel(kit.batteries.ah) }),
+      );
+    if (kit && kit.charger != null) contents.push(t("kit_charger"));
+    if (kit?.case) contents.push(kit.case);
+    if (!kit && line.modelContent === "bare") contents.push(t("choris_mpataria"));
+
+    const swap = extras.swaps[line.id];
+    return {
+      id: line.id,
+      href: `/proion/${line.slug}`,
+      /* The mockup's «… M18 FPD3 — Κιτ»: the clean name with the model root
+         (`pdpTitle`, built on `displayName`), and which version it is in
+         words. The full code stays in the code line under it. */
+      name:
+        model && line.modelContent
+          ? `${pdpTitle(line.name, line.code2)} — ${line.modelContent === "kit" ? t("kit") : t("sketo")}`
+          : displayName(line.name, line.code2),
+      codeLine: [line.code2 || line.sku, model?.code, contents.join(", ")]
+        .filter(Boolean)
+        .join(" · "),
+      tag: platformTag(line.name),
+      image: line.image,
+      quantity: line.quantity,
+      inStock: line.inStock,
+      availability: line.inStock
+        ? showsExactQty(line.availableQty)
+          ? t("se_apothema_tem", { qty: line.availableQty })
+          : t("se_apothema")
+        : t("katopin_paraggelias"),
+      overStock: line.overStock ? t("overstock", { qty: line.availableQty }) : null,
+      unitPrice: formatPrice(line.unitNetFinal, locale, { vatRate: line.vatRate }),
+      unitWas:
+        line.discountPercent > 0
+          ? formatPrice(line.unitNet, locale, { vatRate: line.vatRate })
+          : null,
+      lineTotal: money(line.lineGross),
+      swap: swap
+        ? {
+            productId: swap.productId,
+            label:
+              swap.to === "bare"
+                ? t("allagi_se_sketo", { price: money(swap.unitGross) })
+                : t("allagi_se_kit", { price: money(swap.unitGross) }),
+          }
+        : null,
+    };
+  });
+
+  const totals = cart?.totals;
+  const progress = totals ? freeShippingProgress(totals) : null;
+  const allAt24 = lines.every((l) => l.vatRate === 24);
+
+  const shippingLabel =
+    cart?.shippingMethod === "pickup"
+      ? t("ship_pickup")
+      : cart?.shippingMethod === "express"
+        ? t("ship_express")
+        : t("ship_courier");
+
+  const summaryRows = totals
+    ? [
+        { label: t("proionta_n", { count: totals.itemCount }), value: money(totals.subtotalGross) },
+        {
+          label: shippingLabel,
+          value: totals.shippingGross === 0 ? t("dorean") : money(totals.shippingGross),
+          free: totals.shippingGross === 0,
+        },
+        ...(totals.paymentFeeGross > 0
+          ? [{ label: t("epivarynsi"), value: money(totals.paymentFeeGross) }]
+          : []),
+      ]
+    : [];
+
+  const crossTitle = crossSell.platforms.length ? t("xs_title") : t("xs_title_other");
+  const crossSubtitle = crossSell.platforms.length
+    ? t("xs_sub", { platforms: crossSell.platforms.join(" / ") })
+    : t("xs_sub_other");
 
   return (
     <>
@@ -83,135 +177,109 @@ export default async function CartPage({
         stats={stats}
       />
 
-      <main id="main">
+      <main id="main" className="hdc-cart-page">
         <Zone id="cart.top" locale={locale} />
-        <div className="shell-x bg-k-ink-deep">
-          <nav
-            aria-label="Breadcrumb"
-            className="t-util flex h-11 items-center gap-2.5 text-white/45"
-          >
-            <Link href="/" className="text-white/60 hover:text-white">
-              {upGreek(t("archiki"))}
-            </Link>
-            <span className="text-k-red">/</span>
-            <span className="text-white">{upGreek(t("kalathi_2"))}</span>
-          </nav>
 
-          <div className="flex flex-col gap-6 pt-3 pb-8 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
-            <div>
-              <p className="t-eyebrow mb-3.5 flex items-center gap-[11px] text-k-red">
-                <span className="hidden h-[1.5px] w-[26px] bg-k-red lg:block" />
-                {isEmpty
-                  ? upGreek(t("kanena_proion"))
-                  : `${cart!.totals.itemCount} ${upGreek(t("proionta"))} · ${cart!.totals.unitCount} ${upGreek(t("temachia"))}`}
-              </p>
-              <h1 className="font-display text-[26px] leading-[1.14] t-display text-white lg:text-[34px]">
-                {upGreek(t("to_kalathi_sas"))}
-              </h1>
+        {isEmpty || !totals || !progress ? (
+          <div className="hdc-wrap hdc-cart-empty">
+            <h1 className="hdc-disp">{t("adeio_titlos")}</h1>
+            <p>{t("adeio_keimeno")}</p>
+            <div className="acts">
+              <Link href="/katalogos" className="hdc-btn hdc-btn-red hdc-btn-lg">
+                {t("ston_katalogo")} →
+              </Link>
             </div>
-
-            <ol className="flex shrink-0">
-              {steps.map((step) => (
-                <li
-                  key={step.n}
-                  className={`flex items-center gap-2 border px-4 py-3 text-[11px] font-semibold tracking-[0.07em] ${
-                    step.active
-                      ? "border-k-red bg-k-red text-white"
-                      : "border-white/15 text-white/40"
-                  }`}
-                >
-                  <span className="t-brand-count opacity-70">{step.n}</span>
-                  {step.label}
-                </li>
-              ))}
-            </ol>
-          </div>
-        </div>
-
-        <Zone id="cart.middle" locale={locale} />
-
-        {/*
-          The summary panel is rendered only when there is something to total.
-          Showing it at €0,00 beside an empty-cart message is the flash the spec
-          calls out (§5, acceptance).
-        */}
-        {isEmpty ? (
-          <div className="shell-x bg-white py-20 text-center">
-            <Image
-              src="/icons/cart.png"
-              alt=""
-              width={46}
-              height={46}
-              className="mx-auto block opacity-35"
-            />
-            <p className="font-display t-display mt-5 text-xl leading-[1.3] text-k-ink">
-              {upGreek(t("to_kalathi_einai_adeio"))}
-            </p>
-            <p className="mt-2.5 text-[13.5px] text-k-text-3">
-              {stats.products.toLocaleString(locale)}{" "}
-              {t("kodikoi_sas_perimenoyn_ston_katalogo")}
-            </p>
-            <Link
-              href="/katalogos"
-              className="t-btn-sm mt-5 inline-block bg-k-ink px-7 py-4 text-white transition-colors hover:bg-k-red"
-            >
-              {upGreek(t("ston_katalogo"))} →
-            </Link>
+            <QuickOrderPaste />
           </div>
         ) : (
-          <div className="shell-w bg-white lg:grid lg:grid-cols-[1fr_430px] lg:items-start">
-            {/*
-              `@container` — η λίστα στοιχίζεται από ΤΟ ΔΙΚΟ ΤΗΣ πλάτος.
-              ──────────────────────────────────────────────────────────────
-              Το `lg:` είναι breakpoint ΟΘΟΝΗΣ, και η λίστα δεν παίρνει την
-              οθόνη: δίπλα της κάθεται η στήλη συνόψεως 430px. Σε παράθυρο
-              1115px η γραμμή ήταν 669px, οι σταθερές στήλες ζητούσαν 572, και
-              για το προϊόν έμεναν 17. Το όνομα, η τιμή και το σήμα έπεφταν το
-              ένα πάνω στο άλλο — και το `lg:` έλεγε ότι όλα ήταν εντάξει,
-              γιατί η οθόνη ΗΤΑΝ αρκετά φαρδιά· η στήλη δεν ήταν.
+          <>
+            <div className="hdc-wrap hdc-cart">
+              <div className="hdc-cart-main">
+                <h1 className="hdc-disp">
+                  {t("to_kalathi_sas")}
+                  <small>{t("n_proionta", { count: totals.itemCount })}</small>
+                </h1>
 
-              Η κάρτα προϊόντος έχει ήδη την ίδια σημείωση για τον ίδιο λόγο.
-            */}
-            <div className="@container min-w-0 border-k-line lg:border-r">
-              {/* Column headings — wide rows only; each narrow row labels itself. */}
-              <div className="hidden grid-cols-[minmax(0,1fr)_110px_112px_104px_40px] gap-4 border-b border-k-ink px-5 py-3.5 @[600px]:grid @[900px]:grid-cols-[minmax(0,1fr)_150px_150px_140px_52px] @[900px]:gap-5 @[900px]:px-10 @[900px]:py-4">
-                {[
-                  t("proion"),
-                  `${t("timi_monadas")} (${t("me_fpa_short")})`,
-                  t("posotita"),
-                  t("synolo"),
-                  "",
-                ].map((label, i) => (
-                  <span
-                    key={label || i}
-                    className={`t-footer-col text-k-text-4 ${
-                      i === 1 || i === 3
-                        ? "text-right"
-                        : i === 2
-                          ? "text-center"
-                          : ""
-                    }`}
+                <div className="hdc-free" data-reached={progress.reached || undefined}>
+                  <div className="row">
+                    {progress.reached ? (
+                      <>
+                        {t("dorean_metaforika")}
+                        <span>✓ {t("energo")}</span>
+                      </>
+                    ) : (
+                      <>
+                        {t("akomi_gia_dorean", { amount: money(progress.remainingGross) })}
+                        <span>{progress.percent}%</span>
+                      </>
+                    )}
+                  </div>
+                  <div
+                    className="bar"
+                    role="progressbar"
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={progress.percent}
+                    aria-label={t("dorean_metaforika")}
                   >
-                    {upGreek(label)}
-                  </span>
-                ))}
+                    <i style={{ width: `${progress.percent}%` }} />
+                  </div>
+                </div>
+
+                <div className="hdc-cart-lines">
+                  <div className="th" aria-hidden>
+                    <span>{t("th_proion")}</span>
+                    <span>{t("th_posotita")}</span>
+                    <span className="r">{t("th_timi")}</span>
+                    <span className="r">{t("th_synolo")}</span>
+                    <span />
+                  </div>
+                  {lineViews.map((line) => (
+                    <HdcCartLine key={line.id} line={line} />
+                  ))}
+                </div>
+
+                <CartActionsRow />
+                <QuickOrderPaste />
               </div>
 
-              {lines.map((line) => (
-                <CartLineRow key={line.id} line={line} />
-              ))}
-
-              <QuickOrderPaste />
-              <CartActionsRow />
-              <CartCrossSell items={crossSell} />
+              <HdcCartSummary
+                postcode={postcode}
+                rows={summaryRows}
+                total={money(totals.totalGross)}
+                vatLine={
+                  allAt24
+                    ? t("periechei_fpa_24", { amount: money(totals.vatAmount) })
+                    : t("periechei_fpa", { amount: money(totals.vatAmount) })
+                }
+              />
             </div>
 
-            <CartSummaryPanel
-              totals={cart!.totals}
-              shippingMethod={cart!.shippingMethod}
-              paymentMethod={cart!.paymentMethod}
+            <Zone id="cart.middle" locale={locale} />
+
+            <HdcCartCrossSell
+              title={crossTitle}
+              subtitle={crossSubtitle}
+              items={crossSell.items.map((item) => ({
+                id: item.id,
+                href: `/proion/${item.slug}`,
+                name: displayName(item.name, item.code),
+                image: item.image,
+                price: money(item.priceGross),
+              }))}
             />
-          </div>
+
+            {/* Phones: the total and the way on, always under the thumb. */}
+            <div className="hdc-mbar">
+              <div className="tt">
+                <span>{t("synolo_me_fpa")}</span>
+                <b>{money(totals.totalGross)}</b>
+              </div>
+              <Link href="/checkout" className="go">
+                {t("oloklirosi")} →
+              </Link>
+            </div>
+          </>
         )}
         <Zone id="cart.below" locale={locale} />
       </main>

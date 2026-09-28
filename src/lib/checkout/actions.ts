@@ -5,7 +5,7 @@ import { hash as hashPassword } from "@node-rs/argon2";
 import { sendOrderEmail } from "@/lib/mail/order-email";
 import { sendInternalOrderEmail } from "@/lib/mail/order-internal-email";
 import { randomBytes } from "node:crypto";
-import { z } from "zod";
+import { checkoutSchema, deliveryAddress } from "@/lib/checkout/schema";
 import { prisma } from "@/lib/prisma";
 import { STOCK_HOLD_HOURS, holdExpiry } from "@/lib/orders/hold";
 import { computeTotals, getCart, getCartToken } from "@/lib/cart/cart";
@@ -24,51 +24,11 @@ import { SHOP } from "@/config/shop";
  * disabled submit button is a UX affordance; this is the actual control.
  */
 
-const checkoutSchema = z.object({
-  email: z.email().max(320),
-  phone: z.string().trim().min(8).max(64),
-  firstName: z.string().trim().min(1).max(120),
-  lastName: z.string().trim().min(1).max(120),
-
-  shipLine1: z.string().trim().min(3).max(255),
-  shipLine2: z.string().trim().max(255).optional().or(z.literal("")),
-  shipCity: z.string().trim().min(2).max(120),
-  shipPostcode: z.string().trim().min(4).max(16),
-  /** Νομός. */
-  shipRegion: z.string().trim().max(120).optional().or(z.literal("")),
-  /** Περιφέρεια. */
-  shipAdminRegion: z.string().trim().max(120).optional().or(z.literal("")),
-
-  wantsInvoice: z.union([z.literal("on"), z.literal("")]).optional(),
-  companyName: z.string().trim().max(255).optional().or(z.literal("")),
-  vatNumber: z.string().trim().max(32).optional().or(z.literal("")),
-  taxOffice: z.string().trim().max(120).optional().or(z.literal("")),
-  companyTrade: z.string().trim().max(255).optional().or(z.literal("")),
-  /// Set by the ΑΦΜ lookup when HDCtool already knows this company.
-  erpTrdr: z.coerce.number().int().positive().optional().or(z.literal("")),
-
-  shippingMethod: z.string().max(32),
-  paymentMethod: z.string().max(32),
-  notes: z.string().trim().max(2000).optional().or(z.literal("")),
-  terms: z.union([z.literal("on"), z.literal("")]).optional(),
-  locale: z.string().max(5).optional(),
-
-  /**
-   * An account, if the customer wants one — optional, and empty for everybody
-   * who does not.
-   *
-   * A guest has already typed their name, phone and address; asking them to
-   * type all of it again later to see what they just bought is asking them to
-   * do our filing. A password here is consent and a credential in one field,
-   * so the account can be created outright — no link, no waiting — because the
-   * person is present and chose it themselves.
-   *
-   * Eight characters is the same floor `setNewPassword` enforces. Kept in step
-   * deliberately: a rule that differs by entrance is a rule somebody discovers
-   * by being refused.
-   */
-  password: z.string().min(8).max(200).optional().or(z.literal("")),
-});
+/*
+ * The schema lives in `./schema` (a "use server" module may only export async
+ * functions, and the pickup rule needs a unit test). Delivery address fields
+ * are required there for every method except collection from the shop.
+ */
 
 /**
  * How long the Viva payment code stays valid: exactly as long as the hold.
@@ -138,6 +98,8 @@ export async function placeOrder(
     };
   }
 
+  const address = deliveryAddress(input);
+
   const locale = (routing.locales.includes(input.locale as Locale)
     ? input.locale
     : routing.defaultLocale) as Locale;
@@ -156,7 +118,7 @@ export async function placeOrder(
   const customer = await getCurrentUser();
 
   // Re-priced against the delivery postcode, not the indicative cart quote.
-  const cart = await getCart(locale, input.shipPostcode);
+  const cart = await getCart(locale, address.shipPostcode);
   if (!cart || cart.lines.length === 0) return { error: "Το καλάθι σας είναι άδειο." };
 
   const shipping =
@@ -186,7 +148,7 @@ export async function placeOrder(
    * The form is the last word and the ids above are already validated against
    * the offered list, so the totals are recomputed from them.
    */
-  const totals = await computeTotals(cart.lines, shipping.id, payment.id, input.shipPostcode);
+  const totals = await computeTotals(cart.lines, shipping.id, payment.id, address.shipPostcode);
 
   const quote =
     shipping.expressMultiplier > 0
@@ -198,7 +160,7 @@ export async function placeOrder(
             length: l.length,
             height: l.height,
           })),
-          postcode: input.shipPostcode,
+          postcode: address.shipPostcode,
         })
       : null;
 
@@ -231,12 +193,8 @@ export async function placeOrder(
       firstName: input.firstName,
       lastName: input.lastName,
 
-      shipLine1: input.shipLine1,
-      shipLine2: input.shipLine2 || null,
-      shipCity: input.shipCity,
-      shipPostcode: input.shipPostcode,
-      shipRegion: input.shipRegion || null,
-      shipAdminRegion: input.shipAdminRegion || null,
+      // The shop's own address for a pickup order — see `deliveryAddress`.
+      ...address,
 
       wantsInvoice,
       companyName: wantsInvoice ? input.companyName || null : null,

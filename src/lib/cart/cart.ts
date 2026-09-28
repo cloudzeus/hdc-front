@@ -57,6 +57,22 @@ export const getCartToken = cache(async (): Promise<string | null> => {
   return store.get(CART_COOKIE)?.value ?? null;
 });
 
+/**
+ * The postcode the customer typed to price the delivery, before checkout.
+ *
+ * A cookie rather than a query string: a postcode is a piece of an address and
+ * does not belong in URLs, logs and referrers. Written by `setDeliveryPostcode`
+ * (the cart's «ΥΠΟΛΟΓΙΣΜΟΣ» and the checkout's Τ.Κ. field), read by both pages
+ * so the quote the cart showed is the one checkout opens with.
+ */
+export const POSTCODE_COOKIE = `${SHOP.cookiePrefix}TK`;
+
+export const getDeliveryPostcode = cache(async (): Promise<string | null> => {
+  const store = await cookies();
+  const value = store.get(POSTCODE_COOKIE)?.value ?? "";
+  return /^\d{5}$/.test(value) ? value : null;
+});
+
 export async function setCartCookie(token: string) {
   const store = await cookies();
   store.set(CART_COOKIE, token, {
@@ -181,6 +197,11 @@ export const getCart = cache(async (
        * κωδικό με τη σελίδα.
        */
       sku: p.code || p.code2,
+      code2: p.code2,
+      platform: p.platform,
+      modelRoot: p.modelRoot,
+      modelContent:
+        p.modelContent === "bare" || p.modelContent === "kit" ? p.modelContent : null,
       brandName: p.mtrmark != null ? (brands.get(p.mtrmark) ?? null) : null,
       image: p.images[0]?.url ?? null,
       quantity: line.quantity,

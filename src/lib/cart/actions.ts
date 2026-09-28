@@ -5,8 +5,10 @@ import { redirect } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { cookies } from "next/headers";
 import {
   PAYMENT_METHODS,
+  POSTCODE_COOKIE,
   SHIPPING_METHODS,
   getCartToken,
   newToken,
@@ -233,6 +235,99 @@ export async function updateCartLine(input: unknown): Promise<CartActionResult> 
       where: { id: line.id },
       data: { quantity: parsed.data.quantity },
     });
+  }
+
+  revalidateCart();
+  return { ok: true };
+}
+
+/**
+ * Kit ↔ bare tool, inside the cart (checkout.html, screen 1: «Αλλαγή σε σκέτο
+ * εργαλείο»).
+ *
+ * It is exactly a remove and an add of the same quantity — done in one
+ * transaction, so a failure half way cannot leave the customer with neither.
+ * The target must be an active product of the SAME model root and of the
+ * other content, which is what stops this from being a way to put an arbitrary
+ * product id into somebody's cart at a line's quantity.
+ */
+const swapSchema = z.object({
+  lineId: z.string().min(1).max(64),
+  productId: z.string().min(1).max(64),
+});
+
+export async function swapCartLine(input: unknown): Promise<CartActionResult> {
+  const parsed = swapSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid_input" };
+
+  const token = await getCartToken();
+  if (!token) return { ok: false, error: "no_cart" };
+
+  const line = await prisma.cartLine.findFirst({
+    where: { id: parsed.data.lineId, cart: { token } },
+    select: {
+      id: true,
+      cartId: true,
+      quantity: true,
+      createdAt: true,
+      product: { select: { modelRoot: true, modelContent: true } },
+    },
+  });
+  if (!line?.product.modelRoot) return { ok: false, error: "line_not_found" };
+
+  const target = await prisma.product.findFirst({
+    where: {
+      id: parsed.data.productId,
+      isActive: true,
+      modelRoot: line.product.modelRoot,
+      NOT: { modelContent: line.product.modelContent },
+    },
+    select: { id: true, priceNet: true },
+  });
+  if (!target) return { ok: false, error: "product_unavailable" };
+
+  await prisma.$transaction([
+    prisma.cartLine.delete({ where: { id: line.id } }),
+    prisma.cartLine.upsert({
+      where: { cartId_productId: { cartId: line.cartId, productId: target.id } },
+      update: { quantity: { increment: line.quantity } },
+      create: {
+        cartId: line.cartId,
+        productId: target.id,
+        quantity: line.quantity,
+        addedPriceNet: target.priceNet,
+        // Same place in the list: the cart is ordered by `createdAt`, and a
+        // swapped line jumping to the bottom reads as a different product.
+        createdAt: line.createdAt,
+      },
+    }),
+  ]);
+
+  revalidateCart();
+  return { ok: true, added: line.quantity };
+}
+
+/**
+ * The postcode that prices the delivery before checkout — see
+ * `getDeliveryPostcode`. Five digits, or empty to forget it.
+ */
+export async function setDeliveryPostcode(input: unknown): Promise<CartActionResult> {
+  const parsed = z
+    .object({ postcode: z.string().trim().regex(/^(\d{5})?$/) })
+    .safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid_postcode" };
+
+  const store = await cookies();
+  if (parsed.data.postcode) {
+    store.set(POSTCODE_COOKIE, parsed.data.postcode, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 30,
+    });
+  } else {
+    store.delete(POSTCODE_COOKIE);
   }
 
   revalidateCart();

@@ -34,6 +34,7 @@ export function CompanyVatFields({
     postcode: "billPostcode",
   },
   showAddress = false,
+  variant = "default",
 }: {
   required?: boolean;
   fieldErrors?: Record<string, string | undefined>;
@@ -48,6 +49,14 @@ export function CompanyVatFields({
   };
   /** Checkout keeps the billing address separate; registration asks for it here. */
   showAddress?: boolean;
+  /**
+   * "hdc": the HDC checkout's invoice row (checkout.html `.inv .f3` — ΑΦΜ,
+   * ΕΠΩΝΥΜΙΑ, Δ.Ο.Υ.), styled by src/styles/hdc/checkout.css. No lookup button:
+   * the lookup runs by itself once the ΑΦΜ is nine valid digits, which is what
+   * «συμπληρώνεται αυτόματα» under the other two fields promises. The activity
+   * is still submitted, as a hidden field. Same state, same server action.
+   */
+  variant?: "default" | "hdc";
 }) {
   const t = useTranslations("account.CompanyVatFields");
   const [afm, setAfm] = useState("");
@@ -60,10 +69,10 @@ export function CompanyVatFields({
   const digits = normaliseAfm(afm);
   const canLookup = isValidAfm(digits);
 
-  const lookup = () => {
-    if (!canLookup || pending) return;
+  const lookup = (afmDigits: string = digits) => {
+    if (!isValidAfm(afmDigits) || pending) return;
     startTransition(async () => {
-      const result = await lookupCompanyByVat({ afm: digits });
+      const result = await lookupCompanyByVat({ afm: afmDigits });
       if (result.found) {
         setCompany(result.company);
         setStatus(result.source);
@@ -81,6 +90,91 @@ export function CompanyVatFields({
    * controlled state that fights every keystroke.
    */
   const fillKey = company?.afm ?? "empty";
+
+  if (variant === "hdc") {
+    const afmError = fieldErrors?.[names.afm] || status === "invalid";
+    return (
+      <div className="hdc-vat">
+        <div className="f3">
+          <label className="hdc-fld">
+            <span className="lbl">
+              {upGreek(t("afm"))}
+              {required && <em> *</em>}
+            </span>
+            <input
+              name={names.afm}
+              value={afm}
+              onChange={(e) => {
+                const next = e.target.value;
+                setAfm(next);
+                setStatus(null);
+                // Nine valid digits is the whole question; ask it once, now.
+                const nextDigits = normaliseAfm(next);
+                if (isValidAfm(nextDigits) && nextDigits !== company?.afm) lookup(nextDigits);
+              }}
+              onKeyDown={(e) => {
+                // Enter inside a checkout form would submit the order.
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  lookup();
+                }
+              }}
+              inputMode="numeric"
+              autoComplete="off"
+              placeholder={t("afm_placeholder")}
+              required={required}
+              aria-invalid={afmError ? true : undefined}
+              aria-describedby="vat-status"
+              className={afmError ? "bad" : undefined}
+            />
+          </label>
+          <Filled
+            key={`${fillKey}-name`}
+            hdc
+            label={t("eponymia")}
+            name={names.name}
+            defaultValue={company?.name ?? ""}
+            required={required}
+            error={fieldErrors?.[names.name]}
+            placeholder={t("symplironetai_aftomata")}
+          />
+          <Filled
+            key={`${fillKey}-doy`}
+            hdc
+            label={t("doy")}
+            name={names.doy}
+            defaultValue={company?.doy ?? ""}
+            error={fieldErrors?.[names.doy]}
+            placeholder={t("symplironetai_aftomata")}
+          />
+        </div>
+        <input
+          key={`${fillKey}-trade`}
+          type="hidden"
+          name={names.trade}
+          defaultValue={company?.profession ?? ""}
+        />
+        <p id="vat-status" aria-live="polite" className="hint">
+          {pending ? (
+            <span>{t("anazitisi")}…</span>
+          ) : status === "kolleris" ? (
+            <span className="ok">{t("sas_vrikame_stoys_pelates_mas")}</span>
+          ) : status === "aade" ? (
+            <span className="ok">{t("stoicheia_apo_to_mitroo_aade")}</span>
+          ) : status === "not_found" ? (
+            <span className="wait">{t("to_afm_den_vrethike_sto")}</span>
+          ) : status === "unavailable" ? (
+            <span className="wait">{t("to_mitroo_den_apanta_ayti")}</span>
+          ) : status === "invalid" ? (
+            <span className="bad">{t("to_afm_den_einai_egkyro")}</span>
+          ) : (
+            <span>{t("hdc_voitheia")}</span>
+          )}
+        </p>
+        {company?.trdr && <input type="hidden" name="erpTrdr" value={company.trdr} />}
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -119,7 +213,7 @@ export function CompanyVatFields({
             />
             <button
               type="button"
-              onClick={lookup}
+              onClick={() => lookup()}
               disabled={!canLookup || pending}
               className="t-btn-sm h-12 shrink-0 bg-k-ink px-4 text-white transition-colors hover:bg-k-red disabled:cursor-not-allowed disabled:opacity-40 lg:px-6"
             >
@@ -234,6 +328,8 @@ function Filled({
   required,
   error,
   className = "",
+  hdc = false,
+  placeholder,
 }: {
   label: string;
   name: string;
@@ -241,7 +337,29 @@ function Filled({
   required?: boolean;
   error?: string;
   className?: string;
+  hdc?: boolean;
+  placeholder?: string;
 }) {
+  if (hdc) {
+    return (
+      <label className="hdc-fld">
+        <span className="lbl">
+          {upGreek(label)}
+          {required && <em> *</em>}
+        </span>
+        <input
+          name={name}
+          defaultValue={defaultValue}
+          required={required}
+          autoComplete="off"
+          placeholder={placeholder}
+          aria-invalid={error ? true : undefined}
+          className={error ? "bad" : undefined}
+        />
+        {error && <span className="err">{error}</span>}
+      </label>
+    );
+  }
   return (
     <label className={`block ${className}`}>
       <span className="t-account-label mb-1.5 block text-k-text-4">

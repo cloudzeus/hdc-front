@@ -80,6 +80,7 @@ export function AddressAutocomplete({
   defaultValue,
   fields = CHECKOUT_FIELDS,
   help,
+  variant = "default",
 }: {
   label: string;
   name: string;
@@ -91,6 +92,11 @@ export function AddressAutocomplete({
   fields?: AddressFieldNames;
   /** Overrides the checkout's own hint, for a form with different wording. */
   help?: string;
+  /**
+   * "hdc": the HDC checkout's field (checkout.html `.fld`), styled by
+   * src/styles/hdc/checkout.css. The behaviour is identical.
+   */
+  variant?: "default" | "hdc";
 }) {
   const locale = useLocale();
   const t = useTranslations("checkout.AddressAutocomplete");
@@ -188,11 +194,13 @@ export function AddressAutocomplete({
     }
   }
 
+  const hdc = variant === "hdc";
+
   return (
-    <label className="relative block">
-      <span className="t-account-label mb-1.5 block text-k-text-4">
+    <label className={hdc ? "hdc-fld hdc-fld--suggest" : "relative block"}>
+      <span className={hdc ? "lbl" : "t-account-label mb-1.5 block text-k-text-4"}>
         {upGreek(label)}
-        {required && <span className="ml-1 text-k-red">*</span>}
+        {required && (hdc ? <em> *</em> : <span className="ml-1 text-k-red">*</span>)}
       </span>
 
       <input
@@ -217,7 +225,12 @@ export function AddressAutocomplete({
         // for the click to land.
         onBlur={() => setTimeout(() => setOpen(false), 120)}
         onFocus={() => setOpen(items.length > 0)}
-        className="h-11 w-full border border-k-line-2 bg-white px-3 text-[13.5px] text-k-ink outline-none focus:border-k-ink"
+        placeholder={hdc ? t("placeholder") : undefined}
+        className={
+          hdc
+            ? undefined
+            : "h-11 w-full border border-k-line-2 bg-white px-3 text-[13.5px] text-k-ink outline-none focus:border-k-ink"
+        }
       />
 
       {open && items.length > 0 && (
@@ -251,8 +264,8 @@ export function AddressAutocomplete({
       )}
 
       {error ? (
-        <span className="mt-1.5 block text-[11.5px] text-k-red">{error}</span>
-      ) : (
+        <span className={hdc ? "err" : "mt-1.5 block text-[11.5px] text-k-red"}>{error}</span>
+      ) : hdc ? null : (
         <span className="mt-1.5 block text-[11px] text-k-text-3">{help ?? t("voitheia")}</span>
       )}
     </label>

@@ -82,6 +82,13 @@ export type CartLineView = {
   slug: string;
   name: string;
   sku: string;
+  /** The manufacturer's code (Milwaukee 4933…), which is what the HDC prints. */
+  code2: string;
+  /** "M12" | "M18" | "MX", or null for products outside a battery platform. */
+  platform: string | null;
+  /** "M18 FPD3" — the bare tool and its kits share it. */
+  modelRoot: string | null;
+  modelContent: "bare" | "kit" | null;
   brandName: string | null;
   image: string | null;
   quantity: number;
@@ -180,3 +187,28 @@ export type MiniCartSummary = {
   freeShippingRemaining: number;
   freeShippingReached: boolean;
 };
+
+/**
+ * The free-shipping bar, in the words a retail customer reads.
+ *
+ * The threshold stays NET (`FREE_SHIPPING_THRESHOLD_NET`) and `computeTotals`
+ * stays the only place that decides whether it is reached. What changes is how
+ * the gap is said: a customer adds products at VAT-inclusive prices, so "86,75 €
+ * more" has to be the gross amount — the net remainder grossed up at the
+ * basket's own VAT ratio, not a second threshold.
+ */
+export function freeShippingProgress(
+  totals: Pick<
+    CartTotals,
+    "subtotalNet" | "subtotalGross" | "freeShippingRemaining" | "freeShippingReached"
+  >,
+): { reached: boolean; percent: number; remainingGross: number } {
+  if (totals.freeShippingReached) return { reached: true, percent: 100, remainingGross: 0 };
+  const ratio = totals.subtotalNet > 0 ? totals.subtotalGross / totals.subtotalNet : 1.24;
+  const remainingGross = Math.round(totals.freeShippingRemaining * ratio * 100) / 100;
+  const percent = Math.max(
+    0,
+    Math.min(99, Math.floor((totals.subtotalNet / FREE_SHIPPING_THRESHOLD_NET) * 100)),
+  );
+  return { reached: false, percent, remainingGross };
+}
