@@ -3,6 +3,7 @@ import { pageMeta } from "@/lib/seo/urls";
 import { categoryBreadcrumb, categoryItemList } from "@/lib/seo/product-schema";
 import type { Metadata } from "next";
 import { cache } from "react";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { SiteChrome } from "@/components/chrome/SiteChrome";
@@ -20,6 +21,7 @@ import {
 } from "@/lib/compare/compare";
 import { platformsPresent } from "@/lib/catalog/hdc-filters";
 import { milwaukeeCategoryImage } from "@/lib/catalog/milwaukee-categories";
+import { PLATFORM_COOKIE, parsePlatformCookie } from "@/lib/catalog/platform-cookie";
 import { getPlpData, getPlpSummary, parsePlpParams } from "@/lib/catalog/plp";
 import {
   getCatalogueStats,
@@ -95,7 +97,25 @@ export default async function CategoryPage({
   const { locale, kathgoria } = await params;
   setRequestLocale(locale);
 
-  const raw = await searchParams;
+  const asked = await searchParams;
+
+  /*
+   * The platform the visitor picked in the mega menu (or on another category
+   * page) is remembered in a cookie and opens this page pre-filtered — as a
+   * DEFAULT only: an explicit `?platform=` always wins (`all` included, which
+   * is what «ΟΛΕΣ» sends), and a category with nothing for that platform
+   * (hand tools, PACKOUT) opens unfiltered rather than empty.
+   */
+  const [summary, jar] = await Promise.all([
+    getPlpSummary({ categorySlug: kathgoria }, locale),
+    cookies(),
+  ]);
+  const remembered = parsePlatformCookie(jar.get(PLATFORM_COOKIE)?.value);
+  const raw =
+    remembered && asked.platform == null && summary.platforms[remembered] > 0
+      ? { ...asked, platform: remembered }
+      : asked;
+
   /*
    * HDC listing: prices in the URL are the gross euros the cards print, and
    * `page` N means "the first N pages" — «ΠΕΡΙΣΣΟΤΕΡΑ ΠΡΟΪΟΝΤΑ» appends
@@ -110,7 +130,6 @@ export default async function CategoryPage({
   const [
     category,
     data,
-    summary,
     menuTree,
     brands,
     stats,
@@ -121,7 +140,6 @@ export default async function CategoryPage({
   ] = await Promise.all([
     getCategory(kathgoria),
     getPlpData(plpParams, locale),
-    getPlpSummary({ categorySlug: kathgoria }, locale),
     getMenuTree(locale),
     getTopBrands(locale),
     getCatalogueStats(),
@@ -225,6 +243,7 @@ export default async function CategoryPage({
           params={raw}
           data={data}
           compareStateFor={compareStateFor}
+          rememberedPlatform={remembered != null}
         />
         <Zone id="category.bottom" locale={locale} />
       </main>

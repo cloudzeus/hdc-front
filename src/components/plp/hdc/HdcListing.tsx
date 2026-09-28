@@ -6,6 +6,7 @@ import {
   HdcSortSelect,
   type SortChoice,
 } from "@/components/plp/hdc/HdcSortSelect";
+import { PlatformLink } from "@/components/plp/hdc/PlatformLink";
 import { HdcProductCard } from "@/components/product/HdcProductCard";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -72,12 +73,18 @@ export async function HdcListing({
   params,
   data,
   compareStateFor,
+  rememberedPlatform = false,
 }: {
   variant: Variant;
   locale: Locale;
   basePath: string;
   params: RawParams;
   data: PlpResult;
+  /**
+   * A platform is remembered in the cookie, so a URL without `?platform`
+   * would bring it back: «ΟΛΕΣ» must say `platform=all` explicitly.
+   */
+  rememberedPlatform?: boolean;
   compareStateFor: (
     slug: string,
     scopeKey?: string | null,
@@ -120,6 +127,7 @@ export async function HdcListing({
           params={params}
           facets={facets}
           locale={locale}
+          allValue={rememberedPlatform ? "all" : null}
         />
 
         <div className="hdc-plp-body">
@@ -151,6 +159,7 @@ export async function HdcListing({
               params={params}
               facets={facets}
               locale={locale}
+              allValue={rememberedPlatform ? "all" : null}
               sort={
                 <HdcSortSelect
                   value={currentSort}
@@ -258,8 +267,10 @@ function PlatformControl({
   params,
   facets,
   locale,
+  allValue,
 }: {
   variant: Variant;
+  allValue: string | null;
   basePath: string;
   params: RawParams;
   facets: PlpFacets;
@@ -286,7 +297,7 @@ function PlatformControl({
       basePath,
       params,
       "platform",
-      key === "all" ? null : key,
+      key === "all" ? allValue : key,
     ),
     on: active === key,
     off: key !== "all" && active !== key && counts[key] === 0,
@@ -305,8 +316,9 @@ function PlatformControl({
               <span>{item.note}</span>
             </span>
           ) : (
-            <Link
+            <PlatformLink
               key={item.key}
+              platform={item.key}
               href={item.href}
               scroll={false}
               prefetch={false}
@@ -315,7 +327,7 @@ function PlatformControl({
             >
               <b>{item.label}</b>
               <span>{item.note}</span>
-            </Link>
+            </PlatformLink>
           ),
         )}
       </div>
@@ -327,8 +339,9 @@ function PlatformControl({
               {item.label}
             </span>
           ) : (
-            <Link
+            <PlatformLink
               key={item.key}
+              platform={item.key}
               href={item.href}
               scroll={false}
               prefetch={false}
@@ -336,7 +349,7 @@ function PlatformControl({
               aria-current={item.on ? "true" : undefined}
             >
               {item.label}
-            </Link>
+            </PlatformLink>
           ),
         )}
       </div>
@@ -566,7 +579,9 @@ function Toolbar({
   facets,
   locale,
   sort,
+  allValue,
 }: {
+  allValue: string | null;
   total: number;
   basePath: string;
   params: RawParams;
@@ -575,13 +590,14 @@ function Toolbar({
   sort: React.ReactNode;
 }) {
   const t = useTranslations("plp.Hdc");
-  const chips: Array<{ label: string; href: string }> = [];
+  const chips: Array<{ label: string; href: string; platform?: boolean }> = [];
 
   const platform = parsePlatform(params.platform);
   if (platform) {
     chips.push({
       label: platformLabel(platform),
-      href: setParamHref(basePath, params, "platform", null),
+      href: setParamHref(basePath, params, "platform", allValue),
+      platform: true,
     });
   }
   const avail = parseAvail(params.avail);
@@ -624,18 +640,32 @@ function Toolbar({
       <span className="hdc-toolbar-count">
         {upGreek(t("proionta_count", { count: total }))}
       </span>
-      {chips.map((chip) => (
-        <Link
-          key={chip.label}
-          href={chip.href}
-          scroll={false}
-          prefetch={false}
-          className="hdc-chip"
-          aria-label={t("afairesi", { label: chip.label })}
-        >
-          {upGreek(chip.label)} <b aria-hidden>✕</b>
-        </Link>
-      ))}
+      {chips.map((chip) =>
+        chip.platform ? (
+          <PlatformLink
+            key={chip.label}
+            platform="all"
+            href={chip.href}
+            scroll={false}
+            prefetch={false}
+            className="hdc-chip"
+            aria-label={t("afairesi", { label: chip.label })}
+          >
+            {upGreek(chip.label)} <b aria-hidden>✕</b>
+          </PlatformLink>
+        ) : (
+          <Link
+            key={chip.label}
+            href={chip.href}
+            scroll={false}
+            prefetch={false}
+            className="hdc-chip"
+            aria-label={t("afairesi", { label: chip.label })}
+          >
+            {upGreek(chip.label)} <b aria-hidden>✕</b>
+          </Link>
+        ),
+      )}
       {sort}
     </div>
   );

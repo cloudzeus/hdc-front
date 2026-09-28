@@ -15,9 +15,10 @@ import type { BrandTile, MenuCategory, ProductCardData } from "@/lib/catalog/que
  * first paint.
  *
  * The signature is unchanged from the Kolleris chrome. `brands`, `stats` and
- * `featured` fed the old mega menu and brand links; the HDC header has neither
- * (the HDC mega menu is Plan 3, Task 8), so they are accepted and unused until
- * then rather than touched in thirty pages twice.
+ * `featured` fed the old Kolleris mega menu and its brands tab, both gone: the
+ * HDC mega menu fetches its own data (`/api/mega-menu`) on first use. They are
+ * still accepted, and unused, so the twenty-odd pages that pass them need not
+ * change in the same commit.
  */
 export function SiteChrome({
   locale,

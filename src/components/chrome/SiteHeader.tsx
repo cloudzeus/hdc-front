@@ -2,7 +2,7 @@ import { Heart, User } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { MiniCart } from "@/components/cart/MiniCart";
-import { HeaderNav } from "@/components/chrome/HeaderNav";
+import { HeaderMega } from "@/components/chrome/MegaMenu/HeaderMega";
 import { MobileHeader } from "@/components/chrome/MobileHeader";
 import { MobileMenu } from "@/components/chrome/MobileMenu";
 import { SearchSuggest } from "@/components/chrome/SearchSuggest";
@@ -22,8 +22,8 @@ const LOCKUP = { src: "/brand/hdc-lockup-440.png", width: 440, height: 183 } as 
  * search box and ♡ ◯ 🛒. Below 1024px: the 56px phone bar, with search in a
  * row that opens under it and everything else in the drawer.
  *
- * Server-rendered; the islands are the nav underline, the search field, the
- * mini-cart, the drawer and the phone search toggle.
+ * Server-rendered; the islands are the nav with its mega menu, the search
+ * field, the mini-cart, the drawer and the phone search toggle.
  */
 export function SiteHeader({
   locale,
@@ -37,6 +37,7 @@ export function SiteHeader({
   const t = useTranslations("chrome.SiteHeader");
   const resolved = resolveHdcNav(categories);
   const nav = resolved.map((item) => ({
+    key: item.key,
     href: item.href,
     label: t(`nav_${item.key}`),
   }));
@@ -86,7 +87,7 @@ export function SiteHeader({
         <div className="hdc-wrap">
           {lockup(58)}
 
-          <HeaderNav label={t("kyria_ploigisi")} items={nav} />
+          <HeaderMega label={t("kyria_ploigisi")} items={nav} packoutHref={packoutHref} />
 
           <div className="hdc-hdr-search">
             <SearchSuggest locale={locale} packoutHref={packoutHref} />

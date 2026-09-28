@@ -10,7 +10,9 @@ import { searchKey } from "@/lib/greek";
  * a sync runs. So each item is matched by name, and falls back to a page that
  * always exists (the catalogue, or a search) rather than to a dead link.
  *
- * When the mega menu arrives (Plan 3, Task 8) this is the one place to replace.
+ * These hrefs are what the items link to when the mega menu cannot open (no
+ * Milwaukee tree from HDCtool), and what the drawer lists in that case; with
+ * the tree, four of them open the mega menu instead (`MegaMenu/HeaderMega`).
  */
 
 export type HdcNavKey = "battery" | "accessories" | "packout" | "hand" | "offers";
