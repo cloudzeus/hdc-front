@@ -295,6 +295,35 @@ export type HdctoolMilwaukeeCategory = {
   children: HdctoolMilwaukeeCategory[];
 };
 
+/**
+ * H7 — the storefront's legal and help content (`/api/public/eshop-content`):
+ * terms, privacy, returns, cookies and the FAQ, edited by staff in HDCtool.
+ * Every text field is rich text (HTML) in three languages; sanitize before
+ * rendering.
+ */
+export type HdctoolLocalized = { el: string; en: string; it: string };
+
+export type HdctoolEshopTerm = {
+  slug: string | null;
+  title: HdctoolLocalized;
+  content: HdctoolLocalized;
+  updatedAt: string;
+};
+
+export type HdctoolEshopQandA = {
+  slug: string | null;
+  order: number;
+  question: HdctoolLocalized;
+  answer: HdctoolLocalized;
+};
+
+export type HdctoolEshopContent = {
+  success: boolean;
+  site: "hdc" | "main";
+  terms: HdctoolEshopTerm[];
+  qanda: HdctoolEshopQandA[];
+};
+
 // ── Methods ─────────────────────────────────────────────────────────────────
 
 /** Max the API accepts (PUBLIC_ESHOP_MAX_LIMIT). */
@@ -383,6 +412,18 @@ export const hdctool = {
     count: number;
   }> {
     return request("/api/public/milwaukee-categories", undefined, {
+      method: "GET",
+      timeoutMs: 5_000,
+    });
+  },
+
+  /**
+   * Terms, privacy, returns, cookies and FAQ for one storefront. A GET with a
+   * short timeout, like the category tree: it fills a page, and the page has
+   * its own fallback when HDCtool is slow or the endpoint is not there yet.
+   */
+  eshopContent(site: "hdc" | "main"): Promise<HdctoolEshopContent> {
+    return request(`/api/public/eshop-content?site=${encodeURIComponent(site)}`, undefined, {
       method: "GET",
       timeoutMs: 5_000,
     });

@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { SHOP } from "@/config/shop";
-import { directionsUrl, isStoreOpen } from "@/lib/hdc-home";
+import { hoursMessageArgs, isStoreOpen } from "@/lib/contact/hours";
+import { directionsUrl } from "@/lib/hdc-home";
 
 const FACTS = ["paralavi", "dokimi", "symvouli", "eggyisi"] as const;
 
@@ -46,7 +47,7 @@ export async function StoreBand() {
             <b>{SHOP.name.toUpperCase()}</b>
             <br />
             <span>
-              {contact.street}, {contact.postcode} {contact.city} · {t("orario", contact.hours)} ·{" "}
+              {contact.address} · {t("orario", hoursMessageArgs(contact.hours))} ·{" "}
               <span className={open ? "hdc-store-open" : undefined}>
                 ● {open ? t("anoichta") : t("kleista")}
               </span>

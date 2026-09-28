@@ -7,6 +7,7 @@ import { useActionState } from "react";
 import { trackOrder, type TrackState } from "@/lib/orders/lookup";
 import { formatMoney } from "@/lib/format";
 import { upGreek } from "@/lib/greek";
+import { PRIMARY_PHONE } from "@/config/shop";
 
 /**
  * Order lookup + status timeline.
@@ -207,8 +208,8 @@ function Result({ order }: { order: Extract<TrackState, { state: "found" }>["ord
 
       <p className="mt-5 text-[12.5px] text-k-text-3">
         {t("kati_den_paei_kala")}{" "}
-        <a href="tel:+302104111355" className="font-semibold text-k-ink underline underline-offset-4">
-          210 411 1355
+        <a href={`tel:${PRIMARY_PHONE.e164}`} className="font-semibold text-k-ink underline underline-offset-4">
+          {PRIMARY_PHONE.display}
         </a>{" "}
         ·{" "}
         <button

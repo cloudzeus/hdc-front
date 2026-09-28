@@ -16,6 +16,7 @@ import {
 } from "@/lib/catalog/filter-href";
 import { formatPrice } from "@/lib/format";
 import { upGreek } from "@/lib/greek";
+import { PRIMARY_PHONE } from "@/config/shop";
 
 /**
  * Faceted filters — a SERVER component.
@@ -184,10 +185,10 @@ export function FilterSidebar({
               {t("peite_mas_ti_doyleia_kai", { years: yearsInBusiness() })}
             </p>
             <a
-              href="tel:+302104111355"
+              href={`tel:${PRIMARY_PHONE.e164}`}
               className="t-card-cta mt-3 flex h-11 items-center justify-center bg-k-ink text-white transition-colors hover:bg-k-red"
             >
-              210 411 1355
+              {PRIMARY_PHONE.display}
             </a>
           </div>
         </div>

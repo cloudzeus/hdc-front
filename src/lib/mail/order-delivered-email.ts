@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { sendTemplateMail } from "@/lib/mail/send-template";
 import { mailUrls } from "@/lib/mail/urls";
 import { siteOrigin } from "@/lib/seo/urls";
+import { PRIMARY_PHONE } from "@/config/shop";
 
 /**
  * «Η παραγγελία παραδόθηκε».
@@ -93,7 +94,7 @@ export async function sendDeliveredEmail(orderNumber: string) {
       `Διεύθυνση: ${order.shipLine1}, ${order.shipPostcode} ${order.shipCity}`,
       "",
       "Ελέγξτε τα είδη σας. Αν κάτι δεν είναι σωστό, απαντήστε σε αυτό το email",
-      "ή καλέστε στο +30 210 411 1355.",
+      `ή καλέστε στο ${PRIMARY_PHONE.display}.`,
       "",
       `Η παραγγελία σας: ${link}`,
     ].join("\n"),

@@ -11,6 +11,7 @@ import {
 } from "@/lib/account/session";
 import { lookupVat } from "@/lib/account/vat-lookup";
 import type { VatLookupResult } from "@/lib/account/vat";
+import { PRIMARY_PHONE } from "@/config/shop";
 
 /**
  * Account server actions.
@@ -44,7 +45,7 @@ const LOGIN_ERRORS: Record<string, string> = {
   locked_out: "Πολλές αποτυχημένες προσπάθειες. Δοκιμάστε ξανά σε 15 λεπτά.",
   pending_approval:
     "Ο εταιρικός λογαριασμός σας δεν έχει εγκριθεί ακόμη. Ενεργοποιείται σε 2 εργάσιμες.",
-  suspended: "Ο λογαριασμός σας έχει ανασταλεί. Καλέστε μας στο 210 411 1355.",
+  suspended: `Ο λογαριασμός σας έχει ανασταλεί. Καλέστε μας στο ${PRIMARY_PHONE.display}.`,
 };
 
 export async function signIn(_prev: AuthState, formData: FormData): Promise<AuthState> {

@@ -32,7 +32,7 @@ import {
 import { formatPrice } from "@/lib/format";
 import { upGreek } from "@/lib/greek";
 import { displayName } from "@/lib/milwaukee/display";
-import { SHOP } from "@/config/shop";
+import { PRIMARY_PHONE } from "@/config/shop";
 import { HdcProductCard } from "@/components/product/HdcProductCard";
 import type { ProductCardData } from "@/lib/catalog/queries";
 import { showsExactQty } from "@/lib/stock-display";
@@ -309,8 +309,8 @@ async function NoResults({
         <aside className="hdc-ask">
           <h2 className="hdc-disp">{upGreek(t("rotiste"))}</h2>
           <p>{t("rotiste_keimeno")}</p>
-          <a href={`tel:${SHOP.contact.phoneE164}`} className="hdc-ask-ph">
-            {SHOP.contact.phone}
+          <a href={`tel:${PRIMARY_PHONE.e164}`} className="hdc-ask-ph">
+            {PRIMARY_PHONE.display}
           </a>
           <Link href={ask} className="hdc-btn hdc-btn-red">
             {upGreek(t("steilte_minyma"))}

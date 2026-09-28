@@ -1,6 +1,7 @@
 import { absoluteUrl, siteOrigin } from "@/lib/seo/urls";
 import type { Locale } from "@/i18n/routing";
-import { SHOP as CONFIG } from "@/config/shop";
+import { PRIMARY_PHONE, SHOP as CONFIG } from "@/config/shop";
+import { openingHoursSpecification } from "@/lib/contact/hours";
 
 /**
  * Structured data for the whole site.
@@ -26,7 +27,7 @@ import { SHOP as CONFIG } from "@/config/shop";
 export const SHOP = {
   name: CONFIG.name,
   legalName: CONFIG.operator.name,
-  phone: CONFIG.contact.phoneE164,
+  phone: PRIMARY_PHONE.e164,
   email: CONFIG.contact.email,
   street: CONFIG.contact.street,
   city: CONFIG.contact.city,
@@ -87,14 +88,7 @@ export function siteJsonLd(locale: Locale) {
           latitude: SHOP.lat,
           longitude: SHOP.lon,
         },
-        openingHoursSpecification: [
-          {
-            "@type": "OpeningHoursSpecification",
-            dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-            opens: SHOP.hours.open,
-            closes: SHOP.hours.close,
-          },
-        ],
+        openingHoursSpecification: openingHoursSpecification(SHOP.hours),
       },
       {
         "@type": "WebSite",

@@ -1,9 +1,10 @@
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { SHOP } from "@/config/shop";
+import { PRIMARY_PHONE, SHOP } from "@/config/shop";
 import { Link } from "@/i18n/navigation";
 import type { CategoryTile } from "@/lib/catalog/queries";
 import { upGreek } from "@/lib/greek";
+import { hoursMessageArgs } from "@/lib/contact/hours";
 import { resolveHdcNav } from "@/lib/hdc-nav";
 
 /*
@@ -54,6 +55,7 @@ export function SiteFooter({ categories }: { categories: CategoryTile[] }) {
         { href: nav.hand, label: t("ergaleia_cheiros") },
         { href: "/prosfores", label: t("prosfores") },
         { href: "/nees-afixeis", label: t("nees_afixeis") },
+        { href: "/etaireia", label: t("schetika") },
       ],
     },
     {
@@ -91,15 +93,15 @@ export function SiteFooter({ categories }: { categories: CategoryTile[] }) {
               className="hdc-foot-logo"
             />
             <address className="hdc-foot-contact">
-              <a href={`tel:${contact.phoneE164}`}>
-                <strong>{contact.phone}</strong>
+              <a href={`tel:${PRIMARY_PHONE.e164}`}>
+                <strong>{PRIMARY_PHONE.display}</strong>
               </a>
               <br />
               <a href={`mailto:${contact.email}`}>{contact.email}</a>
               <br />
-              {contact.street}, {contact.postcode} {contact.city}
+              {contact.address}
               <br />
-              {t("orario", contact.hours)}
+              {t("orario", hoursMessageArgs(contact.hours))}
             </address>
             <ul className="hdc-foot-pay" aria-label={t("pliromes")}>
               {PAYMENTS.map((payment) => (
@@ -147,8 +149,8 @@ export function SiteFooter({ categories }: { categories: CategoryTile[] }) {
             </Link>
             {" · "}
             {/* No cookie page of its own: the cookie policy is a section of
-                the privacy policy. */}
-            <Link href="/aporrito" prefetch={false}>
+                the privacy page, anchored. */}
+            <Link href="/aporrito#cookies" prefetch={false}>
               {t("cookies")}
             </Link>
           </nav>

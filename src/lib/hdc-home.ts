@@ -114,30 +114,11 @@ export function resolveHomeCategories(
   });
 }
 
-type Hours = { open: string; close: string };
-
-const minutes = (hhmm: string) => {
-  const [h, m] = hhmm.split(":").map(Number);
-  return h * 60 + m;
-};
-
-/**
- * Is the store open right now? Monday to Friday, `hours.open`–`hours.close`,
- * Athens time — whatever timezone the server runs in.
+/*
+ * Whether the store is open lives with the rest of the hours logic
+ * (Saturday has its own window), re-exported for the existing callers.
  */
-export function isStoreOpen(hours: Hours, now: Date = new Date()): boolean {
-  const parts = new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Europe/Athens",
-    weekday: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h23",
-  }).formatToParts(now);
-  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
-  if (get("weekday") === "Sat" || get("weekday") === "Sun") return false;
-  const current = Number(get("hour")) * 60 + Number(get("minute"));
-  return current >= minutes(hours.open) && current < minutes(hours.close);
-}
+export { isStoreOpen } from "@/lib/contact/hours";
 
 /** Google Maps directions to the store, from its printed address. */
 export function directionsUrl(contact: { street: string; postcode: string; city: string }): string {

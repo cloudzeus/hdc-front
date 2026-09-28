@@ -42,7 +42,7 @@ export async function GET() {
 Address: ${SHOP.street}, ${SHOP.postcode} ${SHOP.city}, Greece
 Phone: ${SHOP.phone}
 Email: ${SHOP.email}
-Hours: Monday to Friday, 08:00-16:30 (Europe/Athens). Closed weekends.
+Hours: Monday to Friday, ${SHOP.hours.weekdays.open}-${SHOP.hours.weekdays.close}; Saturday, ${SHOP.hours.saturday.open}-${SHOP.hours.saturday.close} (Europe/Athens). Closed Sundays.
 Languages: Greek (default), English, Italian.
 Currency: EUR. All displayed prices include Greek VAT and exclude shipping.
 

@@ -8,6 +8,7 @@ import { useMemo, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import type { BrandListItem } from "@/lib/catalog/brands";
 import { searchKey, upGreek } from "@/lib/greek";
+import { PRIMARY_PHONE } from "@/config/shop";
 
 /**
  * "Όλα τα brands με απόθεμα" plus its find-box.
@@ -81,10 +82,10 @@ export function BrandSearchGrid({ brands }: { brands: BrandListItem[] }) {
             {t("antiprosopeyoyme_polla_akomi_brands_kai")}
           </p>
           <a
-            href="tel:+302104111355"
+            href={`tel:${PRIMARY_PHONE.e164}`}
             className="t-btn-sm mt-5 inline-block bg-k-ink px-7 py-4 text-white transition-colors hover:bg-k-red"
           >
-            {t("t_210_411_1355")}
+            {PRIMARY_PHONE.display}
           </a>
         </div>
       ) : (

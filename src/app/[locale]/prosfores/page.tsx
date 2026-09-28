@@ -299,25 +299,7 @@ export default async function OffersPage({
                     </p>
                   </div>
 
-                  <div className="mt-8 grid gap-px border border-k-line bg-k-line lg:mt-10 lg:grid-cols-2">
-                    <div className="flex flex-col gap-3 border-l-[3px] border-k-red bg-white p-5 lg:p-7">
-                      <p className="t-eyebrow text-k-red">
-                        {upGreek(t("i_pragmatiki_ekptosi"))}
-                      </p>
-                      <p className="font-display t-display text-[17px] leading-[1.3] text-k-ink lg:text-xl">
-                        {upGreek(t("timi_synergati_gia_epaggelmaties"))}
-                      </p>
-                      <p className="text-[12.5px] leading-[1.65] text-k-text-3">
-                        {t("an_agorazete_gia_etaireia_i")}
-                      </p>
-                      <Link
-                        href="/eggrafi"
-                        className="t-btn-sm mt-auto self-start bg-k-ink px-6 py-3.5 text-white transition-colors hover:bg-k-red"
-                      >
-                        {upGreek(t("aitisi_b2b"))} →
-                      </Link>
-                    </div>
-
+                  <div className="mt-8 grid gap-px border border-k-line bg-k-line lg:mt-10">
                     <div className="flex flex-col gap-3 bg-white p-5 lg:p-7">
                       <p className="t-eyebrow text-k-text-4">
                         {upGreek(t("o_ti_kinithike_teleytaia"))}

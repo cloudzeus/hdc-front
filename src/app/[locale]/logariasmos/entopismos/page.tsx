@@ -6,6 +6,7 @@ import { OrderTracker } from "@/components/orders/OrderTracker";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { upGreek } from "@/lib/greek";
+import { PRIMARY_PHONE } from "@/config/shop";
 
 export async function generateMetadata({
   params,
@@ -73,8 +74,8 @@ export default async function TrackOrderPage({
             <div className="hdc-box-body">
               <p className="hdc-lead hdc-lead--box">{t("einai_sto_email_epivevaiosis_sti")}</p>
               <div className="hdc-btn-row">
-                <a href="tel:+302104111355" className="hdc-btn hdc-btn-ink">
-                  210 411 1355
+                <a href={`tel:${PRIMARY_PHONE.e164}`} className="hdc-btn hdc-btn-ink">
+                  {PRIMARY_PHONE.display}
                 </a>
                 <Link href="/syxnes-erotiseis#apostoli" className="hdc-btn hdc-btn-line">
                   {upGreek(t("erotiseis_apostolis"))}

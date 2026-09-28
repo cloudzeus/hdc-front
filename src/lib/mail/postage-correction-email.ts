@@ -3,6 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { sendTemplateMail } from "@/lib/mail/send-template";
 import { PAYMENT_METHODS } from "@/lib/cart/options";
 import { siteOrigin } from "@/lib/seo/urls";
+import { PRIMARY_PHONE, SHOP } from "@/config/shop";
+
+const { weekdays, saturday } = SHOP.contact.hours;
+/** "Δευ–Παρ 08:00–16:00, Σάβ 09:00–14:00", from the shop config. */
+const HOURS_LINE = `Δευ–Παρ ${weekdays.open}–${weekdays.close}, Σάβ ${saturday.open}–${saturday.close}`;
 
 /**
  * «Συγγνώμη για το λάθος» — the corrected price, and a way to pay it.
@@ -71,7 +76,7 @@ export async function sendPostageCorrectionEmail(
       "",
       `Ολοκλήρωση πληρωμής: ${payUrl}`,
       "",
-      "Χρειάζεστε βοήθεια; +30 210 411 1355 (Δευ–Παρ 08:00–17:00) ή απαντήστε σε αυτό το email.",
+      `Χρειάζεστε βοήθεια; ${PRIMARY_PHONE.display} (${HOURS_LINE}) ή απαντήστε σε αυτό το email.`,
     ].join("\n"),
   });
 }

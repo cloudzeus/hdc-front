@@ -19,6 +19,7 @@ import {
 } from "@/lib/catalog/queries";
 import { upGreek } from "@/lib/greek";
 import { Zone } from "@/components/zones/Zone";
+import { PRIMARY_PHONE } from "@/config/shop";
 
 type PageProps = { params: Promise<{ locale: Locale; slug: string }> };
 
@@ -199,10 +200,10 @@ export default async function BlogPostPage({ params }: PageProps) {
                 ← {upGreek(t("ola_ta_arthra"))}
               </Link>
               <a
-                href="tel:+302104111355"
+                href={`tel:${PRIMARY_PHONE.e164}`}
                 className="t-btn-sm bg-k-ink px-6 py-3.5 text-white transition-colors hover:bg-k-red"
               >
-                210 411 1355
+                {PRIMARY_PHONE.display}
               </a>
             </div>
           </div>

@@ -39,15 +39,25 @@ describe("resolveHomeCategories", () => {
 });
 
 describe("isStoreOpen", () => {
-  const hours = { open: "08:00", close: "17:00" };
+  const hours = {
+    weekdays: { open: "08:00", close: "16:00" },
+    saturday: { open: "09:00", close: "14:00" },
+    sunday: null,
+  };
   it("is open on a weekday inside the hours, Athens time", () => {
     // Monday 28/9/2026 10:00 Athens = 07:00 UTC (EEST, UTC+3)
     expect(isStoreOpen(hours, new Date("2026-09-28T07:00:00Z"))).toBe(true);
   });
-  it("is closed before opening, after closing and at weekends", () => {
+  it("is closed before opening, at closing time and on Sunday", () => {
     expect(isStoreOpen(hours, new Date("2026-09-28T04:30:00Z"))).toBe(false); // 07:30
-    expect(isStoreOpen(hours, new Date("2026-09-28T14:00:00Z"))).toBe(false); // 17:00
-    expect(isStoreOpen(hours, new Date("2026-10-03T08:00:00Z"))).toBe(false); // Saturday
+    expect(isStoreOpen(hours, new Date("2026-09-28T13:00:00Z"))).toBe(false); // 16:00
+    expect(isStoreOpen(hours, new Date("2026-10-04T08:00:00Z"))).toBe(false); // Sunday 11:00
+  });
+  it("keeps Saturday's own hours, 09:00-14:00", () => {
+    expect(isStoreOpen(hours, new Date("2026-10-03T05:30:00Z"))).toBe(false); // Sat 08:30
+    expect(isStoreOpen(hours, new Date("2026-10-03T06:00:00Z"))).toBe(true); // Sat 09:00
+    expect(isStoreOpen(hours, new Date("2026-10-03T10:59:00Z"))).toBe(true); // Sat 13:59
+    expect(isStoreOpen(hours, new Date("2026-10-03T11:00:00Z"))).toBe(false); // Sat 14:00
   });
 });
 

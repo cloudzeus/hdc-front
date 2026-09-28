@@ -15,6 +15,7 @@ import { createPaymentOrder, isVivaConfigured } from "@/lib/payment/viva";
 import { routing, type Locale } from "@/i18n/routing";
 import { getCurrentUser } from "@/lib/account/session";
 import { SHOP } from "@/config/shop";
+import { PRIMARY_PHONE } from "@/config/shop";
 
 /**
  * Order placement.
@@ -457,7 +458,7 @@ export async function placeOrder(
       },
     });
     return {
-      error: `Η σύνδεση με την τράπεζα απέτυχε. Η παραγγελία ${order.orderNumber} καταχωρήθηκε — καλέστε μας στο 210 411 1355.`,
+      error: `Η σύνδεση με την τράπεζα απέτυχε. Η παραγγελία ${order.orderNumber} καταχωρήθηκε — καλέστε μας στο ${PRIMARY_PHONE.display}.`,
     };
   }
 

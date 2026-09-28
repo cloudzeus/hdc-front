@@ -3,6 +3,7 @@ import { sendTemplateMail } from "@/lib/mail/send-template";
 import { mailUrls } from "@/lib/mail/urls";
 import { stampNow } from "@/lib/mail/request-context";
 import type { RequestFingerprint } from "@/lib/mail/request-context";
+import { PRIMARY_PHONE } from "@/config/shop";
 
 /**
  * Τα email του κύκλου ζωής ενός λογαριασμού.
@@ -133,7 +134,7 @@ export async function sendPasswordChangedEmail(
       `Συσκευή: ${fingerprint.device}`,
       `IP: ${fingerprint.ip}`,
       "",
-      "Αν δεν το κάνατε εσείς, καλέστε μας άμεσα στο +30 210 411 1355.",
+      `Αν δεν το κάνατε εσείς, καλέστε μας άμεσα στο ${PRIMARY_PHONE.display}.`,
     ].join("\n"),
   });
 }
@@ -228,7 +229,7 @@ export async function sendB2bApprovedEmail(
            φτάνουν εδώ ακόμη. Παύλα αντί για επινοημένη τιμή. */
         payment_terms: "—",
         sales_rep: "—",
-        sales_rep_phone: "+30 210 411 1355",
+        sales_rep_phone: PRIMARY_PHONE.display,
       },
       benefits: [
         { index: "01", title: "Τιμες συνεργατη", text: "Οι τιμές σας εμφανίζονται παντού μόλις συνδεθείτε." },

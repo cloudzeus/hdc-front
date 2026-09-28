@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import Image from "next/image";
-import { SHOP } from "@/config/shop";
+import { PRIMARY_PHONE } from "@/config/shop";
 import { Link } from "@/i18n/navigation";
 
 const LOCKUP = { src: "/brand/hdc-lockup-440.png", width: 440, height: 183 } as const;
@@ -38,8 +38,8 @@ export async function HdcCheckoutHeader() {
         </span>
         <span className="help">
           {t("chreiazeste_voitheia")}{" "}
-          <a href={`tel:${SHOP.contact.phoneE164}`}>
-            <b>{SHOP.contact.phone}</b>
+          <a href={`tel:${PRIMARY_PHONE.e164}`}>
+            <b>{PRIMARY_PHONE.display}</b>
           </a>
         </span>
         <Link href="/kalathi" className="back" prefetch={false}>

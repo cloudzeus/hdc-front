@@ -16,22 +16,38 @@ export const SHOP = {
   cookiePrefix: "HDC_",
 
   /**
-   * How to reach the shop — footer, and anything else that prints it.
-   *
-   * PLACEHOLDERS: these are still the Kolleris store's details, pending the
-   * HDC's own phone, mailbox and hours. Change them here and nowhere else.
+   * How to reach the shop: footer, store band, contact page, checkout header,
+   * JSON-LD. Change them here and nowhere else. Source: the previous HDC site
+   * (docs/content/milwaukeetoolshdc-pages.md), hours as decided by the client.
    */
   contact: {
-    /** As printed. */
-    phone: "210 411 1355",
-    /** For `tel:` links. */
-    phoneE164: "+302104111355",
+    /** In the order they are printed; the first is the primary line. */
+    phones: [
+      { display: "+30 210 422 02 39", e164: "+302104220239" },
+      { display: "+30 210 411 37 54", e164: "+302104113754" },
+      { display: "+30 210 413 14 90", e164: "+302104131490" },
+      { display: "+30 694 081 63 38", e164: "+306940816338" },
+    ],
+    /** General enquiries. */
     email: "info@kolleris.com",
+    /** Orders and payments. */
+    ordersEmail: "accounts@kolleris.com",
     street: "Κ. Μαυρομιχάλη 4",
+    /** Five digits, as the checkout and the courier want it. */
     postcode: "18545",
     city: "Πειραιάς",
-    /** Monday to Friday; the day names come from the message files. */
-    hours: { open: "08:00", close: "17:00" },
+    /** As printed. */
+    address: "Κ. Μαυρομιχάλη 4, 185 45 Πειραιάς",
+    /**
+     * Opening hours, Europe/Athens. `null` = closed all day. The day names
+     * come from the message files; the open/closed logic is
+     * src/lib/contact/hours.ts.
+     */
+    hours: {
+      weekdays: { open: "08:00", close: "16:00" },
+      saturday: { open: "09:00", close: "14:00" },
+      sunday: null,
+    },
   },
 
   /**
@@ -44,3 +60,7 @@ export const SHOP = {
     gemi: "44598907000",
   },
 } as const;
+
+/** The line printed first and dialled from every "call us" button. */
+export const PRIMARY_PHONE = SHOP.contact.phones[0];
+
