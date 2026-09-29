@@ -255,14 +255,18 @@ type ResolvedFilters = {
   campaigns: Prisma.ProductWhereInput | null;
   /** Size families whose OTHER sizes match `?q=` (see `searchFamiliesOf`). */
   searchFamilies: string[];
-  /** Size families with at least one size in stock (see `familyStockClause`). */
+  /** Size families with at least one size available, ours or the supplier's (see `familyStockClause`). */
   stockedFamilies: string[];
 };
 
-/** Families with any size in stock — a few dozen keys at most. */
+/** Families with any size available, ours or the supplier's — a few dozen keys at most. */
 async function stockedFamiliesOf(): Promise<string[]> {
   const rows = await prisma.product.findMany({
-    where: { isActive: true, inStock: true, variantGroup: { not: null } },
+    where: {
+      isActive: true,
+      OR: [{ inStock: true }, { supplierAvailable: true }],
+      variantGroup: { not: null },
+    },
     distinct: ["variantGroup"],
     select: { variantGroup: true },
   });
@@ -272,10 +276,11 @@ async function stockedFamiliesOf(): Promise<string[]> {
 /**
  * The availability filter, read per size family.
  *
- * The card of a family speaks for all its sizes, so «Άμεσα διαθέσιμα» has to
- * as well: HI-DEX gloves whose 9/L is on the shelf are in stock even when the
- * 7/S that leads the family is not — and a filter that hid them while the card
- * said «Σε απόθεμα» would contradict itself.
+ * «Διαθέσιμα» is ours or the supplier's (`stockClause`); «Παράδοση 1–3
+ * εργάσιμες» is neither. The card of a family speaks for all its sizes, so the
+ * filter has to as well: HI-DEX gloves whose 9/L is on the shelf are available
+ * even when the 7/S that leads the family is not — and a filter that hid them
+ * while the card said «Σε απόθεμα» would contradict itself.
  */
 function familyStockClause(
   avail: PlpParams["avail"],
@@ -284,10 +289,13 @@ function familyStockClause(
   const plain = stockClause(avail);
   if (!plain || stockedFamilies.length === 0) return plain;
   if (avail === "in-stock") {
-    return { OR: [{ inStock: true }, { variantGroup: { in: stockedFamilies } }] };
+    return {
+      OR: [{ inStock: true }, { supplierAvailable: true }, { variantGroup: { in: stockedFamilies } }],
+    };
   }
   return {
     inStock: false,
+    supplierAvailable: false,
     OR: [{ variantGroup: null }, { variantGroup: { notIn: stockedFamilies } }],
   };
 }
@@ -751,8 +759,12 @@ const getFacets = sharedCatalogue(
         _min: { priceNet: true },
         _max: { priceNet: true },
       }),
-      /* "All" and "in stock" share a where clause too: one groupBy, two numbers. */
-      prisma.product.groupBy({ by: ["inStock"], where: whereForAvail, _count: { _all: true } }),
+      /* "All" and "available" share a where clause too: one groupBy, two numbers. */
+      prisma.product.groupBy({
+        by: ["inStock", "supplierAvailable"],
+        where: whereForAvail,
+        _count: { _all: true },
+      }),
       /*
        * Counted the same way the filter selects, or the number beside it is a
        * lie. It said 0 while the filter would have returned 3.028, because it
@@ -796,9 +808,10 @@ const getFacets = sharedCatalogue(
     let inStockCount = 0;
     for (const row of byStock) {
       allCount += row._count._all;
-      if (row.inStock) inStockCount += row._count._all;
+      // «Διαθέσιμα»: ours or the supplier's, as `stockClause` selects.
+      if (row.inStock || row.supplierAvailable) inStockCount += row._count._all;
     }
-    // A family counts as in stock when any of its sizes is (familyStockClause).
+    // A family counts as available when any of its sizes is (familyStockClause).
     if (filters.stockedFamilies.length > 0) {
       inStockCount = await prisma.product.count({
         where: { AND: [whereForAvail, familyStockClause("in-stock", filters.stockedFamilies)!] },

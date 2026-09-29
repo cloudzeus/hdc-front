@@ -44,8 +44,17 @@ describe("HDC filter parsing", () => {
     expect(parseAvail("in-stock")).toBe("in-stock");
     expect(parseAvail("order")).toBe("order");
     expect(parseAvail(undefined)).toBe("all");
-    expect(stockClause("in-stock")).toEqual({ inStock: true });
-    expect(stockClause("order")).toEqual({ inStock: false });
+  });
+});
+
+describe("stockClause", () => {
+  it("«Διαθέσιμα» is ours or the supplier's", () => {
+    expect(stockClause("in-stock")).toEqual({ OR: [{ inStock: true }, { supplierAvailable: true }] });
+  });
+  it("«Παράδοση 1–3 εργάσιμες» is neither", () => {
+    expect(stockClause("order")).toEqual({ inStock: false, supplierAvailable: false });
+  });
+  it("no filter", () => {
     expect(stockClause("all")).toBeNull();
   });
 });

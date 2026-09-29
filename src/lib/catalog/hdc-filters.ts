@@ -106,10 +106,16 @@ export function hdcFilterClauses(
   return and;
 }
 
-/** Where clause for the availability boxes (null = both, or neither, ticked). */
+/**
+ * Where clause for the availability boxes (null = both, or neither, ticked).
+ *
+ * «Διαθέσιμα» (`in-stock`) is ours OR the supplier's; «Παράδοση 1–3
+ * εργάσιμες» (`order`) is neither. The URL values stay as they were, so old
+ * links keep working. See `lib/catalog/availability.ts`.
+ */
 export function stockClause(avail: "in-stock" | "order" | "all" | undefined) {
-  if (avail === "in-stock") return { inStock: true };
-  if (avail === "order") return { inStock: false };
+  if (avail === "in-stock") return { OR: [{ inStock: true }, { supplierAvailable: true }] };
+  if (avail === "order") return { inStock: false, supplierAvailable: false };
   return null;
 }
 
