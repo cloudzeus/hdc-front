@@ -13,7 +13,8 @@ import type { VariantOption } from "@/lib/catalog/variants";
  * back button works, and each size keeps an address that can be shared.
  *
  * Sizes out of stock stay, dashed and grey — a size missing from the row is
- * one the customer never learns exists.
+ * one the customer never learns exists. A size only the supplier has is solid
+ * and amber: it can be bought, in 3–5 working days.
  */
 export function HdcSizePicker({
   options,
@@ -45,7 +46,7 @@ export function HdcSizePicker({
         <ul className="hdc-pdp-sizes-row">
           {options.map((option) => {
             const title = titleOf(option);
-            const cls = `hdc-pdp-size${option.inStock ? "" : " out"}`;
+            const cls = `hdc-pdp-size${option.inStock ? "" : option.supplierAvailable ? " sup" : " out"}`;
             return (
               <li key={option.slug}>
                 {option.current ? (

@@ -559,6 +559,15 @@
   .hdc-pdp-size.out.on {
     border-style: solid;
   }
+  /* Only the supplier has it: buyable, in 3–5 working days. */
+  .hdc-pdp-size.sup {
+    border-style: solid;
+    border-color: var(--hdc-wait);
+    color: var(--hdc-wait);
+  }
+  .hdc-pdp-size.sup.on {
+    border-color: var(--hdc-red);
+  }
 
   /* Price box (.pricebox, .avail, .cta, .subacts) */
   .hdc-pdp-pricebox {

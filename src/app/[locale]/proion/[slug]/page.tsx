@@ -531,7 +531,9 @@ export default async function ProductPage({ params }: PageProps) {
                       available: sizes.filter((s) => s.inStock).length,
                       total: sizes.length,
                     })
-                  : t("megethi_kamia")
+                  : sizes.some((s) => s.supplierAvailable)
+                    ? t("megethi_3_5")
+                    : t("megethi_kamia")
               }
               navLabel={t("megethos_epilogi")}
               titleOf={(s) =>
