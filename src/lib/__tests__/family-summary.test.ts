@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/prisma", () => ({ prisma: {} }));
 
-import { summarizeFamily } from "@/lib/catalog/variants";
+import { dedupeSizes, summarizeFamily, type VariantOption } from "@/lib/catalog/variants";
 
 const glove = (size: string, inStock: boolean, slug = `gantia-${size.replace("/", "-").toLowerCase()}`) => ({
   slug,
@@ -48,5 +48,36 @@ describe("summarizeFamily — where a size-family card opens", () => {
     ]);
     expect(s.availability).toBe("stock");
     expect(s.openSlug).toBe("gantia-10-xl");
+  });
+});
+
+describe("dedupeSizes — two codes for the same size", () => {
+  const opt = (slug: string, over: Partial<VariantOption> = {}): VariantOption => ({
+    slug,
+    label: "42",
+    code: slug,
+    inStock: false,
+    supplierAvailable: false,
+    family: null,
+    current: false,
+    ...over,
+  });
+
+  it("keeps ours over the supplier's, and the supplier's over neither", () => {
+    expect(dedupeSizes([opt("a"), opt("b", { supplierAvailable: true })]).map((o) => o.slug)).toEqual(["b"]);
+    expect(
+      dedupeSizes([opt("a", { supplierAvailable: true }), opt("b", { inStock: true })]).map((o) => o.slug),
+    ).toEqual(["b"]);
+    expect(
+      dedupeSizes([opt("a", { inStock: true }), opt("b", { supplierAvailable: true })]).map((o) => o.slug),
+    ).toEqual(["a"]);
+  });
+
+  it("always keeps the current one", () => {
+    expect(dedupeSizes([opt("a", { current: true }), opt("b", { inStock: true })]).map((o) => o.slug)).toEqual(["a"]);
+  });
+
+  it("sorts by size", () => {
+    expect(dedupeSizes([opt("x", { label: "44" }), opt("y", { label: "42" })]).map((o) => o.label)).toEqual(["42", "44"]);
   });
 });

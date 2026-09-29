@@ -460,8 +460,9 @@ function orderBy(sort: SortValue): Prisma.ProductOrderByWithRelationInput[] {
     case "newest":
       return [{ erpInsertedAt: "desc" }, { mtrl: "desc" }];
     default:
-      // "Relevance" with no query: in-stock first, then discounted, then name.
-      return [{ inStock: "desc" }, { onSale: "desc" }, { name: "asc" }];
+      // "Relevance" with no query: ours first, then the supplier's, then
+      // discounted, then name.
+      return [{ inStock: "desc" }, { supplierAvailable: "desc" }, { onSale: "desc" }, { name: "asc" }];
   }
 }
 
@@ -753,7 +754,7 @@ const getFacets = sharedCatalogue(
       }),
     ]);
 
-    const [priceAgg, byStock, saleCount] = await Promise.all([
+    const [priceAgg, byStock, saleCount, familyAvailableCount] = await Promise.all([
       prisma.product.aggregate({
         where: whereForPrice,
         _min: { priceNet: true },
@@ -776,6 +777,12 @@ const getFacets = sharedCatalogue(
           ? prisma.product.count({ where: { AND: [whereForBrands, campaigns] } })
           : 0,
       ),
+      // A family counts as available when any of its sizes is (familyStockClause).
+      filters.stockedFamilies.length > 0
+        ? prisma.product.count({
+            where: { AND: [whereForAvail, familyStockClause("in-stock", filters.stockedFamilies)!] },
+          })
+        : Promise.resolve(null),
     ]);
 
     /* The Milwaukee filters, and on search the number of distinct models. */
@@ -811,12 +818,7 @@ const getFacets = sharedCatalogue(
       // «Διαθέσιμα»: ours or the supplier's, as `stockClause` selects.
       if (row.inStock || row.supplierAvailable) inStockCount += row._count._all;
     }
-    // A family counts as available when any of its sizes is (familyStockClause).
-    if (filters.stockedFamilies.length > 0) {
-      inStockCount = await prisma.product.count({
-        where: { AND: [whereForAvail, familyStockClause("in-stock", filters.stockedFamilies)!] },
-      });
-    }
+    if (familyAvailableCount != null) inStockCount = familyAvailableCount;
 
     const activeBrands = new Set(params.brand ?? []);
     let brands: FacetItem[] = [];

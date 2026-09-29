@@ -51,35 +51,41 @@ export const variantsOf = cache(
       // Χωρίς ετικέτα δεν υπάρχει τι να πατήσει κανείς — ένα κενό κουμπί είναι
       // χειρότερο από μια γραμμή που λείπει.
       if (!label) continue;
+      const inStock = row.inStock && Number(row.qty ?? 0) > 0;
       options.push({
         slug: row.slug,
         label,
         code: row.code2 || row.code,
-        inStock: row.inStock && Number(row.qty ?? 0) > 0,
-        supplierAvailable: !row.inStock && row.supplierAvailable,
+        inStock,
+        supplierAvailable: !inStock && row.supplierAvailable,
         family: row.sizes[0]?.family ?? null,
         current: row.id === product.id,
       });
     }
 
-    /*
-     * Διπλά νούμερα: κρατά ένα, και προτιμά το τρέχον, μετά αυτό με απόθεμα.
-     * ─────────────────────────────────────────────────────────────────────
-     * Ο κατάλογος έχει πραγματικές διπλοκαταχωρίσεις — δύο MTRL για το ίδιο
-     * είδος, ίδιο όνομα, ίδιο νούμερο. Δύο κουμπιά «42» δίπλα-δίπλα είναι
-     * ερώτηση χωρίς απάντηση για τον πελάτη.
-     */
-    const byLabel = new Map<string, VariantOption>();
-    for (const option of options) {
-      const kept = byLabel.get(option.label);
-      if (!kept || option.current || (!kept.current && !kept.inStock && option.inStock)) {
-        byLabel.set(option.label, option);
-      }
-    }
-
-    return [...byLabel.values()].sort((a, b) => compareSizeLabels(a.label, b.label));
+    return dedupeSizes(options);
   },
 );
+
+/**
+ * Διπλά νούμερα: κρατά ένα, και προτιμά το τρέχον, μετά αυτό με δικό μας
+ * απόθεμα, μετά αυτό που έχει ο προμηθευτής. Ταξινομημένα κατά μέγεθος. Pure.
+ * ─────────────────────────────────────────────────────────────────────────
+ * Ο κατάλογος έχει πραγματικές διπλοκαταχωρίσεις — δύο MTRL για το ίδιο
+ * είδος, ίδιο όνομα, ίδιο νούμερο. Δύο κουμπιά «42» δίπλα-δίπλα είναι
+ * ερώτηση χωρίς απάντηση για τον πελάτη.
+ */
+export function dedupeSizes(options: VariantOption[]): VariantOption[] {
+  const rank = (o: VariantOption) => (o.inStock ? 2 : o.supplierAvailable ? 1 : 0);
+  const byLabel = new Map<string, VariantOption>();
+  for (const option of options) {
+    const kept = byLabel.get(option.label);
+    if (!kept || option.current || (!kept.current && rank(option) > rank(kept))) {
+      byLabel.set(option.label, option);
+    }
+  }
+  return [...byLabel.values()].sort((a, b) => compareSizeLabels(a.label, b.label));
+}
 
 /** What a card that stands for a whole size family says about it. */
 export type FamilySummary = {

@@ -115,6 +115,7 @@ describe("groupByModel", () => {
     priceNet: 100 * n,
     vatRate: 24,
     inStock: true,
+    supplierAvailable: false,
     qty: 3,
     insertedAt: 0,
     ...over,
@@ -160,6 +161,22 @@ describe("groupByModel", () => {
   it("says a model is in stock when any variant is", () => {
     expect(groups.find((g) => g.root === "M18 FPD3")!.inStock).toBe(true);
     expect(groups.find((g) => g.root === "M18 FPD2")!.inStock).toBe(false);
+  });
+  it("says the supplier has a model only when none of its variants is ours", () => {
+    const g = groupByModel(
+      [
+        row("ΔΡΑΠΑΝΟ M18 FPD9-0X FUEL", "M18 FPD9", { inStock: false, supplierAvailable: false }),
+        row("ΔΡΑΠΑΝΟ M18 FPD9-502X FUEL", "M18 FPD9", { inStock: false, supplierAvailable: true }),
+        row("ΔΡΑΠΑΝΟ M18 FPD8-0X FUEL", "M18 FPD8", { inStock: true, supplierAvailable: false }),
+        row("ΔΡΑΠΑΝΟ M18 FPD8-502X FUEL", "M18 FPD8", { inStock: false, supplierAvailable: true }),
+        row("ΔΡΑΠΑΝΟ M18 FPD7-0X FUEL", "M18 FPD7", { inStock: false, supplierAvailable: false }),
+      ],
+      queryTokens("fpd"),
+    );
+    const of = (root: string) => g.find((x) => x.root === root)!;
+    expect(of("M18 FPD9")).toMatchObject({ inStock: false, supplierAvailable: true });
+    expect(of("M18 FPD8")).toMatchObject({ inStock: true, supplierAvailable: false });
+    expect(of("M18 FPD7")).toMatchObject({ inStock: false, supplierAvailable: false });
   });
   it("ranks a model whose code matches above one found by its description", () => {
     const byWords = groupByModel(rows, queryTokens("fpd3"));
