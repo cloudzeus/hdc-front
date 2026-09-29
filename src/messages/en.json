@@ -151,6 +151,8 @@
       "vlepete": "Showing {shown} of {total} products",
       "perissotera": "More products",
       "filtra_n": "Filters ({n})",
+      "kat_filtra": "Categories · Filters",
+      "kat_filtra_n": "Categories · Filters ({n})",
       "kleisimo": "Close filters",
       "deite": "{count, plural, one {See # product} other {See # products}}",
       "kanena": "No products match these filters",

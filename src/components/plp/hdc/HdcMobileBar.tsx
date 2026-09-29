@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 
 /**
  * Phones and tablets (plp.html phone frames): the sticky bottom bar —
- * «ΦΙΛΤΡΑ (n)» black, «ΤΑΞΙΝΟΜΗΣΗ» white — and the filter sheet that rises
+ * «ΦΙΛΤΡΑ (n)» black (or «ΚΑΤΗΓΟΡΙΕΣ · ΦΙΛΤΡΑ (n)» when the sheet lists
+ * categories), «ΤΑΞΙΝΟΜΗΣΗ» white — and the filter sheet that rises
  * from the bottom.
  *
  * A client SHELL: it owns the open flag and the scroll lock, nothing else. The
@@ -53,7 +54,7 @@ export function HdcMobileBar({
           aria-expanded={open}
           onClick={() => setOpen(true)}
         >
-          {filtersLabel}
+          <span className="hdc-mbar-label">{filtersLabel}</span>
         </button>
         {sort}
       </div>

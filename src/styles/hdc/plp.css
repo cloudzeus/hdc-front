@@ -273,32 +273,54 @@
     padding-left: 10px;
     border-left: 1px solid var(--hdc-g3);
   }
+  /* The column and the sheet are size containers, so the category names
+     (long, upper case, Greek) are sized by the pane they sit in. */
+  .hdc-filters,
+  .hdc-sheet-body {
+    container-type: inline-size;
+  }
   .hdc-cnav li > a {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     min-height: 34px;
-    padding: 5px 0;
+    padding: 6px 0;
     font-stretch: 87.5%;
-    font-size: var(--fs-15);
+    font-size: var(--fs-14-pane);
+    line-height: 1.25;
+    letter-spacing: -0.005em;
+  }
+  .hdc-cnav ul ul li > a {
+    font-size: var(--fs-13-pane);
+  }
+  /* Search: the categories are ticks, at the category size. */
+  .hdc-cnav .hdc-fopt {
+    font-size: var(--fs-14-pane);
+    line-height: 1.25;
+    letter-spacing: -0.005em;
   }
   .hdc-cnav li > a:hover .hdc-cnav-label {
     text-decoration: underline;
   }
+  /* Long names wrap onto a second line, never an ellipsis. */
   .hdc-cnav-label {
     min-width: 0;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
   }
-  .hdc-cnav-count {
+  .hdc-cnav-count,
+  .hdc-cnav .hdc-fopt-count {
+    flex: 0 0 auto;
     margin-left: auto;
-    padding-left: 8px;
-    font-size: var(--fs-13);
+    padding-left: 4px;
+    font-size: var(--fs-13-pane);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
     color: var(--hdc-g5);
   }
-  .hdc-cnav-up {
+  .hdc-cnav li > a.hdc-cnav-up {
     font-weight: 700;
-    font-size: var(--fs-13);
+    font-size: var(--fs-13-pane);
     letter-spacing: 0.04em;
     color: var(--hdc-red);
   }
@@ -318,8 +340,11 @@
     width: 3px;
     background: var(--hdc-red);
   }
-  .hdc-cnav-self.is-on .hdc-cnav-label {
-    box-shadow: inset 0 -3px 0 var(--hdc-red);
+  /* A real underline, so a name on two lines is underlined on both. */
+  .hdc-cnav-self.is-on .hdc-cnav-label,
+  .hdc-cnav li > a.hdc-cnav-self.is-on:hover .hdc-cnav-label {
+    text-decoration: underline 3px var(--hdc-red);
+    text-underline-offset: 4px;
   }
   .hdc-cnav ul ul a.is-on .hdc-cnav-count {
     color: var(--hdc-ink);
@@ -891,6 +916,22 @@
     .hdc-mbar-filters {
       background: var(--hdc-ink);
       color: #fff;
+    }
+    /* «ΚΑΤΗΓΟΡΙΕΣ · ΦΙΛΤΡΑ (n)» on one line in half a phone: condensed, a
+       touch less tracking, and a size that follows the button's width
+       (--fs-14-fit, never under 12px) rather than a breakpoint. The sort
+       half uses the same label so the two read as one bar. */
+    .hdc-mbar-filters,
+    .hdc-mbar-sort {
+      container-type: inline-size;
+      padding: 0 8px;
+    }
+    .hdc-mbar-label {
+      min-width: 0;
+      white-space: nowrap;
+      font-stretch: 87.5%;
+      font-size: var(--fs-14-fit);
+      letter-spacing: 0.01em;
     }
     .hdc-mbar-sort {
       background: #fff;

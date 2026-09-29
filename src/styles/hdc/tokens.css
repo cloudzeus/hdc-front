@@ -66,6 +66,33 @@
 /* fluid-type:end */
 
 /*
+ * Container-relative sizes, written by hand (fluid-type.mjs only generates the
+ * viewport tokens above and never touches this block).
+ *
+ * A few labels live in a box whose width, not the viewport's, decides whether
+ * they fit, so they are sized in cqi of their nearest size container instead
+ * of following the house phone rule (+1px under 16px). They still have a 12px
+ * floor, so nothing becomes unreadable. The name is the size they settle at on
+ * a desktop-sized box, as with the tokens above. `cqi` is resolved where the
+ * token is used; with no container around it falls back to the viewport.
+ *
+ *   --fs-14-fit   the phone bar's «ΚΑΤΗΓΟΡΙΕΣ · ΦΙΛΤΡΑ (n)» and «ΤΑΞΙΝΟΜΗΣΗ», in
+ *                 buttons half the screen wide: 7.5% of the button's content
+ *                 box, so about 12.3px at 360px, 12.9px at 375px and 14px from
+ *                 about 400px up. The longest label (en, with a count) keeps
+ *                 some 10px spare at 360px, so it never wraps or clips.
+ *   --fs-14-pane  a category in the filter column / sheet: 14px at the 270px
+ *                 desktop column, up to 15px in a wide sheet.
+ *   --fs-13-pane  its groups, a notch smaller: 13.3px at 270px, 14px at 386px
+ *                 (the sheet on a 414px phone).
+ */
+:root {
+  --fs-14-fit: clamp(0.75rem, 7.5cqi, 0.875rem);
+  --fs-14-pane: clamp(0.8125rem, 0.7782rem + 0.595cqi, 0.9375rem);
+  --fs-13-pane: clamp(0.75rem, 0.7313rem + 0.595cqi, 0.875rem);
+}
+
+/*
  * Phones: a text field under 16px makes iOS Safari zoom the page on focus.
  * Unlayered on purpose, so it wins over a `text-sm` utility on the field.
  */

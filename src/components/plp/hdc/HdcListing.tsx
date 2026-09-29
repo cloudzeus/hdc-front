@@ -125,6 +125,21 @@ export async function HdcListing({
 
   const shown = data.products.length;
 
+  /* Whether «ΚΑΤΗΓΟΡΙΕΣ» shows (the same test CategoryNav makes): then the
+     phone bar and its sheet say so, «ΚΑΤΗΓΟΡΙΕΣ · ΦΙΛΤΡΑ». */
+  const hasCategories =
+    variant === "search"
+      ? facets.subcategories.length > 0
+      : category != null &&
+        (facets.subcategories.length > 0 || category.parent != null);
+  const sheetTitle = hasCategories ? t("kat_filtra") : t("filtra");
+  const barLabel =
+    n > 0
+      ? hasCategories
+        ? t("kat_filtra_n", { n })
+        : t("filtra_n", { n })
+      : sheetTitle;
+
   return (
     <>
       <div className="hdc-wrap hdc-plp">
@@ -241,8 +256,8 @@ export async function HdcListing({
       </div>
 
       <HdcMobileBar
-        filtersLabel={upGreek(n > 0 ? t("filtra_n", { n }) : t("filtra"))}
-        title={upGreek(t("filtra"))}
+        filtersLabel={upGreek(barLabel)}
+        title={upGreek(sheetTitle)}
         closeLabel={t("kleisimo")}
         applyLabel={upGreek(t("deite", { count: data.total }))}
         sort={

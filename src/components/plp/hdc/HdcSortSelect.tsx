@@ -34,7 +34,7 @@ export function HdcSortSelect({
   if (variant === "bar") {
     return (
       <label className="hdc-mbar-sort">
-        {label}
+        <span className="hdc-mbar-label">{label}</span>
         <select
           aria-label={label}
           value={value}
