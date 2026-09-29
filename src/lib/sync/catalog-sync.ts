@@ -1064,7 +1064,7 @@ export async function syncProducts(
     if (errors.length === 0 && seen.size > 0) {
       await prisma.product.updateMany({
         where: { mtrl: { notIn: [...seen] }, isActive: true },
-        data: { isActive: false, inStock: false },
+        data: { isActive: false, inStock: false, supplierAvailable: false },
       });
     }
 
@@ -1249,7 +1249,7 @@ export async function syncProductsByMtrl(mtrls: number[]): Promise<TargetedSyncR
     if (missing.length > 0) {
       const result = await prisma.product.updateMany({
         where: { mtrl: { in: missing }, isActive: true },
-        data: { isActive: false, inStock: false },
+        data: { isActive: false, inStock: false, supplierAvailable: false },
       });
       removed = result.count;
     }
@@ -1376,7 +1376,7 @@ export async function reconcileCatalog(): Promise<TargetedSyncResult> {
       );
       const off = await prisma.product.updateMany({
         where: { mtrl: { in: toRemove } },
-        data: { isActive: false, inStock: false },
+        data: { isActive: false, inStock: false, supplierAvailable: false },
       });
       removed += off.count;
     }
