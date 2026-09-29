@@ -801,7 +801,9 @@
     .hdc-toolbar .hdc-sort {
       display: none;
     }
-    .hdc-mbar {
+    /* Scoped: checkout.css has a bar of its own under the same class name
+       (display: block on phones), and it loads later. */
+    .hdc-plp-page .hdc-mbar {
       position: fixed;
       left: 0;
       right: 0;
