@@ -14,7 +14,7 @@ import { DEFAULT_VAT_RATE } from "@/lib/format";
 import { milwaukeeFields } from "@/lib/milwaukee/product-fields";
 import { hasErpIds, isFeedId } from "@/lib/sync/feed-id";
 import { isShopProduct } from "@/lib/sync/shop-filter";
-import { planXmlRekey } from "@/lib/sync/xml-rekey";
+import { isXmlCodeClash, planXmlRekey } from "@/lib/sync/xml-rekey";
 import { milwaukeeKey, milwaukeeNameIndex, withMilwaukeeNames } from "@/lib/sync/milwaukee-names";
 import {
   hdctool,
@@ -804,12 +804,29 @@ async function upsertProduct(
   const { searchKey: raw, ...rest } = base;
   const data = { ...rest, searchKey: normaliseSearchKey(raw) };
 
-  const product = await prisma.product.upsert({
-    where: { mtrl: p.mtrl },
-    update: data,
-    create: { ...data, mtrl: p.mtrl, firstListedAt: new Date() },
-    select: { id: true, createdAt: true, updatedAt: true },
-  });
+  const write = (values: Omit<typeof data, "xmlCode"> & { xmlCode?: string }) =>
+    prisma.product.upsert({
+      where: { mtrl: p.mtrl },
+      update: values,
+      create: { ...values, mtrl: p.mtrl, firstListedAt: new Date() },
+      select: { id: true, createdAt: true, updatedAt: true },
+    });
+  let product: Awaited<ReturnType<typeof write>>;
+  try {
+    product = await write(data);
+  } catch (error) {
+    /*
+     * The code is still held by another row (two products in one run claiming
+     * it, or a row this chunk's rekey could not see). The product itself still
+     * gets written — one clash must not fail it, and with it the full walk's
+     * sweep for the whole catalogue. The next run settles the code.
+     */
+    if (!("xmlCode" in data) || !isXmlCodeClash(error)) throw error;
+    console.warn(
+      `[catalog-sync] mtrl ${p.mtrl}: xmlCode ${p.xmlCode} is held by another row; written without it`,
+    );
+    product = await write({ ...data, xmlCode: undefined });
+  }
 
   /*
    * Stamp `firstListedAt` the first time a product is actually listed.
@@ -924,36 +941,42 @@ function normaliseSearchKey(raw: string): string {
 }
 
 /**
- * XML-only products that now have an ERP MTRL, moved onto it before the
- * chunk's stored rows are read, so the upsert finds the row by its new MTRL.
+ * Before the chunk's stored rows are read: XML-only rows that now have an ERP
+ * MTRL are moved onto it (so the upsert finds them by the new MTRL), and any
+ * other row holding an incoming code under a different mtrl lets it go.
  */
 async function rekeyXmlRows(products: HdctoolProduct[]): Promise<void> {
-  // Προϊόν μόνο-XML που απέκτησε MTRL: η γραμμή του παίρνει το πραγματικό MTRL (slug, κριτικές, αγαπημένα μένουν)· αν το MTRL έχει ήδη γραμμή, η γραμμή XML αποσύρεται.
-  const candidates = products.filter((p) => p.mtrl > 0 && p.xmlCode);
+  // Προϊόν μόνο-XML που απέκτησε MTRL: η γραμμή του παίρνει το πραγματικό MTRL (slug, κριτικές, αγαπημένα μένουν)· αν το MTRL έχει ήδη γραμμή, η γραμμή XML αποσύρεται· όποια άλλη γραμμή κρατά τον κωδικό τον αφήνει (αρχή είναι το HDCtool).
+  const candidates = products.filter((p) => p.xmlCode);
   if (candidates.length === 0) return;
-  const codes = candidates.map((p) => p.xmlCode!);
-  const xmlRows = await prisma.product.findMany({
-    where: { xmlCode: { in: codes }, mtrl: { lt: 0 } },
+  const holders = await prisma.product.findMany({
+    where: { xmlCode: { in: candidates.map((p) => p.xmlCode!) } },
     select: { id: true, mtrl: true, xmlCode: true },
   });
-  if (xmlRows.length === 0) return;
+  if (holders.length === 0) return;
+  const positive = candidates.map((p) => p.mtrl).filter((m) => m > 0);
   const existing = new Set(
-    (
-      await prisma.product.findMany({
-        where: { mtrl: { in: candidates.map((p) => p.mtrl) } },
-        select: { mtrl: true },
-      })
-    ).map((r) => r.mtrl),
+    positive.length === 0
+      ? []
+      : (
+          await prisma.product.findMany({ where: { mtrl: { in: positive } }, select: { mtrl: true } })
+        ).map((r) => r.mtrl),
   );
-  for (const action of planXmlRekey(candidates, xmlRows, existing)) {
-    if (action.kind === "move") {
-      await prisma.product.update({ where: { id: action.id }, data: { mtrl: action.to } });
-    } else {
-      // `xmlCode` is freed so the ERP row can take it in the upsert.
+  const actions = planXmlRekey(candidates, holders, existing);
+  // Codes are freed first, so nothing below or in the upsert can collide on them.
+  for (const action of actions) {
+    if (action.kind === "retire") {
       await prisma.product.update({
         where: { id: action.id },
         data: { isActive: false, inStock: false, supplierAvailable: false, xmlCode: null },
       });
+    } else if (action.kind === "release") {
+      await prisma.product.update({ where: { id: action.id }, data: { xmlCode: null } });
+    }
+  }
+  for (const action of actions) {
+    if (action.kind === "move") {
+      await prisma.product.update({ where: { id: action.id }, data: { mtrl: action.to } });
     }
   }
 }

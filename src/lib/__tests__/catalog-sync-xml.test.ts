@@ -62,12 +62,17 @@ vi.mock("@/lib/prisma", () => {
       create: Partial<Row>;
     }) => {
       const row = db.rows.find((r) => r.mtrl === where.mtrl);
+      // The unique index on xmlCode, reported the way the pg adapter does.
+      const code = row ? update.xmlCode : create.xmlCode;
+      if (code && db.rows.some((r) => r !== row && r.xmlCode === code)) {
+        throw Object.assign(new Error("Unique constraint failed"), {
+          code: "P2002",
+          meta: { driverAdapterError: { cause: { constraint: { fields: ['"xmlCode"'] } } } },
+        });
+      }
       if (row) {
         Object.assign(row, update, { updatedAt: new Date(row.createdAt.getTime() + 1) });
         return row;
-      }
-      if (create.xmlCode && db.rows.some((r) => r.xmlCode === create.xmlCode)) {
-        throw new Error("Unique constraint failed on xmlCode");
       }
       const now = new Date();
       const fresh = {
@@ -200,6 +205,43 @@ describe("syncProductsByMtrl with XML-only products", () => {
     serve([product(812)]);
     await syncProductsByMtrl([812]);
     expect(db.rows[0].xmlCode).toBe("P1");
+  });
+
+  it("frees an ERP row's code when an XML-only product arrives with it", async () => {
+    db.rows.push(row("erp", 812, "P1", "erp-slug"));
+    serve([product(-5, { xmlCode: "P1", supplierAvailable: true })]);
+    const result = await syncProductsByMtrl([-5]);
+    expect(result.failed).toBe(0);
+    expect(db.rows.find((r) => r.id === "erp")?.xmlCode).toBeNull();
+    expect(db.rows.find((r) => r.mtrl === -5)?.xmlCode).toBe("P1");
+  });
+
+  it("follows HDCtool when it re-links a code from one MTRL to another", async () => {
+    db.rows.push(row("old", 812, "P1", "old-slug"));
+    serve([product(900, { xmlCode: "P1" })]);
+    const result = await syncProductsByMtrl([900]);
+    expect(result.failed).toBe(0);
+    expect(db.rows.find((r) => r.id === "old")).toMatchObject({ mtrl: 812, xmlCode: null, slug: "old-slug" });
+    expect(db.rows.find((r) => r.mtrl === 900)?.xmlCode).toBe("P1");
+  });
+
+  it("frees the old XML row's code when the item comes back under a new feed sequence", async () => {
+    db.rows.push(row("old", -3, "P1", "old-slug"));
+    serve([product(-5, { xmlCode: "P1", supplierAvailable: true })]);
+    const result = await syncProductsByMtrl([-5]);
+    expect(result.failed).toBe(0);
+    expect(db.rows.find((r) => r.id === "old")?.xmlCode).toBeNull();
+    expect(db.rows.find((r) => r.mtrl === -5)?.xmlCode).toBe("P1");
+  });
+
+  it("writes a product without its code, rather than failing it, when the code is still taken", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    serve([product(812, { xmlCode: "P1" }), product(900, { xmlCode: "P1" })]);
+    const result = await syncProductsByMtrl([812, 900]);
+    expect(result).toMatchObject({ created: 2, failed: 0 });
+    expect(db.rows.filter((r) => r.xmlCode === "P1")).toHaveLength(1);
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
   });
 
   it("de-lists an XML-only id that HDCtool no longer returns", async () => {
