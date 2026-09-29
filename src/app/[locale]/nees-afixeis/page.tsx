@@ -27,6 +27,7 @@ import {
 } from "@/lib/compare/compare";
 import { upGreek } from "@/lib/greek";
 import { Zone } from "@/components/zones/Zone";
+import { jsonLdHtml } from "@/lib/seo/json-ld";
 
 export async function generateMetadata({
   params,
@@ -176,12 +177,12 @@ export default async function NewArrivalsPage({
     <QuickViewProvider locale={locale}>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbsLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdHtml(crumbsLd) }}
       />
       {arrivalsLd && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(arrivalsLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdHtml(arrivalsLd) }}
         />
       )}
       <SiteChrome

@@ -29,6 +29,7 @@ import {
 import { upGreek } from "@/lib/greek";
 import { collectionJsonLd } from "@/lib/seo/structured-data";
 import { Zone } from "@/components/zones/Zone";
+import { jsonLdHtml } from "@/lib/seo/json-ld";
 
 export async function generateMetadata({
   params,
@@ -145,14 +146,14 @@ export default async function OffersPage({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbsLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdHtml(crumbsLd) }}
       />
       {/* Άδεια λίστα δεν δηλώνεται: ένα `ItemList` με μηδέν στοιχεία λέει σε
           μια μηχανή «εδώ υπάρχει κατάλογος προσφορών» και της δίνει κενό. */}
       {collectionLd && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdHtml(collectionLd) }}
         />
       )}
       <QuickViewProvider locale={locale}>

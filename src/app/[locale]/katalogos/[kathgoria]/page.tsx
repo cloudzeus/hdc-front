@@ -31,6 +31,7 @@ import {
 } from "@/lib/catalog/queries";
 import { prisma } from "@/lib/prisma";
 import { Zone } from "@/components/zones/Zone";
+import { jsonLdHtml } from "@/lib/seo/json-ld";
 
 type PageProps = {
   params: Promise<{ locale: Locale; kathgoria: string }>;
@@ -207,12 +208,12 @@ export default async function CategoryPage({
     <QuickViewProvider locale={locale}>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdHtml(breadcrumbLd) }}
       />
       {itemListLd && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdHtml(itemListLd) }}
         />
       )}
       <SiteChrome

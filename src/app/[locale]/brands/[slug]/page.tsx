@@ -36,6 +36,7 @@ import {
 } from "@/lib/catalog/queries";
 import { upGreek } from "@/lib/greek";
 import { Zone } from "@/components/zones/Zone";
+import { jsonLdHtml } from "@/lib/seo/json-ld";
 
 type PageProps = {
   params: Promise<{ locale: Locale; slug: string }>;
@@ -185,16 +186,16 @@ export default async function BrandPage({ params, searchParams }: PageProps) {
     <QuickViewProvider locale={locale}>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbsLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdHtml(crumbsLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(brandLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdHtml(brandLd) }}
       />
       {faqLd && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdHtml(faqLd) }}
         />
       )}
       <SiteChrome

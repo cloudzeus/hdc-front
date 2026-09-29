@@ -29,6 +29,7 @@ import {
 } from "@/lib/catalog/queries";
 import { upGreek } from "@/lib/greek";
 import { Zone } from "@/components/zones/Zone";
+import { jsonLdHtml } from "@/lib/seo/json-ld";
 
 /**
  * Every product, in one list.
@@ -164,12 +165,12 @@ export default async function AllProductsPage({
     <QuickViewProvider locale={locale}>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbsLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdHtml(crumbsLd) }}
       />
       {listLd && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(listLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdHtml(listLd) }}
         />
       )}
       <SiteChrome

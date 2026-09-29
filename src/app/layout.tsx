@@ -20,6 +20,7 @@ import { SHOP } from "@/config/shop";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { GoogleTagManager, GoogleTagManagerNoScript } from "@/components/analytics/GoogleTagManager";
 import type { Locale } from "@/i18n/routing";
+import { jsonLdHtml } from "@/lib/seo/json-ld";
 
 /*
  * Root layout owns <html>/<body> for BOTH trees — the localised storefront
@@ -147,7 +148,7 @@ export default async function RootLayout({
         */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd(locale as Locale)) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdHtml(siteJsonLd(locale as Locale)) }}
         />
         {children}
         <GoogleAnalytics />

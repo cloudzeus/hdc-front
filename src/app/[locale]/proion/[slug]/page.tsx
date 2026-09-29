@@ -63,6 +63,7 @@ import {
   shippingDetails,
 } from "@/lib/seo/product-schema";
 import { absoluteUrl, pageMeta } from "@/lib/seo/urls";
+import { jsonLdHtml } from "@/lib/seo/json-ld";
 
 type PageProps = {
   params: Promise<{ locale: Locale; slug: string }>;
@@ -412,8 +413,8 @@ export default async function ProductPage({ params }: PageProps) {
         featured={null}
       />
 
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(breadcrumbLd) }} />
 
       <main id="main" className="hdc-pdp-page">
         <nav aria-label="Breadcrumb" className="hdc-wrap hdc-pdp-crumb">

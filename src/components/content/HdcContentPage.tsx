@@ -15,6 +15,7 @@ import {
 import { hoursMessageArgs } from "@/lib/contact/hours";
 import type { Block } from "@/lib/content/hdc-pages";
 import { upGreek } from "@/lib/greek";
+import { jsonLdHtml } from "@/lib/seo/json-ld";
 
 /**
  * The frame every HDC content page shares: chrome, crumb, the graphite title
@@ -61,7 +62,7 @@ export async function HdcContentPage({
           type="application/ld+json"
           // JSON.stringify of our own object; `<` escaped so text from HDCtool
           // cannot close the script element.
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+          dangerouslySetInnerHTML={{ __html: jsonLdHtml(jsonLd) }}
         />
       )}
       <main id="main" className="hdc-cp">

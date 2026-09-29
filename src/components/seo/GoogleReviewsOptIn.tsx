@@ -1,5 +1,6 @@
 import Script from "next/script";
 import { MERCHANT_ID } from "@/lib/seo/google-reviews";
+import { jsonLdHtml } from "@/lib/seo/json-ld";
 
 /**
  * The Google Customer Reviews survey opt-in, on the order confirmation page.
@@ -48,7 +49,7 @@ export function GoogleReviewsOptIn({
         id="google-reviews-optin-config"
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
-          __html: `window.renderOptIn=function(){window.gapi.load('surveyoptin',function(){window.gapi.surveyoptin.render(${JSON.stringify(config)})})}`,
+          __html: `window.renderOptIn=function(){window.gapi.load('surveyoptin',function(){window.gapi.surveyoptin.render(${jsonLdHtml(config)})})}`,
         }}
       />
       {/*

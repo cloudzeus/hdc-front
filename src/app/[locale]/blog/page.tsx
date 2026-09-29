@@ -23,6 +23,7 @@ import {
 } from "@/lib/catalog/queries";
 import { upGreek } from "@/lib/greek";
 import { Zone } from "@/components/zones/Zone";
+import { jsonLdHtml } from "@/lib/seo/json-ld";
 
 export async function generateMetadata({
   params,
@@ -113,12 +114,12 @@ export default async function BlogPage({
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbsLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdHtml(crumbsLd) }}
       />
       {blogLd && (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(blogLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdHtml(blogLd) }}
         />
       )}
       <SiteChrome
