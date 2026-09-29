@@ -787,6 +787,7 @@ async function upsertProduct(
     guaranteeMonths: p.guaranteeTime ?? null,
     isActive: true,
     inStock: qty > 0,
+    supplierAvailable: p.supplierAvailable === true,
     onSale: priceList != null,
     erpInsertedAt: p.insDate ? new Date(p.insDate) : null,
     erpUpdatedAt: p.updDate ? new Date(p.updDate) : null,

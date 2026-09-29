@@ -162,6 +162,8 @@ export type HdctoolProduct = {
   quantityReserved?: number | null;
   /** Αναμενόμενα από παραγγελία σε προμηθευτή. */
   quantityIncoming?: number | null;
+  /** The supplier XML lists it «Διαθέσιμο». Absent on HDCtool builds before 29/9/2026. */
+  supplierAvailable?: boolean;
   unit: number | null;
   brand: {
     id: string | null;
