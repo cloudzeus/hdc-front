@@ -324,5 +324,111 @@
   },
   "ΠΡΙΤΣΙΝΑΔΟΡΟΙ": {
     "en": "Rivet Guns"
+  },
+  "ΜΗΧΑΝΟΥΡΓΙΚΑ ΕΙΔΗ - ΚΟΛΑΟΥΖΑ": {
+    "it": "Lavorazioni meccaniche – Maschi"
+  },
+  "ΣΕΤ ΚΟΛΑΟΥΖΑ - ΦΙΛΙΕΡΕΣ": {
+    "it": "Set di maschi e filiere"
+  },
+  "ΣΥΝΔΕΣΗ - ΣΥΝΑΡΜΟΛΟΓΗΣΗ": {
+    "en": "Joining & Assembly",
+    "it": "Giunzione e assemblaggio"
+  },
+  "ΤΡΙΒΕΙΑ ΕΚΚΕΝΤΡΑ": {
+    "en": "Random Orbital Sanders",
+    "it": "Levigatrici rotorbitali"
+  },
+  "ΕΚΚΕΝΤΡΑ ΤΡΕΒΕΙΑ Φ150": {
+    "en": "Random Orbital Sanders Ø150",
+    "it": "Levigatrici rotorbitali Ø150"
+  },
+  "ΤΡΥΠΑΝΟΚΟΛΑΟΥΖΑ": {
+    "en": "Combination Drill Taps",
+    "it": "Maschi combinati con punta"
+  },
+  "ΓΡΑΝΙΤΗ ΚΕΡΑΜΙΚΩΝ": {
+    "en": "Granite & Ceramic",
+    "it": "Granito e ceramica"
+  },
+  "ΚΟΦΤΕΣ ΚΑΛΩΔΙΩΝ - ΣΥΡΜΑΤΟΣΧΟΙΝΩΝ": {
+    "en": "Cable & Wire Rope Cutters",
+    "it": "Tronchesi per cavi e funi metalliche"
+  },
+  "ΛΟΣΤΟΙ - ΠΡΟΚΟΒΓΑΛΤΕΣ - ΤΣΕΚΟΥΡΙΑ": {
+    "en": "Pry Bars – Nail Pullers – Axes",
+    "it": "Leve – Cavachiodi – Asce"
+  },
+  "ΡΑΓΕΣ": {
+    "en": "Guide Rails",
+    "it": "Binari di guida"
+  },
+  "ΣΕΤ ΑΝΩ ΤΩΝ ΤΡΙΩΝ ΕΡΓΑΛΕΙΩΝ": {
+    "en": "Sets of More Than Three Tools",
+    "it": "Set di più di tre utensili"
+  },
+  "ΣΕΤ ΜΕ ΚΡΟΥΣΤΙΚΟ ΔΡΑΠΑΝΟΚΑΤΣΑΒΙΔΟ ΚΑΙ ΠΑΛΜΙΚΟ": {
+    "en": "Combi Drill & Impact Driver Sets",
+    "it": "Set trapano avvitatore a percussione e avvitatore a impulsi"
+  },
+  "ΣΕΤ ΜΕ ΠΕΡΙΣΤΡΟΦΙΚΟ ΔΡΑΠΑΝΟΚΑΤΣΑΒΙΔΟ ΚΑΙ ΠΑΛΜΙΚΟ": {
+    "en": "Drill Driver & Impact Driver Sets",
+    "it": "Set trapano avvitatore e avvitatore a impulsi"
+  },
+  "ΣΕΤ ΜΕ ΤΡΙΑ ΕΡΓΑΛΕΙΑ": {
+    "en": "Three-Tool Sets",
+    "it": "Set con tre utensili"
+  },
+  "ΤΟΡΞ - TORX ΑΡΣΕΝΙΚΑ": {
+    "en": "Male TORX",
+    "it": "TORX maschio"
+  },
+  "ΤΣΙΜΠΙΔΙΑ ΑΣΦΑΛΕΙΩΝ": {
+    "en": "Circlip Pliers",
+    "it": "Pinze per anelli seeger"
+  },
+  "ΕΚΚΙΝΗΤΕΣ": {
+    "en": "Jump Starters",
+    "it": "Avviatori di emergenza"
+  },
+  "ΜΑΝΕΛΕΣ - ΛΑΒΕΣ": {
+    "en": "Breaker Bars – Handles",
+    "it": "Leve snodate – Impugnature"
+  },
+  "ΚΑΣΤΑΝΙΕΣ": {
+    "en": "Ratchets",
+    "it": "Cricchetti"
+  },
+  "6ΓΩΝΗ ΥΠΟΔΟΧΗ 1/4": {
+    "en": "1/4\" Hex Shank",
+    "it": "Attacco esagonale 1/4\""
+  },
+  "ΒΙΔΟΛΟΓΟΙ ΗΛΕΚΤΡΙΚΟΙ - ΜΠΑΤΑΡΙΑΣ": {
+    "en": "Electric & Cordless Pipe Threaders",
+    "it": "Filettatrici elettriche e a batteria"
+  },
+  "ΠΡΕΣΕΣ ΣΥΝΔΕΣΗΣ": {
+    "en": "Press Tools",
+    "it": "Pressatrici"
+  },
+  "ΠΑΝΤΕΛΟΝΙΑ": {
+    "en": "Trousers",
+    "it": "Pantaloni"
+  },
+  "ΜΠΕΤΟΥ": {
+    "en": "Concrete",
+    "it": "Calcestruzzo"
+  },
+  "ΞΥΛΟΥ": {
+    "en": "Wood",
+    "it": "Legno"
+  },
+  "ΦΡΕΖΕΣ ΑΥΛΑΚΩΣΕΩΝ": {
+    "en": "Wall Chasers",
+    "it": "Scanalatrici"
+  },
+  "ΤΣΙΜΠΙΔΕΣ": {
+    "en": "Pliers",
+    "it": "Pinze"
   }
 }

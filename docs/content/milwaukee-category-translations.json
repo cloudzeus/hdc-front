@@ -1,2613 +1,436 @@
 [
  {
-  "id": "cmi5h58740005d4uqa18lnffq",
+  "id": "cmumdb95y0001d4by2athj9qf",
   "erpType": "CATEGORY",
-  "erpCode": "25",
+  "erpCode": "17",
   "parentCode": null,
-  "el": "ΔΙΑΤΡΗΣΗ",
+  "el": "ΜΗΧΑΝΟΥΡΓΙΚΑ ΕΙΔΗ - ΚΟΛΑΟΥΖΑ",
   "en": null,
-  "it": "Foratura"
+  "it": "Lavorazioni meccaniche – Maschi"
  },
  {
-  "id": "cmi5h58fh0007d4uqshvyrtgv",
-  "erpType": "CATEGORY",
-  "erpCode": "36",
-  "parentCode": null,
-  "el": "ΔΙΑΦΟΡΑ",
-  "en": null,
-  "it": "Varie"
- },
- {
-  "id": "cmi5h58pj0009d4uqc9hwbayb",
-  "erpType": "CATEGORY",
-  "erpCode": "33",
-  "parentCode": null,
-  "el": "ΕΙΔΗ ΒΙΔΟΠΟΙΙΑΣ",
-  "en": null,
-  "it": "Viteria"
- },
- {
-  "id": "cmi5h58wm000bd4uqx1ohwrmf",
-  "erpType": "CATEGORY",
-  "erpCode": "35",
-  "parentCode": null,
-  "el": "ΕΞΑΡΤΗΜΑΤΑ ΗΛΕΚΤΡΙΚΩΝ ΕΡΓΑΛΕΙΩΝ ΚΑΙ ΜΠΑΤΑΡΙΑΣ",
-  "en": null,
-  "it": "Accessori per elettroutensili e batterie"
- },
- {
-  "id": "cmi5h593q000dd4uq940irpym",
-  "erpType": "CATEGORY",
-  "erpCode": "20",
-  "parentCode": null,
-  "el": "ΕΞΟΠΛΙΣΜΟΣ ΗΛΕΚΤΡΟΛΟΓΩΝ & ΗΛΕΚΤΡΟΝΙΚΏΝ - ΦΩΤΙΣΜΟΣ",
-  "en": null,
-  "it": "Attrezzatura per elettricisti ed elettronici – Illuminazione"
- },
- {
-  "id": "cmi5h59as000fd4uqw7gbongh",
-  "erpType": "CATEGORY",
-  "erpCode": "14",
-  "parentCode": null,
-  "el": "ΕΞΟΠΛΙΣΜΟΣ ΣΥΝΕΡΓΕΙΟΥ",
-  "en": null,
-  "it": "Attrezzatura da officina"
- },
- {
-  "id": "cmi5h59ht000hd4uqndissrks",
-  "erpType": "CATEGORY",
-  "erpCode": "31",
-  "parentCode": null,
-  "el": "ΕΡΓΑΛΕΙΑ ΚΑΙ ΕΞΑΡΤΗΜΑΤΑ ΥΔΡΑΥΛΙΚΩΝ",
-  "en": null,
-  "it": "Utensili e accessori per idraulica"
- },
- {
-  "id": "cmi5h59py000jd4uqbek352zg",
-  "erpType": "CATEGORY",
-  "erpCode": "12",
-  "parentCode": null,
-  "el": "ΕΡΓΑΛΕΙΑ ΜΠΑΤΑΡΙΑΣ",
-  "en": null,
-  "it": "Utensili a batteria"
- },
- {
-  "id": "cmi5h59x4000ld4uqir8p80r2",
-  "erpType": "CATEGORY",
-  "erpCode": "10",
-  "parentCode": null,
-  "el": "ΕΡΓΑΛΕΙΑ ΧΕΙΡΟΣ",
-  "en": null,
-  "it": "Utensili manuali"
- },
- {
-  "id": "cmi5h5a4d000nd4uql9egfsbk",
-  "erpType": "CATEGORY",
-  "erpCode": "11",
-  "parentCode": null,
-  "el": "ΗΛΕΚΤΡΙΚΑ ΕΡΓΑΛΕΙΑ",
-  "en": null,
-  "it": "Elettroutensili"
- },
- {
-  "id": "cmi5h5abj000pd4uqc43y5s59",
-  "erpType": "CATEGORY",
-  "erpCode": "19",
-  "parentCode": null,
-  "el": "ΚΟΛΛΕΣ - ΛΙΠΑΝΤΙΚΑ - SPRAYS - ΣΙΛΙΚΟΝΕΣ",
-  "en": null,
-  "it": "Adesivi – Lubrificanti – Spray – Siliconi"
- },
- {
-  "id": "cmi5h5ain000rd4uqn53fmlf6",
-  "erpType": "CATEGORY",
-  "erpCode": "26",
-  "parentCode": null,
-  "el": "ΛΕΙΑΝΣΗ - ΚΟΠΗ",
-  "en": null,
-  "it": "Levigatura – Taglio"
- },
- {
-  "id": "cmi5h5apn000td4uqbokxxnn7",
-  "erpType": "CATEGORY",
-  "erpCode": "28",
-  "parentCode": null,
-  "el": "ΜΕΣΑ ΑΤΟΜΙΚΗΣ ΠΡΟΣΤΑΣΙΑΣ - ΟΔΟΠΟΙΙΑ",
-  "en": null,
-  "it": "Dispositivi di protezione individuale – Lavori stradali"
- },
- {
-  "id": "cmi5h5awl000vd4uqdwy7ulzp",
-  "erpType": "CATEGORY",
-  "erpCode": "18",
-  "parentCode": null,
-  "el": "ΜΕΤΑΦΟΡΑ - ΑΠΟΘΗΚΕΥΣΗ - ΘΕΣΗ ΕΡΓΑΣΙΑΣ",
-  "en": null,
-  "it": "Trasporto – Stoccaggio – Postazione di lavoro"
- },
- {
-  "id": "cmi5h5b3k000xd4uqwh2w0jfj",
-  "erpType": "CATEGORY",
-  "erpCode": "16",
-  "parentCode": null,
-  "el": "ΜΗΧΑΝΗΜΑΤΑ - ΕΙΔΗ ΚΑΘΑΡΙΣΜΟΥ - ΧΗΜΙΚΑ",
-  "en": null,
-  "it": "Macchine – Prodotti per la pulizia – Chimici"
- },
- {
-  "id": "cmi5h5baf000zd4uqigkld8xr",
-  "erpType": "CATEGORY",
-  "erpCode": "34",
-  "parentCode": null,
-  "el": "ΟΙΚΙΑΚΑ ΕΙΔΗ - ΧΟΜΠΙ - ΤΑΙΝΙΕΣ",
-  "en": null,
-  "it": "Articoli per la casa – Hobby – Nastri"
- },
- {
-  "id": "cmi5h5bhc0011d4uqsj40is6t",
-  "erpType": "CATEGORY",
-  "erpCode": "29",
-  "parentCode": null,
-  "el": "ΟΙΚΟΔΟΜΙΚΑ ΕΡΓΑΛΕΙΑ - ΕΡΓΑΛΕΙΑ ΚΗΠΟΥ",
-  "en": null,
-  "it": "Utensili da costruzione – Utensili da giardino"
- },
- {
-  "id": "cmi5h5bo70013d4uqfoa8hyim",
-  "erpType": "CATEGORY",
-  "erpCode": "24",
-  "parentCode": null,
-  "el": "ΟΡΓΑΝΑ ΜΕΤΡΗΣΗΣ - ΜΕΤΡΗΣΗ/ΧΑΡΑΞΗ",
-  "en": null,
-  "it": "Strumenti di misura – Misurazione/Tracciatura"
- },
- {
-  "id": "cmi5h5bv30015d4uqr614sm4t",
-  "erpType": "CATEGORY",
-  "erpCode": "13",
-  "parentCode": null,
-  "el": "ΣΥΣΤΗΜΑΤΑ ΠΕΠΙΕΣΜΕΝΟΥ ΑΕΡΑ",
-  "en": null,
-  "it": "Sistemi ad aria compressa"
- },
- {
-  "id": "cmi5h5c7n0017d4uqwj3r2ss4",
+  "id": "cmumdb9eq0003d4by4q5femnd",
   "erpType": "GROUP",
-  "erpCode": "1300",
-  "parentCode": "13",
-  "el": "ΑΕΡΟΣΥΜΠΙΕΣΤΕΣ",
-  "en": null,
-  "it": "Compressori d'aria"
- },
- {
-  "id": "cmi5h5cg30019d4uqos8hba2e",
-  "erpType": "GROUP",
-  "erpCode": "1106",
-  "parentCode": "11",
-  "el": "ΑΛΟΙΦΑΔΟΡΟΙ - ΣΑΤΙΝΙΕΡΕΣ - ΕΥΘΕΙΣ ΛΕΙΑΝΤΗΡΕΣ",
-  "en": null,
-  "it": "Lucidatrici – Satinatrici – Smerigliatrici diritte"
- },
- {
-  "id": "cmi5h5con001bd4uq3yafu3gk",
-  "erpType": "GROUP",
-  "erpCode": "1207",
-  "parentCode": "12",
-  "el": "ΑΛΟΙΦΑΔΟΡΟΙ - ΣΑΤΙΝΙΕΡΕΣ - ΕΥΘΕΙΣ ΛΕΙΑΝΤΗΡΕΣ",
-  "en": null,
-  "it": "Lucidatrici – Satinatrici – Smerigliatrici diritte"
- },
- {
-  "id": "cmi5h5cwt001dd4uqc234zcqk",
-  "erpType": "GROUP",
-  "erpCode": "3945",
-  "parentCode": "35",
-  "el": "ΑΝΤΑΛΛΑΚΤΙΚΑ",
-  "en": "Spare Parts",
-  "it": "Ricambi"
- },
- {
-  "id": "cmi5h5d58001fd4uqu5menem6",
-  "erpType": "GROUP",
-  "erpCode": "1903",
-  "parentCode": "20",
-  "el": "ΑΝΤΙΕΚΡΗΚΤΙΚΟΙ ΦΑΚΟΙ",
-  "en": "Explosion-Proof Torches",
-  "it": "Torce antideflagranti"
- },
- {
-  "id": "cmi5h5ddf001hd4uq5fr42c8j",
-  "erpType": "GROUP",
-  "erpCode": "2907",
-  "parentCode": "29",
-  "el": "ΓΕΝΝΗΤΡΙΕΣ",
-  "en": "Generators",
-  "it": "Generatori"
- },
- {
-  "id": "cmi5h5dlr001jd4uq0k6frudh",
-  "erpType": "GROUP",
-  "erpCode": "1022",
+  "erpCode": "1012",
   "parentCode": "10",
-  "el": "ΓΩΝΙΑΚΑ ΚΛΕΙΔΙΑ - ΤΑΦ - ΓΑΜΑ",
-  "en": "L-Keys – T-Handle Keys",
-  "it": "Chiavi a L – Chiavi a T",
-  "forceEn": true
- },
- {
-  "id": "cmi5h5du1001ld4uq6pyp2x62",
-  "erpType": "GROUP",
-  "erpCode": "3501",
-  "parentCode": "35",
-  "el": "ΓΩΝΙΑΚΟΙ ΤΡΟΧΟΙ",
-  "en": "Angle Grinders",
-  "it": "Smerigliatrici angolari"
- },
- {
-  "id": "cmi5h5e37001nd4uqte6xvdjl",
-  "erpType": "GROUP",
-  "erpCode": "1103",
-  "parentCode": "11",
-  "el": "ΓΩΝΙΑΚΟΙ ΤΡΟΧΟΙ - ΛΕΙΑΝΤΗΡΕΣ ΜΠΕΤΟΥ - ΦΡΕΖΕΣ",
+  "el": "ΔΥΝΑΜΟΜΕΤΡΙΚΑ ΕΡΓΑΛΕΙΑ",
   "en": null,
-  "it": "Smerigliatrici angolari – Levigatrici per calcestruzzo – Fresatrici"
+  "it": "Utensili dinamometrici"
  },
  {
-  "id": "cmi5h5ebh001pd4uq3y5e26gk",
+  "id": "cmumdb9j00005d4bygpvxxw67",
   "erpType": "GROUP",
-  "erpCode": "1203",
-  "parentCode": "12",
-  "el": "ΓΩΝΙΑΚΟΙ ΤΡΟΧΟΙ - ΛΕΙΑΝΤΗΡΕΣ ΜΠΕΤΟΥ ΦΡΕΖΕΣ",
-  "en": null,
-  "it": "Smerigliatrici angolari – Levigatrici per calcestruzzo – Fresatrici"
- },
- {
-  "id": "cmi5h5ejx001rd4uq893qgp84",
-  "erpType": "GROUP",
-  "erpCode": "2402",
+  "erpCode": "2406",
   "parentCode": "24",
-  "el": "ΔΙΑΣΤΑΣΗ",
-  "en": "Dimensional Measurement",
-  "it": "Misurazione dimensionale"
+  "el": "ΜΑΝΟΜΕΤΡΑ - ΘΕΡΜΟΜΕΤΡΑ",
+  "en": "Pressure Gauges – Thermometers",
+  "it": "Manometri – termometri"
  },
  {
-  "id": "cmi5h5esj001td4uq7xai9luj",
+  "id": "cmumdb9n90007d4byutgp2fm8",
   "erpType": "GROUP",
-  "erpCode": "1036",
-  "parentCode": "10",
-  "el": "ΔΙΑΦΟΡΑ",
+  "erpCode": "1704",
+  "parentCode": "17",
+  "el": "ΣΕΤ ΚΟΛΑΟΥΖΑ - ΦΙΛΙΕΡΕΣ",
   "en": null,
-  "it": "Varie"
+  "it": "Set di maschi e filiere"
  },
  {
-  "id": "cmi5h5f12001vd4uqltjbow2z",
+  "id": "cmumdb9rm0009d4bycoivqsrk",
   "erpType": "GROUP",
-  "erpCode": "2508",
-  "parentCode": "25",
-  "el": "ΔΙΑΦΟΡΑ",
-  "en": "Miscellaneous",
-  "it": "Varie"
- },
- {
-  "id": "cmi5h5f9s001xd4uqxsk7okvy",
-  "erpType": "GROUP",
-  "erpCode": "3921",
-  "parentCode": "11",
-  "el": "ΔΙΑΦΟΡΑ",
-  "en": null,
-  "it": "Varie"
- },
- {
-  "id": "cmi5h5fia001zd4uqnua6yphb",
-  "erpType": "GROUP",
-  "erpCode": "3944",
-  "parentCode": "35",
-  "el": "ΔΙΑΦΟΡΑ",
-  "en": "Miscellaneous",
-  "it": "Varie"
- },
- {
-  "id": "cmi5h5fqn0021d4uqum5553jh",
-  "erpType": "GROUP",
-  "erpCode": "2505",
-  "parentCode": "25",
-  "el": "ΔΙΑΦΟΡΑ ΤΡΥΠΑΝΙΑ",
-  "en": "Miscellaneous Drill Bits",
-  "it": "Punte varie"
- },
- {
-  "id": "cmi5h5fz50023d4uqjbnaft7u",
-  "erpType": "GROUP",
-  "erpCode": "2605",
-  "parentCode": "26",
-  "el": "ΔΙΣΚΟΙ ΛΕΙΑΝΣΗΣ - ΣΤΙΛΒΩΣΗΣ",
-  "en": "Grinding – Polishing Discs",
-  "it": "Dischi da levigatura – lucidatura"
- },
- {
-  "id": "cmi5h5g7p0025d4uqrrtbf50l",
-  "erpType": "GROUP",
-  "erpCode": "3932",
-  "parentCode": "35",
-  "el": "ΔΙΣΚΟΠΡΙΟΝΑ ΜΕΤΑΛΛΟΥ",
-  "en": "Metal Circular Saws",
-  "it": "Seghe circolari per metallo"
- },
- {
-  "id": "cmi5h5gg60027d4uq4gshcxpi",
-  "erpType": "GROUP",
-  "erpCode": "3512",
-  "parentCode": "35",
-  "el": "ΔΙΣΚΟΠΡΙΟΝΑ ΞΥΛΟΥ-ΑΛΟΥΜΙΝΙΟΥ",
-  "en": "Wood & Aluminium Circular Saws",
-  "it": "Seghe circolari per legno e alluminio"
- },
- {
-  "id": "cmi5h5gol0029d4uqor0qwtge",
-  "erpType": "GROUP",
-  "erpCode": "1108",
-  "parentCode": "11",
-  "el": "ΔΙΣΚΟΠΡΙΟΝΑ ΧΕΙΡΟΣ",
-  "en": null,
-  "it": "Seghe circolari manuali"
- },
- {
-  "id": "cmi5h5gwq002bd4uq6kh1b39e",
-  "erpType": "GROUP",
-  "erpCode": "1209",
-  "parentCode": "12",
-  "el": "ΔΙΣΚΟΠΡΙΟΝΑ ΧΕΙΡΟΣ",
-  "en": null,
-  "it": "Seghe circolari manuali"
- },
- {
-  "id": "cmi5h5h53002dd4uqcl3hwxz1",
-  "erpType": "GROUP",
-  "erpCode": "3502",
-  "parentCode": "35",
-  "el": "ΔΡΑΠΑΝΑ",
-  "en": "Drills",
-  "it": "Trapani"
- },
- {
-  "id": "cmi5h5hdl002fd4uq3hv71npw",
-  "erpType": "GROUP",
-  "erpCode": "1101",
-  "parentCode": "11",
-  "el": "ΔΡΑΠΑΝΑ - ΚΑΤΣΑΒΙΔΙΕΡΕΣ  - ΜΠΟΥΛΟΝΟΚΛΕΙΔΑ",
-  "en": null,
-  "it": "Trapani – avvitatori – avvitatori a massa battente"
- },
- {
-  "id": "cmi5h5hm5002hd4uq8jqsln5y",
-  "erpType": "GROUP",
-  "erpCode": "1201",
-  "parentCode": "12",
-  "el": "ΔΡΑΠΑΝΑ ΚΑΤΣΑΒΙΔΙΕΡΕΣ ΜΠΟΥΛΟΝΟΚΛΕΙΔΑ ΚΑΣΤΑΝΙΕΣ",
-  "en": null,
-  "it": "Trapani, avvitatori, avvitatori a massa battente, cricchetti"
- },
- {
-  "id": "cmi5h5hum002jd4uq18kwb6p3",
-  "erpType": "GROUP",
-  "erpCode": "2904",
-  "parentCode": "29",
-  "el": "ΕΞΟΠΛΙΣΜΟΣ ΚΗΠΟΥ - ΟΙΚΟΔΟΜΗΣ ΧΕΙΡΟΣ",
-  "en": "Garden & Construction Hand Tools",
-  "it": "Attrezzi manuali da giardino e cantiere"
- },
- {
-  "id": "cmi5h5i30002ld4uq6ujogxzv",
-  "erpType": "GROUP",
-  "erpCode": "1011",
-  "parentCode": "10",
-  "el": "ΕΞΩΛΚΕΙΣ",
-  "en": null,
-  "it": "Estrattori"
- },
- {
-  "id": "cmi5h5ibf002nd4uqdgkyff3x",
-  "erpType": "GROUP",
-  "erpCode": "3101",
+  "erpCode": "3104",
   "parentCode": "31",
-  "el": "ΕΡΓΑΛΕΙΑ ΓΕΝΙΚΗΣ ΧΡΗΣΗΣ - ΣΥΣΦΙΞΗ",
-  "en": "General Purpose Tools – Clamping",
-  "it": "Utensili per uso generale – serraggio"
+  "el": "ΣΥΝΔΕΣΗ - ΣΥΝΑΡΜΟΛΟΓΗΣΗ",
+  "en": "Joining & Assembly",
+  "it": "Giunzione e assemblaggio"
  },
  {
-  "id": "cmi5h5iju002pd4uq1vmfsu5c",
+  "id": "cmumdb9vv000bd4byu1rt4diu",
   "erpType": "GROUP",
-  "erpCode": "1035",
-  "parentCode": "10",
-  "el": "ΕΡΓΑΛΕΙΑ ΕΛΕΓΧΟΥ - ΣΥΓΚΡΑΤΗΣΗΣ",
-  "en": "Inspection & Pick-Up Tools",
-  "it": "Utensili di ispezione e presa",
-  "forceEn": true
+  "erpCode": "3505",
+  "parentCode": "35",
+  "el": "ΤΡΙΒΕΙΑ ΕΚΚΕΝΤΡΑ",
+  "en": "Random Orbital Sanders",
+  "it": "Levigatrici rotorbitali"
  },
  {
-  "id": "cmi5h5is9002rd4uqy28xhgbq",
+  "id": "cmumdba08000dd4by7nl5uu0r",
   "erpType": "GROUP",
-  "erpCode": "2902",
-  "parentCode": "29",
-  "el": "ΕΡΓΑΛΕΙΑ ΚΗΠΟΥ ΜΠΑΤΑΡΙΑΣ",
-  "en": "Battery Garden Tools",
-  "it": "Utensili da giardino a batteria"
+  "erpCode": "1711",
+  "parentCode": "17",
+  "el": "ΤΡΥΠΑΝΟΚΟΛΑΟΥΖΑ",
+  "en": "Combination Drill Taps",
+  "it": "Maschi combinati con punta"
  },
  {
-  "id": "cmi5h5j0g002td4uqmc4aqrvo",
+  "id": "cmumdba4o000fd4byrzkfxr29",
   "erpType": "GROUP",
-  "erpCode": "1033",
-  "parentCode": "10",
-  "el": "ΕΡΓΑΛΕΙΑ ΚΟΠΗΣ",
-  "en": null,
-  "it": "Utensili da taglio"
- },
- {
-  "id": "cmi5h5j9y002vd4uq7vte65cu",
-  "erpType": "GROUP",
-  "erpCode": "1401",
+  "erpCode": "1402",
   "parentCode": "14",
-  "el": "ΕΡΓΑΛΕΙΑ ΧΕΙΡΟΣ",
+  "el": "ΦΟΡΤΙΣΗ",
   "en": null,
-  "it": "Utensili a mano"
+  "it": "Ricarica"
  },
  {
-  "id": "cmi5h5ji4002xd4uqai7y03mm",
+  "id": "cmumdba8v000hd4by7h46l6vy",
   "erpType": "GROUP",
-  "erpCode": "3901",
-  "parentCode": "18",
-  "el": "ΕΡΓΑΛΕΙΟΘΗΚΕΣ-ΣΚΑΦΑΚΙΑ-ΚΟΥΤΙΑ ΑΠΟΘΗΚΕΥΣΗΣ",
-  "en": "Toolboxes – Organisers – Storage Boxes",
-  "it": "Cassette portautensili – Organizer – Contenitori"
- },
- {
-  "id": "cmi5h5jq9002zd4uqx6h39j06",
-  "erpType": "GROUP",
-  "erpCode": "3902",
-  "parentCode": "18",
-  "el": "ΕΡΓΑΛΕΙΟΦΟΡΟΙ-ΝΤΟΥΛΑΠΕΣ-ΠΑΓΚΟΙ",
-  "en": "Roller Cabinets – Cabinets – Workbenches",
-  "it": "Carrelli porta utensili – armadi – banchi da lavoro"
- },
- {
-  "id": "cmi5h5jyf0031d4uq3vbr7yba",
-  "erpType": "GROUP",
-  "erpCode": "1214",
-  "parentCode": "12",
-  "el": "ΚΑΡΟΤΙΕΡΕΣ - ΑΝΑΔΕΥΤΗΡΕΣ",
-  "en": "Core Drills – Mixers",
-  "it": "Carotatrici – Miscelatori",
-  "forceEn": true
- },
- {
-  "id": "cmi5h5k6m0033d4uqqco63zy1",
-  "erpType": "GROUP",
-  "erpCode": "3604",
-  "parentCode": "18",
-  "el": "ΚΑΡΟΤΣΙΑ ΜΕΤΑΦΟΡΑΣ-ΠΛΑΤΦΟΡΜΕΣ-ΡΑΜΠΕΣ",
-  "en": "Transport Trolleys – Platforms – Ramps",
-  "it": "Carrelli da trasporto – piattaforme – rampe"
- },
- {
-  "id": "cmi5h5kes0035d4uq3spwlnei",
-  "erpType": "GROUP",
-  "erpCode": "3306",
-  "parentCode": "33",
-  "el": "ΚΑΡΦΩΤΙΚΑ",
-  "en": "Nailers",
-  "it": "Chiodatrici"
- },
- {
-  "id": "cmi5h5kn00037d4uqh10n5pue",
-  "erpType": "GROUP",
-  "erpCode": "1013",
-  "parentCode": "10",
-  "el": "ΚΑΤΣΑΒΙΔΙΑ",
-  "en": null,
-  "it": "Cacciaviti"
- },
- {
-  "id": "cmi5h5kv80039d4uqxqsg4zt2",
-  "erpType": "GROUP",
-  "erpCode": "1021",
-  "parentCode": "10",
-  "el": "ΚΛΕΙΔΙΑ ΓΑΛΛΙΚΑ",
-  "en": null,
-  "it": "Chiavi regolabili"
- },
- {
-  "id": "cmi5h5l3d003bd4uqalj6u5xm",
-  "erpType": "GROUP",
-  "erpCode": "1014",
-  "parentCode": "10",
-  "el": "ΚΛΕΙΔΙΑ ΓΕΡΜΑΝΙΚΑ",
-  "en": null,
-  "it": "Chiavi a forchetta"
- },
- {
-  "id": "cmi5h5lbj003dd4uq8bhfa6f8",
-  "erpType": "GROUP",
-  "erpCode": "1010",
-  "parentCode": "10",
-  "el": "ΚΛΕΙΔΙΑ ΓΕΡΜΑΝΟΠΟΛΥΓΩΝΑ",
-  "en": null,
-  "it": "Chiavi combinate"
- },
- {
-  "id": "cmi5h5ljx003fd4uqm6onpiqe",
-  "erpType": "GROUP",
-  "erpCode": "1018",
-  "parentCode": "10",
-  "el": "ΚΛΕΙΔΙΑ ΠΟΛΥΓΩΝΑ",
-  "en": null,
-  "it": "Chiavi a poligono"
- },
- {
-  "id": "cmi5h5ls4003hd4uqj5lbjnf4",
-  "erpType": "GROUP",
-  "erpCode": "3102",
-  "parentCode": "31",
-  "el": "ΚΟΠΗ - ΠΡΙΟΝΙΣΜΑ - ΑΠΟΓΡΕΖΩΣΗ",
-  "en": "Cutting – Sawing – Deburring",
-  "it": "Taglio – segatura – sbavatura"
- },
- {
-  "id": "cmi5h5m0a003jd4uqg501m4qd",
-  "erpType": "GROUP",
-  "erpCode": "1213",
-  "parentCode": "12",
-  "el": "ΚΟΦΤΕΣ ΚΑΛΩΔΙΩΝ - ΔΟΜΙΚΩΝ ΥΛΙΚΩΝ",
-  "en": "Cable & Construction Material Cutters",
-  "it": "Tronchesi per cavi e materiali da costruzione"
- },
- {
-  "id": "cmi5h5m8h003ld4uqc1zxlh5r",
-  "erpType": "GROUP",
-  "erpCode": "2602",
+  "erpCode": "2614",
   "parentCode": "26",
-  "el": "ΛΕΙΑΝΤΙΚΑ ΣΕ ΤΑΙΝΙΑ",
-  "en": "Belt Sanders",
-  "it": "Levigatrici a nastro"
+  "el": "ΧΑΡΤΟΔΙΣΚΟΙ",
+  "en": "Sanding Discs",
+  "it": "Dischi abrasivi"
  },
  {
-  "id": "cmi5h5mgr003nd4uqkhm79fmq",
-  "erpType": "GROUP",
-  "erpCode": "2805",
-  "parentCode": "28",
-  "el": "ΛΟΙΠΑ ΜΕΣΑ ΑΤΟΜΙΚΗΣ ΠΡΟΣΤΑΣΙΑΣ",
-  "en": "Other Personal Protective Equipment",
-  "it": "Altri dispositivi di protezione individuale"
- },
- {
-  "id": "cmi5h5mow003pd4uqow8qa690",
-  "erpType": "GROUP",
-  "erpCode": "1217",
-  "parentCode": "12",
-  "el": "ΛΟΙΠΑ ΜΗΧΑΝΗΜΑΤΑ ΜΠΑΤΑΡΙΑΣ",
-  "en": null,
-  "it": "Altre macchine a batteria"
- },
- {
-  "id": "cmi5h5mx7003rd4uqgqg4teux",
-  "erpType": "GROUP",
-  "erpCode": "2408",
-  "parentCode": "24",
-  "el": "ΛΟΙΠΑ ΟΡΓΑΝΑ ΜΕΤΡΗΣΗΣ",
-  "en": "Other Measuring Instruments",
-  "it": "Altri strumenti di misura"
- },
- {
-  "id": "cmi5h5n5n003td4uqi5r0q5v3",
-  "erpType": "GROUP",
-  "erpCode": "1406",
-  "parentCode": "14",
-  "el": "ΛΟΙΠΟΣ ΕΞΟΠΛΙΣΜΟΣ ΣΥΝΕΡΓΕΙΟΥ",
-  "en": null,
-  "it": "Altre attrezzature da officina"
- },
- {
-  "id": "cmi5h5ne4003vd4uq19w58x4k",
-  "erpType": "GROUP",
-  "erpCode": "1909",
-  "parentCode": "20",
-  "el": "ΛΟΙΠΟΣ ΗΛΕΚΤΡΟΛΟΓΙΚΟΣ ΕΞΟΠΛΙΣΜΟΣ",
-  "en": "Other Electrical Equipment",
-  "it": "Altre attrezzature elettriche"
- },
- {
-  "id": "cmi5h5nuz003zd4uqymd5ln8n",
-  "erpType": "GROUP",
-  "erpCode": "2608",
-  "parentCode": "26",
-  "el": "ΜΕΤΑΛΛΙΚΟΙ ΔΙΣΚΟΙ ΓΩΝΙΑΚΩΝ ΤΡΟΧΩΝ",
-  "en": "Metal Discs for Angle Grinders",
-  "it": "Dischi metallici per smerigliatrici angolari"
- },
- {
-  "id": "cmi5h5o3m0041d4uqwxzto5gv",
-  "erpType": "GROUP",
-  "erpCode": "3942",
-  "parentCode": "35",
-  "el": "ΜΠΑΤΑΡΙΕΣ",
-  "en": "Batteries",
-  "it": null
- },
- {
-  "id": "cmi5h5osm0048d4uqbn1fea7p",
-  "erpType": "GROUP",
-  "erpCode": "3405",
-  "parentCode": "34",
-  "el": "ΟΙΚΙΑΚΑ ΕΙΔΗ",
-  "en": "Household Items",
-  "it": null
- },
- {
-  "id": "cmi5h5p0v004ad4uq6dw46zef",
-  "erpType": "GROUP",
-  "erpCode": "2401",
-  "parentCode": "24",
-  "el": "ΟΡΓΑΝΑ ΜΕΤΡΗΣΗΣ \"POWER TOOLS\"",
-  "en": "\"Power Tools\" Measuring Instruments",
-  "it": null
- },
- {
-  "id": "cmi5h5p95004cd4uqsoodlbb7",
-  "erpType": "GROUP",
-  "erpCode": "2405",
-  "parentCode": "24",
-  "el": "ΟΡΓΑΝΑ ΜΕΤΡΗΣΗΣ ΗΛΕΚΤΡΟΛΟΓΟΥ - ΔΙΚΤΥΩΝ",
-  "en": "Electrician & Network Measuring Instruments",
-  "it": null
- },
- {
-  "id": "cmi5h5phf004ed4uqi7vnb5bh",
-  "erpType": "GROUP",
-  "erpCode": "3934",
-  "parentCode": "35",
-  "el": "ΠΑΛΜΙΚΑ ΠΟΛΥΕΡΓΑΛΕΙΑ",
-  "en": "Oscillating Multi-Tools",
-  "it": null
- },
- {
-  "id": "cmi5h5qef004md4uq4zg4ztpw",
-  "erpType": "GROUP",
-  "erpCode": "3946",
-  "parentCode": "35",
-  "el": "ΠΙΣΤΟΛΕΤΑ ΕΞΑΓΩΝΗ ΥΠΟΔΟΧΗ",
-  "en": "Hex Shank Hammers",
-  "it": "Martelli con attacco esagonale",
-  "forceIt": true
- },
- {
-  "id": "cmi5h5qux004qd4uqqrbeibf2",
-  "erpType": "GROUP",
-  "erpCode": "1808",
-  "parentCode": "19",
-  "el": "ΠΙΣΤΟΛΙΑ ΣΙΛΙΚΟΝΗΣ ΧΕΙΡΟΣ",
-  "en": "Hand Caulking Guns",
-  "it": null
- },
- {
-  "id": "cmi5h5rrs004yd4uqs6zepz6w",
-  "erpType": "GROUP",
-  "erpCode": "2507",
-  "parentCode": "25",
-  "el": "ΠΟΤΗΡΟΤΡΥΠΑΝΑ",
-  "en": "Hole Saws",
-  "it": null
- },
- {
-  "id": "cmi5h5s000050d4uq22zh9vz1",
-  "erpType": "GROUP",
-  "erpCode": "3938",
-  "parentCode": "35",
-  "el": "ΠΡΕΣΕΣ ΑΚΡΟΔΕΚΤΩΝ",
-  "en": "Crimping Tools",
-  "it": null
- },
- {
-  "id": "cmi5h5s880052d4uqa5d5gdjm",
-  "erpType": "GROUP",
-  "erpCode": "3308",
-  "parentCode": "33",
-  "el": "ΠΡΙΤΣΙΝΩΜΑ",
-  "en": "Riveting",
-  "it": null
- },
- {
-  "id": "cmi5h5sgf0054d4uqr2cm30r6",
-  "erpType": "GROUP",
-  "erpCode": "2801",
-  "parentCode": "28",
-  "el": "ΠΡΟΣΤΑΣΙΑ ΑΝΩ ΑΚΡΩΝ",
-  "en": "Hand & Arm Protection",
-  "it": null
- },
- {
-  "id": "cmi5h5som0056d4uqd8onk0so",
-  "erpType": "GROUP",
-  "erpCode": "2803",
-  "parentCode": "28",
-  "el": "ΠΡΟΣΤΑΣΙΑ ΚΑΤΩ ΑΚΡΩΝ",
-  "en": "Foot & Leg Protection",
-  "it": null
- },
- {
-  "id": "cmi5h5swt0058d4uq0p08iu33",
-  "erpType": "GROUP",
-  "erpCode": "2802",
-  "parentCode": "28",
-  "el": "ΠΡΟΣΤΑΣΙΑ ΚΕΦΑΛΗΣ ΠΡΟΣΩΠΟΥ",
-  "en": "Head & Face Protection",
-  "it": null
- },
- {
-  "id": "cmi5h5t4y005ad4uqlj0s2o5z",
-  "erpType": "GROUP",
-  "erpCode": "2804",
-  "parentCode": "28",
-  "el": "ΠΡΟΣΤΑΣΙΑ ΣΩΜΑΤΟΣ",
-  "en": "Body Protection",
-  "it": null
- },
- {
-  "id": "cmi5h5tdb005cd4uq8xloyq0j",
-  "erpType": "GROUP",
-  "erpCode": "3930",
-  "parentCode": "35",
-  "el": "ΣΑΤΙΝΙΕΡΕΣ",
-  "en": "Burnishers",
-  "it": null
- },
- {
-  "id": "cmi5h5tm2005ed4uqvmnodizc",
-  "erpType": "GROUP",
-  "erpCode": "3511",
-  "parentCode": "35",
-  "el": "ΣΕΓΕΣ",
-  "en": "Jigsaws",
-  "it": null
- },
- {
-  "id": "cmi5h5vh0005ud4uqvevta1ov",
-  "erpType": "GROUP",
-  "erpCode": "2506",
-  "parentCode": "25",
-  "el": "ΣΕΤ",
-  "en": "Sets",
-  "it": null
- },
- {
-  "id": "cmi5h5wmi0064d4uque8e8zcx",
-  "erpType": "GROUP",
-  "erpCode": "2613",
-  "parentCode": "26",
-  "el": "ΣΜΥΡΙΔΟΔΙΣΚΟΙ ΚΟΠΗΣ",
-  "en": "Cut-Off Wheels",
-  "it": null
- },
- {
-  "id": "cmi5h5x2x0068d4uqxduj9shn",
-  "erpType": "GROUP",
-  "erpCode": "3510",
-  "parentCode": "35",
-  "el": "ΣΠΑΘΟΣΕΓΕΣ",
-  "en": "Reciprocating Saws",
-  "it": null
- },
- {
-  "id": "cmi5h5y85006id4uq9ksqmlf7",
-  "erpType": "GROUP",
-  "erpCode": "3106",
-  "parentCode": "31",
-  "el": "ΣΥΝΤΗΡΗΣΗ",
-  "en": "Maintenance",
-  "it": null
- },
- {
-  "id": "cmi5h5z4r006qd4uqnyuxu9o4",
-  "erpType": "GROUP",
-  "erpCode": "3507",
-  "parentCode": "35",
-  "el": "ΤΡΙΒΕΙΑ ΤΡΙΓΩΝΑ",
-  "en": "Delta Sanders",
-  "it": null
- },
- {
-  "id": "cmi5h5zd0006sd4uqxjxx95ru",
-  "erpType": "GROUP",
-  "erpCode": "2509",
-  "parentCode": "25",
-  "el": "ΤΡΥΠΑΝΙΑ ΔΙΑΒΑΘΜΙΣΗΣ",
-  "en": "Step Drill Bits",
-  "it": null
- },
- {
-  "id": "cmi5h5zl8006ud4uq45uzketn",
-  "erpType": "GROUP",
-  "erpCode": "2501",
-  "parentCode": "25",
-  "el": "ΤΡΥΠΑΝΙΑ ΜΕΤΑΛΛΟΥ",
-  "en": "Metal Drill Bits",
-  "it": null
- },
- {
-  "id": "cmi5h5zth006wd4uqceeltbne",
-  "erpType": "GROUP",
-  "erpCode": "2502",
-  "parentCode": "25",
-  "el": "ΤΡΥΠΑΝΙΑ ΜΠΕΤΟΥ",
-  "en": "Concrete Drill Bits",
-  "it": null
- },
- {
-  "id": "cmi5h601s006yd4uq0csw0nbr",
-  "erpType": "GROUP",
-  "erpCode": "2503",
-  "parentCode": "25",
-  "el": "ΤΡΥΠΑΝΙΑ ΞΥΛΟΥ",
-  "en": "Wood Drill Bits",
-  "it": null
- },
- {
-  "id": "cmi5h60a10070d4uq11il731r",
-  "erpType": "GROUP",
-  "erpCode": "2504",
-  "parentCode": "25",
-  "el": "ΤΡΥΠΑΝΙΑ ΠΟΛΛΑΠΛΩΝ ΧΡΗΣΕΩΝ",
-  "en": "Multi-Purpose Drill Bits",
-  "it": null
- },
- {
-  "id": "cmi5h60i90072d4uqx65j3tot",
-  "erpType": "GROUP",
-  "erpCode": "3504",
-  "parentCode": "35",
-  "el": "ΥΠΟΔΟΧΗ SDS-MAX",
-  "en": "SDS-Max Accessories",
-  "it": "Accessori SDS-Max",
-  "forceIt": true
- },
- {
-  "id": "cmi5h60qh0074d4uq1cy1wxg8",
-  "erpType": "GROUP",
-  "erpCode": "3503",
-  "parentCode": "35",
-  "el": "ΥΠΟΔΟΧΗ SDS-PLUS",
-  "en": "SDS-Plus Accessories",
-  "it": "Accessori SDS-Plus",
-  "forceIt": true
- },
- {
-  "id": "cmi5h60yo0076d4uq5hm1sfa1",
-  "erpType": "GROUP",
-  "erpCode": "1901",
-  "parentCode": "20",
-  "el": "ΦΑΚΟΙ",
-  "en": "Torches",
-  "it": null
- },
- {
-  "id": "cmi5h616w0078d4uq1vhcrbbl",
-  "erpType": "GROUP",
-  "erpCode": "1902",
-  "parentCode": "20",
-  "el": "ΦΑΚΟΙ ΕΠΑΝΑΦΟΡΤΙΖΟΜΕΝΟΙ",
-  "en": "Rechargeable Torches",
-  "it": null
- },
- {
-  "id": "cmi5h61he007ad4uqxjjlik6f",
-  "erpType": "GROUP",
-  "erpCode": "3943",
-  "parentCode": "35",
-  "el": "ΦΟΡΤΙΣΤΕΣ",
-  "en": "Chargers",
-  "it": null
- },
- {
-  "id": "cmi5h61pp007cd4uq5i217amx",
-  "erpType": "GROUP",
-  "erpCode": "2403",
-  "parentCode": "24",
-  "el": "ΧΑΡΑΞΗ",
-  "en": "Marking Out",
-  "it": null
- },
- {
-  "id": "cmi5h62hv007id4uqgu548587",
+  "id": "cmumdbada000jd4bymoqmj5cf",
   "erpType": "SUBGROUP",
-  "erpCode": "254",
-  "parentCode": "1013",
-  "el": "TORX",
-  "en": null,
-  "it": "TORX"
+  "erpCode": "835",
+  "parentCode": "2501",
+  "el": "6ΓΩΝΗ ΥΠΟΔΟΧΗ 1/4",
+  "en": "1/4\" Hex Shank",
+  "it": "Attacco esagonale 1/4\""
  },
  {
-  "id": "cmi5h62q6007kd4uqsq34uexl",
+  "id": "cmumdbahl000ld4byir7uwx0b",
   "erpType": "SUBGROUP",
-  "erpCode": "840",
-  "parentCode": "2503",
-  "el": "ΑΚΙΔΑΣ",
-  "en": "Brad Point Bits",
-  "it": "Punte per legno con centratore",
-  "forceEn": true
+  "erpCode": "767",
+  "parentCode": "3104",
+  "el": "ΒΙΔΟΛΟΓΟΙ ΗΛΕΚΤΡΙΚΟΙ - ΜΠΑΤΑΡΙΑΣ",
+  "en": "Electric & Cordless Pipe Threaders",
+  "it": "Filettatrici elettriche e a batteria"
  },
  {
-  "id": "cmi5h62yj007md4uqfknk3kg3",
+  "id": "cmumdbalw000nd4bydjmrucxi",
   "erpType": "SUBGROUP",
-  "erpCode": "311",
-  "parentCode": "1022",
-  "el": "ΑΛΛΕΝ - ALLEN ΜΕΤΡΙΚΑ",
-  "en": "Metric Allen Keys",
-  "it": "Chiavi a brugola metriche",
-  "forceEn": true
- },
- {
-  "id": "cmi5h636p007od4uqgki4sjk1",
-  "erpType": "SUBGROUP",
-  "erpCode": "347",
-  "parentCode": "1106",
-  "el": "ΑΛΟΙΦΑΔΟΡΟΙ",
-  "en": null,
-  "it": "Lucidatrici"
- },
- {
-  "id": "cmi5h63eu007qd4uq2ctoxprh",
-  "erpType": "SUBGROUP",
-  "erpCode": "406",
-  "parentCode": "1207",
-  "el": "ΑΛΟΙΦΑΔΟΡΟΙ",
-  "en": null,
-  "it": "Lucidatrici"
- },
- {
-  "id": "cmi5h63n2007sd4uq379kt7oj",
-  "erpType": "SUBGROUP",
-  "erpCode": "727",
-  "parentCode": "2403",
-  "el": "ΑΛΦΑΔΙΑ - ΜΟΙΡΟΓΝΩΜΟΝΙΑ",
-  "en": "Levels – Protractors",
-  "it": "Livelle – Goniometri"
- },
- {
-  "id": "cmi5h63vd007ud4uqer0wly9a",
-  "erpType": "SUBGROUP",
-  "erpCode": "804",
-  "parentCode": "2904",
-  "el": "ΑΝΤΑΛΛΑΚΤΙΚΑ ΕΞΑΡΤΗΜΑΤΑ",
-  "en": null,
-  "it": "Ricambi e accessori"
- },
- {
-  "id": "cmi5h643j007wd4uq3khyxzix",
-  "erpType": "SUBGROUP",
-  "erpCode": "632",
-  "parentCode": "3901",
-  "el": "ΑΞΕΣΟΥΑΡ - ΑΝΤΑΛΛΑΚΤΙΚΑ",
-  "en": null,
-  "it": "Accessori – ricambi"
- },
- {
-  "id": "cmi5h64cd007yd4uqp1jbfb75",
-  "erpType": "SUBGROUP",
-  "erpCode": "640",
-  "parentCode": "3902",
-  "el": "ΑΞΕΣΟΥΑΡ - ΑΝΤΑΛΛΑΚΤΙΚΑ",
-  "en": null,
-  "it": "Accessori – ricambi"
- },
- {
-  "id": "cmi5h64kv0080d4uqc6bazyuj",
-  "erpType": "SUBGROUP",
-  "erpCode": "109",
-  "parentCode": "1010",
-  "el": "ΑΠΛΑ",
-  "en": "Standard",
-  "it": "Standard",
-  "forceEn": true
- },
- {
-  "id": "cmi5h64tb0082d4uqhpxb1x1l",
-  "erpType": "SUBGROUP",
-  "erpCode": "284",
-  "parentCode": "1015",
-  "el": "ΑΠΟΓΥΜΝΩΤΕΣ",
-  "en": null,
-  "it": "Pinze spellafili"
- },
- {
-  "id": "cmi5h651n0084d4uqq7omj7h3",
-  "erpType": "SUBGROUP",
-  "erpCode": "104",
-  "parentCode": "1006",
-  "el": "ΒΑΡΙΟΠΟΥΛΕΣ",
-  "en": null,
-  "it": "Mazze"
- },
- {
-  "id": "cmi5h65ai0086d4uqpwk56bec",
-  "erpType": "SUBGROUP",
-  "erpCode": "738",
-  "parentCode": "2801",
-  "el": "ΓΑΝΤΙΑ",
-  "en": null,
-  "it": "Guanti"
- },
- {
-  "id": "cmi5h65iv0088d4uqbfet2jwu",
-  "erpType": "SUBGROUP",
-  "erpCode": "752",
-  "parentCode": "2804",
-  "el": "ΓΙΛΕΚΑ",
-  "en": null,
-  "it": "Gilet"
- },
- {
-  "id": "cmi5h65re008ad4uqaq65oe9c",
-  "erpType": "SUBGROUP",
-  "erpCode": "281",
-  "parentCode": "1015",
-  "el": "ΓΚΑΖΟΤΑΝΑΛΙΕΣ",
-  "en": "Water Pump Pliers",
-  "it": "Pinze regolabili a pappagallo",
-  "forceEn": true
- },
- {
-  "id": "cmi5h65zs008cd4uq6y0dbojr",
-  "erpType": "SUBGROUP",
-  "erpCode": "714",
-  "parentCode": "2401",
-  "el": "ΓΡΑΜΜΙΚΑ - ΠΕΡΙΣΤΡΟΦΙΚΑ LASER - ΔΕΚΤΕΣ LASER",
-  "en": null,
-  "it": "Laser lineari e rotativi – ricevitori laser"
- },
- {
-  "id": "cmi5h668a008ed4uqni0nj8e6",
-  "erpType": "SUBGROUP",
-  "erpCode": "743",
-  "parentCode": "2802",
-  "el": "ΓΥΑΛΙΑ ΠΡΟΣΤΑΣΙΑΣ",
-  "en": "Safety Glasses",
-  "it": "Occhiali di protezione"
- },
- {
-  "id": "cmi5h66gi008gd4uqftqkcjgg",
-  "erpType": "SUBGROUP",
-  "erpCode": "376",
-  "parentCode": "1201",
-  "el": "ΓΩΝΙΑΚΑ ΔΡΑΠΑΝΑ",
-  "en": null,
-  "it": "Trapani angolari"
- },
- {
-  "id": "cmi5h66q5008id4uqqiczx3th",
-  "erpType": "SUBGROUP",
-  "erpCode": "387",
-  "parentCode": "1203",
-  "el": "ΓΩΝΙΑΚΟΙ ΤΡΟΧΟΙ ΜΙΚΡΟΤΕΡΟΙ ΑΠΟ Φ115",
-  "en": null,
-  "it": "Smerigliatrici angolari inferiori a Ø115"
- },
- {
-  "id": "cmi5h66yk008kd4uqxn9l5u0v",
-  "erpType": "SUBGROUP",
-  "erpCode": "331",
-  "parentCode": "1103",
-  "el": "ΓΩΝΙΑΚΟΙ ΤΡΟΧΟΙ Φ125",
-  "en": null,
-  "it": "Smerigliatrici angolari Ø125"
- },
- {
-  "id": "cmi5h676u008md4uqff3as53b",
-  "erpType": "SUBGROUP",
-  "erpCode": "389",
-  "parentCode": "1203",
-  "el": "ΓΩΝΙΑΚΟΙ ΤΡΟΧΟΙ Φ125",
-  "en": null,
-  "it": "Smerigliatrici angolari Ø125"
- },
- {
-  "id": "cmi5h67f4008od4uqlhnsrkft",
-  "erpType": "SUBGROUP",
-  "erpCode": "334",
-  "parentCode": "1103",
-  "el": "ΓΩΝΙΑΚΟΙ ΤΡΟΧΟΙ Φ230",
-  "en": null,
-  "it": "Smerigliatrici angolari Ø230"
- },
- {
-  "id": "cmi5h67nb008qd4uqxufemjtp",
-  "erpType": "SUBGROUP",
-  "erpCode": "392",
-  "parentCode": "1203",
-  "el": "ΓΩΝΙΑΚΟΙ ΤΡΟΧΟΙ Φ230",
-  "en": null,
-  "it": "Smerigliatrici angolari Ø230"
- },
- {
-  "id": "cmi5h67vm008sd4uq02bfj0uz",
-  "erpType": "SUBGROUP",
-  "erpCode": "324",
-  "parentCode": "1101",
-  "el": "ΓΩΝΙΚΑ ΔΡΑΠΑΝΑ",
-  "en": null,
-  "it": "Trapani angolari"
- },
- {
-  "id": "cmi5h683z008ud4uqjjjqh54j",
-  "erpType": "SUBGROUP",
-  "erpCode": "203",
-  "parentCode": "1028",
-  "el": "ΔΙΑΦΟΡΑ",
-  "en": null,
-  "it": "Varie"
- },
- {
-  "id": "cmi5h68c9008wd4uqp1lov8wr",
-  "erpType": "SUBGROUP",
-  "erpCode": "314",
-  "parentCode": "1022",
-  "el": "ΔΙΑΦΟΡΑ",
-  "en": null,
-  "it": "Varie"
- },
- {
-  "id": "cmi5h68lb008yd4uqjyv2f9em",
-  "erpType": "SUBGROUP",
-  "erpCode": "1077",
-  "parentCode": "3503",
-  "el": "ΔΙΑΦΟΡΑ",
-  "en": null,
-  "it": "Varie"
- },
- {
-  "id": "cmi5h68tl0090d4uqb00svty1",
-  "erpType": "SUBGROUP",
-  "erpCode": "1081",
-  "parentCode": "3504",
-  "el": "ΔΙΑΦΟΡΑ",
-  "en": null,
-  "it": "Varie"
- },
- {
-  "id": "cmi5h69250092d4uqf1fa6x05",
-  "erpType": "SUBGROUP",
-  "erpCode": "112",
-  "parentCode": "1014",
-  "el": "ΔΙΠΛΑ",
-  "en": "Double Open-End Spanners",
-  "it": "Chiavi a forchetta doppie",
-  "forceEn": true
- },
- {
-  "id": "cmi5h69ae0094d4uq4n09ve1n",
-  "erpType": "SUBGROUP",
-  "erpCode": "114",
-  "parentCode": "1018",
-  "el": "ΔΙΠΛΑ ΖΗΤΑ",
-  "en": "Double Offset Ring Spanners",
-  "it": "Chiavi poligonali doppie piegate",
-  "forceEn": true
- },
- {
-  "id": "cmi5h69iq0096d4uqdqeshl6u",
-  "erpType": "SUBGROUP",
-  "erpCode": "288",
-  "parentCode": "1015",
-  "el": "ΕΙΔΙΚΕΣ ΠΕΝΣΕΣ - ΔΙΑΦΟΡΑ",
-  "en": null,
-  "it": "Pinze speciali – varie"
- },
- {
-  "id": "cmi5h69qw0098d4uqx9ynrrb5",
-  "erpType": "SUBGROUP",
-  "erpCode": "337",
-  "parentCode": "1104",
-  "el": "ΕΚΚΕΝΤΡΑ ΤΡΙΒΕΙΑ Φ125",
-  "en": "Random Orbital Sanders Ø125",
-  "it": "Levigatrici rotorbitali Ø125"
- },
- {
-  "id": "cmi5h69z3009ad4uqya68yllu",
-  "erpType": "SUBGROUP",
-  "erpCode": "426",
-  "parentCode": "1216",
-  "el": "ΕΚΚΕΝΤΡΑ ΤΡΙΒΕΙΑ Φ125",
-  "en": "Random Orbital Sanders Ø125",
-  "it": "Levigatrici rotorbitali Ø125"
- },
- {
-  "id": "cmi5h6a7a009cd4uqyuhrzaoo",
-  "erpType": "SUBGROUP",
-  "erpCode": "734",
-  "parentCode": "2405",
-  "el": "ΕΛΕΓΚΤΕΣ ΤΑΣΗΣ - ΦΑΣΗΣ - ΜΑΓΝΗΤΤΙΚΟΙ ΑΙΣΘΗΤΗΡΕΣ",
-  "en": null,
-  "it": "Tester di tensione – fase – rilevatori magnetici"
- },
- {
-  "id": "cmi5h6afh009ed4uqf8bwbxyr",
-  "erpType": "SUBGROUP",
-  "erpCode": "754",
-  "parentCode": "2401",
-  "el": "ΕΝΔΟΣΚΟΠΙΑ - ΣΤΡΟΦΟΜΕΤΡΑ",
-  "en": null,
-  "it": "Endoscopi – tachimetri"
- },
- {
-  "id": "cmi5h6anq009gd4uqdhhde2f6",
-  "erpType": "SUBGROUP",
-  "erpCode": "814",
-  "parentCode": "3306",
-  "el": "ΕΞΑΡΤΗΜΑΤΑ",
-  "en": null,
-  "it": "Accessori"
- },
- {
-  "id": "cmi5h6avy009id4uqtp47i68d",
-  "erpType": "SUBGROUP",
-  "erpCode": "515",
-  "parentCode": "1404",
-  "el": "ΕΞΑΡΤΗΜΑΤΑ & ΑΝΤΑΛΛΑΚΤΙΚΑ",
-  "en": null,
-  "it": "Accessori e ricambi"
- },
- {
-  "id": "cmi5h6b47009kd4uqnysszuw0",
-  "erpType": "SUBGROUP",
-  "erpCode": "556",
-  "parentCode": "1602",
-  "el": "ΕΞΑΡΤΗΜΑΤΑ & ΑΝΤΑΛΛΑΚΤΙΚΑ ΣΚΟΥΠΩΝ",
-  "en": null,
-  "it": "Accessori e ricambi per aspiratori"
- },
- {
-  "id": "cmi5h6bce009md4uqq9dpq912",
-  "erpType": "SUBGROUP",
-  "erpCode": "791",
-  "parentCode": "2902",
-  "el": "ΕΞΑΡΤΗΜΑΤΑ ΑΝΤΑΛΛΑΚΤΙΚΑ",
-  "en": null,
-  "it": "Accessori e ricambi"
- },
- {
-  "id": "cmi5h6bkk009od4uqwlu24zte",
-  "erpType": "SUBGROUP",
-  "erpCode": "748",
-  "parentCode": "2803",
-  "el": "ΕΠΙΓΟΝΑΤΙΔΕΣ",
-  "en": "Knee Pads",
-  "it": "Ginocchiere"
- },
- {
-  "id": "cmi5h6bsq009qd4uq8p8v6i76",
-  "erpType": "SUBGROUP",
-  "erpCode": "490",
-  "parentCode": "1401",
-  "el": "ΕΡΓΑΛΕΙΑ ΜΗΧΑΝΙΚΟΥ",
-  "en": null,
-  "it": "Utensili da meccanico"
- },
- {
-  "id": "cmi5h6c0x009sd4uq2nr3botb",
-  "erpType": "SUBGROUP",
-  "erpCode": "627",
-  "parentCode": "3901",
-  "el": "ΕΡΓΑΛΕΙΟΘΗΚΕΣ ΜΕ ΡΟΔΕΣ",
-  "en": "Wheeled Toolboxes",
-  "it": "Cassette portautensili con ruote"
- },
- {
-  "id": "cmi5h6c93009ud4uqhghin2n0",
-  "erpType": "SUBGROUP",
-  "erpCode": "628",
-  "parentCode": "3901",
-  "el": "ΕΡΓΑΛΕΙΟΘΗΚΕΣ ΠΛΑΤΗΣ (BACKPACK)",
-  "en": "Tool Backpacks",
-  "it": "Zaini porta utensili"
- },
- {
-  "id": "cmi5h6che009wd4uq3cp8403e",
-  "erpType": "SUBGROUP",
-  "erpCode": "633",
-  "parentCode": "3902",
-  "el": "ΕΡΓΑΛΕΙΟΦΟΡΟΙ ΤΡΟΧΗΛΑΤΟΙ",
-  "en": null,
-  "it": "Carrelli porta utensili"
- },
- {
-  "id": "cmi5h6cpl009yd4uqs8siufk8",
-  "erpType": "SUBGROUP",
-  "erpCode": "408",
-  "parentCode": "1207",
-  "el": "ΕΥΘΕΙΣ ΛΕΙΑΝΤΗΡΕΣ ΡΥΘΜΙΖΟΜΕΝΟΙ",
-  "en": null,
-  "it": "Smerigliatrici diritte a velocità variabile"
- },
- {
-  "id": "cmi5h6cxv00a0d4uqf5wxmgwo",
-  "erpType": "SUBGROUP",
-  "erpCode": "409",
-  "parentCode": "1207",
-  "el": "ΕΥΘΕΙΣ ΛΕΙΑΝΤΗΡΕΣ ΧΩΡΙΣ ΡΥΘΜΙΣΗ",
-  "en": null,
-  "it": "Smerigliatrici diritte a velocità fissa"
- },
- {
-  "id": "cmi5h6d6500a2d4uqvk0harho",
-  "erpType": "SUBGROUP",
-  "erpCode": "715",
-  "parentCode": "2401",
-  "el": "ΘΕΡΜΟΜΕΤΡΑ LASER - ΘΕΡΜΙΚΕΣ ΚΑΜΕΡΕΣ",
-  "en": null,
-  "it": "Termometri laser – termocamere"
- },
- {
-  "id": "cmi5h6deg00a4d4uq8nzqamxk",
-  "erpType": "SUBGROUP",
-  "erpCode": "638",
-  "parentCode": "3902",
-  "el": "ΘΗΚΕΣ ΤΑΚΤΟΠΟΙΗΣΗΣ ΕΡΓΑΛΕΙΟΦΟΡΩΝ",
-  "en": null,
-  "it": "Inserti organizzatori per carrelli porta utensili"
- },
- {
-  "id": "cmi5h6dmu00a6d4uqupse6owi",
-  "erpType": "SUBGROUP",
-  "erpCode": "251",
-  "parentCode": "1013",
-  "el": "ΙΣΙΑ",
-  "en": null,
-  "it": "A taglio"
- },
- {
-  "id": "cmi5h6dv300a8d4uqrumuywln",
-  "erpType": "SUBGROUP",
-  "erpCode": "1074",
-  "parentCode": "3503",
-  "el": "ΚΑΛΕΜΙΣΜΑ",
-  "en": null,
-  "it": "Scalpellatura"
- },
- {
-  "id": "cmi5h6e3800aad4uqbi3ubkjx",
-  "erpType": "SUBGROUP",
-  "erpCode": "1078",
-  "parentCode": "3504",
-  "el": "ΚΑΛΕΜΙΣΜΑ",
-  "en": null,
-  "it": "Scalpellatura"
- },
- {
-  "id": "cmi5h6ebe00acd4uqj4v1nwpe",
-  "erpType": "SUBGROUP",
-  "erpCode": "1001",
+  "erpCode": "1003",
   "parentCode": "2507",
-  "el": "ΚΑΡΒΙΔΙΟΥ",
-  "en": "Carbide",
-  "it": "Metallo duro",
+  "el": "ΓΡΑΝΙΤΗ ΚΕΡΑΜΙΚΩΝ",
+  "en": "Granite & Ceramic",
+  "it": "Granito e ceramica"
+ },
+ {
+  "id": "cmumdbaqd000pd4by7ip3lvlp",
+  "erpType": "SUBGROUP",
+  "erpCode": "1101",
+  "parentCode": "3512",
+  "el": "ΔΙΣΚΟΙ",
+  "en": null,
+  "it": "Lame"
+ },
+ {
+  "id": "cmumdbauq000rd4bymmiae900",
+  "erpType": "SUBGROUP",
+  "erpCode": "427",
+  "parentCode": "1216",
+  "el": "ΕΚΚΕΝΤΡΑ ΤΡΕΒΕΙΑ Φ150",
+  "en": "Random Orbital Sanders Ø150",
+  "it": "Levigatrici rotorbitali Ø150",
   "forceEn": true
  },
  {
-  "id": "cmi5h6eji00aed4uqyrk6gx9z",
+  "id": "cmumdbayz000td4byxvvti8bt",
   "erpType": "SUBGROUP",
-  "erpCode": "657",
-  "parentCode": "3604",
-  "el": "ΚΑΡΟΤΣΙΑ ΔΙΤΡΟΧΑ",
-  "en": "Two-Wheel Hand Trucks",
-  "it": "Carrelli a due ruote"
+  "erpCode": "497",
+  "parentCode": "1402",
+  "el": "ΕΚΚΙΝΗΤΕΣ",
+  "en": "Jump Starters",
+  "it": "Avviatori di emergenza",
+  "forceEn": true
  },
  {
-  "id": "cmi5h6erw00agd4uqxmaboqvb",
+  "id": "cmumdbb3e000vd4byafftd6hy",
   "erpType": "SUBGROUP",
-  "erpCode": "148",
-  "parentCode": "1026",
-  "el": "ΚΑΡΥΔΑΚΙΑ 6ΓΩΝΑ",
+  "erpCode": "237",
+  "parentCode": "1012",
+  "el": "ΚΑΡΕ 1/2'",
   "en": null,
-  "it": "Bussole esagonali"
+  "it": "Attacco 1/2\""
  },
  {
-  "id": "cmi5h6f0500aid4uqzoi1jph7",
+  "id": "cmumdbb7q000xd4byo04jxztm",
   "erpType": "SUBGROUP",
-  "erpCode": "176",
-  "parentCode": "1027",
+  "erpCode": "235",
+  "parentCode": "1012",
+  "el": "ΚΑΡΕ 1/4'",
+  "en": null,
+  "it": "Attacco 1/4\""
+ },
+ {
+  "id": "cmumdbbc7000zd4by2i9lfwlr",
+  "erpType": "SUBGROUP",
+  "erpCode": "236",
+  "parentCode": "1012",
+  "el": "ΚΑΡΕ 3/8'",
+  "en": null,
+  "it": "Attacco 3/8\""
+ },
+ {
+  "id": "cmumdbbgm0011d4byspa9v16u",
+  "erpType": "SUBGROUP",
+  "erpCode": "194",
+  "parentCode": "1028",
   "el": "ΚΑΡΥΔΑΚΙΑ 6ΓΩΝΑ",
   "en": "6-Point Sockets",
   "it": "Bussole esagonali"
  },
  {
-  "id": "cmi5h6f8e00akd4uqol7we8b0",
+  "id": "cmumdbbkw0013d4byg7509hgv",
   "erpType": "SUBGROUP",
-  "erpCode": "198",
-  "parentCode": "1028",
-  "el": "ΚΑΡΥΔΑΚΙΑ IMPACT",
-  "en": null,
-  "it": "Bussole Impact"
- },
- {
-  "id": "cmi5h6fgl00amd4uq58dhbgr5",
-  "erpType": "SUBGROUP",
-  "erpCode": "108",
-  "parentCode": "1010",
-  "el": "ΚΑΣΤΑΝΙΑΣ",
-  "en": null,
-  "it": "Cricchetto"
- },
- {
-  "id": "cmi5h6fow00aod4uqv82o41pv",
-  "erpType": "SUBGROUP",
-  "erpCode": "193",
-  "parentCode": "1028",
+  "erpCode": "147",
+  "parentCode": "1026",
   "el": "ΚΑΣΤΑΝΙΕΣ",
-  "en": null,
-  "it": "Cricchetti"
+  "en": "Ratchets",
+  "it": "Cricchetti",
+  "forceEn": true
  },
  {
-  "id": "cmi5h6fx300aqd4uq8x1g20bt",
+  "id": "cmumdbbp70015d4byvyjszgid",
   "erpType": "SUBGROUP",
-  "erpCode": "382",
-  "parentCode": "1201",
+  "erpCode": "175",
+  "parentCode": "1027",
   "el": "ΚΑΣΤΑΝΙΕΣ",
-  "en": null,
-  "it": "Cricchetti"
- },
- {
-  "id": "cmi5h6g5900asd4uq2v52eh0y",
-  "erpType": "SUBGROUP",
-  "erpCode": "385",
-  "parentCode": "1202",
-  "el": "ΚΑΤΕΔΑΦΙΣΤΙΚΑ ΠΙΣΤΟΛΕΤΑ",
-  "en": null,
-  "it": "Martelli demolitori"
- },
- {
-  "id": "cmi5h6gdi00aud4uq90o24qr2",
-  "erpType": "SUBGROUP",
-  "erpCode": "328",
-  "parentCode": "1102",
-  "el": "ΚΑΤΕΔΑΦΙΣΤΙΚΑ ΠΙΣΤΟΛΕΤΣ",
-  "en": null,
-  "it": "Martelli demolitori"
- },
- {
-  "id": "cmi5h6glr00awd4uqzn4sax6r",
-  "erpType": "SUBGROUP",
-  "erpCode": "266",
-  "parentCode": "1013",
-  "el": "ΚΑΤΣΑΒΙΔΙ ΚΑΡΥΔΑΚΙ",
-  "en": null,
-  "it": "Cacciaviti a bussola"
- },
- {
-  "id": "cmi5h6gu000ayd4uqjiwj8d1e",
-  "erpType": "SUBGROUP",
-  "erpCode": "435",
-  "parentCode": "1013",
-  "el": "ΚΑΤΣΑΒΙΔΙΑ ΝΑΝΟΙ",
-  "en": null,
-  "it": "Cacciaviti corti"
- },
- {
-  "id": "cmi5h6h2800b0d4uqe6thgrvs",
-  "erpType": "SUBGROUP",
-  "erpCode": "378",
-  "parentCode": "1201",
-  "el": "ΚΑΤΣΑΒΙΔΙΕΡΕΣ",
-  "en": null,
-  "it": "Trapani avvitatori"
- },
- {
-  "id": "cmi5h6hae00b2d4uqn144al3h",
-  "erpType": "SUBGROUP",
-  "erpCode": "302",
-  "parentCode": "1013",
-  "el": "ΚΑΤΣΑΒΙΔΟΛΑΒΕΣ",
-  "en": null,
-  "it": "Manici per cacciaviti"
- },
- {
-  "id": "cmi5h6him00b4d4uqqxn9ozhv",
-  "erpType": "SUBGROUP",
-  "erpCode": "731",
-  "parentCode": "2403",
-  "el": "ΚΙΜΩΛΙΕΣ - ΝΗΜΑ ΣΤΑΘΜΗΣ",
-  "en": "Chalk Lines – Plumb Lines",
-  "it": "Tracciatori a polvere – Fili a piombo"
- },
- {
-  "id": "cmi5h6hqy00b6d4uqybcbsxas",
-  "erpType": "SUBGROUP",
-  "erpCode": "837",
-  "parentCode": "2502",
-  "el": "ΚΟΙΝΑ ΤΣΟΚ",
-  "en": "Standard Chucks",
-  "it": "Mandrini standard"
- },
- {
-  "id": "cmi5h6i5t00b8d4uq7xlnli50",
-  "erpType": "SUBGROUP",
-  "erpCode": "412",
-  "parentCode": "1208",
-  "el": "ΚΟΥΡΕΥΤΙΚΑ ΠΕΡΙΘΩΡΙΩΝ",
-  "en": null,
-  "it": "Tagliabordi"
- },
- {
-  "id": "cmi5h6iff00bad4uqw4pyt584",
-  "erpType": "SUBGROUP",
-  "erpCode": "744",
-  "parentCode": "2802",
-  "el": "ΚΡΑΝΗ ΠΡΟΣΤΑΣΙΑΣ",
-  "en": "Safety Helmets",
-  "it": "Caschi di protezione"
- },
- {
-  "id": "cmi5h6inq00bcd4uqdhhr91t8",
-  "erpType": "SUBGROUP",
-  "erpCode": "259",
-  "parentCode": "1013",
-  "el": "ΚΡΟΥΣΗΣ",
-  "en": "Impact Screwdrivers",
-  "it": "Cacciaviti a percussione",
+  "en": "Ratchets",
+  "it": "Cricchetti",
   "forceEn": true
  },
  {
-  "id": "cmi5h6iw400bed4uqan4q98zc",
+  "id": "cmumdbbtl0017d4by8uwc3882",
   "erpType": "SUBGROUP",
-  "erpCode": "318",
-  "parentCode": "1101",
-  "el": "ΚΡΟΥΣΤΙΚΑ ΔΡΑΠΑΝΑ",
-  "en": null,
-  "it": "Trapani a percussione"
- },
- {
-  "id": "cmi5h6j4c00bgd4uqu60uu43k",
-  "erpType": "SUBGROUP",
-  "erpCode": "374",
-  "parentCode": "1201",
-  "el": "ΚΡΟΥΣΤΙΚΑ ΔΡΑΠΑΝΑ",
-  "en": "Hammer Drills",
-  "it": "Trapani a percussione",
+  "erpCode": "290",
+  "parentCode": "1015",
+  "el": "ΚΟΦΤΕΣ ΚΑΛΩΔΙΩΝ - ΣΥΡΜΑΤΟΣΧΟΙΝΩΝ",
+  "en": "Cable & Wire Rope Cutters",
+  "it": "Tronchesi per cavi e funi metalliche",
   "forceEn": true
  },
  {
-  "id": "cmi5h6jcj00bid4uqlyh51pw2",
+  "id": "cmumdbbxx0019d4byh2mfr5gv",
   "erpType": "SUBGROUP",
-  "erpCode": "1092",
-  "parentCode": "3510",
-  "el": "ΛΑΜΕΣ ΜΕΤΑΛΛΟΥ",
-  "en": "Metal Blades",
-  "it": "Lame per metallo"
- },
- {
-  "id": "cmi5h6jkw00bkd4uqyufd8054",
-  "erpType": "SUBGROUP",
-  "erpCode": "1098",
-  "parentCode": "3511",
-  "el": "ΛΑΜΕΣ ΜΕΤΑΛΛΟΥ",
-  "en": "Metal Blades",
-  "it": "Lame per metallo"
- },
- {
-  "id": "cmi5h6jt600bmd4uqqqiaowxv",
-  "erpType": "SUBGROUP",
-  "erpCode": "1094",
-  "parentCode": "3510",
-  "el": "ΛΑΜΕΣ ΞΥΛΟΥ",
-  "en": null,
-  "it": "Lame per legno"
- },
- {
-  "id": "cmi5h6k1f00bod4uq3juc29ns",
-  "erpType": "SUBGROUP",
-  "erpCode": "1097",
-  "parentCode": "3511",
-  "el": "ΛΑΜΕΣ ΞΥΛΟΥ",
-  "en": null,
-  "it": "Lame per legno"
- },
- {
-  "id": "cmi5h6ka900bqd4uq2a7fviq8",
-  "erpType": "SUBGROUP",
-  "erpCode": "1093",
-  "parentCode": "3510",
-  "el": "ΛΑΜΕΣ ΞΥΛΟΥ-ΜΕΤΑΛΛΟΥ",
-  "en": null,
-  "it": "Lame per legno-metallo"
- },
- {
-  "id": "cmi5h6kif00bsd4uq6lee0nr7",
-  "erpType": "SUBGROUP",
-  "erpCode": "386",
-  "parentCode": "1202",
-  "el": "ΛΟΙΠΑ",
-  "en": "Other",
-  "it": "Altri",
-  "forceEn": true
- },
- {
-  "id": "cmi5h6kql00bud4uq5iiilet7",
-  "erpType": "SUBGROUP",
-  "erpCode": "838",
-  "parentCode": "2502",
-  "el": "ΛΟΙΠΑ",
-  "en": "Other",
-  "it": "Altri",
-  "forceEn": true
- },
- {
-  "id": "cmi5h6kyt00bwd4uq0ehffdz5",
-  "erpType": "SUBGROUP",
-  "erpCode": "843",
-  "parentCode": "2503",
-  "el": "ΛΟΙΠΑ",
-  "en": "Other",
-  "it": "Altri",
-  "forceEn": true
- },
- {
-  "id": "cmi5h6l6y00byd4uqnc4nm9j0",
-  "erpType": "SUBGROUP",
-  "erpCode": "847",
-  "parentCode": "2506",
-  "el": "ΛΟΙΠΑ",
-  "en": "Other",
-  "it": "Altri",
-  "forceEn": true
- },
- {
-  "id": "cmi5h6lf600c0d4uqutge1mbs",
-  "erpType": "SUBGROUP",
-  "erpCode": "1004",
-  "parentCode": "2507",
-  "el": "ΛΟΙΠΑ",
-  "en": "Other",
-  "it": "Altri",
-  "forceEn": true
- },
- {
-  "id": "cmi5h6lnf00c2d4uq5zduplw7",
-  "erpType": "SUBGROUP",
-  "erpCode": "790",
-  "parentCode": "2902",
-  "el": "ΛΟΙΠΑ ΜΗΧΑΝΗΜΑΤΑ",
-  "en": null,
-  "it": "Altre macchine"
- },
- {
-  "id": "cmi5h6lvx00c4d4uqp9kbybkx",
-  "erpType": "SUBGROUP",
-  "erpCode": "107",
-  "parentCode": "1006",
-  "el": "ΛΟΙΠΑ ΣΦΥΡΙΑ",
-  "en": null,
-  "it": "Altri martelli"
- },
- {
-  "id": "cmi5h6m4600c6d4uqt4dp1vzz",
-  "erpType": "SUBGROUP",
-  "erpCode": "1095",
-  "parentCode": "3510",
-  "el": "ΛΟΙΠΕΣ ΛΑΜΕΣ",
-  "en": null,
-  "it": "Altre lame"
- },
- {
-  "id": "cmi5h6mcl00c8d4uq4avjxdzy",
-  "erpType": "SUBGROUP",
-  "erpCode": "1099",
-  "parentCode": "3511",
-  "el": "ΛΟΙΠΕΣ ΛΑΜΕΣ",
-  "en": null,
-  "it": "Altre lame"
- },
- {
-  "id": "cmi5h6mku00cad4uq73jhbqk4",
-  "erpType": "SUBGROUP",
-  "erpCode": "362",
-  "parentCode": "1110",
+  "erpCode": "421",
+  "parentCode": "1211",
   "el": "ΛΟΙΠΕΣ ΜΑΡΚΕΣ",
   "en": null,
   "it": "Altre marche"
  },
  {
-  "id": "cmi5h6n1500ced4uqc2kqfkv0",
+  "id": "cmumdbc2a001bd4byus4vx9rt",
   "erpType": "SUBGROUP",
-  "erpCode": "908",
-  "parentCode": "2608",
-  "el": "ΛΟΙΠΟΙ",
-  "en": "Other",
-  "it": "Altri",
+  "erpCode": "799",
+  "parentCode": "2904",
+  "el": "ΛΟΣΤΟΙ - ΠΡΟΚΟΒΓΑΛΤΕΣ - ΤΣΕΚΟΥΡΙΑ",
+  "en": "Pry Bars – Nail Pullers – Axes",
+  "it": "Leve – Cavachiodi – Asce"
+ },
+ {
+  "id": "cmumdbc6o001dd4bybnu6tndi",
+  "erpType": "SUBGROUP",
+  "erpCode": "190",
+  "parentCode": "1028",
+  "el": "ΜΑΝΕΛΕΣ - ΛΑΒΕΣ",
+  "en": "Breaker Bars – Handles",
+  "it": "Leve snodate – Impugnature",
   "forceEn": true
  },
  {
-  "id": "cmi5h6n9a00cgd4uq9obfiave",
+  "id": "cmumdbcb3001fd4byqqntcg7f",
   "erpType": "SUBGROUP",
-  "erpCode": "263",
-  "parentCode": "1013",
-  "el": "ΜΑΓΝΗΤΙΚΑ ΚΑΤΣΑΒΙΔΙΑ",
-  "en": null,
-  "it": "Cacciaviti magnetici"
- },
- {
-  "id": "cmi5h6nhh00cid4uqyxzi09c2",
-  "erpType": "SUBGROUP",
-  "erpCode": "730",
-  "parentCode": "2403",
-  "el": "ΜΑΡΚΑΔΟΡΟΙ - ΜΟΛΥΒΙΑ",
-  "en": "Markers – Pencils",
-  "it": "Marcatori – matite"
- },
- {
-  "id": "cmi5h6npp00ckd4uqn3a90fuz",
-  "erpType": "SUBGROUP",
-  "erpCode": "739",
-  "parentCode": "2802",
-  "el": "ΜΑΣΚΕΣ ΣΚΟΝΗΣ",
-  "en": "Dust Masks",
-  "it": "Maschere antipolvere"
- },
- {
-  "id": "cmi5h6nxw00cmd4uq78ng2iah",
-  "erpType": "SUBGROUP",
-  "erpCode": "103",
-  "parentCode": "1006",
-  "el": "ΜΑΤΣΟΛΕΣ",
-  "en": null,
-  "it": "Mazzuole"
- },
- {
-  "id": "cmi5h6o6m00cod4uqhechj0z3",
-  "erpType": "SUBGROUP",
-  "erpCode": "261",
-  "parentCode": "1013",
-  "el": "ΜΕ ΕΝΑΛΛΑΣΟΜΕΝΕΣ ΛΑΜΕΣ",
-  "en": null,
-  "it": "Con lame intercambiabili"
- },
- {
-  "id": "cmi5h6oes00cqd4uqz6svyvhe",
-  "erpType": "SUBGROUP",
-  "erpCode": "626",
-  "parentCode": "3901",
-  "el": "ΜΕΤΑΛΙΚΕΣ ΕΡΓΑΛΕΙΟΘΗΚΕΣ",
-  "en": "Metal Toolboxes",
-  "it": "Cassette portautensili in metallo"
- },
- {
-  "id": "cmi5h6on100csd4uqmb2g42ro",
-  "erpType": "SUBGROUP",
-  "erpCode": "415",
-  "parentCode": "1209",
-  "el": "ΜΕΤΑΛΛΟΥ",
-  "en": null,
-  "it": "Metallo"
- },
- {
-  "id": "cmi5h6ova00cud4uq733nuftw",
-  "erpType": "SUBGROUP",
-  "erpCode": "844",
+  "erpCode": "846",
   "parentCode": "2506",
-  "el": "ΜΕΤΑΛΛΟΥ",
-  "en": "Metal",
-  "it": "Metallo",
+  "el": "ΜΠΕΤΟΥ",
+  "en": "Concrete",
+  "it": "Calcestruzzo",
   "forceEn": true
  },
  {
-  "id": "cmi5h6p3e00cwd4uqk1zedalm",
+  "id": "cmumdbcfh001hd4bybxuwr4p9",
   "erpType": "SUBGROUP",
-  "erpCode": "723",
-  "parentCode": "2402",
-  "el": "ΜΕΤΡΑ - ΜΕΤΡΟΤΑΙΝΙΕΣ - ΤΡΟΧΟΙ ΜΕΤΡΗΣΗΣ",
-  "en": "Tape Measures – Measuring Tapes – Measuring Wheels",
-  "it": "Metri – Rotelle metriche – Odometri",
+  "erpCode": "845",
+  "parentCode": "2506",
+  "el": "ΞΥΛΟΥ",
+  "en": "Wood",
+  "it": "Legno",
   "forceEn": true
  },
  {
-  "id": "cmi5h6pbl00cyd4uqu8r3mgw8",
+  "id": "cmumdbcjt001jd4byvfoaf8s9",
   "erpType": "SUBGROUP",
-  "erpCode": "713",
-  "parentCode": "2401",
-  "el": "ΜΕΤΡΗΤΕΣ ΑΠΟΣΤΑΣΕΩΝ - ΑΝΙΧΝΕΥΤΕΣ ΜΕΤΑΛΛΩΝ",
-  "en": null,
-  "it": "Misuratori di distanza – rilevatori di metalli"
- },
- {
-  "id": "cmi5h6pjy00d0d4uqkvu1fr0n",
-  "erpType": "SUBGROUP",
-  "erpCode": "747",
+  "erpCode": "753",
   "parentCode": "2803",
-  "el": "ΜΠΟΤΑΚΙΑ ΑΣΦΑΛΕΙΑΣ",
-  "en": "Safety Boots",
-  "it": "Scarpe antinfortunistiche"
- },
- {
-  "id": "cmi5h6ps600d2d4uqa80ciewi",
-  "erpType": "SUBGROUP",
-  "erpCode": "381",
-  "parentCode": "1201",
-  "el": "ΜΠΟΥΛΟΝΟΚΛΕΙΔΑ 1",
-  "en": null,
-  "it": "Avvitatori a massa battente 1\""
- },
- {
-  "id": "cmi5h6q0d00d4d4uq34pagrb0",
-  "erpType": "SUBGROUP",
-  "erpCode": "321",
-  "parentCode": "1101",
-  "el": "ΜΠΟΥΛΟΝΟΚΛΕΙΔΑ 1/2\"",
-  "en": null,
-  "it": "Avvitatori a massa battente 1/2\""
- },
- {
-  "id": "cmi5h6q8k00d6d4uq4z9sv0q2",
-  "erpType": "SUBGROUP",
-  "erpCode": "379",
-  "parentCode": "1201",
-  "el": "ΜΠΟΥΛΟΝΟΚΛΕΙΔΑ 1/2\"",
-  "en": null,
-  "it": "Avvitatori a massa battente 1/2\""
- },
- {
-  "id": "cmi5h6qgt00d8d4uqz4j2dxvk",
-  "erpType": "SUBGROUP",
-  "erpCode": "322",
-  "parentCode": "1101",
-  "el": "ΜΠΟΥΛΟΝΟΚΛΕΙΔΑ 3/4\"",
-  "en": null,
-  "it": "Avvitatori a massa battente 3/4\""
- },
- {
-  "id": "cmi5h6qoy00dad4uqktf1uwxi",
-  "erpType": "SUBGROUP",
-  "erpCode": "380",
-  "parentCode": "1201",
-  "el": "ΜΠΟΥΛΟΝΟΚΛΕΙΔΑ 3/4\"",
-  "en": null,
-  "it": "Avvitatori a massa battente 3/4\""
- },
- {
-  "id": "cmi5h6qx800dcd4uqdwod79hx",
-  "erpType": "SUBGROUP",
-  "erpCode": "535",
-  "parentCode": "1201",
-  "el": "ΜΠΟΥΛΟΝΟΚΛΕΙΔΑ 3/8\"",
-  "en": null,
-  "it": "Avvitatori a massa battente 3/8\""
- },
- {
-  "id": "cmi5h6r5d00ded4uqinz14xb3",
-  "erpType": "SUBGROUP",
-  "erpCode": "751",
-  "parentCode": "2804",
-  "el": "ΜΠΟΥΦΑΝ - ΚΑΠΑΡΤΙΝΕΣ",
-  "en": "Jackets – Raincoats",
-  "it": "Giacche – Impermeabili"
- },
- {
-  "id": "cmi5h6rdh00dgd4uq7exo9yt2",
-  "erpType": "SUBGROUP",
-  "erpCode": "283",
-  "parentCode": "1015",
-  "el": "ΜΥΤΟΤΣΙΜΠΙΔΑ - ΠΛΑΤΥΤΣΙΜΠΙΔΑ",
-  "en": "Long Nose Pliers – Flat Nose Pliers",
-  "it": "Pinze a becchi lunghi – Pinze a becchi piatti",
+  "el": "ΠΑΝΤΕΛΟΝΙΑ",
+  "en": "Trousers",
+  "it": "Pantaloni",
   "forceEn": true
  },
  {
-  "id": "cmi5h6rlm00did4uqt73oe27m",
+  "id": "cmumdbco4001ld4by8jdwixoa",
   "erpType": "SUBGROUP",
-  "erpCode": "355",
-  "parentCode": "1108",
-  "el": "ΞΥΛΟΥ - ΑΛΟΥΜΙΝΙΟΥ",
-  "en": "Wood – Aluminium",
-  "it": "Legno – Alluminio"
- },
- {
-  "id": "cmi5h6rtr00dkd4uqmiyrk2rx",
-  "erpType": "SUBGROUP",
-  "erpCode": "414",
-  "parentCode": "1209",
-  "el": "ΞΥΛΟΥ - ΑΛΟΥΜΙΝΙΟΥ",
-  "en": "Wood – Aluminium",
-  "it": "Legno – Alluminio"
- },
- {
-  "id": "cmi5h6s1y00dmd4uqp9r8cfyj",
-  "erpType": "SUBGROUP",
-  "erpCode": "841",
-  "parentCode": "2503",
-  "el": "ΟΦΙΟΕΙΔΗ",
-  "en": null,
-  "it": "Punte a tortiglione"
- },
- {
-  "id": "cmi5h6sa600dod4uq5poqwwox",
-  "erpType": "SUBGROUP",
-  "erpCode": "534",
+  "erpCode": "375",
   "parentCode": "1201",
-  "el": "ΠΑΛΜΙΚΑ ΚΑΤΣΑΒΙΔΙΑ",
-  "en": null,
-  "it": "Avvitatori a impulsi"
- },
- {
-  "id": "cmi5h6sie00dqd4uqbittxhh9",
-  "erpType": "SUBGROUP",
-  "erpCode": "428",
-  "parentCode": "1216",
-  "el": "ΠΑΛΜΙΚΑ ΤΡΙΒΕΙΑ",
-  "en": "Orbital Sanders",
-  "it": "Levigatrici orbitali",
-  "forceEn": true
- },
- {
-  "id": "cmi5h6sqq00dsd4uq6gf33npv",
-  "erpType": "SUBGROUP",
-  "erpCode": "746",
-  "parentCode": "2803",
-  "el": "ΠΑΠΟΥΤΣΙΑ ΑΣΦΑΛΕΙΑΣ (ΧΑΜΗΛΑ)",
-  "en": "Safety Shoes (Low)",
-  "it": "Scarpe antinfortunistiche (basse)"
- },
- {
-  "id": "cmi5h6syw00dud4uqgua7ezq9",
-  "erpType": "SUBGROUP",
-  "erpCode": "277",
-  "parentCode": "1015",
-  "el": "ΠΕΝΣΕΣ",
-  "en": null,
-  "it": "Pinze"
- },
- {
-  "id": "cmi5h6t7100dwd4uqakgh0f8i",
-  "erpType": "SUBGROUP",
-  "erpCode": "287",
-  "parentCode": "1015",
-  "el": "ΠΕΝΣΕΣ GRIP - ΣΚΥΛΕΣ",
-  "en": "Locking Pliers",
-  "it": "Pinze autobloccanti",
-  "forceEn": true
- },
- {
-  "id": "cmi5h6tf700dyd4uqxp6aaccs",
-  "erpType": "SUBGROUP",
-  "erpCode": "289",
-  "parentCode": "1015",
-  "el": "ΠΕΝΣΕΣ ΣΥΣΦΙΞΗΣ (ΠΡΕΣΣΕΣ)",
-  "en": null,
-  "it": "Pinze crimpatrici"
- },
- {
-  "id": "cmi5h6tnf00e0d4uqs1hf5mtm",
-  "erpType": "SUBGROUP",
-  "erpCode": "326",
-  "parentCode": "1102",
-  "el": "ΠΕΡΙΣΤΡΟΦΙΚΑ - ΣΚΑΠΤΙΚΑ ΠΙΣΤΟΛΕΤΑ SDS-MAX",
-  "en": null,
-  "it": "Tassellatori – martelli demolitori SDS-Max"
- },
- {
-  "id": "cmi5h6tvk00e2d4uq12g42lta",
-  "erpType": "SUBGROUP",
-  "erpCode": "383",
-  "parentCode": "1202",
-  "el": "ΠΕΡΙΣΤΡΟΦΙΚΑ 2 ΛΕΙΤΟΥΡΓΙΩΝ SDS-PLUS",
-  "en": null,
-  "it": "Tassellatori a 2 funzioni SDS-Plus"
- },
- {
-  "id": "cmi5h6u5300e4d4uqrq7c8j38",
-  "erpType": "SUBGROUP",
-  "erpCode": "319",
-  "parentCode": "1101",
   "el": "ΠΕΡΙΣΤΡΟΦΙΚΑ ΔΡΑΠΑΝΑ",
   "en": null,
   "it": "Trapani rotativi"
  },
  {
-  "id": "cmi5h6uda00e6d4uq6qqv057p",
+  "id": "cmumdbcsl001nd4by9jyzvo8e",
   "erpType": "SUBGROUP",
-  "erpCode": "384",
-  "parentCode": "1202",
-  "el": "ΠΕΡΙΣΤΡΟΦΙΚΑ-ΣΚΑΠΤΙΚΑ 3 ΛΕΙΤΟΥΡΓΙΩΝ SDS-PLUS",
-  "en": null,
-  "it": "Tassellatori – martelli demolitori a 3 funzioni SDS-Plus"
+  "erpCode": "770",
+  "parentCode": "3104",
+  "el": "ΠΡΕΣΕΣ ΣΥΝΔΕΣΗΣ",
+  "en": "Press Tools",
+  "it": "Pressatrici"
  },
  {
-  "id": "cmi5h6ulh00e8d4uqq4qy1vbb",
+  "id": "cmumdbcx2001pd4byi3pid478",
   "erpType": "SUBGROUP",
-  "erpCode": "325",
-  "parentCode": "1102",
-  "el": "ΠΙΣΤΟΛΕΤΑ SDS-PLUS 2-ΛΕΙΤ",
-  "en": "SDS-Plus 2-Mode Rotary Hammers",
-  "it": "Tassellatori SDS-Plus 2 funzioni"
- },
- {
-  "id": "cmi5h6utq00ead4uqekblmd3l",
-  "erpType": "SUBGROUP",
-  "erpCode": "531",
-  "parentCode": "1102",
-  "el": "ΠΙΣΤΟΛΕΤΑ SDS-PLUS 3-ΛΕΙΤ",
-  "en": "SDS-Plus 3-Mode Rotary Hammers",
-  "it": "Tassellatori SDS-Plus 3 funzioni"
- },
- {
-  "id": "cmi5h6v1y00ecd4uqin70ktgc",
-  "erpType": "SUBGROUP",
-  "erpCode": "419",
-  "parentCode": "1210",
-  "el": "ΠΙΣΤΟΛΙΑ ΘΕΡΜΟΚΟΛΛΗΣΗΣ",
-  "en": null,
-  "it": "Pistole per colla a caldo"
- },
- {
-  "id": "cmi5h6va800eed4uqvi6nioy8",
-  "erpType": "SUBGROUP",
-  "erpCode": "417",
-  "parentCode": "1210",
-  "el": "ΠΙΣΤΟΛΙΑ ΘΕΡΜΟΥ ΑΕΡΑ",
-  "en": null,
-  "it": "Pistole ad aria calda"
- },
- {
-  "id": "cmi5h6vie00egd4uqqsgxhcyw",
-  "erpType": "SUBGROUP",
-  "erpCode": "280",
-  "parentCode": "1015",
-  "el": "ΠΛΑΓΙΟΚΟΦΤΕΣ",
-  "en": null,
-  "it": "Tronchesi laterali"
- },
- {
-  "id": "cmi5h6vqk00eid4uq8q01tjq2",
-  "erpType": "SUBGROUP",
-  "erpCode": "410",
-  "parentCode": "1208",
-  "el": "ΠΛΑΝΕΣ",
-  "en": null,
-  "it": "Pialle"
- },
- {
-  "id": "cmi5h6vyq00ekd4uq8wmzoskh",
-  "erpType": "SUBGROUP",
-  "erpCode": "623",
-  "parentCode": "3901",
-  "el": "ΠΛΑΣΤΙΚΕΣ ΕΡΓΑΛΕΙΟΘΗΚΕΣ",
-  "en": null,
-  "it": "Cassette per utensili in plastica"
- },
- {
-  "id": "cmi5h6w7500emd4uqljoo4bd9",
-  "erpType": "SUBGROUP",
-  "erpCode": "733",
-  "parentCode": "2405",
-  "el": "ΠΟΛΥΜΕΤΡΑ - ΑΜΠΕΡΟΤΣΙΜΠΙΔΕΣ",
-  "en": null,
-  "it": "Multimetri – pinze amperometriche"
- },
- {
-  "id": "cmi5h6wff00eod4uqgb85mra2",
-  "erpType": "SUBGROUP",
-  "erpCode": "1076",
-  "parentCode": "3503",
-  "el": "ΠΟΤΗΡΟΚΟΡΩΝΕΣ",
-  "en": null,
-  "it": "Seghe a tazza"
- },
- {
-  "id": "cmi5h6wnm00eqd4uqystpy6ou",
-  "erpType": "SUBGROUP",
-  "erpCode": "1080",
-  "parentCode": "3504",
-  "el": "ΠΟΤΗΡΟΚΟΡΩΝΕΣ",
-  "en": null,
-  "it": "Seghe a tazza"
- },
- {
-  "id": "cmi5h6wvr00esd4uq7hnjcltx",
-  "erpType": "SUBGROUP",
-  "erpCode": "308",
-  "parentCode": "1033",
-  "el": "ΠΡΙΟΝΙΑ",
-  "en": null,
-  "it": "Seghe"
- },
- {
-  "id": "cmi5h6x3x00eud4uqd5zqsgkj",
-  "erpType": "SUBGROUP",
-  "erpCode": "815",
-  "parentCode": "3308",
-  "el": "ΠΡΙΤΣΙΝΑΔΟΡΟΙ",
-  "en": "Rivet Guns",
-  "it": "Rivettatrici"
- },
- {
-  "id": "cmi5h6xck00ewd4uqjqj0kwuy",
-  "erpType": "SUBGROUP",
-  "erpCode": "681",
-  "parentCode": "1901",
-  "el": "ΠΡΟΒΟΛΕΙΣ - ΣΥΝΕΡΓΕΙΟΥ",
-  "en": null,
-  "it": "Fari da officina"
- },
- {
-  "id": "cmi5h6xkq00eyd4uqoaeb0l73",
-  "erpType": "SUBGROUP",
-  "erpCode": "685",
-  "parentCode": "1902",
-  "el": "ΠΡΟΒΟΛΕΙΣ ΣΥΝΕΡΓΕΙΟΥ",
-  "en": null,
-  "it": "Fari da officina"
- },
- {
-  "id": "cmi5h6xsz00f0d4uqec3r6oem",
-  "erpType": "SUBGROUP",
-  "erpCode": "191",
-  "parentCode": "1028",
-  "el": "ΠΡΟΕΚΤΑΣΕΙΣ",
-  "en": null,
-  "it": "Prolunghe"
- },
- {
-  "id": "cmi5h6y1900f2d4uqh3pcqbmy",
-  "erpType": "SUBGROUP",
-  "erpCode": "209",
-  "parentCode": "1029",
-  "el": "ΠΡΟΕΚΤΑΣΕΙΣ",
-  "en": null,
-  "it": "Prolunghe"
- },
- {
-  "id": "cmi5h6y9k00f4d4uq1acophw2",
-  "erpType": "SUBGROUP",
-  "erpCode": "722",
-  "parentCode": "2402",
-  "el": "ΡΙΓΕΣ - ΓΩΝΙΕΣ",
-  "en": "Rulers – Squares",
-  "it": "Righelli – Squadre"
- },
- {
-  "id": "cmi5h6yhu00f6d4uqwmbxuuhk",
-  "erpType": "SUBGROUP",
-  "erpCode": "411",
-  "parentCode": "1208",
-  "el": "ΡΟΥΤΕΡ",
-  "en": null,
-  "it": "Fresatrici"
- },
- {
-  "id": "cmi5h6yq500f8d4uqetqquhyj",
-  "erpType": "SUBGROUP",
-  "erpCode": "407",
-  "parentCode": "1207",
-  "el": "ΣΑΤΙΝΙΕΡΕΣ",
-  "en": null,
-  "it": "Satinatrici"
- },
- {
-  "id": "cmi5h6yyd00fad4uq1px9l7t6",
-  "erpType": "SUBGROUP",
-  "erpCode": "403",
-  "parentCode": "1206",
-  "el": "ΣΕΓΕΣ",
-  "en": null,
-  "it": "Seghetti alternativi"
- },
- {
-  "id": "cmi5h6z6n00fcd4uqsjqg4i87",
-  "erpType": "SUBGROUP",
-  "erpCode": "146",
-  "parentCode": "1026",
-  "el": "ΣΕΙΡΑ IMPACT",
-  "en": "Impact Series",
-  "it": "Serie Impact"
- },
- {
-  "id": "cmi5h6zev00fed4uqlyjhedho",
-  "erpType": "SUBGROUP",
-  "erpCode": "192",
-  "parentCode": "1028",
-  "el": "ΣΕΙΡΑ IMPACT",
-  "en": "Impact Series",
-  "it": "Serie Impact",
+  "erpCode": "1102",
+  "parentCode": "3512",
+  "el": "ΡΑΓΕΣ",
+  "en": "Guide Rails",
+  "it": "Binari di guida",
   "forceEn": true
  },
  {
-  "id": "cmi5h6zn100fgd4uq2gksvgi4",
+  "id": "cmumdbd1e001rd4by6bia3a52",
   "erpType": "SUBGROUP",
-  "erpCode": "317",
-  "parentCode": "1017",
-  "el": "ΣΕΤ",
-  "en": null,
-  "it": "Set"
+  "erpCode": "397",
+  "parentCode": "1204",
+  "el": "ΣΕΤ ΑΝΩ ΤΩΝ ΤΡΙΩΝ ΕΡΓΑΛΕΙΩΝ",
+  "en": "Sets of More Than Three Tools",
+  "it": "Set di più di tre utensili",
+  "forceEn": true
  },
  {
-  "id": "cmi5h6zv800fid4uqfe9r2npf",
+  "id": "cmumdbd5n001td4byatnbb5l3",
   "erpType": "SUBGROUP",
-  "erpCode": "298",
-  "parentCode": "1011",
-  "el": "ΣΕΤ - ΕΞΩΛΚΕΩΝ",
-  "en": null,
-  "it": "Set di estrattori"
- },
- {
-  "id": "cmi5h703k00fkd4uqx1ylzd8r",
-  "erpType": "SUBGROUP",
-  "erpCode": "250",
-  "parentCode": "1013",
-  "el": "ΣΕΤ - ΚΑΤΣΑΒΙΔΙΩΝ",
-  "en": null,
-  "it": "Set di cacciaviti"
- },
- {
-  "id": "cmi5h70bs00fmd4uqj8idw4dm",
-  "erpType": "SUBGROUP",
-  "erpCode": "292",
-  "parentCode": "1015",
-  "el": "ΣΕΤ - ΠΕΝΣΙΚΩΝ",
-  "en": null,
-  "it": "Set di pinze"
- },
- {
-  "id": "cmi5h710i00fsd4uqxqd262it",
-  "erpType": "SUBGROUP",
-  "erpCode": "400",
-  "parentCode": "1205",
+  "erpCode": "395",
+  "parentCode": "1204",
   "el": "ΣΕΤ ΜΕ ΔΥΟ ΕΡΓΑΛΕΙΑ",
   "en": null,
   "it": "Kit con due utensili"
  },
  {
-  "id": "cmi5h718p00fud4uqy2l15wj7",
+  "id": "cmumdbd9w001vd4by8rjhvjzr",
   "erpType": "SUBGROUP",
-  "erpCode": "141",
-  "parentCode": "1026",
-  "el": "ΣΕΤ ΜΕ ΚΑΡΥΔΑΚΙΑ ΚΑΙ ΚΑΣΤΑΝΙΑ ΜΕΤΡΙΚΟ",
-  "en": "Metric Socket & Ratchet Sets",
-  "it": "Set di bussole metriche con cricchetto",
-  "forceEn": true
- },
- {
-  "id": "cmi5h71h200fwd4uqkkfiq1mv",
-  "erpType": "SUBGROUP",
-  "erpCode": "187",
-  "parentCode": "1028",
-  "el": "ΣΕΤ ΜΕ ΚΑΡΥΔΑΚΙΑ ΚΑΙ ΚΑΣΤΑΝΙΑ ΜΕΤΡΙΚΟ",
-  "en": "Metric Socket & Ratchet Sets",
-  "it": "Set di bussole metriche con cricchetto",
-  "forceEn": true
- },
- {
-  "id": "cmi5h71p900fyd4uqap08y7yv",
-  "erpType": "SUBGROUP",
-  "erpCode": "206",
+  "erpCode": "205",
   "parentCode": "1029",
-  "el": "ΣΕΤ ΜΕ ΚΑΡΥΔΑΚΙΑ ΚΑΙ ΚΑΣΤΑΝΙΑ ΜΕΤΡΙΚΟ",
-  "en": "Metric Socket & Ratchet Sets",
-  "it": "Set di bussole metriche con cricchetto",
-  "forceEn": true
- },
- {
-  "id": "cmi5h71xh00g0d4uqj0f87av0",
-  "erpType": "SUBGROUP",
-  "erpCode": "169",
-  "parentCode": "1027",
-  "el": "ΣΕΤ ΜΕ ΚΑΡΥΔΑΚΙΑ ΚΑΙ ΚΑΣΤΑΝΙΑΣ ΜΕΤΡΙΚΟ",
-  "en": "Metric Socket & Ratchet Sets",
-  "it": "Set di bussole metriche con cricchetto",
-  "forceEn": true
- },
- {
-  "id": "cmi5h726200g2d4uqt7rhfe9z",
-  "erpType": "SUBGROUP",
-  "erpCode": "140",
-  "parentCode": "1026",
   "el": "ΣΕΤ ΜΕ ΚΑΡΥΔΑΚΙΑ ΜΟΝΟ",
   "en": "Socket Sets",
   "it": "Set di sole bussole",
   "forceEn": true
  },
  {
-  "id": "cmi5h73be00gcd4uqqudpwytc",
+  "id": "cmumdbdea001xd4byoalkfavx",
   "erpType": "SUBGROUP",
-  "erpCode": "327",
-  "parentCode": "1102",
-  "el": "ΣΚΑΠΤΙΚΑ ΠΙΣΤΟΛΕΤΑ SDS-MAX",
-  "en": "SDS-Max Demolition Hammers",
-  "it": "Martelli demolitori SDS-Max",
+  "erpCode": "393",
+  "parentCode": "1204",
+  "el": "ΣΕΤ ΜΕ ΚΡΟΥΣΤΙΚΟ ΔΡΑΠΑΝΟΚΑΤΣΑΒΙΔΟ ΚΑΙ ΠΑΛΜΙΚΟ",
+  "en": "Combi Drill & Impact Driver Sets",
+  "it": "Set trapano avvitatore a percussione e avvitatore a impulsi",
   "forceEn": true
  },
  {
-  "id": "cmi5h73jn00ged4uqzdmv1395",
+  "id": "cmumdbdin001zd4byvtr9lzxc",
   "erpType": "SUBGROUP",
-  "erpCode": "631",
-  "parentCode": "3901",
-  "el": "ΣΚΑΦΑΚΙΑ - ΚΟΥΤΙΑ ΑΠΟΘΗΚΕΥΣΗΣ - ΣΥΡΤΑΡΟΘΗΚΕΣ",
-  "en": "Organisers – Storage Boxes – Drawer Units",
-  "it": "Organizer – Contenitori – Cassettiere"
- },
- {
-  "id": "cmi5h73ry00ggd4uqp2ou0eju",
-  "erpType": "SUBGROUP",
-  "erpCode": "554",
-  "parentCode": "1602",
-  "el": "ΣΚΟΥΠΕΣ ΜΠΑΤΑΡΙΑΣ",
-  "en": "Cordless Vacuums",
-  "it": "Aspiratori a batteria",
+  "erpCode": "394",
+  "parentCode": "1204",
+  "el": "ΣΕΤ ΜΕ ΠΕΡΙΣΤΡΟΦΙΚΟ ΔΡΑΠΑΝΟΚΑΤΣΑΒΙΔΟ ΚΑΙ ΠΑΛΜΙΚΟ",
+  "en": "Drill Driver & Impact Driver Sets",
+  "it": "Set trapano avvitatore e avvitatore a impulsi",
   "forceEn": true
  },
  {
-  "id": "cmi5h740b00gid4uqmhzgog9b",
+  "id": "cmumdbdmy0021d4by262xwmbu",
   "erpType": "SUBGROUP",
-  "erpCode": "552",
-  "parentCode": "1602",
-  "el": "ΣΚΟΥΠΕΣ ΥΓΡΩΝ - ΣΤΕΡΕΩΝ",
-  "en": "Wet/Dry Vacuums",
-  "it": "Aspiratori solidi-liquidi",
+  "erpCode": "396",
+  "parentCode": "1204",
+  "el": "ΣΕΤ ΜΕ ΤΡΙΑ ΕΡΓΑΛΕΙΑ",
+  "en": "Three-Tool Sets",
+  "it": "Set con tre utensili",
   "forceEn": true
  },
  {
-  "id": "cmi5h748k00gkd4uqr6pfr9dz",
+  "id": "cmumdbdrd0023d4by79bu0wgn",
   "erpType": "SUBGROUP",
-  "erpCode": "404",
-  "parentCode": "1206",
-  "el": "ΣΠΑΘΟΣΕΓΕΣ",
-  "en": null,
-  "it": "Seghe a gattuccio"
- },
- {
-  "id": "cmi5h74h200gmd4uqumb3vmq6",
-  "erpType": "SUBGROUP",
-  "erpCode": "422",
-  "parentCode": "1215",
-  "el": "ΣΤΑΘΕΡΑ ΔΙΣΚΟΠΡΙΟΝΑ - ΦΑΛΤΣΟΠΡΙΟΝΑ - ΞΥΛΟΥ ΑΛΟΥΜΙΝ",
-  "en": "Table Saws – Mitre Saws – Wood & Aluminium",
-  "it": "Seghe circolari da banco – Troncatrici – Legno e alluminio",
+  "erpCode": "401",
+  "parentCode": "1205",
+  "el": "ΣΕΤ ΜΕ ΤΡΙΑ ΕΡΓΑΛΕΙΑ",
+  "en": "Three-Tool Sets",
+  "it": "Set con tre utensili",
   "forceEn": true
  },
  {
-  "id": "cmi5h74pf00god4uqj5ua2mdg",
+  "id": "cmumdbdvn0025d4byhr5uii02",
   "erpType": "SUBGROUP",
-  "erpCode": "365",
-  "parentCode": "1113",
-  "el": "ΣΤΑΘΕΡΑ ΔΙΣΚΟΠΡΙΟΝΑ ΜΕΤΑΛΛΟΥ",
+  "erpCode": "434",
+  "parentCode": "1022",
+  "el": "ΤΑΦ ΚΑΡΥΔΑΚΙΑ",
   "en": null,
-  "it": "Seghe circolari fisse per metallo"
+  "it": "Bussole con manico a T"
  },
  {
-  "id": "cmi5h74xn00gqd4uqmavjk3kj",
+  "id": "cmumdbe050027d4by50glb1zk",
   "erpType": "SUBGROUP",
-  "erpCode": "252",
-  "parentCode": "1013",
-  "el": "ΣΤΑΥΡΟΥ - PHILIPS",
-  "en": null,
-  "it": "Phillips"
+  "erpCode": "315",
+  "parentCode": "1022",
+  "el": "ΤΟΡΞ - TORX ΑΡΣΕΝΙΚΑ",
+  "en": "Male TORX",
+  "it": "TORX maschio",
+  "forceEn": true
  },
  {
-  "id": "cmi5h755w00gsd4uqxl46zxjx",
+  "id": "cmumdbe6l0029d4by4s5b9ppi",
   "erpType": "SUBGROUP",
-  "erpCode": "253",
-  "parentCode": "1013",
-  "el": "ΣΤΑΥΡΟΥ - POZIDRIV",
-  "en": null,
-  "it": "Pozidriv"
- },
- {
-  "id": "cmi5h75e500gud4uqx3fevwsb",
-  "erpType": "SUBGROUP",
-  "erpCode": "832",
-  "parentCode": "2501",
-  "el": "ΣΤΡΟΓΓΥΛΗ ΥΠΟΔΟΧΗ",
-  "en": "Round Shank",
-  "it": "Gambo cilindrico"
- },
- {
-  "id": "cmi5h75mb00gwd4uqxxm3o4js",
-  "erpType": "SUBGROUP",
-  "erpCode": "106",
-  "parentCode": "1006",
-  "el": "ΣΦΥΡΙΑ ΜΠΑΛΑΣ",
-  "en": null,
-  "it": "Martelli a palla"
- },
- {
-  "id": "cmi5h75vw00gyd4uqga7h9sij",
-  "erpType": "SUBGROUP",
-  "erpCode": "105",
-  "parentCode": "1006",
-  "el": "ΣΦΥΡΙΑ ΠΕΝΑΣ",
-  "en": null,
-  "it": "Martelli a penna"
- },
- {
-  "id": "cmi5h764500h0d4uq2ik6eetw",
-  "erpType": "SUBGROUP",
-  "erpCode": "279",
+  "erpCode": "278",
   "parentCode": "1015",
-  "el": "ΣΩΛΗΝΟΚΑΒΟΥΡΕΣ",
-  "en": null,
-  "it": "Chiavi giratubi"
+  "el": "ΤΣΙΜΠΙΔΕΣ",
+  "en": "Pliers",
+  "it": "Pinze",
+  "forceEn": true
  },
  {
-  "id": "cmi5h76ch00h2d4uq8uub8wfs",
+  "id": "cmumdbeax002bd4bytggkf32j",
   "erpType": "SUBGROUP",
-  "erpCode": "759",
-  "parentCode": "3102",
-  "el": "ΣΩΛΗΝΟΚΟΦΤΕΣ ΠΛΑΣΤΙΚΟΥ",
-  "en": null,
-  "it": "Tagliatubi per plastica"
+  "erpCode": "285",
+  "parentCode": "1015",
+  "el": "ΤΣΙΜΠΙΔΙΑ ΑΣΦΑΛΕΙΩΝ",
+  "en": "Circlip Pliers",
+  "it": "Pinze per anelli seeger",
+  "forceEn": true
  },
  {
-  "id": "cmi5h76kn00h4d4uq45w2uwvw",
+  "id": "cmumdbefe002dd4bywuvdrfk2",
   "erpType": "SUBGROUP",
-  "erpCode": "757",
-  "parentCode": "3102",
-  "el": "ΣΩΛΗΝΟΚΟΦΤΕΣ ΧΑΛΚΟΥ",
-  "en": null,
-  "it": "Tagliatubi per rame"
- },
- {
-  "id": "cmi5h76su00h6d4uq2tqvzxsf",
-  "erpType": "SUBGROUP",
-  "erpCode": "431",
-  "parentCode": "1216",
-  "el": "ΤΑΙΝΙΟΛΕΙΑΝΤΗΡΕΣ",
-  "en": null,
-  "it": "Levigatrici a nastro"
- },
- {
-  "id": "cmi5h770z00h8d4uq1hljfflq",
-  "erpType": "SUBGROUP",
-  "erpCode": "630",
-  "parentCode": "3901",
-  "el": "ΤΑΜΠΑΚΙΕΡΕΣ - ORGANIZER",
-  "en": "Small Parts Organisers",
-  "it": "Organizer portaminuterie"
- },
- {
-  "id": "cmi5h779600had4uq263ht586",
-  "erpType": "SUBGROUP",
-  "erpCode": "1075",
-  "parentCode": "3503",
-  "el": "ΤΡΥΠΗΜΑ",
-  "en": "Drilling",
-  "it": "Foratura"
- },
- {
-  "id": "cmi5h77hd00hcd4uqwypz0rem",
-  "erpType": "SUBGROUP",
-  "erpCode": "1079",
-  "parentCode": "3504",
-  "el": "ΤΡΥΠΗΜΑ",
-  "en": "Drilling",
-  "it": "Foratura"
- },
- {
-  "id": "cmi5h77pk00hed4uqna6tz3j7",
-  "erpType": "SUBGROUP",
-  "erpCode": "624",
-  "parentCode": "3901",
-  "el": "ΥΦΑΣΜΑΤΙΝΕΣ ΕΡΓΑΛΕΙΟΘΗΚΕΣ - ΤΣΑΝΤΑΚΙΑ - ΘΗΚΕΣ",
-  "en": "Fabric Tool Bags – Pouches – Cases",
-  "it": "Borse in tessuto – Pochette – Custodie"
- },
- {
-  "id": "cmi5h77xv00hgd4uqagkkbjnk",
-  "erpType": "SUBGROUP",
-  "erpCode": "867",
-  "parentCode": "2605",
-  "el": "Φ100",
-  "en": "Ø100",
-  "it": "Ø100"
- },
- {
-  "id": "cmi5h786700hid4uqehzw4br6",
-  "erpType": "SUBGROUP",
-  "erpCode": "903",
+  "erpCode": "902",
   "parentCode": "2608",
+  "el": "Φ115",
+  "en": "Ø115",
+  "it": "Ø115"
+ },
+ {
+  "id": "cmumdbejs002fd4bybuhnh8ro",
+  "erpType": "SUBGROUP",
+  "erpCode": "869",
+  "parentCode": "2605",
   "el": "Φ125",
   "en": "Ø125",
   "it": "Ø125"
  },
  {
-  "id": "cmi5h78eu00hkd4uqkyl2datl",
+  "id": "cmumdbeo9002hd4by1tzx65wb",
   "erpType": "SUBGROUP",
-  "erpCode": "1027",
-  "parentCode": "2613",
+  "erpCode": "1083",
+  "parentCode": "3505",
   "el": "Φ125",
   "en": null,
   "it": "Ø125"
  },
  {
-  "id": "cmi5h78n200hmd4uquhb3vtim",
+  "id": "cmumdbesi002jd4by4gfdexle",
   "erpType": "SUBGROUP",
-  "erpCode": "870",
-  "parentCode": "2605",
-  "el": "Φ150",
-  "en": "Ø150",
-  "it": "Ø150"
- },
- {
-  "id": "cmi5h78va00hod4uq1prjiido",
-  "erpType": "SUBGROUP",
-  "erpCode": "680",
-  "parentCode": "1901",
-  "el": "ΦΑΚΟΙ ΚΕΦΑΛΗΣ",
-  "en": "Head Torches",
-  "it": "Lampade frontali"
- },
- {
-  "id": "cmi5h793i00hqd4uqgx0yb79e",
-  "erpType": "SUBGROUP",
-  "erpCode": "684",
-  "parentCode": "1902",
-  "el": "ΦΑΚΟΙ ΚΕΦΑΛΗΣ",
-  "en": "Head Torches",
-  "it": "Lampade frontali"
- },
- {
-  "id": "cmi5h79bs00hsd4uqcnzcvt68",
-  "erpType": "SUBGROUP",
-  "erpCode": "679",
-  "parentCode": "1901",
-  "el": "ΦΑΚΟΙ ΧΕΙΡΟΣ",
-  "en": "Hand Torches",
-  "it": "Torce portatili"
- },
- {
-  "id": "cmi5h79k700hud4uq766rnegs",
-  "erpType": "SUBGROUP",
-  "erpCode": "683",
-  "parentCode": "1902",
-  "el": "ΦΑΚΟΙ ΧΕΙΡΟΣ",
-  "en": "Hand Torches",
-  "it": "Torce portatili"
- },
- {
-  "id": "cmi5h79sf00hwd4uqyzegh4l6",
-  "erpType": "SUBGROUP",
-  "erpCode": "294",
-  "parentCode": "1033",
-  "el": "ΦΑΛΤΣΕΤΕΣ",
-  "en": null,
-  "it": "Taglierini"
- },
- {
-  "id": "cmi5h7a0n00hyd4uqdg1zn588",
-  "erpType": "SUBGROUP",
-  "erpCode": "839",
-  "parentCode": "2503",
-  "el": "ΦΤΕΡΟΥ",
-  "en": "Spade Bits",
-  "it": "Punte piatte",
+  "erpCode": "336",
+  "parentCode": "1103",
+  "el": "ΦΡΕΖΕΣ ΑΥΛΑΚΩΣΕΩΝ",
+  "en": "Wall Chasers",
+  "it": "Scanalatrici",
   "forceEn": true
- },
- {
-  "id": "cmi5h7a8w00i0d4uq4v10ipud",
-  "erpType": "SUBGROUP",
-  "erpCode": "418",
-  "parentCode": "1210",
-  "el": "ΦΥΣΕΡΑ",
-  "en": null,
-  "it": "Soffiatori"
- },
- {
-  "id": "cmi5h7ah200i2d4uqsvwqzgow",
-  "erpType": "SUBGROUP",
-  "erpCode": "295",
-  "parentCode": "1033",
-  "el": "ΨΑΛΙΔΙΑ",
-  "en": null,
-  "it": "Forbici"
- },
- {
-  "id": "cmi5h7ap900i4d4uq4aft7ww3",
-  "erpType": "SUBGROUP",
-  "erpCode": "742",
-  "parentCode": "2802",
-  "el": "ΩΤΟΑΣΠΙΔΕΣ",
-  "en": null,
-  "it": "Protezioni auricolari"
  }
 ]
