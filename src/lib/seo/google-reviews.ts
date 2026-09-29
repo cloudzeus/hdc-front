@@ -72,3 +72,21 @@ function addDays(date: Date, days: number): Date {
 function isoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
+
+/**
+ * Which catalogue rows an order's lines were, for their GTINs.
+ *
+ * By MTRL where the line has one; an XML-only product's line has none (it
+ * travels by its XML code), so it is found by the product id kept on the line.
+ */
+export function orderedProductsWhere(
+  lines: ReadonlyArray<{ mtrl: number | null; productId: string | null }>,
+): { OR: Array<{ mtrl: { in: number[] } } | { id: { in: string[] } }> } | null {
+  const mtrls = lines.flatMap((l) => (l.mtrl != null ? [l.mtrl] : []));
+  const ids = lines.flatMap((l) => (l.mtrl == null && l.productId ? [l.productId] : []));
+  const or = [
+    ...(mtrls.length ? [{ mtrl: { in: mtrls } }] : []),
+    ...(ids.length ? [{ id: { in: ids } }] : []),
+  ];
+  return or.length ? { OR: or } : null;
+}

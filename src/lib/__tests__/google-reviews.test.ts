@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { estimatedDeliveryDate } from "@/lib/seo/google-reviews";
+import { estimatedDeliveryDate, orderedProductsWhere } from "@/lib/seo/google-reviews";
 
 /**
  * When Google should ask the customer how it went.
@@ -36,5 +36,21 @@ describe("estimatedDeliveryDate", () => {
   it("crosses a month boundary correctly", () => {
     const endOfMonth = new Date("2026-08-29T10:00:00Z");
     expect(estimatedDeliveryDate(endOfMonth, "2-4", "courier")).toBe("2026-09-04");
+  });
+});
+
+describe("orderedProductsWhere — the products behind an order's lines", () => {
+  it("finds ERP lines by MTRL and XML-only lines (no MTRL) by product id", () => {
+    expect(
+      orderedProductsWhere([
+        { mtrl: 812, productId: "a" },
+        { mtrl: null, productId: "b" },
+        { mtrl: null, productId: null },
+      ]),
+    ).toEqual({ OR: [{ mtrl: { in: [812] } }, { id: { in: ["b"] } }] });
+  });
+
+  it("is null when no line can be traced", () => {
+    expect(orderedProductsWhere([{ mtrl: null, productId: null }])).toBeNull();
   });
 });

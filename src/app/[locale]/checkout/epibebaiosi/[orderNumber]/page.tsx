@@ -18,7 +18,7 @@ import {
 import { paymentPageUrl } from "@/lib/payment/viva";
 import { isValidGtin } from "@/lib/feeds/google-merchant";
 import { GoogleReviewsOptIn } from "@/components/seo/GoogleReviewsOptIn";
-import { estimatedDeliveryDate } from "@/lib/seo/google-reviews";
+import { estimatedDeliveryDate, orderedProductsWhere } from "@/lib/seo/google-reviews";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -90,13 +90,11 @@ export default async function ConfirmationPage({ params, searchParams }: PagePro
    * off the order (a snapshot that never carried them); only codes that survive
    * their own check digit are sent.
    */
-  const orderedMtrl = order.lines
-    .map((line) => line.mtrl)
-    .filter((mtrl): mtrl is number => mtrl != null);
-  const gtins = orderedMtrl.length
+  const ordered = orderedProductsWhere(order.lines);
+  const gtins = ordered
     ? (
         await prisma.product.findMany({
-          where: { mtrl: { in: orderedMtrl } },
+          where: ordered,
           select: { code1: true },
         })
       )
