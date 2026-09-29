@@ -14,6 +14,7 @@ import { DEFAULT_VAT_RATE } from "@/lib/format";
 import { milwaukeeFields } from "@/lib/milwaukee/product-fields";
 import { hasErpIds, isFeedId } from "@/lib/sync/feed-id";
 import { isShopProduct } from "@/lib/sync/shop-filter";
+import { planXmlRekey } from "@/lib/sync/xml-rekey";
 import { milwaukeeKey, milwaukeeNameIndex, withMilwaukeeNames } from "@/lib/sync/milwaukee-names";
 import {
   hdctool,
@@ -794,6 +795,8 @@ async function upsertProduct(
     erpUpdatedAt: p.updDate ? new Date(p.updDate) : null,
     syncedAt: new Date(),
     ...milwaukeeFields(name),
+    // Never null: an ERP product with no XML history must not erase anything.
+    ...(p.xmlCode ? { xmlCode: p.xmlCode } : {}),
   };
 
   // `searchKey` is stored normalised so query-time matching is a plain equality
@@ -921,6 +924,41 @@ function normaliseSearchKey(raw: string): string {
 }
 
 /**
+ * XML-only products that now have an ERP MTRL, moved onto it before the
+ * chunk's stored rows are read, so the upsert finds the row by its new MTRL.
+ */
+async function rekeyXmlRows(products: HdctoolProduct[]): Promise<void> {
+  // Προϊόν μόνο-XML που απέκτησε MTRL: η γραμμή του παίρνει το πραγματικό MTRL (slug, κριτικές, αγαπημένα μένουν)· αν το MTRL έχει ήδη γραμμή, η γραμμή XML αποσύρεται.
+  const candidates = products.filter((p) => p.mtrl > 0 && p.xmlCode);
+  if (candidates.length === 0) return;
+  const codes = candidates.map((p) => p.xmlCode!);
+  const xmlRows = await prisma.product.findMany({
+    where: { xmlCode: { in: codes }, mtrl: { lt: 0 } },
+    select: { id: true, mtrl: true, xmlCode: true },
+  });
+  if (xmlRows.length === 0) return;
+  const existing = new Set(
+    (
+      await prisma.product.findMany({
+        where: { mtrl: { in: candidates.map((p) => p.mtrl) } },
+        select: { mtrl: true },
+      })
+    ).map((r) => r.mtrl),
+  );
+  for (const action of planXmlRekey(candidates, xmlRows, existing)) {
+    if (action.kind === "move") {
+      await prisma.product.update({ where: { id: action.id }, data: { mtrl: action.to } });
+    } else {
+      // `xmlCode` is freed so the ERP row can take it in the upsert.
+      await prisma.product.update({
+        where: { id: action.id },
+        data: { isActive: false, inStock: false, supplierAvailable: false, xmlCode: null },
+      });
+    }
+  }
+}
+
+/**
  * Write one chunk of products fetched from HDCtool.
  *
  * Per chunk: one batched read of what is stored (six queries), one slug
@@ -938,6 +976,7 @@ async function writeProductChunk(
   written: number[];
   failedMtrl: number[];
 }> {
+  await rekeyXmlRows(products);
   const stored = await loadStoredProducts(products.map((p) => p.mtrl));
 
   // Slugs are allocated before any concurrent write, because `taken` is shared
@@ -1043,6 +1082,21 @@ export async function syncProducts(
 
       cursor = response.pagination.nextCursor;
       if (!cursor || response.products.length === 0) break;
+    }
+
+    // Τα προϊόντα μόνο-XML δεν είναι στη διαδρομή του κέρσορα (αυτή είναι
+    // MTRL του ERP)· έρχονται σε δική τους σελιδοποίηση. Μπαίνουν στο `seen`,
+    // αλλιώς το σκούπισμα παρακάτω θα τα απέσυρε σε κάθε πλήρη διαδρομή.
+    for (let page = 1; page <= maxPages; page++) {
+      const response = await hdctool.products({ source: "xml", page, limit: HDCTOOL_MAX_LIMIT });
+      const shopProducts = response.products.filter(isShopProduct);
+      const chunk = await writeProductChunk(shopProducts, taken);
+      processed += chunk.processed;
+      created += chunk.created;
+      updated += chunk.updated;
+      errors.push(...chunk.errors);
+      for (const mtrl of chunk.written) seen.add(mtrl);
+      if (!response.pagination.hasNext || response.products.length === 0) break;
     }
 
     /*
