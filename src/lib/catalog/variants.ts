@@ -82,7 +82,37 @@ export type FamilySummary = {
   count: number;
   /** Whether ANY size is in stock — the card speaks for all of them. */
   inStock: boolean;
+  /**
+   * Where the card opens: the smallest size that is in stock, or null when
+   * none is (the card then opens its own, the lead). The card keeps the
+   * lead's picture and price so it does not change with every stock update;
+   * only the link follows the stock, so "Σε απόθεμα" on the card is what the
+   * shopper lands on.
+   */
+  openSlug: string | null;
 };
+
+type FamilyMember = {
+  slug: string;
+  name: string;
+  inStock: boolean;
+  qty: unknown;
+  sizes: Array<{ label: string }>;
+};
+
+/** One family's summary: size count, any stock, and the smallest size in stock. Pure. */
+export function summarizeFamily(members: FamilyMember[]): FamilySummary {
+  // The same test as the card's «Σε απόθεμα», so the two never disagree.
+  const inStockMembers = members.filter((m) => m.inStock);
+  const labelOf = (m: FamilyMember) =>
+    sizeDisplayLabel(m.name, m.sizes.map((x) => x.label)) ?? m.sizes[0]?.label ?? "";
+  const first = [...inStockMembers].sort((a, b) => compareSizeLabels(labelOf(a), labelOf(b)))[0];
+  return {
+    count: members.length,
+    inStock: inStockMembers.length > 0,
+    openSlug: first?.slug ?? null,
+  };
+}
 
 /**
  * Size count and stock per family, for a page of cards in one query.
@@ -97,18 +127,24 @@ export async function familySummaries(
   const out = new Map<string, FamilySummary>();
   if (wanted.length === 0) return out;
 
-  const rows = await prisma.product.groupBy({
-    by: ["variantGroup", "inStock"],
+  const rows = await prisma.product.findMany({
     where: { isActive: true, variantGroup: { in: wanted } },
-    _count: { _all: true },
+    select: {
+      slug: true,
+      name: true,
+      variantGroup: true,
+      inStock: true,
+      qty: true,
+      sizes: { select: { label: true }, orderBy: { order: "asc" } },
+    },
   });
+  const byGroup = new Map<string, typeof rows>();
   for (const row of rows) {
     if (!row.variantGroup) continue;
-    const prev = out.get(row.variantGroup) ?? { count: 0, inStock: false };
-    out.set(row.variantGroup, {
-      count: prev.count + row._count._all,
-      inStock: prev.inStock || row.inStock,
-    });
+    byGroup.set(row.variantGroup, [...(byGroup.get(row.variantGroup) ?? []), row]);
+  }
+  for (const [group, members] of byGroup) {
+    out.set(group, summarizeFamily(members));
   }
   return out;
 }

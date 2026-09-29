@@ -66,7 +66,9 @@ export async function HdcProductCard({
         ? t("kit", { count: model.kit.batteries, ah: model.kit.ah.toFixed(1) })
         : null;
 
-  const href = `/proion/${product.slug}`;
+  /* A family card opens its smallest size in stock, so "Σε απόθεμα" on the
+     card is what the shopper lands on; otherwise its own page. */
+  const href = `/proion/${product.sizes?.openSlug ?? product.slug}`;
 
   /* A card for a size family speaks for all its sizes: how many there are,
      whether ANY is on the shelf, and a button that opens the page to choose
