@@ -59,6 +59,14 @@ describe("merchantId", () => {
     expect(merchantId({ mtrl: -17, xmlCode: "P1" })).toBe("X-P1");
   });
 
+  it("stays within Google's 50 characters, the same id every time", () => {
+    const code = "P".repeat(60);
+    const id = merchantId({ mtrl: -17, xmlCode: code });
+    expect(id).toBe(`X-${"P".repeat(48)}`);
+    expect(id.length).toBe(50);
+    expect(merchantId({ mtrl: -17, xmlCode: code })).toBe(id);
+  });
+
   it("falls back to the feed sequence when the code is missing", () => {
     expect(merchantId({ mtrl: -17, xmlCode: null })).toBe("X-17");
   });

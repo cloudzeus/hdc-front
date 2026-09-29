@@ -83,7 +83,8 @@ export function handlingTimeLines(availability: Availability): string[] {
  * αλλάζει μία φορά· η Google το βλέπει ως νέο προϊόν.
  */
 export function merchantId(p: { mtrl: number; xmlCode: string | null }): string {
-  return p.mtrl > 0 ? String(p.mtrl) : `X-${p.xmlCode ?? -p.mtrl}`;
+  // Google caps `id` at 50 characters: "X-" and at most 48 of the code.
+  return p.mtrl > 0 ? String(p.mtrl) : `X-${String(p.xmlCode ?? -p.mtrl).slice(0, 48)}`;
 }
 
 export async function buildMerchantFeed(locale: Locale = "el"): Promise<string> {
