@@ -9,7 +9,7 @@ import { setRequestLocale } from "next-intl/server";
 import { SiteChrome } from "@/components/chrome/SiteChrome";
 import { SiteFooter } from "@/components/chrome/SiteFooter";
 import { CompareTray } from "@/components/compare/CompareTray";
-import { HdcCategoryBand, HdcGroupStrip } from "@/components/plp/hdc/HdcBands";
+import { HdcCategoryBand } from "@/components/plp/hdc/HdcBands";
 import { HdcListing } from "@/components/plp/hdc/HdcListing";
 import { QuickViewProvider } from "@/components/product/QuickViewProvider";
 import type { Locale } from "@/i18n/routing";
@@ -51,6 +51,8 @@ const getCategory = cache(async (slug: string) =>
       nameIt: true,
       productCount: true,
       childCount: true,
+      /* The way back up, first line of the «ΚΑΤΗΓΟΡΙΕΣ» list. */
+      parent: { select: { slug: true, nameEl: true, nameEn: true, nameIt: true } },
     },
   }),
 );
@@ -153,12 +155,12 @@ export default async function CategoryPage({
   // as a legitimate-looking "no products" page and gets indexed.
   if (!category || !data) notFound();
 
-  const name =
-    locale === "en"
-      ? category.nameEn
-      : locale === "it"
-        ? category.nameIt
-        : category.nameEl;
+  const localName = (row: { nameEl: string; nameEn: string; nameIt: string }) =>
+    locale === "en" ? row.nameEn : locale === "it" ? row.nameIt : row.nameEl;
+  const name = localName(category);
+  const parent = category.parent
+    ? { slug: category.parent.slug, name: localName(category.parent) }
+    : null;
 
   /* Milwaukee's own photo for the category, from HDCtool (cached for an hour;
      without HDCtool the band simply has no picture). */
@@ -230,11 +232,6 @@ export default async function CategoryPage({
           stats={bandStats}
           image={image}
         />
-        <HdcGroupStrip
-          basePath={basePath}
-          params={raw}
-          groups={data.facets.subcategories}
-        />
         <Zone id="category.middle" locale={locale} />
         <HdcListing
           variant="category"
@@ -244,6 +241,7 @@ export default async function CategoryPage({
           data={data}
           compareStateFor={compareStateFor}
           rememberedPlatform={remembered != null}
+          category={{ name, parent }}
         />
         <Zone id="category.bottom" locale={locale} />
       </main>

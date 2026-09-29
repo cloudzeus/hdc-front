@@ -104,33 +104,6 @@
     margin-left: auto;
   }
 
-  /* ── Groups strip (.groups) ──────────────────────────────────────────── */
-  .hdc-groups {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    padding: 18px 0 4px;
-    scrollbar-width: thin;
-  }
-  .hdc-groups a {
-    flex: 0 0 auto;
-    padding: 10px 14px;
-    border: 1px solid var(--hdc-g3);
-    font-stretch: 87.5%;
-    font-weight: 700;
-    font-size: var(--fs-13);
-    letter-spacing: 0.04em;
-    white-space: nowrap;
-    transition: border-color 0.15s;
-  }
-  .hdc-groups a:hover {
-    border-color: var(--hdc-ink);
-  }
-  .hdc-groups a.is-on {
-    padding: 9px 13px;
-    border: 2px solid var(--hdc-ink);
-  }
-
   /* ── Search band (.rband) ────────────────────────────────────────────── */
   .hdc-rband > .hdc-wrap {
     padding-top: 30px;
@@ -229,19 +202,19 @@
     color: #b5b5b5;
   }
 
-  /* Phones: the platforms as chips (.pchips). */
+  /* Phones: the platforms as chips (.pchips). They wrap onto a second line
+     rather than scroll sideways. */
   .hdc-pchips {
     display: none;
+    flex-wrap: wrap;
     gap: 6px;
-    overflow-x: auto;
     padding: 12px 0 10px;
-    scrollbar-width: none;
   }
   .hdc-pchips > * {
     flex: 0 0 auto;
     display: flex;
     align-items: center;
-    min-height: 36px;
+    min-height: 44px;
     padding: 5px 10px;
     border: 2px solid var(--hdc-ink);
     font-stretch: 87.5%;
@@ -276,6 +249,80 @@
   }
   .hdc-plp-main {
     min-width: 0;
+  }
+
+  /* ── Categories: first section of the filter column and the sheet ────── */
+  .hdc-cnav {
+    margin-bottom: 22px;
+  }
+  .hdc-cnav-head {
+    margin: 0 0 6px;
+    padding-bottom: 10px;
+    border-bottom: 4px solid var(--hdc-ink);
+    font-weight: 800;
+    font-stretch: 120%;
+    font-size: var(--fs-14);
+  }
+  .hdc-cnav ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .hdc-cnav ul ul {
+    margin-left: 10px;
+    padding-left: 10px;
+    border-left: 1px solid var(--hdc-g3);
+  }
+  .hdc-cnav li > a {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 34px;
+    padding: 5px 0;
+    font-stretch: 87.5%;
+    font-size: var(--fs-15);
+  }
+  .hdc-cnav li > a:hover .hdc-cnav-label {
+    text-decoration: underline;
+  }
+  .hdc-cnav-label {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .hdc-cnav-count {
+    margin-left: auto;
+    padding-left: 8px;
+    font-size: var(--fs-13);
+    color: var(--hdc-g5);
+  }
+  .hdc-cnav-up {
+    font-weight: 700;
+    font-size: var(--fs-13);
+    letter-spacing: 0.04em;
+    color: var(--hdc-red);
+  }
+  .hdc-cnav-self {
+    font-weight: 700;
+  }
+  /* The view on screen: a red bar on the rule, the name in bold. */
+  .hdc-cnav li > a.is-on {
+    font-weight: 800;
+  }
+  .hdc-cnav ul ul a.is-on::before {
+    content: "";
+    position: absolute;
+    left: -12px;
+    top: 6px;
+    bottom: 6px;
+    width: 3px;
+    background: var(--hdc-red);
+  }
+  .hdc-cnav-self.is-on .hdc-cnav-label {
+    box-shadow: inset 0 -3px 0 var(--hdc-red);
+  }
+  .hdc-cnav ul ul a.is-on .hdc-cnav-count {
+    color: var(--hdc-ink);
   }
 
   /* ── Filters (.filters / .fg) ────────────────────────────────────────── */
@@ -761,8 +808,20 @@
     padding: 0 14px;
     overscroll-behavior: contain;
   }
-  .hdc-sheet-body .hdc-fopt {
+  .hdc-sheet-body .hdc-fopt,
+  .hdc-sheet-body .hdc-cnav li > a {
     min-height: 44px;
+  }
+  .hdc-sheet-body .hdc-cnav {
+    margin-bottom: 8px;
+    padding-top: 14px;
+  }
+  .hdc-sheet-body .hdc-cnav-head {
+    border-bottom-width: 1px;
+    border-color: var(--hdc-g3);
+    font-stretch: 87.5%;
+    font-weight: 700;
+    letter-spacing: 0.05em;
   }
   .hdc-sheet-apply {
     flex: 0 0 auto;
@@ -876,18 +935,6 @@
     .hdc-rband > .hdc-wrap {
       padding-top: 18px;
       padding-bottom: 18px;
-    }
-    .hdc-groups {
-      padding-top: 10px;
-      gap: 8px;
-      scrollbar-width: none;
-    }
-    .hdc-groups a {
-      padding: 9px 12px;
-      font-size: var(--fs-12);
-    }
-    .hdc-groups a.is-on {
-      padding: 8px 11px;
     }
     .hdc-pfc-grid {
       display: none;

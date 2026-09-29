@@ -36,9 +36,13 @@ import { upGreek } from "@/lib/greek";
 
 /**
  * The body of an HDC listing — category page and search results alike
- * (plp.html; search.html section 2): the platform control, the filter column,
- * the toolbar with chips and sort, the grid of HDC cards, «ΠΕΡΙΣΣΟΤΕΡΑ
- * ΠΡΟΪΟΝΤΑ», and on phones and tablets the sticky bar with its filter sheet.
+ * (plp.html; search.html section 2): the platform control, the filter column
+ * (headed by «ΚΑΤΗΓΟΡΙΕΣ»), the toolbar with chips and sort, the grid of HDC
+ * cards, «ΠΕΡΙΣΣΟΤΕΡΑ ΠΡΟΪΟΝΤΑ», and on phones and tablets the sticky bar with
+ * its filter sheet, which carries the same categories at the top.
+ *
+ * Nothing here scrolls sideways: the categories are a vertical list in the
+ * column (and the sheet), and the phone platform chips wrap.
  *
  * A server component. Every filter is a link computed from the current URL,
  * so a filtered view is a shareable address and nothing here hydrates except
@@ -74,6 +78,7 @@ export async function HdcListing({
   data,
   compareStateFor,
   rememberedPlatform = false,
+  category = null,
 }: {
   variant: Variant;
   locale: Locale;
@@ -85,6 +90,8 @@ export async function HdcListing({
    * would bring it back: «ΟΛΕΣ» must say `platform=all` explicitly.
    */
   rememberedPlatform?: boolean;
+  /** Category pages: the page's own name and its parent, for «ΚΑΤΗΓΟΡΙΕΣ». */
+  category?: CategoryContext | null;
   compareStateFor: (
     slug: string,
     scopeKey?: string | null,
@@ -132,6 +139,14 @@ export async function HdcListing({
 
         <div className="hdc-plp-body">
           <aside className="hdc-filters" aria-label={t("filtra")}>
+            <CategoryNav
+              variant={variant}
+              basePath={basePath}
+              params={params}
+              facets={facets}
+              locale={locale}
+              category={category}
+            />
             <div className="hdc-filters-head">
               {upGreek(t("filtra"))}
               <Link
@@ -143,7 +158,6 @@ export async function HdcListing({
               </Link>
             </div>
             <FilterGroups
-              variant={variant}
               basePath={basePath}
               params={params}
               facets={facets}
@@ -240,8 +254,15 @@ export async function HdcListing({
           />
         }
       >
-        <FilterGroups
+        <CategoryNav
           variant={variant}
+          basePath={basePath}
+          params={params}
+          facets={facets}
+          locale={locale}
+          category={category}
+        />
+        <FilterGroups
           basePath={basePath}
           params={params}
           facets={facets}
@@ -357,8 +378,118 @@ function PlatformControl({
   );
 }
 
+type CategoryContext = {
+  name: string;
+  parent: { slug: string; name: string } | null;
+};
+
 /**
- * ΔΙΑΘΕΣΙΜΟΤΗΤΑ, ΠΕΡΙΕΧΟΜΕΝΟ, ΣΕΙΡΑ, ΤΙΜΗ — and on search ΚΑΤΗΓΟΡΙΑ.
+ * «ΚΑΤΗΓΟΡΙΕΣ» — the first section of the filter column and of the phone
+ * sheet, a vertical list (it used to be a strip above the grid that scrolled
+ * sideways on phones).
+ *
+ *  - Category page: a small tree. The parent category, if any, as the way
+ *    back up; the page's own category («all of it»); its groups indented
+ *    beneath, each with its count. The URLs are the strip's: `?sub=` picks
+ *    one group, without it the whole category shows.
+ *  - Search results: the root categories in the result set, ticked like the
+ *    other filters (several at once).
+ */
+function CategoryNav({
+  variant,
+  basePath,
+  params,
+  facets,
+  locale,
+  category,
+}: {
+  variant: Variant;
+  basePath: string;
+  params: RawParams;
+  facets: PlpFacets;
+  locale: Locale;
+  category: CategoryContext | null;
+}) {
+  const t = useTranslations("plp.Hdc");
+  const items = facets.subcategories;
+  const title = t("katigories");
+
+  if (variant === "search") {
+    if (items.length === 0) return null;
+    return (
+      <div className="hdc-cnav" role="group" aria-label={title}>
+        <p className="hdc-cnav-head">{upGreek(title)}</p>
+        {items.map((c) => (
+          <FilterOption
+            key={c.slug}
+            href={toggleMultiHref(basePath, params, "sub", c.slug)}
+            active={c.active}
+            label={c.label}
+            count={c.count}
+            locale={locale}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  if (!category || (items.length === 0 && !category.parent)) return null;
+  const anyActive = items.some((g) => g.active);
+
+  return (
+    <nav className="hdc-cnav" aria-label={title}>
+      <p className="hdc-cnav-head">{upGreek(title)}</p>
+      <ul>
+        {category.parent && (
+          <li>
+            <Link
+              href={`/katalogos/${category.parent.slug}`}
+              prefetch={false}
+              className="hdc-cnav-up"
+            >
+              <span aria-hidden>‹</span>
+              <span className="hdc-cnav-label">{category.parent.name}</span>
+            </Link>
+          </li>
+        )}
+        <li>
+          <Link
+            href={setParamHref(basePath, params, "sub", null)}
+            scroll={false}
+            prefetch={false}
+            className={`hdc-cnav-self${anyActive ? "" : " is-on"}`}
+            aria-current={anyActive ? undefined : "page"}
+          >
+            <span className="hdc-cnav-label">{category.name}</span>
+          </Link>
+          {items.length > 0 && (
+            <ul>
+              {items.map((g) => (
+                <li key={g.slug}>
+                  <Link
+                    href={setParamHref(basePath, params, "sub", g.slug)}
+                    scroll={false}
+                    prefetch={false}
+                    className={g.active ? "is-on" : undefined}
+                    aria-current={g.active ? "page" : undefined}
+                  >
+                    <span className="hdc-cnav-label">{g.label}</span>
+                    <span className="hdc-cnav-count">
+                      {g.count.toLocaleString(locale)}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </li>
+      </ul>
+    </nav>
+  );
+}
+
+/**
+ * ΔΙΑΘΕΣΙΜΟΤΗΤΑ, ΠΕΡΙΕΧΟΜΕΝΟ, ΣΕΙΡΑ, ΤΙΜΗ.
  *
  * Rendered twice: in the left column and inside the phone sheet. Counts are
  * the result set's, each group counted without its own ticks. A box with
@@ -368,14 +499,12 @@ function PlatformControl({
  * the catalogue does not store battery count/capacity or drive size as data.
  */
 function FilterGroups({
-  variant,
   basePath,
   params,
   facets,
   locale,
   dots,
 }: {
-  variant: Variant;
   basePath: string;
   params: RawParams;
   facets: PlpFacets;
@@ -403,7 +532,6 @@ function FilterGroups({
     facets.content.bare + facets.content.kit > 0 || content.size > 0;
   const hasSeries =
     facets.series.fuel + facets.series.onekey > 0 || series.size > 0;
-  const categories = variant === "search" ? facets.subcategories : [];
 
   return (
     <div className="hdc-fgroups">
@@ -474,21 +602,6 @@ function FilterGroups({
             count={facets.series.basic}
             locale={locale}
           />
-        </FilterGroup>
-      )}
-
-      {categories.length > 0 && (
-        <FilterGroup title={t("katigoria")}>
-          {categories.map((c) => (
-            <FilterOption
-              key={c.slug}
-              href={toggleMultiHref(basePath, params, "sub", c.slug)}
-              active={c.active}
-              label={c.label}
-              count={c.count}
-              locale={locale}
-            />
-          ))}
         </FilterGroup>
       )}
 

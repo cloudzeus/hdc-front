@@ -1,9 +1,7 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
-import { setParamHref, type RawParams } from "@/lib/catalog/filter-href";
 import { platformLabel, type Platform } from "@/lib/catalog/hdc-filters";
-import type { FacetItem } from "@/lib/catalog/plp-options";
 import { upGreek } from "@/lib/greek";
 
 /**
@@ -12,9 +10,11 @@ import { upGreek } from "@/lib/greek";
  *  - `HdcCategoryBand`: plp.html `.crumb` + `.band` — graphite with red
  *    diagonal stripes, the name, a line of text, three real counts and the
  *    category's Milwaukee photo. On phones it becomes the frame's plain title.
- *  - `HdcGroupStrip`: plp.html `.groups` — ΟΛΑ and the groups that have
- *    products; it scrolls sideways on phones.
  *  - `HdcSearchBand`: search.html `.rband`.
+ *
+ * The groups are not a strip under the band any more: they are the first
+ * section of the filter column (`CategoryNav` in HdcListing), so nothing on
+ * the listing scrolls sideways.
  */
 
 export function HdcCategoryBand({
@@ -70,47 +70,6 @@ export function HdcCategoryBand({
         </div>
       </section>
     </>
-  );
-}
-
-export function HdcGroupStrip({
-  basePath,
-  params,
-  groups,
-}: {
-  basePath: string;
-  params: RawParams;
-  groups: FacetItem[];
-}) {
-  const t = useTranslations("plp.Hdc");
-  if (groups.length === 0) return null;
-  const anyActive = groups.some((g) => g.active);
-  return (
-    <nav className="hdc-wrap" aria-label={t("omades_aria")}>
-      <div className="hdc-groups">
-        <Link
-          href={setParamHref(basePath, params, "sub", null)}
-          scroll={false}
-          prefetch={false}
-          className={anyActive ? undefined : "is-on"}
-          aria-current={anyActive ? undefined : "true"}
-        >
-          {upGreek(t("ola"))}
-        </Link>
-        {groups.map((g) => (
-          <Link
-            key={g.slug}
-            href={setParamHref(basePath, params, "sub", g.slug)}
-            scroll={false}
-            prefetch={false}
-            className={g.active ? "is-on" : undefined}
-            aria-current={g.active ? "true" : undefined}
-          >
-            {upGreek(g.label)}
-          </Link>
-        ))}
-      </div>
-    </nav>
   );
 }
 
