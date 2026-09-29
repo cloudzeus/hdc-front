@@ -2,6 +2,7 @@ import "server-only";
 import { cookies } from "next/headers";
 import { cache } from "react";
 import { getTranslations } from "next-intl/server";
+import { availabilityLabelKey, availabilityOf } from "@/lib/catalog/availability";
 import { prisma } from "@/lib/prisma";
 import type { Locale } from "@/i18n/routing";
 
@@ -153,6 +154,7 @@ function loadProducts(slugs: string[], locale: Locale) {
       vatRate: true,
       qty: true,
       inStock: true,
+      supplierAvailable: true,
       weight: true,
       width: true,
       length: true,
@@ -310,6 +312,7 @@ export async function getCompareView(
       vatRate: num(p.vatRate) ?? 24,
       qty: num(p.qty) ?? 0,
       inStock: p.inStock,
+      supplierAvailable: p.supplierAvailable,
     };
   });
 
@@ -325,7 +328,7 @@ export async function getCompareView(
     differingRows,
     scopeKey: scope?.key ?? null,
     scopeLabel: scope ? await scopeLabel(scope.key, locale) : null,
-    advice: buildAdvice(kept, columns, groups, t, locale),
+    advice: buildAdvice(kept, columns, groups, t),
     dropped: [...new Set(dropped)],
   };
 }
@@ -353,18 +356,11 @@ function buildGroups(
       "availability",
       t("diathesimotita"),
       columns.map((c) => ({
-        text: c.inStock ? t("amesa_diathesimo") : t("katopin_paraggelias"),
+        /* No stock numbers: «Σε απόθεμα», the last piece, the supplier's
+           3–5 days or 1–3 days — `lib/catalog/availability.ts`. */
+        text: t(availabilityLabelKey(availabilityOf(c), c.qty)),
       })),
       null,
-    ),
-    buildRow(
-      "qty",
-      t("apothema"),
-      columns.map((c) => ({
-        text: c.inStock ? t("temachia", { n: c.qty.toLocaleString(locale) }) : "—",
-        value: c.inStock ? c.qty : null,
-      })),
-      "higher",
     ),
     buildRow(
       "warranty",
@@ -470,7 +466,6 @@ function buildAdvice(
   columns: CompareColumn[],
   groups: CompareRowGroup[],
   t: Translator,
-  locale: Locale,
 ): CompareAdvice[] {
   if (columns.length < 2) return [];
 
@@ -494,9 +489,9 @@ function buildAdvice(
     const pick = inStock.reduce((a, b) => (b.c.qty > a.c.qty ? b : a));
     advice.push({
       key: "available",
-      badge: t("amesa_diathesimo"),
+      badge: t("se_apothema"),
       title: pick.c.name,
-      reason: t("logos_diathesimo", { n: pick.c.qty.toLocaleString(locale) }),
+      reason: t("logos_diathesimo"),
       columnIndex: pick.i,
     });
   }
@@ -568,6 +563,7 @@ export async function getCompareSuggestions(
       vatRate: true,
       qty: true,
       inStock: true,
+      supplierAvailable: true,
       images: { where: { isFeature: true }, take: 1, select: { url: true } },
       translations: { where: { locale }, select: { name: true } },
     },
@@ -591,6 +587,7 @@ export async function getCompareSuggestions(
       vatRate: num(row.vatRate) ?? 24,
       qty: num(row.qty) ?? 0,
       inStock: row.inStock,
+      supplierAvailable: row.supplierAvailable,
     };
   });
 }

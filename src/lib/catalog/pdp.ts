@@ -302,6 +302,7 @@ export const getRelatedProducts = cache(
         vatRate: num(row.vatRate) ?? 24,
         qty: num(row.qty) ?? 0,
         inStock: row.inStock,
+        supplierAvailable: row.supplierAvailable,
       };
     });
   },
@@ -325,6 +326,7 @@ function fetchScope(scope: Prisma.ProductWhereInput, excludeMtrl: number[], take
       vatRate: true,
       qty: true,
       inStock: true,
+      supplierAvailable: true,
       images: { where: { isFeature: true }, take: 1, select: { url: true } },
       translations: { select: { locale: true, name: true } },
     },

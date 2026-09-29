@@ -1,5 +1,10 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
+import {
+  AVAILABILITY_LABELS_EL,
+  availabilityLabelKey,
+  availabilityOf,
+} from "@/lib/catalog/availability";
 import { renderTemplate } from "@/lib/mail/templates";
 import { grossAmount, formatMoney } from "@/lib/format";
 import { siteOrigin } from "@/lib/seo/urls";
@@ -151,6 +156,8 @@ export async function searchCampaignProducts(
       priceNet: true,
       priceList: true,
       qty: true,
+      inStock: true,
+      supplierAvailable: true,
       mtrmark: true,
       images: { orderBy: [{ isFeature: "desc" }, { order: "asc" }], take: 1, select: { url: true } },
     },
@@ -187,10 +194,11 @@ export async function searchCampaignProducts(
       /*
        * Η ετικέτα λέει την αλήθεια τη στιγμή της ΑΠΟΣΤΟΛΗΣ και παγώνει εκεί.
        * Ένα email είναι στιγμιότυπο· δεν ενημερώνεται όταν το απόθεμα αλλάξει,
-       * και το «Άμεσα διαθέσιμο» σε κάτι που εξαντλήθηκε είναι η πιο συχνή
-       * αιτία παραπόνου μετά από newsletter προσφορών.
+       * και το «Σε απόθεμα» σε κάτι που εξαντλήθηκε είναι η πιο συχνή
+       * αιτία παραπόνου μετά από newsletter προσφορών. Ο ίδιος κανόνας με τη
+       * βιτρίνα: κανένας αριθμός, εκτός από το τελευταίο τεμάχιο.
        */
-      stockLabel: qty > 5 ? "Άμεσα διαθέσιμο" : qty > 0 ? `Τελευταία ${qty} τεμ.` : "Κατόπιν παραγγελίας",
+      stockLabel: AVAILABILITY_LABELS_EL[availabilityLabelKey(availabilityOf(p), qty)],
       url: `${siteOrigin()}/proion/${p.slug}`,
     };
   });

@@ -222,7 +222,7 @@ export type ProductCardData = {
    * None of ours, but the supplier's XML has it: «Διαθέσιμο · 3–5 εργάσιμες».
    * See `lib/catalog/availability.ts`. Absent reads as false.
    */
-  supplierAvailable?: boolean;
+  supplierAvailable: boolean;
   /** Κωδικός IMPA, όπου υπάρχει — για το σήμα της κάρτας. */
   impaCode?: string | null;
   /**

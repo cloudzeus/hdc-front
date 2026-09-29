@@ -34,7 +34,11 @@
       "tem": "pcs.",
       "katopin_paraggelias": "On order",
       "choris_eikona": "No image",
-      "me_fpa": "with VAT {vatRate}%"
+      "me_fpa": "with VAT {vatRate}%",
+      "se_apothema": "In stock",
+      "teleftaio": "Last one in stock",
+      "diathesimo_3_5": "Available · 3–5 working days",
+      "paradosi_1_3": "Delivery in 1–3 working days"
     },
     "ProductRail": {
       "proigoymena_proionta": "Previous products",
@@ -49,7 +53,11 @@
       "tem": "pcs.",
       "katopin_paraggelias": "On order",
       "pliri_stoicheia": "Full details",
-      "me_fpa": "with VAT {vatRate}%"
+      "me_fpa": "with VAT {vatRate}%",
+      "se_apothema": "In stock",
+      "teleftaio": "Last one in stock",
+      "diathesimo_3_5": "Available · 3–5 working days",
+      "paradosi_1_3": "Delivery in 1–3 working days"
     },
     "QuickViewTrigger": {
       "grigori_provoli": "Quick view"
@@ -100,7 +108,7 @@
       "ana_grammi": "Per line",
       "proionta_2": "Products",
       "taxinomisi": "Sort",
-      "amesa_diathesima": "In stock",
+      "amesa_diathesima": "Available",
       "se_prosfora": "On sale",
       "nea": "New"
     },
@@ -488,13 +496,17 @@
       "diastaseis": "Dimensions (W × H × D)",
       "oikonomikotero": "Best price",
       "logos_oikonomikotero": "{price} incl. VAT — the lowest price in the comparison.",
-      "logos_diathesimo": "{n} pcs. in stock — ships today.",
+      "logos_diathesimo": "In stock — ships today.",
       "megalyteri_eggyisi": "Longest warranty",
       "logos_eggyisi": "{value} manufacturer warranty.",
       "ischyrotero": "Strongest",
       "logos_ischyrotero": "{label}: {value} — the highest in the comparison.",
       "elafrytero": "Lightest",
-      "logos_elafrytero": "{value} — less fatigue during use."
+      "logos_elafrytero": "{value} — less fatigue during use.",
+      "se_apothema": "In stock",
+      "teleftaio": "Last one in stock",
+      "diathesimo_3_5": "Available · 3–5 working days",
+      "paradosi_1_3": "Delivery in 1–3 working days"
     }
   },
   "chrome": {
@@ -871,7 +883,8 @@
       "se_apothema": "In stock",
       "katopin": "On request",
       "kod": "code",
-      "apo": "{length} of {length2}"
+      "apo": "{length} of {length2}",
+      "paradosi_1_3": "Delivery in 1–3 working days"
     },
     "page": {
       "brands_me_energa_proionta": "BRANDS WITH ACTIVE PRODUCTS",
@@ -1432,7 +1445,11 @@
       "rotiste": "Ask the store",
       "rotiste_keimeno": "If you are asking for it, we can probably get it. Tell us what you are looking for.",
       "steilte_minyma": "Send us a message",
-      "agorazoun": "What our customers buy"
+      "agorazoun": "What our customers buy",
+      "se_apothema": "In stock",
+      "teleftaio": "Last one in stock",
+      "diathesimo_3_5": "Available · 3–5 working days",
+      "paradosi_1_3": "Delivery in 1–3 working days"
     }
   },
   "layout": {

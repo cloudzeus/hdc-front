@@ -4,6 +4,9 @@ import {
   availabilityOf,
   isLastPiece,
   lineAvailability,
+  merchantAvailability,
+  schemaOrgAvailability,
+  AVAILABILITY_LABELS_EL,
   orderAvailability,
 } from "@/lib/catalog/availability";
 
@@ -86,5 +89,25 @@ describe("lineAvailability — a cart line", () => {
   it("none of ours follows the product", () => {
     expect(lineAvailability(line(false, true, 0, 3))).toBe("supplier");
     expect(lineAvailability(line(false, false, 0, 3))).toBe("order");
+  });
+});
+
+describe("feeds and structured data", () => {
+  it("stock or supplier is in stock; neither stays as before", () => {
+    expect(schemaOrgAvailability("stock")).toBe("https://schema.org/InStock");
+    expect(schemaOrgAvailability("supplier")).toBe("https://schema.org/InStock");
+    expect(schemaOrgAvailability("order")).toBe("https://schema.org/OutOfStock");
+    expect(merchantAvailability("stock")).toBe("in_stock");
+    expect(merchantAvailability("supplier")).toBe("in_stock");
+    expect(merchantAvailability("order")).toBe("out_of_stock");
+  });
+});
+
+describe("AVAILABILITY_LABELS_EL — Greek-only surfaces (emails)", () => {
+  it("has the storefront's words", () => {
+    expect(AVAILABILITY_LABELS_EL[availabilityLabelKey("stock", 4)]).toBe("Σε απόθεμα");
+    expect(AVAILABILITY_LABELS_EL[availabilityLabelKey("stock", 1)]).toBe("Τελευταίο τεμάχιο");
+    expect(AVAILABILITY_LABELS_EL[availabilityLabelKey("supplier", 0)]).toBe("Διαθέσιμο · 3–5 εργάσιμες");
+    expect(AVAILABILITY_LABELS_EL[availabilityLabelKey("order", 0)]).toBe("Παράδοση 1–3 εργάσιμες");
   });
 });

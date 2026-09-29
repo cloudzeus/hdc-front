@@ -93,6 +93,8 @@ export type CompareColumn = {
   vatRate: number;
   qty: number;
   inStock: boolean;
+  /** None of ours, the supplier's XML has it — see `lib/catalog/availability.ts`. */
+  supplierAvailable: boolean;
 };
 
 export type CompareAdvice = {

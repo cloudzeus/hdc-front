@@ -103,7 +103,7 @@ export function BrandSearchGrid({ brands }: { brands: BrandListItem[] }) {
                   }`}
                 />
                 <span className="t-brand-count text-k-text-4">
-                  {brand.inStockCount > 0 ? upGreek(t("se_apothema")) : upGreek(t("katopin"))}
+                  {brand.inStockCount > 0 ? upGreek(t("se_apothema")) : upGreek(t("paradosi_1_3"))}
                 </span>
               </span>
 

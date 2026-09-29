@@ -104,7 +104,7 @@ export async function HdcProductCard({
         )}
         {/* Not for a size family: the quick view would add the lead's size unseen. */}
         {quickView && !family && (
-          <HdcQuickViewButton slug={product.slug} label={t("grigori_provoli")} />
+          <HdcQuickViewButton slug={product.sizes?.openSlug ?? product.slug} label={t("grigori_provoli")} />
         )}
         <Link href={href} className="hdc-card-media" prefetch={false} tabIndex={-1} aria-hidden>
           {product.image ? (

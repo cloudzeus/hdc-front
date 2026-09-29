@@ -35,7 +35,7 @@ import { displayName } from "@/lib/milwaukee/display";
 import { PRIMARY_PHONE } from "@/config/shop";
 import { HdcProductCard } from "@/components/product/HdcProductCard";
 import type { ProductCardData } from "@/lib/catalog/queries";
-import { showsExactQty } from "@/lib/stock-display";
+import { availabilityLabelKey, availabilityOf } from "@/lib/catalog/availability";
 import { Zone } from "@/components/zones/Zone";
 
 type PageProps = {
@@ -208,15 +208,10 @@ export default async function SearchPage({ params, searchParams }: PageProps) {
                 </p>
                 <p
                   className={
-                    exact.inStock ? "hdc-card-avail--ok" : "hdc-card-avail--wait"
+                    availabilityOf(exact) === "stock" ? "hdc-card-avail--ok" : "hdc-card-avail--wait"
                   }
                 >
-                  ●{" "}
-                  {exact.inStock
-                    ? showsExactQty(exact.qty)
-                      ? `${exact.qty} ${t("tem")}`
-                      : t("diathesimo")
-                    : t("katopin")}
+                  ● {t(availabilityLabelKey(availabilityOf(exact), exact.qty))}
                 </p>
               </div>
               <AddToCartButton

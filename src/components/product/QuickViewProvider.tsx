@@ -9,7 +9,7 @@ import { BuyNowButton } from "@/components/cart/BuyNowButton";
 import { Link } from "@/i18n/navigation";
 import { formatPercent, formatPrice, savingsOf } from "@/lib/format";
 import { upGreek } from "@/lib/greek";
-import { showsExactQty } from "@/lib/stock-display";
+import { availabilityLabelKey, availabilityOf } from "@/lib/catalog/availability";
 
 type QuickViewProduct = {
   id: string;
@@ -26,6 +26,7 @@ type QuickViewProduct = {
   vatRate: number;
   qty: number;
   inStock: boolean;
+  supplierAvailable: boolean;
   specs: Array<{ label: string; value: string }>;
 };
 
@@ -172,6 +173,7 @@ function QuickViewBody({
 }) {
   const locale = useLocale();
   const t = useTranslations("product.QuickViewProvider");
+  const availability = availabilityOf(product);
   const ctx = { vatRate: product.vatRate };
   const saving =
     product.priceListNet != null && product.priceNet != null
@@ -231,15 +233,11 @@ function QuickViewBody({
 
         <p
           className={`t-card-stock mt-3 flex items-center gap-2 ${
-            product.inStock ? "text-k-green" : "text-k-text-4"
+            availability === "stock" ? "text-k-green" : "text-k-text-4"
           }`}
         >
           <span className="rounded-pill block h-1.5 w-1.5 bg-current" />
-          {product.inStock
-            ? showsExactQty(product.qty)
-              ? `${upGreek(t("amesa_diathesimo"))} · ${product.qty} ${upGreek(t("tem"))}`
-              : upGreek(t("amesa_diathesimo"))
-            : upGreek(t("katopin_paraggelias"))}
+          {upGreek(t(availabilityLabelKey(availability, product.qty)))}
         </p>
 
         {product.specs.length > 0 && (

@@ -34,7 +34,11 @@
       "tem": "τεμ.",
       "katopin_paraggelias": "Κατόπιν παραγγελίας",
       "choris_eikona": "Χωρίς εικόνα",
-      "me_fpa": "με ΦΠΑ {vatRate}%"
+      "me_fpa": "με ΦΠΑ {vatRate}%",
+      "se_apothema": "Σε απόθεμα",
+      "teleftaio": "Τελευταίο τεμάχιο",
+      "diathesimo_3_5": "Διαθέσιμο · 3–5 εργάσιμες",
+      "paradosi_1_3": "Παράδοση 1–3 εργάσιμες"
     },
     "ProductRail": {
       "proigoymena_proionta": "Προηγούμενα προϊόντα",
@@ -49,7 +53,11 @@
       "tem": "τεμ.",
       "katopin_paraggelias": "Κατόπιν παραγγελίας",
       "pliri_stoicheia": "Πλήρη στοιχεία",
-      "me_fpa": "με ΦΠΑ {vatRate}%"
+      "me_fpa": "με ΦΠΑ {vatRate}%",
+      "se_apothema": "Σε απόθεμα",
+      "teleftaio": "Τελευταίο τεμάχιο",
+      "diathesimo_3_5": "Διαθέσιμο · 3–5 εργάσιμες",
+      "paradosi_1_3": "Παράδοση 1–3 εργάσιμες"
     },
     "QuickViewTrigger": {
       "grigori_provoli": "Γρήγορη προβολή"
@@ -100,7 +108,7 @@
       "ana_grammi": "Ανά γραμμή",
       "proionta_2": "Προϊόντα",
       "taxinomisi": "Ταξινόμηση",
-      "amesa_diathesima": "Άμεσα διαθέσιμα",
+      "amesa_diathesima": "Διαθέσιμα",
       "se_prosfora": "Σε προσφορά",
       "nea": "Νέα"
     },
@@ -488,13 +496,17 @@
       "diastaseis": "Διαστάσεις (Π × Μ × Υ)",
       "oikonomikotero": "Οικονομικότερο",
       "logos_oikonomikotero": "{price} με ΦΠΑ — η χαμηλότερη τιμή στη σύγκριση.",
-      "logos_diathesimo": "{n} τεμ. σε απόθεμα — φεύγει σήμερα.",
+      "logos_diathesimo": "Σε απόθεμα — φεύγει σήμερα.",
       "megalyteri_eggyisi": "Μεγαλύτερη εγγύηση",
       "logos_eggyisi": "{value} εγγύηση κατασκευαστή.",
       "ischyrotero": "Ισχυρότερο",
       "logos_ischyrotero": "{label}: {value} — το υψηλότερο της σύγκρισης.",
       "elafrytero": "Ελαφρύτερο",
-      "logos_elafrytero": "{value} — λιγότερη κούραση στη χρήση."
+      "logos_elafrytero": "{value} — λιγότερη κούραση στη χρήση.",
+      "se_apothema": "Σε απόθεμα",
+      "teleftaio": "Τελευταίο τεμάχιο",
+      "diathesimo_3_5": "Διαθέσιμο · 3–5 εργάσιμες",
+      "paradosi_1_3": "Παράδοση 1–3 εργάσιμες"
     }
   },
   "chrome": {
@@ -871,7 +883,8 @@
       "se_apothema": "Σε απόθεμα",
       "katopin": "Κατόπιν",
       "kod": "κωδ.",
-      "apo": "{length} από {length2}"
+      "apo": "{length} από {length2}",
+      "paradosi_1_3": "Παράδοση 1–3 εργάσιμες"
     },
     "page": {
       "brands_me_energa_proionta": "BRANDS ΜΕ ΕΝΕΡΓΑ ΠΡΟΪΟΝΤΑ",
@@ -1432,7 +1445,11 @@
       "rotiste": "Ρωτήστε το κατάστημα",
       "rotiste_keimeno": "Αν το ζητάτε, μάλλον μπορούμε να το φέρουμε. Πείτε μας τι ψάχνετε.",
       "steilte_minyma": "Στείλτε μας μήνυμα",
-      "agorazoun": "Αυτά αγοράζουν οι πελάτες μας"
+      "agorazoun": "Αυτά αγοράζουν οι πελάτες μας",
+      "se_apothema": "Σε απόθεμα",
+      "teleftaio": "Τελευταίο τεμάχιο",
+      "diathesimo_3_5": "Διαθέσιμο · 3–5 εργάσιμες",
+      "paradosi_1_3": "Παράδοση 1–3 εργάσιμες"
     }
   },
   "layout": {

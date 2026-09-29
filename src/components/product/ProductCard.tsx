@@ -8,7 +8,7 @@ import { QuickViewTrigger } from "@/components/product/QuickViewTrigger";
 import { Link } from "@/i18n/navigation";
 import type { ProductCardData } from "@/lib/catalog/queries";
 import { formatPrice, formatPercent, savingsOf } from "@/lib/format";
-import { showsExactQty } from "@/lib/stock-display";
+import { availabilityLabelKey, availabilityOf } from "@/lib/catalog/availability";
 import { upGreek } from "@/lib/greek";
 import { cn } from "@/lib/utils";
 import { FavouriteButton } from "@/components/product/FavouriteButton";
@@ -65,16 +65,13 @@ export async function ProductCard({
       ? savingsOf(product.priceListNet, product.priceNet, locale, ctx)
       : null;
 
-  /* Ακριβής αριθμός μόνο στα τρία και κάτω — βλ. `stock-display`. Το όριο ήταν
-     πέντε εδώ και πουθενά αλλού, οπότε η κάρτα έκρυβε ό,τι αποκάλυπτε η σελίδα. */
-  const stock = product.inStock
-    ? showsExactQty(product.qty)
-      ? {
-          label: `${upGreek(t("teleytaia"))} ${product.qty} ${upGreek(t("tem"))}`,
-          className: "text-k-amber",
-        }
-      : { label: upGreek(t("amesa_diathesimo")), className: "text-k-green" }
-    : { label: upGreek(t("katopin_paraggelias")), className: "text-k-text-4" };
+  /* Ο ίδιος κανόνας με την κάρτα HDC — βλ. `lib/catalog/availability.ts`:
+     κανένας αριθμός, εκτός από το τελευταίο τεμάχιο. */
+  const availability = availabilityOf(product);
+  const stock = {
+    label: upGreek(t(availabilityLabelKey(availability, product.qty))),
+    className: availability === "stock" ? "text-k-green" : "text-k-text-4",
+  };
 
   return (
     /*

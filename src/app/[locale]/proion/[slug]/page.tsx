@@ -20,7 +20,11 @@ import { getMiniCart } from "@/lib/cart/cart";
 import { FREE_SHIPPING_THRESHOLD_NET } from "@/lib/cart/options";
 import { getModelVariants, type ModelVariant } from "@/lib/catalog/hdc-pdp";
 import { isBattery } from "@/lib/hdc-nav";
-import { availabilityLabelKey, availabilityOf } from "@/lib/catalog/availability";
+import {
+  availabilityLabelKey,
+  availabilityOf,
+  schemaOrgAvailability,
+} from "@/lib/catalog/availability";
 import { getProductBySlug } from "@/lib/catalog/pdp";
 import { variantsOf } from "@/lib/catalog/variants";
 import {
@@ -355,8 +359,8 @@ export default async function ProductPage({ params }: PageProps) {
     category: product.categoryChain.at(-1)?.name ?? undefined,
     /*
      * The offer has to agree with the Merchant Center feed, which Google reads
-     * this page to keep current — out of stock is `OutOfStock`, not a promise
-     * of `BackOrder`.
+     * this page to keep current — ours or the supplier's is `InStock`
+     * (buyable), neither is `OutOfStock`, not a promise of `BackOrder`.
      */
     offers:
       product.priceNet != null
@@ -366,7 +370,7 @@ export default async function ProductPage({ params }: PageProps) {
             price: grossAmount(product.priceNet, ctx).toFixed(2),
             priceCurrency: "EUR",
             itemCondition: "https://schema.org/NewCondition",
-            availability: product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            availability: schemaOrgAvailability(availability),
             priceValidUntil: priceValidUntil(),
             shippingDetails: shippingDetails(locale),
             hasMerchantReturnPolicy: returnPolicy(),

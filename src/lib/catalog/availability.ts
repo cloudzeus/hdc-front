@@ -71,3 +71,24 @@ export function lineAvailability(p: {
   if (isOverStock(p) && p.supplierAvailable) return "supplier";
   return availabilityOf(p);
 }
+
+/** The same lines in Greek, for surfaces without next-intl (the newsletter). */
+export const AVAILABILITY_LABELS_EL: Record<AvailabilityLabelKey, string> = {
+  se_apothema: "Σε απόθεμα",
+  teleftaio: "Τελευταίο τεμάχιο",
+  diathesimo_3_5: "Διαθέσιμο · 3–5 εργάσιμες",
+  paradosi_1_3: "Παράδοση 1–3 εργάσιμες",
+};
+
+/**
+ * schema.org `Offer.availability`. The supplier's stock is buyable, so it is
+ * InStock like ours; neither stays OutOfStock, as it always was.
+ */
+export function schemaOrgAvailability(availability: Availability): string {
+  return availability === "order" ? "https://schema.org/OutOfStock" : "https://schema.org/InStock";
+}
+
+/** Google Merchant `g:availability`, on the same rule as `schemaOrgAvailability`. */
+export function merchantAvailability(availability: Availability): "in_stock" | "out_of_stock" {
+  return availability === "order" ? "out_of_stock" : "in_stock";
+}

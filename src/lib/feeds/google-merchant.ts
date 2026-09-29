@@ -1,4 +1,5 @@
 import "server-only";
+import { availabilityOf, merchantAvailability } from "@/lib/catalog/availability";
 import { prisma } from "@/lib/prisma";
 import { absoluteUrl } from "@/lib/seo/urls";
 import { isPlausibleWeightKg } from "@/lib/shipping/acs-tariff";
@@ -67,7 +68,7 @@ export async function buildMerchantFeed(locale: Locale = "el"): Promise<string> 
     },
     select: {
       mtrl: true, code: true, code1: true, code2: true, slug: true, name: true,
-      priceNet: true, vatRate: true, inStock: true, mtrmark: true, weight: true,
+      priceNet: true, vatRate: true, inStock: true, supplierAvailable: true, mtrmark: true, weight: true,
       mtrcategory: true, mtrgroup: true, cccSubgroup2: true,
       images: {
         orderBy: [{ isFeature: "desc" }, { order: "asc" }],
@@ -145,7 +146,8 @@ export async function buildMerchantFeed(locale: Locale = "el"): Promise<string> 
       `<g:link>${xml(absoluteUrl(`/proion/${product.slug}`, locale))}</g:link>`,
       `<g:image_link>${xml(main!.url)}</g:image_link>`,
       ...extra.map((image) => `<g:additional_image_link>${xml(image.url)}</g:additional_image_link>`),
-      `<g:availability>${product.inStock ? "in_stock" : "out_of_stock"}</g:availability>`,
+      // Ours or the supplier's is buyable: in_stock. Same rule as the page's JSON-LD.
+      `<g:availability>${merchantAvailability(availabilityOf(product))}</g:availability>`,
       `<g:price>${gross.toFixed(2)} EUR</g:price>`,
       `<g:condition>new</g:condition>`,
       `<g:mpn>${xml(product.code2 || product.code)}</g:mpn>`,

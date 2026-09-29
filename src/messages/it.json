@@ -34,7 +34,11 @@
       "tem": "pz.",
       "katopin_paraggelias": "Su ordinazione",
       "choris_eikona": "Nessuna immagine",
-      "me_fpa": "IVA inclusa {vatRate}%"
+      "me_fpa": "IVA inclusa {vatRate}%",
+      "se_apothema": "Disponibile",
+      "teleftaio": "Ultimo pezzo",
+      "diathesimo_3_5": "Disponibile · 3–5 giorni lavorativi",
+      "paradosi_1_3": "Consegna in 1–3 giorni lavorativi"
     },
     "ProductRail": {
       "proigoymena_proionta": "Prodotti precedenti",
@@ -49,7 +53,11 @@
       "tem": "pz.",
       "katopin_paraggelias": "Su ordinazione",
       "pliri_stoicheia": "Dettagli completi",
-      "me_fpa": "IVA inclusa {vatRate}%"
+      "me_fpa": "IVA inclusa {vatRate}%",
+      "se_apothema": "Disponibile",
+      "teleftaio": "Ultimo pezzo",
+      "diathesimo_3_5": "Disponibile · 3–5 giorni lavorativi",
+      "paradosi_1_3": "Consegna in 1–3 giorni lavorativi"
     },
     "QuickViewTrigger": {
       "grigori_provoli": "Vista rapida"
@@ -100,7 +108,7 @@
       "ana_grammi": "Per riga",
       "proionta_2": "Prodotti",
       "taxinomisi": "Ordina",
-      "amesa_diathesima": "Disponibili subito",
+      "amesa_diathesima": "Disponibili",
       "se_prosfora": "In offerta",
       "nea": "Nuovi"
     },
@@ -488,13 +496,17 @@
       "diastaseis": "Dimensioni (L × P × A)",
       "oikonomikotero": "Più economico",
       "logos_oikonomikotero": "{price} IVA inclusa — il prezzo più basso nel confronto.",
-      "logos_diathesimo": "{n} pz. in magazzino — parte oggi.",
+      "logos_diathesimo": "Disponibile — parte oggi.",
       "megalyteri_eggyisi": "Garanzia più lunga",
       "logos_eggyisi": "{value} garanzia del produttore.",
       "ischyrotero": "Più robusto",
       "logos_ischyrotero": "{label}: {value} — il più alto del confronto.",
       "elafrytero": "Più leggero",
-      "logos_elafrytero": "{value} — meno affaticamento nell'uso."
+      "logos_elafrytero": "{value} — meno affaticamento nell'uso.",
+      "se_apothema": "Disponibile",
+      "teleftaio": "Ultimo pezzo",
+      "diathesimo_3_5": "Disponibile · 3–5 giorni lavorativi",
+      "paradosi_1_3": "Consegna in 1–3 giorni lavorativi"
     }
   },
   "chrome": {
@@ -871,7 +883,8 @@
       "se_apothema": "Disponibile",
       "katopin": "Su richiesta",
       "kod": "cod.",
-      "apo": "{length} di {length2}"
+      "apo": "{length} di {length2}",
+      "paradosi_1_3": "Consegna in 1–3 giorni lavorativi"
     },
     "page": {
       "brands_me_energa_proionta": "MARCHI CON PRODOTTI ATTIVI",
@@ -1432,7 +1445,11 @@
       "rotiste": "Chiedete al negozio",
       "rotiste_keimeno": "Se lo cercate, probabilmente possiamo procurarlo. Diteci cosa vi serve.",
       "steilte_minyma": "Inviateci un messaggio",
-      "agorazoun": "Ciò che acquistano i nostri clienti"
+      "agorazoun": "Ciò che acquistano i nostri clienti",
+      "se_apothema": "Disponibile",
+      "teleftaio": "Ultimo pezzo",
+      "diathesimo_3_5": "Disponibile · 3–5 giorni lavorativi",
+      "paradosi_1_3": "Consegna in 1–3 giorni lavorativi"
     }
   },
   "layout": {

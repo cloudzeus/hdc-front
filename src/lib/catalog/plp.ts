@@ -871,7 +871,7 @@ const getFacets = sharedCatalogue(
         },
         {
           slug: "in-stock",
-          label: "Άμεσα διαθέσιμα",
+          label: "Διαθέσιμα",
           count: inStockCount,
           active: params.avail === "in-stock",
         },
