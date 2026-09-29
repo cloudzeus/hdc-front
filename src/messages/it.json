@@ -393,7 +393,8 @@
       "odigies": "INDICAZIONI STRADALI",
       "orario": "Lun–Ven {open}–{close} · Sab {satOpen}–{satClose}",
       "anoichta": "Aperto ora",
-      "kleista": "Chiuso ora"
+      "kleista": "Chiuso ora",
+      "xartis": "Mappa: il negozio in {address}"
     },
     "NewsletterBand": {
       "titlos": "I PRIMI A CONOSCERE I NUOVI UTENSILI",

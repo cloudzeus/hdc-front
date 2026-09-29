@@ -2,12 +2,13 @@ import { getTranslations } from "next-intl/server";
 import { SHOP } from "@/config/shop";
 import { hoursMessageArgs, isStoreOpen } from "@/lib/contact/hours";
 import { directionsUrl } from "@/lib/hdc-home";
+import { StoreMap } from "@/components/home/StoreMap";
 
 const FACTS = ["paralavi", "dokimi", "symvouli", "eggyisi"] as const;
 
 /**
  * "ΕΛΑΤΕ ΝΑ ΤΑ ΔΟΚΙΜΑΣΕΤΕ" (mockup `.store`): the physical store — four facts,
- * directions, and a picture with a black pin bar carrying the name, address,
+ * directions, and a map of the store with a black pin bar carrying the name, address,
  * hours and whether it is open right now (Athens time; the page is rendered
  * per request, so this is never a cached answer).
  *
@@ -43,6 +44,11 @@ export async function StoreBand() {
           </a>
         </div>
         <div className="hdc-store-map">
+          <StoreMap
+            lat={contact.geo.lat}
+            lng={contact.geo.lng}
+            label={t("xartis", { address: contact.address })}
+          />
           <address className="hdc-store-pin">
             <b>{SHOP.name.toUpperCase()}</b>
             <br />

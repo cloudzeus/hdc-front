@@ -393,7 +393,8 @@
       "odigies": "GET DIRECTIONS",
       "orario": "Mon–Fri {open}–{close} · Sat {satOpen}–{satClose}",
       "anoichta": "Open now",
-      "kleista": "Closed now"
+      "kleista": "Closed now",
+      "xartis": "Map: the store at {address}"
     },
     "NewsletterBand": {
       "titlos": "FIRST TO HEAR ABOUT NEW TOOLS",

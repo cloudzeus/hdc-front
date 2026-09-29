@@ -455,10 +455,34 @@
     align-items: flex-end;
     height: 380px;
     border: 1px solid var(--hdc-g3);
-    background: #ddd url("https://www.milwaukeetool.gr/wp-content/uploads/2023/04/diktuo-katastyimaton.jpg")
-      center / cover no-repeat;
+    overflow: hidden;
+    background: var(--hdc-g1);
+  }
+  /* The map fills the panel; the pin bar sits on top of it. */
+  .hdc-store-canvas {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .hdc-store-canvas.is-ready {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hdc-store-canvas {
+      transition: none;
+    }
+  }
+  .hdc-store-map .maplibregl-ctrl-group {
+    border-radius: 0;
+  }
+  .hdc-store-map .maplibregl-ctrl-group button {
+    width: 44px;
+    height: 44px;
   }
   .hdc-store-pin {
+    position: relative;
+    z-index: 1;
     width: 100%;
     padding: 14px 16px;
     background: var(--hdc-ink);

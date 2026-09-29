@@ -393,7 +393,8 @@
       "odigies": "ΟΔΗΓΙΕΣ ΠΡΟΣΒΑΣΗΣ",
       "orario": "Δευ–Παρ {open}–{close} · Σάβ {satOpen}–{satClose}",
       "anoichta": "Ανοιχτά τώρα",
-      "kleista": "Κλειστά τώρα"
+      "kleista": "Κλειστά τώρα",
+      "xartis": "Χάρτης: το κατάστημα στη διεύθυνση {address}"
     },
     "NewsletterBand": {
       "titlos": "ΠΡΩΤΟΙ ΣΤΑ ΝΕΑ ΕΡΓΑΛΕΙΑ",

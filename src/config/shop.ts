@@ -63,6 +63,11 @@ export const SHOP = {
     /** As printed. */
     address: "Κ. Μαυρομιχάλη 4, 185 45 Πειραιάς",
     /**
+     * Where the store is, for the map. MapTiler's geocoder for
+     * «Κ. Μαυρομιχάλη 4, 185 45 Πειραιάς» (an address-level match).
+     */
+    geo: { lat: 37.949726, lng: 23.642506 },
+    /**
      * Opening hours, Europe/Athens. `null` = closed all day. The day names
      * come from the message files; the open/closed logic is
      * src/lib/contact/hours.ts.
