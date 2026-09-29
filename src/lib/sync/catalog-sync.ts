@@ -1110,16 +1110,33 @@ export async function syncProducts(
     // Τα προϊόντα μόνο-XML δεν είναι στη διαδρομή του κέρσορα (αυτή είναι
     // MTRL του ERP)· έρχονται σε δική τους σελιδοποίηση. Μπαίνουν στο `seen`,
     // αλλιώς το σκούπισμα παρακάτω θα τα απέσυρε σε κάθε πλήρη διαδρομή.
-    for (let page = 1; page <= maxPages; page++) {
-      const response = await hdctool.products({ source: "xml", page, limit: HDCTOOL_MAX_LIMIT });
-      const shopProducts = response.products.filter(isShopProduct);
-      const chunk = await writeProductChunk(shopProducts, taken);
-      processed += chunk.processed;
-      created += chunk.created;
-      updated += chunk.updated;
-      errors.push(...chunk.errors);
-      for (const mtrl of chunk.written) seen.add(mtrl);
-      if (!response.pagination.hasNext || response.products.length === 0) break;
+    //
+    // Τα σφάλματά της μένουν χωριστά: μια αποτυχία του XML δεν πρέπει να
+    // σταματά το σκούπισμα του ERP, μόνο των αρνητικών.
+    const xmlErrors: string[] = [];
+    try {
+      for (let page = 1; page <= maxPages; page++) {
+        const response = await hdctool.products({ source: "xml", page, limit: HDCTOOL_MAX_LIMIT });
+        // An HDCtool build without `source` answers with the ERP catalogue.
+        // Nothing of it is written from here, and the XML-only rows are kept.
+        const erp = response.products.find((p) => p.mtrl > 0);
+        if (erp) {
+          throw new Error(`HDCtool ignored source xml (got mtrl ${erp.mtrl}); XML walk stopped`);
+        }
+        const shopProducts = response.products.filter(isShopProduct);
+        const chunk = await writeProductChunk(shopProducts, taken);
+        processed += chunk.processed;
+        created += chunk.created;
+        updated += chunk.updated;
+        xmlErrors.push(...chunk.errors);
+        for (const mtrl of chunk.written) seen.add(mtrl);
+        if (!response.pagination.hasNext || response.products.length === 0) break;
+      }
+    } catch (error) {
+      xmlErrors.push(`xml walk: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    if (xmlErrors.length > 0) {
+      console.error(`[catalog-sync] XML walk: ${xmlErrors.length} error(s)`, xmlErrors.slice(0, 5));
     }
 
     /*
@@ -1139,20 +1156,29 @@ export async function syncProducts(
 
     // Anything not seen in a full walk is no longer eshop-listed. Deactivate
     // rather than delete: orders, wishlists and reviews still reference it.
-    if (errors.length === 0 && seen.size > 0) {
+    // ERP rows need a clean ERP walk; XML-only rows (negative) need both.
+    const seenErp = [...seen].filter((m) => m > 0);
+    if (errors.length === 0 && seenErp.length > 0) {
       await prisma.product.updateMany({
-        where: { mtrl: { notIn: [...seen] }, isActive: true },
+        where: { mtrl: { gt: 0, notIn: seenErp }, isActive: true },
         data: { isActive: false, inStock: false, supplierAvailable: false },
       });
+      if (xmlErrors.length === 0) {
+        await prisma.product.updateMany({
+          where: { mtrl: { lt: 0, notIn: [...seen].filter((m) => m < 0) }, isActive: true },
+          data: { isActive: false, inStock: false, supplierAvailable: false },
+        });
+      }
     }
 
+    const allErrors = [...errors, ...xmlErrors];
     return {
       processed,
       created,
       updated,
-      failed: errors.length,
+      failed: allErrors.length,
       durationMs: Date.now() - startedAt,
-      errors,
+      errors: allErrors,
     };
   });
 }

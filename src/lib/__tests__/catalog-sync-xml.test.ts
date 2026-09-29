@@ -19,16 +19,17 @@ type Row = {
   updatedAt: Date;
 };
 
-const db = vi.hoisted(() => ({ rows: [] as Row[], seq: 0 }));
+const db = vi.hoisted(() => ({ rows: [] as Row[], seq: 0, failMtrl: new Set<number>() }));
 
 function matches(row: Row, where: Record<string, unknown> = {}): boolean {
   for (const [key, cond] of Object.entries(where)) {
     const value = (row as Record<string, unknown>)[key];
     if (cond && typeof cond === "object") {
-      const c = cond as { in?: unknown[]; notIn?: unknown[]; lt?: number };
+      const c = cond as { in?: unknown[]; notIn?: unknown[]; lt?: number; gt?: number };
       if (c.in && !c.in.includes(value)) return false;
       if (c.notIn && c.notIn.includes(value)) return false;
       if (c.lt !== undefined && !((value as number) < c.lt)) return false;
+      if (c.gt !== undefined && !((value as number) > c.gt)) return false;
     } else if (value !== cond) return false;
   }
   return true;
@@ -61,6 +62,7 @@ vi.mock("@/lib/prisma", () => {
       update: Partial<Row>;
       create: Partial<Row>;
     }) => {
+      if (db.failMtrl.has(where.mtrl)) throw new Error("write failed");
       const row = db.rows.find((r) => r.mtrl === where.mtrl);
       // The unique index on xmlCode, reported the way the pg adapter does.
       const code = row ? update.xmlCode : create.xmlCode;
@@ -170,6 +172,7 @@ function serve(catalogue: ReturnType<typeof product>[]) {
 beforeEach(() => {
   db.rows = [];
   db.seq = 0;
+  db.failMtrl = new Set();
   hdc.products.mockReset();
   hdc.catalogDelta.mockReset();
 });
@@ -266,6 +269,53 @@ describe("syncProducts (full walk)", () => {
     expect(db.rows.find((r) => r.mtrl === -3)?.isActive).toBe(true);
     expect(db.rows.find((r) => r.mtrl === 812)?.isActive).toBe(true);
     expect(db.rows.find((r) => r.mtrl === 700)?.isActive).toBe(false);
+  });
+});
+
+describe("syncProducts (full walk) when one side fails", () => {
+  const walk = (xml: () => Promise<unknown>) =>
+    hdc.products.mockImplementation(async (params: { source?: string }) =>
+      params.source === "xml" ? xml() : page([product(812)]),
+    );
+
+  beforeEach(() => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    db.rows.push(row("gone-erp", 700, null, "a"), row("gone-xml", -9, "P9", "b"));
+  });
+
+  it("sweeps ERP rows but leaves XML-only rows alone when the XML walk throws", async () => {
+    walk(async () => {
+      throw new Error("HDCtool down");
+    });
+    const result = await syncProducts({ maxPages: 3 });
+    expect(result.failed).toBeGreaterThan(0);
+    expect(db.rows.find((r) => r.id === "gone-erp")?.isActive).toBe(false);
+    expect(db.rows.find((r) => r.id === "gone-xml")?.isActive).toBe(true);
+    expect(db.rows.find((r) => r.mtrl === 812)?.isActive).toBe(true);
+  });
+
+  it("sweeps XML-only rows too when both walks are clean", async () => {
+    walk(async () => page([product(-3, { xmlCode: "P3", supplierAvailable: true })]));
+    await syncProducts({ maxPages: 3 });
+    expect(db.rows.find((r) => r.id === "gone-erp")?.isActive).toBe(false);
+    expect(db.rows.find((r) => r.id === "gone-xml")?.isActive).toBe(false);
+    expect(db.rows.find((r) => r.mtrl === -3)?.isActive).toBe(true);
+  });
+
+  it("sweeps nothing when the ERP walk had errors", async () => {
+    db.failMtrl.add(812);
+    walk(async () => page([]));
+    await syncProducts({ maxPages: 3 });
+    expect(db.rows.find((r) => r.id === "gone-erp")?.isActive).toBe(true);
+    expect(db.rows.find((r) => r.id === "gone-xml")?.isActive).toBe(true);
+  });
+
+  it("stops the XML walk, and keeps XML-only rows, when HDCtool answers with ERP products (older build)", async () => {
+    walk(async () => page([product(555)], true));
+    await syncProducts({ maxPages: 3 });
+    expect(db.rows.find((r) => r.mtrl === 555)).toBeUndefined();
+    expect(db.rows.find((r) => r.id === "gone-xml")?.isActive).toBe(true);
+    expect(hdc.products.mock.calls.filter(([p]) => (p as { source?: string }).source === "xml")).toHaveLength(1);
   });
 });
 
