@@ -1,4 +1,5 @@
 import { FREE_SHIPPING_THRESHOLD_NET } from "@/lib/cart/options";
+import { availabilityLabelKey, availabilityOf } from "@/lib/catalog/availability";
 
 /**
  * Οι ερωτήσεις που ρωτάει κάποιος πριν αγοράσει ένα εργαλείο — απαντημένες από
@@ -38,6 +39,8 @@ export type FaqProduct = {
   sku: string;
   brandName: string | null;
   inStock: boolean;
+  /** None of ours, the supplier's XML has it — see `lib/catalog/availability.ts`. */
+  supplierAvailable: boolean;
   qty: number;
   guaranteeMonths: number | null;
   priceGross: number | null;
@@ -87,14 +90,22 @@ export function productFaq(product: FaqProduct): FaqPair[] {
   const pairs: FaqPair[] = [];
   const label = askLabel(product);
 
-  /* Διαθεσιμότητα — η πρώτη ερώτηση κάθε αγοραστή, και η μόνη που αλλάζει ώρα με την ώρα. */
+  /* Διαθεσιμότητα — η πρώτη ερώτηση κάθε αγοραστή, και η μόνη που αλλάζει ώρα
+     με την ώρα. Ο ίδιος κανόνας με τη βιτρίνα: κανένας αριθμός αποθέματος,
+     εκτός από το τελευταίο τεμάχιο (lib/catalog/availability.ts). */
+  const which = `Το ${label} (κωδικός ${product.sku})`;
+  const key = availabilityLabelKey(availabilityOf(product), product.qty);
   pairs.push({
     q: `Είναι διαθέσιμο το ${label};`,
-    a: product.inStock
-      ? `Ναι. Το ${label} (κωδικός ${product.sku}) είναι άμεσα διαθέσιμο από το κατάστημά μας στον Πειραιά. ` +
-        `Παραγγελία πριν τις 15:00 εργάσιμη αποστέλλεται αυθημερόν, και μπορείτε να το παραλάβετε και από το κατάστημα.`
-      : `Αυτή τη στιγμή το ${label} (κωδικός ${product.sku}) δεν είναι σε απόθεμα. ` +
-        `Το προμηθευόμαστε κατόπιν παραγγελίας — επικοινωνήστε μαζί μας για χρόνο παράδοσης.`,
+    a:
+      key === "se_apothema" || key === "teleftaio"
+        ? `Ναι. ${which} είναι σε απόθεμα στο κατάστημά μας στον Πειραιά` +
+          `${key === "teleftaio" ? " — το τελευταίο τεμάχιο" : ""}. ` +
+          `Παραγγελία πριν τις 15:00 εργάσιμη αποστέλλεται αυθημερόν, και μπορείτε να το παραλάβετε και από το κατάστημα.`
+        : key === "diathesimo_3_5"
+          ? `Ναι. ${which} είναι διαθέσιμο από τον προμηθευτή μας και η παραγγελία αποστέλλεται σε 3–5 εργάσιμες.`
+          : `${which} δεν είναι αυτή τη στιγμή σε απόθεμα. ` +
+            `Μπορείτε να το παραγγείλετε κανονικά, με παράδοση σε 1–3 εργάσιμες.`,
   });
 
   /* Εγγύηση — μόνο όταν υπάρχει δηλωμένη. */
