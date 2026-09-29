@@ -1,10 +1,11 @@
 /**
  * Runs once when a server instance starts.
  *
- * The only thing here is the nightly catalogue reconcile — the backstop under
- * HDCtool's change feed, which is a push and therefore lossy. See
- * `src/lib/sync/reconcile-schedule.ts` for why it lives in the server rather
- * than in a platform scheduled task.
+ * It starts the shop's schedules: the nightly catalogue reconcile — the
+ * backstop under HDCtool's change feed, which is a push and therefore lossy —
+ * and the recurring jobs in `src/lib/cron/schedule.ts` (catalog changes every
+ * 5 minutes, the order sweep every 30). See `src/lib/sync/reconcile-schedule.ts`
+ * for why they live in the server rather than in a platform scheduled task.
  *
  * `register` blocks the server from accepting requests until it resolves, so
  * nothing in here may wait for work. It arms a timer and returns.
@@ -41,4 +42,7 @@ export async function register(): Promise<void> {
 
   const { startReconcileSchedule } = await import("@/lib/sync/reconcile-schedule");
   startReconcileSchedule();
+
+  const { startCronJobs } = await import("@/lib/cron/schedule");
+  startCronJobs();
 }

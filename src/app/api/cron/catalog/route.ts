@@ -2,13 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { pollCatalogDelta } from "@/lib/sync/delta-poll";
 
 /**
- * Every 5 minutes from Coolify's scheduler:
+ * Runs by itself every 5 minutes inside the server (src/lib/cron/schedule.ts).
+ * This route is for running it by hand:
  *
  *   curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://<shop>/api/cron/catalog
  *
- * A route, not an in-process timer, for the same reason as /api/cron/orders:
- * the shop can run as several replicas and a timer would run once per
- * replica. Without CRON_SECRET it refuses to run rather than run open.
+ * Without CRON_SECRET it refuses to run rather than run open.
  */
 
 export const dynamic = "force-dynamic";
