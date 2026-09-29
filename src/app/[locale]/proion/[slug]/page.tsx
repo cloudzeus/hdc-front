@@ -20,6 +20,7 @@ import { getMiniCart } from "@/lib/cart/cart";
 import { FREE_SHIPPING_THRESHOLD_NET } from "@/lib/cart/options";
 import { getModelVariants, type ModelVariant } from "@/lib/catalog/hdc-pdp";
 import { isBattery } from "@/lib/hdc-nav";
+import { availabilityOf, isLastPiece } from "@/lib/catalog/availability";
 import { getProductBySlug } from "@/lib/catalog/pdp";
 import { variantsOf } from "@/lib/catalog/variants";
 import {
@@ -58,7 +59,6 @@ import {
   shippingDetails,
 } from "@/lib/seo/product-schema";
 import { absoluteUrl, pageMeta } from "@/lib/seo/urls";
-import { showsExactQty } from "@/lib/stock-display";
 
 type PageProps = {
   params: Promise<{ locale: Locale; slug: string }>;
@@ -288,11 +288,17 @@ export default async function ProductPage({ params }: PageProps) {
       : null;
 
   // ── Availability ─────────────────────────────────────────────────────────
-  const stockLine = product.inStock
-    ? showsExactQty(product.qty)
-      ? t("se_apothema_tem", { qty: product.qty })
-      : t("se_apothema")
-    : t("paradosi");
+  // Our stock «Σε απόθεμα», no number («Τελευταίο τεμάχιο» at one); the
+  // supplier's «Διαθέσιμο · 3–5 εργάσιμες»; neither «Παράδοση 1–3 εργάσιμες».
+  const availability = availabilityOf(product);
+  const stockLine =
+    availability === "stock"
+      ? isLastPiece(product.qty)
+        ? t("teleftaio")
+        : t("se_apothema")
+      : availability === "supplier"
+        ? t("diathesimo_3_5")
+        : t("paradosi");
 
   // ── Sections ─────────────────────────────────────────────────────────────
   let paragraphs = descriptionParagraphs(product.longDescription);
@@ -538,7 +544,9 @@ export default async function ProductPage({ params }: PageProps) {
               titleOf={(s) =>
                 s.inStock
                   ? t("megethos_kodikos", { size: s.label, code: s.code })
-                  : t("megethos_paraggelia", { size: s.label, code: s.code })
+                  : s.supplierAvailable
+                    ? t("megethos_3_5", { size: s.label, code: s.code })
+                    : t("megethos_paraggelia", { size: s.label, code: s.code })
               }
             />
 
@@ -551,7 +559,7 @@ export default async function ProductPage({ params }: PageProps) {
                 <small>{t("me_fpa")}</small>
               </p>
               <div className="hdc-pdp-avail">
-                <div className={product.inStock ? "ok" : "wait"}>
+                <div className={availability === "stock" ? "ok" : "wait"}>
                   <span className="dot" aria-hidden />
                   <span>{stockLine}</span>
                 </div>

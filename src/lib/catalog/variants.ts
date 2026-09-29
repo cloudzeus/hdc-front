@@ -19,6 +19,8 @@ export type VariantOption = {
   /** Ο κωδικός κατασκευαστή αυτού του μεγέθους. */
   code: string;
   inStock: boolean;
+  /** Όχι δικό μας απόθεμα, αλλά το έχει ο προμηθευτής: «3–5 εργάσιμες». */
+  supplierAvailable: boolean;
   /** Το νόημα του «M»: άλλο στα ρούχα, άλλο στα γάντια. */
   family: string | null;
   current: boolean;
@@ -38,6 +40,7 @@ export const variantsOf = cache(
         code2: true,
         qty: true,
         inStock: true,
+        supplierAvailable: true,
         sizes: { select: { label: true, family: true }, orderBy: { order: "asc" } },
       },
     });
@@ -53,6 +56,7 @@ export const variantsOf = cache(
         label,
         code: row.code2 || row.code,
         inStock: row.inStock && Number(row.qty ?? 0) > 0,
+        supplierAvailable: !row.inStock && row.supplierAvailable,
         family: row.sizes[0]?.family ?? null,
         current: row.id === product.id,
       });

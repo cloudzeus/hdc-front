@@ -40,6 +40,8 @@ export type ProductDetail = {
   vatRate: number;
   qty: number;
   inStock: boolean;
+  /** None of ours, the supplier's XML has it. See `lib/catalog/availability.ts`. */
+  supplierAvailable: boolean;
   weight: number | null;
   width: number | null;
   height: number | null;
@@ -207,6 +209,7 @@ export const getProductBySlug = cache(
       vatRate: num(product.vatRate) ?? 24,
       qty: num(product.qty) ?? 0,
       inStock: product.inStock,
+      supplierAvailable: product.supplierAvailable,
       weight: num(product.weight),
       width: num(product.width),
       height: num(product.height),
