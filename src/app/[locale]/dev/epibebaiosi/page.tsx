@@ -25,6 +25,7 @@ const FIXTURE: ConfirmationOrder = {
   paymentStatus: "PAID",
   paymentMethod: "card",
   shippingMethod: "courier",
+  supplierOrder: false,
   createdAt: new Date("2026-09-28T07:42:00Z"),
   reservedUntil: null,
   email: "email@example.gr",

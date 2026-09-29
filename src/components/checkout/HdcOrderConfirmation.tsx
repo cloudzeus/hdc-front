@@ -27,6 +27,8 @@ export type ConfirmationOrder = {
   paymentStatus: string;
   paymentMethod: string;
   shippingMethod: string;
+  /** A line came from the supplier: the whole order ships in 3–5 working days. */
+  supplierOrder: boolean;
   createdAt: Date;
   reservedUntil: Date | null;
   email: string;
@@ -173,6 +175,7 @@ export async function HdcOrderConfirmation({
                 ? t("text_pickup", { email: order.email })
                 : t("text_courier", { email: order.email })}
           </p>
+          {order.supplierOrder && <p className="hdc-notice">{t("olokliri_3_5")}</p>}
           <span className="num">{order.orderNumber}</span>
         </div>
 

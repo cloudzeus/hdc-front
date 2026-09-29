@@ -1402,7 +1402,8 @@
       "epivarynsi": "Payment fee",
       "synolo": "TOTAL",
       "periechei_fpa_24": "Includes 24% VAT {amount}",
-      "periechei_fpa": "Includes VAT {amount}"
+      "periechei_fpa": "Includes VAT {amount}",
+      "olokliri_3_5": "Your order ships in 3–5 working days: one or more items come from our supplier."
     }
   },
   "anazitisi": {

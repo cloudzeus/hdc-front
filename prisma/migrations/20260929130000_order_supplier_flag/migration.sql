@@ -1,0 +1,1 @@
+ALTER TABLE "orders" ADD COLUMN "supplierOrder" BOOLEAN NOT NULL DEFAULT false;

@@ -127,8 +127,10 @@ export default async function ConfirmationPage({ params, searchParams }: PagePro
           deliveryCountry={order.shipCountry}
           estimatedDeliveryDate={estimatedDeliveryDate(
             order.createdAt,
-            quote?.etaDays,
-            order.shippingMethod,
+            // A supplier order leaves in 3–5 working days, whatever the zone —
+            // and is not ready in two hours at the shop either.
+            order.supplierOrder ? "3-5" : quote?.etaDays,
+            order.supplierOrder ? "courier" : order.shippingMethod,
           )}
           gtins={gtins}
         />
@@ -143,6 +145,7 @@ export default async function ConfirmationPage({ params, searchParams }: PagePro
             paymentStatus: order.paymentStatus,
             paymentMethod: order.paymentMethod,
             shippingMethod: order.shippingMethod,
+            supplierOrder: order.supplierOrder,
             createdAt: order.createdAt,
             reservedUntil: order.reservedUntil,
             email: order.email,

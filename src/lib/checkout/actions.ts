@@ -10,6 +10,7 @@ import { prisma } from "@/lib/prisma";
 import { STOCK_HOLD_HOURS, holdExpiry } from "@/lib/orders/hold";
 import { computeTotals, getCart, getCartToken } from "@/lib/cart/cart";
 import { PAYMENT_METHODS, SHIPPING_METHODS } from "@/lib/cart/options";
+import { orderAvailability } from "@/lib/catalog/availability";
 import { quoteLivePostage } from "@/lib/shipping/acs-live";
 import { createPaymentOrder, isVivaConfigured } from "@/lib/payment/viva";
 import { routing, type Locale } from "@/i18n/routing";
@@ -207,6 +208,9 @@ export async function placeOrder(
       shippingMethod: shipping.id,
       paymentMethod: payment.id,
       notes: input.notes || null,
+      /* One line from the supplier sends the whole order in 3–5 working days;
+         frozen here so the confirmation and the email keep saying so. */
+      supplierOrder: orderAvailability(cart.lines.map((l) => l.availability)) === "supplier",
 
       subtotalNet: totals.subtotalNet,
       subtotalGross: totals.subtotalGross,

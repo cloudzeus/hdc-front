@@ -186,9 +186,13 @@ export async function buildOrderContext(orderNumber: string) {
 
   const quote = order.shippingQuote as { etaDays?: unknown } | null;
   const etaDays = Number(quote?.etaDays);
-  const eta = Number.isFinite(etaDays) && etaDays > 0
-    ? `Παράδοση σε ${etaDays} ${etaDays === 1 ? "εργάσιμη" : "εργάσιμες"}`
-    : "";
+  /* A line from the supplier sends the whole order in 3–5 working days,
+     whatever the zone says (lib/catalog/availability.ts orderAvailability). */
+  const eta = order.supplierOrder
+    ? "Παράδοση σε 3–5 εργάσιμες"
+    : Number.isFinite(etaDays) && etaDays > 0
+      ? `Παράδοση σε ${etaDays} ${etaDays === 1 ? "εργάσιμη" : "εργάσιμες"}`
+      : "";
 
   const orderData = {
     number: order.orderNumber,
