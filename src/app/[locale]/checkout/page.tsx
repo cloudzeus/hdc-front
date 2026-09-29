@@ -123,7 +123,7 @@ export default async function CheckoutPage({
 
   const shippingOptions: ShippingOption[] = [
     { id: "courier", title: "ACS COURIER", label: "ACS Courier", meta: t(supplierOrder ? "ship_courier_meta_3_5" : "ship_courier_meta"), ...tilePrice(courier) },
-    { id: "express", title: "ACS EXPRESS", label: "ACS Express", meta: t("ship_express_meta"), ...tilePrice(express) },
+    { id: "express", title: "ACS EXPRESS", label: "ACS Express", meta: t(supplierOrder ? "ship_express_meta_3_5" : "ship_express_meta"), ...tilePrice(express) },
     {
       id: "pickup",
       title: t("ship_pickup_title"),
