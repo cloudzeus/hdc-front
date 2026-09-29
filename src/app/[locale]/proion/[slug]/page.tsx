@@ -298,8 +298,10 @@ export default async function ProductPage({ params }: PageProps) {
   const stockLine = t(availabilityLabelKey(availability, product.qty));
 
   // ── Sections ─────────────────────────────────────────────────────────────
-  let paragraphs = descriptionParagraphs(product.longDescription);
-  if (paragraphs.length === 0 && locale !== "el") paragraphs = descriptionParagraphs(product.longDescriptionEl);
+  // An XML-only product (negative mtrl) carries one feature per line.
+  const prose = { lineByLine: product.mtrl < 0 };
+  let paragraphs = descriptionParagraphs(product.longDescription, prose);
+  if (paragraphs.length === 0 && locale !== "el") paragraphs = descriptionParagraphs(product.longDescriptionEl, prose);
   const photo = product.images[1]?.url ?? null;
   const specs = specTable(localTechRows.length > 0 ? localTechRows : techRows, locale);
   const half = Math.ceil(specs.length / 2);

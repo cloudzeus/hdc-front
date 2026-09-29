@@ -140,6 +140,59 @@ describe("descriptionParagraphs", () => {
   });
 });
 
+// An XML-only product's long description, as HDCtool composes it
+// (`composeLongDescription`): one feature per line, a blank line, the specs.
+const XML_EL = `Ισχυρός κινητήρας χωρίς ψήκτρες POWERSTATE™.
+Ηλεκτρονικό σύστημα REDLINK PLUS™ <b>με προστασία</b> <script>alert(1)</script>
+Φωτισμός LED
+
+Τεχνικά χαρακτηριστικά:
+Τάση (V): 18
+Μέγιστη ροπή (Nm): 158
+Σχέση μετάδοσης 1∶2: Ναι`;
+const XML_EN = `Brushless POWERSTATE™ motor.
+LED light
+
+Technical specifications:
+Voltage (V): 18
+Max torque (Nm): 158`;
+const XML_IT = `Motore brushless POWERSTATE™.
+Luce LED
+
+Specifiche tecniche:
+Tensione (V): 18`;
+
+describe("an XML-only product's description", () => {
+  it("renders each feature line as its own paragraph, stopping at the spec block", () => {
+    expect(descriptionParagraphs(XML_EL, { lineByLine: true })).toEqual([
+      "Ισχυρός κινητήρας χωρίς ψήκτρες POWERSTATE™.",
+      "Ηλεκτρονικό σύστημα REDLINK PLUS™ <b>με προστασία</b> <script>alert(1)</script>",
+      "Φωτισμός LED",
+    ]);
+    expect(descriptionParagraphs(XML_EN, { lineByLine: true })).toEqual(["Brushless POWERSTATE™ motor.", "LED light"]);
+    expect(descriptionParagraphs(XML_IT, { lineByLine: true })).toEqual(["Motore brushless POWERSTATE™.", "Luce LED"]);
+  });
+
+  it("keeps markup as plain text (React escapes it; nothing is parsed as HTML)", () => {
+    const lines = descriptionParagraphs(XML_EL, { lineByLine: true });
+    expect(lines[1]).toContain("<script>alert(1)</script>");
+  });
+
+  it("gives the spec table through parseTechBlock, Greek and English", () => {
+    expect(parseTechBlock(XML_EL)).toEqual([
+      { label: "Τάση (V)", value: "18" },
+      { label: "Μέγιστη ροπή (Nm)", value: "158" },
+      { label: "Σχέση μετάδοσης 1∶2", value: "Ναι" },
+    ]);
+    expect(specTable(parseTechBlock(XML_EN), "en")).toContainEqual({ label: "Max torque", value: "158 Nm" });
+  });
+
+  it("leaves the ERP rule alone: without lineByLine, wrapped lines join into one paragraph", () => {
+    expect(descriptionParagraphs("One\ntwo.\n\nThree.")).toEqual(["One two.", "Three."]);
+    expect(descriptionParagraphs("One\ntwo.\n\nThree.", { lineByLine: false })).toEqual(["One two.", "Three."]);
+  });
+});
+
 describe("specTable", () => {
   it("drops the code row and moves the unit into the value", () => {
     const table = specTable(kitRows, "el");

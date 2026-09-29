@@ -77,16 +77,20 @@ const TECH_HEADING =
 /**
  * The prose of a long description: everything before the spec block, one
  * entry per paragraph (paragraphs are separated by a blank line).
+ *
+ * `lineByLine`: every line is its own entry. For an XML-only product, whose
+ * description HDCtool composes as one feature per line; the ERP text wraps
+ * lines inside a paragraph, so there a single newline is only a space.
  */
-export function descriptionParagraphs(text: string | null | undefined): string[] {
+export function descriptionParagraphs(
+  text: string | null | undefined,
+  { lineByLine = false }: { lineByLine?: boolean } = {},
+): string[] {
   if (!text) return [];
   const at = text.search(TECH_HEADING);
-  const prose = at === -1 ? text : text.slice(0, at);
-  return prose
-    .replace(/\r/g, "")
-    .split(/\n\s*\n/)
-    .map((p) => p.replace(/\s*\n\s*/g, " ").trim())
-    .filter(Boolean);
+  const prose = (at === -1 ? text : text.slice(0, at)).replace(/\r/g, "");
+  const parts = lineByLine ? prose.split("\n") : prose.split(/\n\s*\n/);
+  return parts.map((p) => p.replace(/\s*\n\s*/g, " ").trim()).filter(Boolean);
 }
 
 // ── Key numbers ────────────────────────────────────────────────────────────
