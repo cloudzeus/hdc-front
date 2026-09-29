@@ -127,8 +127,13 @@ model LoginAttempt {
 model Product {
   id String @id @default(cuid())
 
-  /// HDCtool MTRL.MTRL — the join key across both systems.
+  /// HDCtool MTRL.MTRL — the join key. Negative for an XML-only product (see `xmlCode`).
   mtrl  Int    @unique
+  /// Κωδικός του Παπαθεοδοσίου για προϊόν που ήρθε από το XML. Όσο δεν υπάρχει
+  /// στο SoftOne, το `mtrl` είναι αρνητικό (`-feedSeq` του HDCtool)· όταν φτάσει
+  /// με πραγματικό MTRL και το ίδιο `xmlCode`, ο συγχρονισμός γράφει το MTRL
+  /// στην ίδια γραμμή (slug, κριτικές και αγαπημένα μένουν).
+  xmlCode String? @unique @db.VarChar(64)
   code  String @db.VarChar(64)
   code1 String @db.VarChar(64) // EAN
   code2 String @db.VarChar(64) // manufacturer / MPN
@@ -854,6 +859,8 @@ model OrderLine {
   /// can never orphan or alter a historical order.
   productId String? @db.VarChar(64)
   mtrl      Int?
+  /// Προϊόν μόνο-XML: ο κωδικός του Παπαθεοδοσίου. Το `mtrl` μένει κενό.
+  xmlCode   String? @db.VarChar(64)
 
   // Snapshot — never re-read from the catalogue.
   sku      String  @db.VarChar(64)
