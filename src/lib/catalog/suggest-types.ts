@@ -23,6 +23,8 @@ export type SuggestProduct = {
   priceNet: number | null;
   vatRate: number;
   inStock: boolean;
+  /** None of ours, the supplier's XML has it: «3–5 εργάσιμες». */
+  supplierAvailable: boolean;
   qty: number;
 };
 
@@ -37,6 +39,8 @@ export type SuggestTile = {
   priceNet: number | null;
   vatRate: number;
   inStock: boolean;
+  /** None of ours, the supplier's XML has it: «3–5 εργάσιμες». */
+  supplierAvailable: boolean;
 };
 
 /** Another variant of the exact hit's model («ΤΟ ΙΔΙΟ ΜΟΝΤΕΛΟ»). */

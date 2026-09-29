@@ -166,6 +166,8 @@ export type ModelVariantRow = {
   priceNet: number | null;
   vatRate: number;
   inStock: boolean;
+  /** None of ours, the supplier's XML has it. Absent reads as false. */
+  supplierAvailable?: boolean;
   qty: number;
   insertedAt: number;
 };
@@ -194,6 +196,8 @@ export type ModelGroup = {
   /** Where the row goes: the bare tool, else the first variant. */
   slug: string;
   inStock: boolean;
+  /** None of its variants in our stock, but one at the supplier: «3–5 εργάσιμες». */
+  supplierAvailable: boolean;
   variants: ModelVariant[];
 };
 
@@ -273,6 +277,7 @@ export function groupByModel(rows: ModelVariantRow[], tokens: string[][]): Model
       image: (kit ?? any) ? (imageOf.get((kit ?? any)!.id) ?? null) : null,
       slug: variants[0].slug,
       inStock: list.some((r) => r.inStock),
+      supplierAvailable: !list.some((r) => r.inStock) && list.some((r) => !!r.supplierAvailable),
       variants,
     };
     return {

@@ -586,7 +586,11 @@ function Panel({
               {data.exact.variant && ` · ${contentLabel(t, data.exact.variant, true)}`}
             </small>
             <span className="hdc-sg-price">{price(data.exact.priceNet, data.exact.vatRate)}</span>
-            <Availability t={t} inStock={data.exact.inStock} />
+            <Availability
+              t={t}
+              inStock={data.exact.inStock}
+              supplierAvailable={data.exact.supplierAvailable}
+            />
           </span>
         </Link>
         <QtyAdd t={t} productId={data.exact.id} disabled={data.exact.priceNet == null} />
@@ -799,10 +803,19 @@ function contentLabel(t: T, v: SuggestVariant, long = false): string {
   return v.suffix ? t("kit_suffix", { suffix: v.suffix }) : t("kit");
 }
 
-function Availability({ t, inStock }: { t: T; inStock: boolean }) {
+/** Ours «Σε απόθεμα»; the supplier's «3–5 εργάσιμες»; neither «1–3 εργάσιμες». */
+function Availability({
+  t,
+  inStock,
+  supplierAvailable,
+}: {
+  t: T;
+  inStock: boolean;
+  supplierAvailable: boolean;
+}) {
   return (
     <span className={`hdc-sg-avail ${inStock ? "is-ok" : "is-wait"}`}>
-      ● {inStock ? t("se_apothema") : t("ergasimes")}
+      ● {inStock ? t("se_apothema") : supplierAvailable ? t("ergasimes_3_5") : t("ergasimes")}
     </span>
   );
 }
@@ -875,7 +888,7 @@ function ModelRow({
           ))}
         </span>
       </span>
-      <Availability t={t} inStock={model.inStock} />
+      <Availability t={t} inStock={model.inStock} supplierAvailable={model.supplierAvailable} />
     </div>
   );
 }

@@ -79,6 +79,7 @@ const CARD = {
   vatRate: true,
   qty: true,
   inStock: true,
+  supplierAvailable: true,
   images: { where: { isFeature: true }, take: 1, select: { url: true } },
   translations: { select: { locale: true, name: true } },
   variantGroup: true,
@@ -139,6 +140,7 @@ type CardRow = {
   vatRate: unknown;
   qty: unknown;
   inStock: boolean;
+  supplierAvailable: boolean;
   images: { url: string }[];
   translations: { locale: string; name: string }[];
   variantGroup?: string | null;
@@ -164,6 +166,7 @@ function toProduct(row: CardRow, locale: Locale): SuggestProduct {
     priceNet: num(row.priceNet),
     vatRate: num(row.vatRate) ?? 24,
     inStock: row.inStock,
+    supplierAvailable: row.supplierAvailable,
     qty: num(row.qty) ?? 0,
   };
 }
@@ -183,6 +186,7 @@ function toTile(row: CardRow, locale: Locale): SuggestTile {
     priceNet: num(row.priceNet),
     vatRate: num(row.vatRate) ?? 24,
     inStock: row.inStock,
+    supplierAvailable: row.supplierAvailable,
   };
 }
 
@@ -207,6 +211,7 @@ function toVariantRow(
     priceNet: num(row.priceNet),
     vatRate: num(row.vatRate) ?? 24,
     inStock: row.inStock,
+    supplierAvailable: row.supplierAvailable,
     qty: num(row.qty) ?? 0,
     insertedAt: row.erpInsertedAt?.getTime() ?? 0,
   };
@@ -256,6 +261,7 @@ export async function getSuggestions(
           modelContent: true,
           platform: true,
           inStock: true,
+          supplierAvailable: true,
           erpInsertedAt: true,
         },
         take: 600,
@@ -317,6 +323,7 @@ export async function getSuggestions(
       priceNet: null,
       vatRate: 24,
       inStock: row.inStock,
+      supplierAvailable: row.supplierAvailable,
       qty: 0,
       insertedAt: row.erpInsertedAt?.getTime() ?? 0,
     })),
@@ -493,6 +500,7 @@ export async function getPopularTiles(locale: Locale, limit = 5): Promise<Sugges
     priceNet: p.priceNet,
     vatRate: p.vatRate,
     inStock: p.inStock,
+    supplierAvailable: p.supplierAvailable ?? false,
   }));
 }
 
