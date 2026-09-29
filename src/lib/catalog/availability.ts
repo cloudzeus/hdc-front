@@ -51,3 +51,23 @@ export function availabilityLabelKey(
   if (availability === "supplier") return "diathesimo_3_5";
   return "paradosi_1_3";
 }
+
+/** A line that asks for more than our warehouse holds (and it holds some). */
+export function isOverStock(p: { inStock: boolean; qty: number; quantity: number }): boolean {
+  return p.inStock && p.qty > 0 && p.quantity > p.qty;
+}
+
+/**
+ * One cart line. Like the product, except that a line asking for more than our
+ * stock, of a product the supplier has, sends the rest from the supplier — so
+ * the line, and with it the whole order, is «3–5 εργάσιμες».
+ */
+export function lineAvailability(p: {
+  inStock: boolean;
+  supplierAvailable?: boolean | null;
+  qty: number;
+  quantity: number;
+}): Availability {
+  if (isOverStock(p) && p.supplierAvailable) return "supplier";
+  return availabilityOf(p);
+}

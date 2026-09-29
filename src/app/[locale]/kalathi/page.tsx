@@ -112,9 +112,12 @@ export default async function CartPage({
       tag: platformTag(line.name),
       image: line.image,
       quantity: line.quantity,
-      inStock: line.inStock,
+      inStock: line.availability === "stock",
       availability: t(availabilityLabelKey(line.availability, line.availableQty)),
-      overStock: line.overStock ? t("overstock", { qty: line.availableQty }) : null,
+      /* No number: the shop shows none but the last piece. */
+      overStock: line.overStock
+        ? t(line.availability === "supplier" ? "overstock_3_5" : "overstock")
+        : null,
       unitPrice: formatPrice(line.unitNetFinal, locale, { vatRate: line.vatRate }),
       unitWas:
         line.discountPercent > 0

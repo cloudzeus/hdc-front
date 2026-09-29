@@ -3,6 +3,7 @@ import {
   availabilityLabelKey,
   availabilityOf,
   isLastPiece,
+  lineAvailability,
   orderAvailability,
 } from "@/lib/catalog/availability";
 
@@ -63,5 +64,27 @@ describe("availabilityLabelKey", () => {
   });
   it("neither", () => {
     expect(availabilityLabelKey("order", 1)).toBe("paradosi_1_3");
+  });
+});
+
+describe("lineAvailability — a cart line", () => {
+  const line = (inStock: boolean, supplierAvailable: boolean, qty: number, quantity: number) => ({
+    inStock,
+    supplierAvailable,
+    qty,
+    quantity,
+  });
+  it("within our stock is stock", () => {
+    expect(lineAvailability(line(true, true, 3, 3))).toBe("stock");
+  });
+  it("more than our stock, the supplier has the rest: supplier", () => {
+    expect(lineAvailability(line(true, true, 2, 3))).toBe("supplier");
+  });
+  it("more than our stock, no supplier: still stock (the rest 1–3 days)", () => {
+    expect(lineAvailability(line(true, false, 2, 3))).toBe("stock");
+  });
+  it("none of ours follows the product", () => {
+    expect(lineAvailability(line(false, true, 0, 3))).toBe("supplier");
+    expect(lineAvailability(line(false, false, 0, 3))).toBe("order");
   });
 });

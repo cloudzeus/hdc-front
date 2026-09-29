@@ -3,7 +3,7 @@ import { randomBytes } from "node:crypto";
 import { cookies } from "next/headers";
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
-import { availabilityOf } from "@/lib/catalog/availability";
+import { isOverStock, lineAvailability } from "@/lib/catalog/availability";
 import { onePerFamily } from "@/lib/catalog/size-family";
 import type { Locale } from "@/i18n/routing";
 import { grossAmount, netAmount } from "@/lib/format";
@@ -217,9 +217,11 @@ export const getCart = cache(async (
       lineNet: netAmount(unitNetFinal * line.quantity),
       lineGross: grossAmount(unitNetFinal * line.quantity, { vatRate }),
       inStock: p.inStock,
-      availability: availabilityOf(p),
+      /* More than our stock of something the supplier has: the rest comes
+         from the supplier, and the line (with the order) is 3–5 days. */
+      availability: lineAvailability({ ...p, qty: availableQty, quantity: line.quantity }),
       availableQty,
-      overStock: p.inStock && availableQty > 0 && line.quantity > availableQty,
+      overStock: isOverStock({ inStock: p.inStock, qty: availableQty, quantity: line.quantity }),
       weight: num(p.weight) || null,
       width: num(p.width) || null,
       length: num(p.length) || null,

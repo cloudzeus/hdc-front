@@ -805,7 +805,7 @@
       "se_apothema_tem": "Disponibile — {qty, plural, one {# pezzo} other {# pezzi}}",
       "se_apothema": "Disponibile",
       "katopin_paraggelias": "Su ordinazione",
-      "overstock": "{qty} disponibili — il resto su ordinazione",
+      "overstock": "Parte della quantità · consegna in 1–3 giorni lavorativi",
       "allagi_se_sketo": "Passa al solo utensile ({price})",
       "allagi_se_kit": "Passa al kit ({price})",
       "ship_courier": "Spedizione ACS",
@@ -855,7 +855,8 @@
       "diathesimo_3_5": "Disponibile · 3–5 giorni lavorativi",
       "teleftaio": "Ultimo pezzo",
       "paradosi_1_3": "Consegna in 1–3 giorni lavorativi",
-      "olokliri_3_5": "L'ordine parte in 3–5 giorni lavorativi: uno o più articoli arrivano dal fornitore."
+      "olokliri_3_5": "L'ordine parte in 3–5 giorni lavorativi: uno o più articoli arrivano dal fornitore.",
+      "overstock_3_5": "Parte della quantità arriva dal fornitore · 3–5 giorni lavorativi"
     }
   },
   "brands": {
