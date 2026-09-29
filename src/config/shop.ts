@@ -16,6 +16,30 @@ export const SHOP = {
   cookiePrefix: "HDC_",
 
   /**
+   * The SoftOne document an HDC order becomes — the same as the Magento store
+   * this shop replaces (milwaukeetoolshdc.gr). HDCtool's Magento sender
+   * (`src/lib/send-magento-order-to-softone.ts`) posts every HDC order as:
+   *
+   *   SERIES 5021 («HDC-ΠΑΡ») · UFTBL01 102 · SHIPMENT 111 · SOCURRENCY 100,
+   *   shipping as EXPANAL 502.
+   *
+   * They travel on each order as `erpSeries`/`erpUftb01`/`erpShipment`, which
+   * HDCtool's eshop intake stores and prefers over its own defaults — those
+   * defaults (6021 / 103) are the Kolleris eshop's, and without these an HDC
+   * order would be booked as a Kolleris one.
+   *
+   * The payment code is deliberately NOT here. Magento sent 1025 for every
+   * order because it only took cards; this shop also takes bank transfer and
+   * IRIS, and HDCtool picks the code from `paymentMethod`: card 1025 (the same
+   * as Magento), bank transfer 1007, IRIS through Viva 1028.
+   */
+  erp: {
+    series: 5021,
+    channel: 102,
+    shipment: 111,
+  },
+
+  /**
    * How to reach the shop: footer, store band, contact page, checkout header,
    * JSON-LD. Change them here and nowhere else. Source: the previous HDC site
    * (docs/content/milwaukeetoolshdc-pages.md), hours as decided by the client.

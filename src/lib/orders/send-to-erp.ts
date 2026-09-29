@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@/generated/prisma/client";
 import { hdctoolRequest } from "@/lib/hdctool/client";
 import { resolvePaymentMethod } from "@/lib/orders/viva-payment-method";
+import { SHOP } from "@/config/shop";
 
 /**
  * Sending a paid order to SoftOne — the half that was missing.
@@ -75,7 +76,7 @@ type OrderWithLines = Prisma.OrderGetPayload<{ include: { lines: true } }>;
  * fields most likely to be forgotten are the payment ones — the whole reason
  * the payment sync exists.
  */
-function buildIntakeBody(order: OrderWithLines) {
+export function buildIntakeBody(order: OrderWithLines) {
   return {
     orderNumber: order.orderNumber,
     orderId: order.id,
@@ -134,14 +135,15 @@ function buildIntakeBody(order: OrderWithLines) {
     erpTrdr: order.erpTrdr,
 
     /*
-     * The document configuration is NOT sent.
-     *
-     * HDCtool holds it — the document series, warehouse 1000, and the payment code
-     * chosen from `paymentMethod` — in `eshop-order-erp-config.ts`. Sending it
-     * from here would put the same four numbers in two places, and the one that
-     * issues the document is the one that should own them. `paymentMethod`
-     * travels instead, which is the fact; the code is the interpretation.
+     * The document this order becomes: HDC's own series and channel marker,
+     * the same as the Magento store this shop replaces — see `SHOP.erp`.
+     * HDCtool's defaults are the Kolleris eshop's, so an HDC order that did not
+     * say which shop it is would be booked as a Kolleris one. The payment code
+     * is not sent: HDCtool derives it from `paymentMethod` above.
      */
+    erpSeries: SHOP.erp.series,
+    erpUftb01: SHOP.erp.channel,
+    erpShipment: SHOP.erp.shipment,
 
     lines: order.lines.map((line) => ({
       mtrl: line.mtrl,
