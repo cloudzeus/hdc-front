@@ -10,6 +10,12 @@
  */
 export type Availability = "stock" | "supplier" | "order";
 
+/**
+ * How long a supplier item takes to leave: «3–5 εργάσιμες». The one source for
+ * the numbers the JSON-LD offer and the Merchant feed declare.
+ */
+export const SUPPLIER_HANDLING_DAYS = { min: 3, max: 5 } as const;
+
 export function availabilityOf(p: { inStock: boolean; supplierAvailable?: boolean | null }): Availability {
   if (p.inStock) return "stock";
   if (p.supplierAvailable) return "supplier";

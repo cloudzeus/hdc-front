@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isValidGtin } from "../feeds/google-merchant";
+import { handlingTimeLines, isValidGtin } from "../feeds/google-merchant";
 
 /**
  * A wrong GTIN is a disapproval; an absent one is fine, because every product
@@ -35,5 +35,16 @@ describe("GTIN validation", () => {
 
   it("accepts a valid EAN-8", () => {
     expect(isValidGtin("96385074")).toBe(true);
+  });
+});
+
+describe("handling time", () => {
+  it("only supplier items carry their own 3–5 days", () => {
+    expect(handlingTimeLines("supplier")).toEqual([
+      "<g:min_handling_time>3</g:min_handling_time>",
+      "<g:max_handling_time>5</g:max_handling_time>",
+    ]);
+    expect(handlingTimeLines("stock")).toEqual([]);
+    expect(handlingTimeLines("order")).toEqual([]);
   });
 });

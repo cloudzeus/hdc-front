@@ -372,7 +372,7 @@ export default async function ProductPage({ params }: PageProps) {
             itemCondition: "https://schema.org/NewCondition",
             availability: schemaOrgAvailability(availability),
             priceValidUntil: priceValidUntil(),
-            shippingDetails: shippingDetails(locale),
+            shippingDetails: shippingDetails(locale, availability),
             hasMerchantReturnPolicy: returnPolicy(),
           }
         : undefined,

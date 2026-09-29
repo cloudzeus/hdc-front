@@ -1,4 +1,5 @@
 import type { Locale } from "@/i18n/routing";
+import { SUPPLIER_HANDLING_DAYS, type Availability } from "@/lib/catalog/availability";
 import { FREE_SHIPPING_THRESHOLD_NET } from "@/lib/cart/options";
 import { absoluteUrl } from "@/lib/seo/urls";
 
@@ -94,7 +95,8 @@ export function specsAsProperties(
  * παραδίδονται την ίδια μέρα, και ένα «1 εργάσιμη» θα ήταν σωστό για τον μισό
  * πληθυσμό και ψέμα για τον άλλον.
  */
-export function shippingDetails(locale: Locale) {
+export function shippingDetails(locale: Locale, availability: Availability) {
+  const supplier = availability === "supplier";
   return {
     "@type": "OfferShippingDetails",
     shippingRate: {
@@ -114,11 +116,12 @@ export function shippingDetails(locale: Locale) {
     },
     deliveryTime: {
       "@type": "ShippingDeliveryTime",
-      // Παραγγελία πριν τις 15:00 φεύγει αυθημερόν.
+      // Παραγγελία πριν τις 15:00 φεύγει αυθημερόν — εκτός αν έρχεται από τον
+      // προμηθευτή: τότε φεύγει σε 3–5 εργάσιμες (lib/catalog/availability.ts).
       handlingTime: {
         "@type": "QuantitativeValue",
-        minValue: 0,
-        maxValue: 1,
+        minValue: supplier ? SUPPLIER_HANDLING_DAYS.min : 0,
+        maxValue: supplier ? SUPPLIER_HANDLING_DAYS.max : 1,
         unitCode: "DAY",
       },
       // Αττική 1 εργάσιμη · νησιά και δυσπρόσιτες έως 3.

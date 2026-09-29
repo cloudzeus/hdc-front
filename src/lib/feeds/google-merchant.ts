@@ -1,5 +1,10 @@
 import "server-only";
-import { availabilityOf, merchantAvailability } from "@/lib/catalog/availability";
+import {
+  SUPPLIER_HANDLING_DAYS,
+  availabilityOf,
+  merchantAvailability,
+  type Availability,
+} from "@/lib/catalog/availability";
 import { prisma } from "@/lib/prisma";
 import { absoluteUrl } from "@/lib/seo/urls";
 import { isPlausibleWeightKg } from "@/lib/shipping/acs-tariff";
@@ -58,6 +63,19 @@ const MAX_TITLE = 150;
 const MAX_DESCRIPTION = 5000;
 /** One main image plus up to ten more, which is Google's own ceiling. */
 const MAX_EXTRA_IMAGES = 10;
+
+/**
+ * The item's own handling time. Only supplier items carry one — 3–5 working
+ * days — so in_stock does not inherit the account's same-day handling. Ours
+ * keep the account-level setting.
+ */
+export function handlingTimeLines(availability: Availability): string[] {
+  if (availability !== "supplier") return [];
+  return [
+    `<g:min_handling_time>${SUPPLIER_HANDLING_DAYS.min}</g:min_handling_time>`,
+    `<g:max_handling_time>${SUPPLIER_HANDLING_DAYS.max}</g:max_handling_time>`,
+  ];
+}
 
 export async function buildMerchantFeed(locale: Locale = "el"): Promise<string> {
   const products = await prisma.product.findMany({
@@ -148,6 +166,7 @@ export async function buildMerchantFeed(locale: Locale = "el"): Promise<string> 
       ...extra.map((image) => `<g:additional_image_link>${xml(image.url)}</g:additional_image_link>`),
       // Ours or the supplier's is buyable: in_stock. Same rule as the page's JSON-LD.
       `<g:availability>${merchantAvailability(availabilityOf(product))}</g:availability>`,
+      ...handlingTimeLines(availabilityOf(product)),
       `<g:price>${gross.toFixed(2)} EUR</g:price>`,
       `<g:condition>new</g:condition>`,
       `<g:mpn>${xml(product.code2 || product.code)}</g:mpn>`,
