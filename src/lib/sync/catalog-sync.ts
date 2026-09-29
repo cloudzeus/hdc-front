@@ -12,6 +12,7 @@ import {
 } from "./product-children";
 import { DEFAULT_VAT_RATE } from "@/lib/format";
 import { milwaukeeFields } from "@/lib/milwaukee/product-fields";
+import { hasErpIds, isFeedId } from "@/lib/sync/feed-id";
 import { isShopProduct } from "@/lib/sync/shop-filter";
 import { milwaukeeKey, milwaukeeNameIndex, withMilwaukeeNames } from "@/lib/sync/milwaukee-names";
 import {
@@ -1180,7 +1181,7 @@ export type TargetedSyncResult = SyncResult & {
  */
 export async function syncProductsByMtrl(mtrls: number[]): Promise<TargetedSyncResult> {
   const startedAt = Date.now();
-  const wanted = [...new Set(mtrls.filter((m) => Number.isInteger(m) && m > 0))];
+  const wanted = [...new Set(mtrls.filter(isFeedId))];
 
   const empty: TargetedSyncResult = {
     processed: 0, created: 0, updated: 0, removed: 0, failed: 0, failedMtrl: [],
@@ -1320,8 +1321,11 @@ export async function reconcileCatalog(): Promise<TargetedSyncResult> {
      * empty array" are indistinguishable from here, and acting on the first
      * would deactivate the entire catalogue. A real catalogue emptying is a
      * decision somebody makes deliberately, not something a reconcile discovers.
+     *
+     * Only ERP ids count (`hasErpIds`): XML-only products (negative ids) ride
+     * on the first page regardless, and must not let an empty ERP answer pass.
      */
-    if (remote.size === 0) {
+    if (!hasErpIds(remote)) {
       throw new Error("Reconcile refused: HDCtool returned no eshop-listed products");
     }
 

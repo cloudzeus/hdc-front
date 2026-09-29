@@ -164,6 +164,8 @@ export type HdctoolProduct = {
   quantityIncoming?: number | null;
   /** The supplier XML lists it «Διαθέσιμο». Absent on HDCtool builds before 29/9/2026. */
   supplierAvailable?: boolean;
+  /** Προϊόν μόνο-XML, ή ERP που ήταν μόνο-XML: ο κωδικός του Παπαθεοδοσίου. */
+  xmlCode?: string | null;
   unit: number | null;
   brand: {
     id: string | null;
@@ -357,8 +359,10 @@ export const hdctool = {
     categoryId?: string;
     groupId?: string;
     subgroupId?: string;
-    /** Specific ERP ids. Capped at `HDCTOOL_MAX_LIMIT` server-side. */
+    /** Specific feed ids (ERP MTRL, or negative for XML-only). Capped at `HDCTOOL_MAX_LIMIT` server-side. */
     mtrl?: number[];
+    /** "xml": μόνο τα προϊόντα μόνο-XML, σελιδοποίηση με page. */
+    source?: "xml";
   }): Promise<HdctoolProductsResponse> {
     return request<HdctoolProductsResponse>("/api/public/products", params);
   },

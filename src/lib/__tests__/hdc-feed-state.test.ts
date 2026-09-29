@@ -37,9 +37,9 @@ describe("cursor text", () => {
     expect(readCursor("not json")).toEqual({ lastSeq: 0, sentAt: null, pendingMtrl: [] });
   });
 
-  it("drops junk from the pending list", () => {
-    const cursor = readCursor('{"lastSeq":1,"sentAt":null,"pendingMtrl":[5,5,"x",-1,2.5,7]}');
-    expect(cursor.pendingMtrl).toEqual([5, 7]);
+  it("drops junk from the pending list, keeps negative XML-only ids", () => {
+    const cursor = readCursor('{"lastSeq":1,"sentAt":null,"pendingMtrl":[5,5,"x",-1,0,2.5,7]}');
+    expect(cursor.pendingMtrl).toEqual([5, -1, 7]);
   });
 
   it("round-trips, and writes the old shape when nothing is pending", () => {
@@ -65,6 +65,10 @@ describe("isGap", () => {
 describe("planRun", () => {
   it("applies owed ids first and never drops the overflow", () => {
     expect(planRun([7, 8], [8, 9, 10], 3)).toEqual({ now: [7, 8, 9], later: [10] });
+  });
+
+  it("carries XML-only ids (negative) like any other", () => {
+    expect(planRun([-3], [8, -3, 0], 5)).toEqual({ now: [-3, 8], later: [] });
   });
 });
 

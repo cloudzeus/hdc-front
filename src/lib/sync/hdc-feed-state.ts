@@ -5,6 +5,8 @@
  * forgotten can be tested without a database or an HTTP request.
  */
 
+import { isFeedId } from "./feed-id";
+
 /**
  * `SyncState.cursor` for the `catalog-webhook` channel. Free text, so it grew
  * a field without a migration.
@@ -32,7 +34,7 @@ export const MAX_PENDING = 10_000;
 
 function validIds(values: unknown): number[] {
   if (!Array.isArray(values)) return [];
-  return values.filter((v): v is number => Number.isInteger(v) && (v as number) > 0);
+  return values.filter(isFeedId);
 }
 
 export function readCursor(raw: string | null | undefined): HdcCursor {
@@ -66,7 +68,7 @@ export function writeCursor(cursor: HdcCursor): string {
 export function uniqueIds(...lists: ReadonlyArray<ReadonlyArray<number>>): number[] {
   const seen = new Set<number>();
   for (const list of lists) {
-    for (const id of list) if (Number.isInteger(id) && id > 0) seen.add(id);
+    for (const id of list) if (isFeedId(id)) seen.add(id);
   }
   return [...seen];
 }

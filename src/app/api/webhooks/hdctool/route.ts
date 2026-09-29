@@ -6,6 +6,7 @@ import {
   TIMESTAMP_HEADER,
 } from "@/lib/webhooks/hdc-signature";
 import { applyHdcDeliveryInBackground } from "@/lib/sync/hdc-feed";
+import { isFeedId } from "@/lib/sync/feed-id";
 
 /**
  * HDCtool tells us what changed.
@@ -127,7 +128,7 @@ export async function POST(request: NextRequest) {
   }
 
   const mtrl = Array.isArray(payload.mtrl)
-    ? payload.mtrl.filter((m): m is number => Number.isInteger(m) && m > 0)
+    ? payload.mtrl.filter(isFeedId)
     : [];
 
   after(() =>
