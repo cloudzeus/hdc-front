@@ -14,6 +14,7 @@ import type { Locale } from "@/i18n/routing";
 import { getCart, getDeliveryPostcode, getMiniCart } from "@/lib/cart/cart";
 import { getCartLineExtras, getHdcCrossSell } from "@/lib/cart/hdc-cart";
 import { freeShippingProgress } from "@/lib/cart/options";
+import { isLastPiece, orderAvailability } from "@/lib/catalog/availability";
 import {
   getCatalogueStats,
   getMenuTree,
@@ -24,7 +25,6 @@ import { formatMoney, formatPrice } from "@/lib/format";
 import { displayName, platformTag } from "@/lib/milwaukee/display";
 import { parseModel } from "@/lib/milwaukee/model";
 import { ahLabel, pdpTitle } from "@/lib/milwaukee/pdp";
-import { showsExactQty } from "@/lib/stock-display";
 
 /** Always fresh: a cached cart is a wrong cart. */
 export const dynamic = "force-dynamic";
@@ -113,11 +113,14 @@ export default async function CartPage({
       image: line.image,
       quantity: line.quantity,
       inStock: line.inStock,
-      availability: line.inStock
-        ? showsExactQty(line.availableQty)
-          ? t("se_apothema_tem", { qty: line.availableQty })
-          : t("se_apothema")
-        : t("katopin_paraggelias"),
+      availability:
+        line.availability === "stock"
+          ? isLastPiece(line.availableQty)
+            ? t("teleftaio")
+            : t("se_apothema")
+          : line.availability === "supplier"
+            ? t("diathesimo_3_5")
+            : t("paradosi_1_3"),
       overStock: line.overStock ? t("overstock", { qty: line.availableQty }) : null,
       unitPrice: formatPrice(line.unitNetFinal, locale, { vatRate: line.vatRate }),
       unitWas:
@@ -139,6 +142,8 @@ export default async function CartPage({
 
   const totals = cart?.totals;
   const progress = totals ? freeShippingProgress(totals) : null;
+  /* One line from the supplier sends the whole order from the supplier. */
+  const supplierOrder = orderAvailability(lines.map((l) => l.availability)) === "supplier";
   const allAt24 = lines.every((l) => l.vatRate === 24);
 
   const shippingLabel =
@@ -225,6 +230,12 @@ export default async function CartPage({
                     <i style={{ width: `${progress.percent}%` }} />
                   </div>
                 </div>
+
+                {supplierOrder && (
+                  <p className="hdc-notice" role="status">
+                    {t("olokliri_3_5")}
+                  </p>
+                )}
 
                 <div className="hdc-cart-lines">
                   <div className="th" aria-hidden>

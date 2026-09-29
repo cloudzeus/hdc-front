@@ -7,6 +7,8 @@
  * `next/headers` into the browser bundle.
  */
 
+import type { Availability } from "@/lib/catalog/availability";
+
 /** Free-shipping threshold on the NET subtotal. Moves to `SiteSetting` in Phase 3. */
 export const FREE_SHIPPING_THRESHOLD_NET = 150;
 
@@ -114,6 +116,11 @@ export type CartLineView = {
   lineNet: number;
   lineGross: number;
   inStock: boolean;
+  /**
+   * Ours, the supplier's, or to order — see `lib/catalog/availability.ts`.
+   * One supplier line sends the whole order in 3–5 days (`orderAvailability`).
+   */
+  availability: Availability;
   availableQty: number;
   /** True when the line asks for more than the warehouse currently holds. */
   overStock: boolean;

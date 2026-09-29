@@ -11,6 +11,7 @@ import { prisma } from "@/lib/prisma";
 import type { Locale } from "@/i18n/routing";
 import { computeTotals, getCart, getDeliveryPostcode } from "@/lib/cart/cart";
 import type { CartTotals, ShippingMethodId } from "@/lib/cart/options";
+import { orderAvailability } from "@/lib/catalog/availability";
 import { formatMoney } from "@/lib/format";
 import { displayName } from "@/lib/milwaukee/display";
 import { parseModel } from "@/lib/milwaukee/model";
@@ -95,6 +96,8 @@ export default async function CheckoutPage({
   // An empty cart has nothing to check out; bouncing back is kinder than an
   // empty form that fails on submit.
   if (!cart || cart.lines.length === 0) redirect("/kalathi");
+  /* One line from the supplier sends the whole order in 3–5 working days. */
+  const supplierOrder = orderAvailability(cart.lines.map((l) => l.availability)) === "supplier";
 
   const totals = cart.totals;
   const money = (n: number) => formatMoney(n, locale);
@@ -119,13 +122,13 @@ export default async function CheckoutPage({
         : { price: null, free: false };
 
   const shippingOptions: ShippingOption[] = [
-    { id: "courier", title: "ACS COURIER", label: "ACS Courier", meta: t("ship_courier_meta"), ...tilePrice(courier) },
+    { id: "courier", title: "ACS COURIER", label: "ACS Courier", meta: t(supplierOrder ? "ship_courier_meta_3_5" : "ship_courier_meta"), ...tilePrice(courier) },
     { id: "express", title: "ACS EXPRESS", label: "ACS Express", meta: t("ship_express_meta"), ...tilePrice(express) },
     {
       id: "pickup",
       title: t("ship_pickup_title"),
       label: t("ship_pickup_row"),
-      meta: t("ship_pickup_meta"),
+      meta: t(supplierOrder ? "ship_pickup_meta_3_5" : "ship_pickup_meta"),
       price: t("dorean"),
       free: true,
     },
