@@ -1,5 +1,6 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
+import { merchantId } from "@/lib/feeds/google-merchant";
 
 /**
  * The local inventory feed — a second, small feed alongside the main product
@@ -90,7 +91,7 @@ export function availabilityFor(inStock: boolean, quantity: number): "in stock" 
 export async function buildLocalInventoryFeed(): Promise<string> {
   const products = await prisma.product.findMany({
     where: { isActive: true, priceNet: { gt: 0 }, images: { some: {} } },
-    select: { mtrl: true, qty: true, inStock: true },
+    select: { mtrl: true, xmlCode: true, qty: true, inStock: true },
     orderBy: { mtrl: "asc" },
   });
 
@@ -104,7 +105,8 @@ export async function buildLocalInventoryFeed(): Promise<string> {
 
     return [
       STORE_CODE,
-      String(product.mtrl),
+      // Same id as the Merchant feed, or Google cannot join the two.
+      merchantId(product),
       String(quantity),
       availability,
       // Checkout completes fully online before pickup — see the "pickup"

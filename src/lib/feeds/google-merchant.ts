@@ -77,6 +77,15 @@ export function handlingTimeLines(availability: Availability): string[] {
   ];
 }
 
+/**
+ * The item id both Google feeds use: the MTRL, or `X-<xmlCode>` for an
+ * XML-only product (negative mtrl). Όταν πουληθεί και αποκτήσει MTRL, το id
+ * αλλάζει μία φορά· η Google το βλέπει ως νέο προϊόν.
+ */
+export function merchantId(p: { mtrl: number; xmlCode: string | null }): string {
+  return p.mtrl > 0 ? String(p.mtrl) : `X-${p.xmlCode ?? -p.mtrl}`;
+}
+
 export async function buildMerchantFeed(locale: Locale = "el"): Promise<string> {
   const products = await prisma.product.findMany({
     where: {
@@ -85,7 +94,7 @@ export async function buildMerchantFeed(locale: Locale = "el"): Promise<string> 
       images: { some: {} },
     },
     select: {
-      mtrl: true, code: true, code1: true, code2: true, slug: true, name: true,
+      mtrl: true, xmlCode: true, code: true, code1: true, code2: true, slug: true, name: true,
       priceNet: true, vatRate: true, inStock: true, supplierAvailable: true, mtrmark: true, weight: true,
       mtrcategory: true, mtrgroup: true, cccSubgroup2: true,
       images: {
@@ -158,7 +167,7 @@ export async function buildMerchantFeed(locale: Locale = "el"): Promise<string> 
     const [main, ...extra] = product.images;
 
     const lines = [
-      `<g:id>${xml(String(product.mtrl))}</g:id>`,
+      `<g:id>${xml(merchantId(product))}</g:id>`,
       `<g:title>${xml(title)}</g:title>`,
       `<g:description>${xml(description)}</g:description>`,
       `<g:link>${xml(absoluteUrl(`/proion/${product.slug}`, locale))}</g:link>`,

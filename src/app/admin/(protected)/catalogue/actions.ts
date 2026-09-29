@@ -11,6 +11,7 @@ import {
   saveSpec,
 } from "@/lib/pim/pim";
 import { searchProductsForPicker } from "@/lib/media/picker";
+import { xmlOnlyPimError } from "@/lib/pim/xml-only";
 import type { Locale } from "@/i18n/routing";
 
 /**
@@ -35,6 +36,8 @@ export async function actionSearch(query: string, locale: Locale) {
 
 export async function actionSaveOrder(mtrl: number, urls: string[], featureUrl: string | null) {
   await requireCatalogue();
+  const locked = xmlOnlyPimError(mtrl);
+  if (locked) return locked;
   const result = await saveImageOrder(mtrl, urls, featureUrl);
   revalidatePath("/admin/catalogue");
   return result;
@@ -42,6 +45,8 @@ export async function actionSaveOrder(mtrl: number, urls: string[], featureUrl: 
 
 export async function actionSaveSpec(mtrl: number, field: string, value: string, locale: Locale) {
   await requireCatalogue();
+  const locked = xmlOnlyPimError(mtrl);
+  if (locked) return locked;
   const result = await saveSpec(mtrl, field, value, locale);
   revalidatePath("/admin/catalogue");
   return result;
@@ -50,6 +55,8 @@ export async function actionSaveSpec(mtrl: number, field: string, value: string,
 /** Remove the field from this product only. */
 export async function actionClearSpec(mtrl: number, field: string) {
   await requireCatalogue();
+  const locked = xmlOnlyPimError(mtrl);
+  if (locked) return locked;
   const result = await clearSpec(mtrl, field);
   revalidatePath("/admin/catalogue");
   return result;
@@ -65,6 +72,8 @@ export async function actionClearSpec(mtrl: number, field: string) {
  */
 export async function actionClearSpecSubgroup(mtrl: number, field: string) {
   await requireCatalogue();
+  const locked = xmlOnlyPimError(mtrl);
+  if (locked) return locked;
   const result = await clearSpecForSubgroup(mtrl, field);
   revalidatePath("/admin/catalogue");
   return result;
@@ -73,6 +82,8 @@ export async function actionClearSpecSubgroup(mtrl: number, field: string) {
 /** Remove one image from the product. */
 export async function actionDeleteImage(mtrl: number, url: string) {
   await requireCatalogue();
+  const locked = xmlOnlyPimError(mtrl);
+  if (locked) return locked;
   const result = await deleteImage(mtrl, url);
   revalidatePath("/admin/catalogue");
   return result;

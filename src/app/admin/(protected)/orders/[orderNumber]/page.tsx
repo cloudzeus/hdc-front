@@ -320,7 +320,11 @@ export default async function OrderDetailPage({
                               <div className="numeral text-[11px] text-k-text-3">
                                 {line.brand ? `${line.brand} · ` : ""}
                                 {line.sku}
-                                {line.mtrl ? ` · MTRL ${line.mtrl}` : " · χωρίς MTRL"}
+                                {line.mtrl
+                                  ? ` · MTRL ${line.mtrl}`
+                                  : line.xmlCode
+                                    ? ` · XML ${line.xmlCode} · αναμονή δημιουργίας`
+                                    : " · χωρίς MTRL"}
                               </div>
                               <div className="numeral text-[11px] text-k-text-4">
                                 Βάρος {kg(line.weightKg != null ? Number(line.weightKg) : null)}

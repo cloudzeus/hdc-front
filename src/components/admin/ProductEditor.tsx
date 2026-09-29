@@ -165,6 +165,13 @@ export function ProductEditor({ product, locale }: { product: PimProduct; locale
         Οι αλλαγές γράφονται στο HDCtool και ισχύουν παντού — και στο Magento και στο Skroutz. Στο
         κατάστημα εμφανίζονται μετά τον επόμενο συγχρονισμό.
       </p>
+      {product.mtrl < 0 && (
+        <p className="flex items-start gap-2 border border-l-[3px] border-amber-500 bg-amber-50 px-4 py-3 text-[length:var(--fs-12)] leading-[1.55] text-k-text-2">
+          <Info className="mt-px size-3.5 shrink-0 text-amber-600" />
+          Προϊόν μόνο-XML (Παπαθεοδοσίου): δεν έχει ακόμη είδος στο SoftOne. Φωτογραφίες και
+          χαρακτηριστικά επεξεργάζονται στο HDCtool → Milwaukee XML.
+        </p>
+      )}
 
       {/* ── Φωτογραφίες ── */}
       <section className="border border-k-line bg-white">

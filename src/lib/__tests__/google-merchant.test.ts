@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { handlingTimeLines, isValidGtin } from "../feeds/google-merchant";
+import { handlingTimeLines, isValidGtin, merchantId } from "../feeds/google-merchant";
 
 /**
  * A wrong GTIN is a disapproval; an absent one is fine, because every product
@@ -46,5 +46,20 @@ describe("handling time", () => {
     ]);
     expect(handlingTimeLines("stock")).toEqual([]);
     expect(handlingTimeLines("order")).toEqual([]);
+  });
+});
+
+describe("merchantId", () => {
+  it("is the MTRL for an ERP product, as before", () => {
+    expect(merchantId({ mtrl: 812, xmlCode: null })).toBe("812");
+    expect(merchantId({ mtrl: 812, xmlCode: "P1" })).toBe("812");
+  });
+
+  it("is X- and the XML code for an XML-only product", () => {
+    expect(merchantId({ mtrl: -17, xmlCode: "P1" })).toBe("X-P1");
+  });
+
+  it("falls back to the feed sequence when the code is missing", () => {
+    expect(merchantId({ mtrl: -17, xmlCode: null })).toBe("X-17");
   });
 });

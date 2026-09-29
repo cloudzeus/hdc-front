@@ -6,6 +6,7 @@ import { sendOrderEmail } from "@/lib/mail/order-email";
 import { sendInternalOrderEmail } from "@/lib/mail/order-internal-email";
 import { randomBytes } from "node:crypto";
 import { checkoutSchema, deliveryAddress } from "@/lib/checkout/schema";
+import { orderLineIds } from "@/lib/checkout/line-ids";
 import { prisma } from "@/lib/prisma";
 import { STOCK_HOLD_HOURS, holdExpiry } from "@/lib/orders/hold";
 import { computeTotals, getCart, getCartToken } from "@/lib/cart/cart";
@@ -176,9 +177,11 @@ export async function placeOrder(
    */
   const mtrlRows = await prisma.product.findMany({
     where: { id: { in: cart.lines.map((line) => line.productId) } },
-    select: { id: true, mtrl: true },
+    select: { id: true, mtrl: true, xmlCode: true },
   });
-  const mtrlByProductId = new Map(mtrlRows.map((row) => [row.id, row.mtrl]));
+  const idsByProductId = new Map(
+    mtrlRows.map((row) => [row.id, { mtrl: row.mtrl, xmlCode: row.xmlCode }]),
+  );
 
   const order = await prisma.order.create({
     data: {
@@ -240,7 +243,8 @@ export async function placeOrder(
            * order is a record of what was bought, not of what the catalogue
            * says today.
            */
-          mtrl: mtrlByProductId.get(line.productId) ?? null,
+          // Αρνητικό mtrl = προϊόν μόνο-XML· ταξιδεύει με τον κωδικό του XML.
+          ...orderLineIds(idsByProductId.get(line.productId)),
           sku: line.sku,
           name: line.name,
           brand: line.brandName,

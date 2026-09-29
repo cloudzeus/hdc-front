@@ -41,6 +41,8 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "kolleris.b-cdn.net" },
       { protocol: "https", hostname: "cdn.kolleris.com" },
       { protocol: "https", hostname: "hdctool.wwa.gr" },
+      // Φωτογραφίες των προϊόντων μόνο-XML (Παπαθεοδοσίου).
+      { protocol: "https", hostname: "static.synfiles.gr" },
     ],
   },
   serverExternalPackages: ["@node-rs/argon2"],

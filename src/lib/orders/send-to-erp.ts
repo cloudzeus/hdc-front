@@ -147,6 +147,8 @@ export function buildIntakeBody(order: OrderWithLines) {
 
     lines: order.lines.map((line) => ({
       mtrl: line.mtrl,
+      // XML-only product: no MTRL yet, HDCtool holds the document until it has one.
+      xmlCode: line.xmlCode ?? null,
       sku: line.sku,
       name: line.name,
       brand: line.brand,

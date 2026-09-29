@@ -64,4 +64,27 @@ describe("buildIntakeBody — the SoftOne document of an HDC order", () => {
     expect(body).not.toHaveProperty("erpPayment");
     expect(body.paymentMethod).toBe("bank");
   });
+
+  it("sends an XML-only line with no MTRL and its XML code", () => {
+    const line = {
+      mtrl: null, xmlCode: "P1", sku: "4933479860", name: "M18 FPD3", brand: "Milwaukee", quantity: 1,
+      unitNet: d("100.00"), discountPercent: d("0.00"), offerTitle: null, unitGross: d("124.00"),
+      vatRate: d("24.00"), lineNet: d("100.00"), lineGross: d("124.00"), weightKg: null,
+    };
+    const body = buildIntakeBody({ ...order, lines: [line] } as unknown as typeof order) as {
+      lines: Array<Record<string, unknown>>;
+    };
+    expect(body.lines[0]).toMatchObject({ mtrl: null, xmlCode: "P1" });
+  });
+
+  it("sends xmlCode null on an ERP line", () => {
+    const line = {
+      mtrl: 812, sku: "x", name: "y", brand: null, quantity: 1, unitNet: d("1"), discountPercent: d("0"),
+      offerTitle: null, unitGross: d("1.24"), vatRate: d("24"), lineNet: d("1"), lineGross: d("1.24"), weightKg: null,
+    };
+    const body = buildIntakeBody({ ...order, lines: [line] } as unknown as typeof order) as {
+      lines: Array<Record<string, unknown>>;
+    };
+    expect(body.lines[0]).toMatchObject({ mtrl: 812, xmlCode: null });
+  });
 });
