@@ -24,7 +24,8 @@ type QuickViewProduct = {
   priceNet: number | null;
   priceListNet: number | null;
   vatRate: number;
-  qty: number;
+  /** Exactly one left — the only stock fact the payload carries. */
+  lastPiece: boolean;
   inStock: boolean;
   supplierAvailable: boolean;
   specs: Array<{ label: string; value: string }>;
@@ -237,7 +238,7 @@ function QuickViewBody({
           }`}
         >
           <span className="rounded-pill block h-1.5 w-1.5 bg-current" />
-          {upGreek(t(availabilityLabelKey(availability, product.qty)))}
+          {upGreek(t(availabilityLabelKey(availability, product.lastPiece ? 1 : null)))}
         </p>
 
         {product.specs.length > 0 && (

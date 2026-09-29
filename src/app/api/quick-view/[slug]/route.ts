@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { isLastPiece } from "@/lib/catalog/availability";
 import { getProductBySlug } from "@/lib/catalog/pdp";
 import { routing, type Locale } from "@/i18n/routing";
 import { formatSpecValue } from "@/lib/catalog/spec-format";
@@ -39,7 +40,8 @@ export async function GET(
     priceNet: product.priceNet,
     priceListNet: product.priceListNet,
     vatRate: product.vatRate,
-    qty: product.qty,
+    // Never the stock number itself: the shop shows only the last piece.
+    lastPiece: isLastPiece(product.qty),
     inStock: product.inStock,
     supplierAvailable: product.supplierAvailable,
     specs: product.specs.slice(0, 8).map((s) => ({
