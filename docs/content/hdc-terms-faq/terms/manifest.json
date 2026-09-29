@@ -1,0 +1,10 @@
+[
+  { "slug": "terms-of-use", "file": "terms-of-use",
+    "title": { "el": "Όροι χρήσης", "en": "Terms of use", "it": "Condizioni d'uso" } },
+  { "slug": "return-policy", "file": "return-policy",
+    "title": { "el": "Πολιτική επιστροφών", "en": "Returns policy", "it": "Politica di reso" } },
+  { "slug": "personal-data-protection-policy", "file": "personal-data-protection-policy",
+    "title": { "el": "Πολιτική απορρήτου", "en": "Privacy policy", "it": "Informativa sulla privacy" } },
+  { "slug": "cookie-policy-kolleris-com", "file": "cookie-policy",
+    "title": { "el": "Πολιτική cookies", "en": "Cookie policy", "it": "Cookie policy" } }
+]

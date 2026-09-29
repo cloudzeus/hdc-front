@@ -1,0 +1,242 @@
+[
+  {
+    "slug": "what-hours-and-days-is-the-physical-store-open-nbsp",
+    "action": "update",
+    "order": 0,
+    "q": {
+      "el": "Ποιες μέρες και ώρες είναι ανοιχτό το κατάστημα;",
+      "en": "When is the store open?",
+      "it": "Quali sono gli orari del negozio?"
+    },
+    "a": {
+      "el": "<p>Δευτέρα έως Παρασκευή 08:00–16:00 και Σάββατο 09:00–14:00. Κυριακή και αργίες είμαστε κλειστά.</p>",
+      "en": "<p>Monday to Friday 08:00–16:00 and Saturday 09:00–14:00. We are closed on Sundays and public holidays.</p>",
+      "it": "<p>Dal lunedì al venerdì 08:00–16:00 e il sabato 09:00–14:00. Chiuso la domenica e nei giorni festivi.</p>"
+    }
+  },
+  {
+    "slug": "where-is-your-physical-store-located",
+    "action": "update",
+    "order": 1,
+    "q": {
+      "el": "Πού βρίσκεται το κατάστημα;",
+      "en": "Where is the store?",
+      "it": "Dove si trova il negozio?"
+    },
+    "a": {
+      "el": "<p>Στην Κ. Μαυρομιχάλη 4, 185 45 Πειραιάς, κοντά στο λιμάνι. Εκεί θα δείτε από κοντά τα εργαλεία M12, M18 και MX FUEL και θα παραλάβετε τις online παραγγελίες σας.</p>",
+      "en": "<p>At K. Mavromichali 4, 185 45 Piraeus, close to the port. Come and see the M12, M18 and MX FUEL tools in person, and collect your online orders there.</p>",
+      "it": "<p>In K. Mavromichali 4, 185 45 Pireo, vicino al porto. Qui potete vedere dal vivo gli utensili M12, M18 e MX FUEL e ritirare i vostri ordini online.</p>"
+    }
+  },
+  {
+    "slug": "can-i-pick-up-my-order-from-the-store",
+    "action": "update",
+    "order": 2,
+    "q": {
+      "el": "Μπορώ να παραλάβω την παραγγελία από το κατάστημα;",
+      "en": "Can I collect my order from the store?",
+      "it": "Posso ritirare l'ordine in negozio?"
+    },
+    "a": {
+      "el": "<p>Ναι, δωρεάν. Στην ολοκλήρωση επιλέξτε «Παραλαβή από Πειραιά». Η παραγγελία ετοιμάζεται συνήθως σε 2 ώρες, μέσα στο ωράριο. Θα σας ειδοποιήσουμε με SMS ή email μόλις είναι έτοιμη. Η πληρωμή γίνεται online, κατά την παραγγελία.</p>",
+      "en": "<p>Yes, free of charge. At checkout choose “Pickup in Piraeus”. Orders are usually ready within 2 hours during opening hours, and we will notify you by SMS or email when yours is ready. Payment is made online when you order.</p>",
+      "it": "<p>Sì, gratuitamente. Al checkout scegliete “Ritiro al Pireo”. Di solito l'ordine è pronto entro 2 ore, durante l'orario di apertura, e vi avvisiamo via SMS o email. Il pagamento avviene online al momento dell'ordine.</p>"
+    }
+  },
+  {
+    "slug": "strong-what-are-the-payment-options-strong",
+    "action": "update",
+    "order": 3,
+    "q": {
+      "el": "Πώς μπορώ να πληρώσω;",
+      "en": "How can I pay?",
+      "it": "Come posso pagare?"
+    },
+    "a": {
+      "el": "<p>Με κάρτα (Visa, Mastercard), με IRIS ή με τραπεζική κατάθεση μέσω κωδικού πληρωμής Viva. Με την κατάθεση κρατάμε τα προϊόντα για εσάς 3 ώρες. Όλες οι πληρωμές γίνονται μέσω της Viva Payments. Δεν προσφέρεται αντικαταβολή. <a href=\"/tropoi-pliromis\">Τρόποι πληρωμής</a></p>",
+      "en": "<p>By card (Visa, Mastercard), IRIS, or bank transfer with a Viva payment code (we hold the items for you for 3 hours). All payments go through Viva Payments. Cash on delivery is not available. <a href=\"/en/tropoi-pliromis\">Payment methods</a></p>",
+      "it": "<p>Con carta (Visa, Mastercard), IRIS o bonifico bancario con codice di pagamento Viva (teniamo i prodotti per voi 3 ore). Tutti i pagamenti passano da Viva Payments. Il contrassegno non è disponibile. <a href=\"/it/tropoi-pliromis\">Metodi di pagamento</a></p>"
+    }
+  },
+  {
+    "slug": "hdc-shipping-cost",
+    "action": "create",
+    "order": 4,
+    "q": {
+      "el": "Πόσο κοστίζει η αποστολή;",
+      "en": "How much is shipping?",
+      "it": "Quanto costa la spedizione?"
+    },
+    "a": {
+      "el": "<p>Το κόστος υπολογίζεται από το βάρος και τον όγκο του δέματος και από τον Τ.Κ. σας. Βλέπετε το ακριβές ποσό στο καλάθι, πριν πληρώσετε. Με ACS Courier, για παραγγελίες άνω των 150 € καθαρής αξίας, η αποστολή είναι δωρεάν. Η παραλαβή από το κατάστημα είναι πάντα δωρεάν.</p>",
+      "en": "<p>It depends on the weight and size of the parcel and on your postcode, and you see the exact amount in the cart before you pay. ACS Courier is free for orders over €150 net. Store pickup is always free.</p>",
+      "it": "<p>Dipende da peso e volume del pacco e dal vostro CAP; l'importo esatto è visibile nel carrello prima del pagamento. ACS Courier è gratuito per ordini oltre 150 € netti. Il ritiro in negozio è sempre gratuito.</p>"
+    }
+  },
+  {
+    "slug": "hdc-delivery-time",
+    "action": "create",
+    "order": 5,
+    "q": {
+      "el": "Σε πόσο θα φτάσει η παραγγελία μου;",
+      "en": "How long does delivery take?",
+      "it": "Quanto tempo richiede la consegna?"
+    },
+    "a": {
+      "el": "<p>Ετοιμάζουμε την παραγγελία σε 1–2 εργάσιμες μετά την πληρωμή. Με ACS Courier παραδίδεται συνήθως σε 2–5 εργάσιμες ημέρες. Με ACS Express η παράδοση γίνεται έως τις 12:00 της επόμενης εργάσιμης μετά την αποστολή. <a href=\"/apostoli-paradosi\">Αποστολή και παράδοση</a></p>",
+      "en": "<p>We prepare your order within 1–2 working days of payment. ACS Courier usually delivers in 2–5 working days; ACS Express delivers by 12:00 on the next working day after dispatch. <a href=\"/en/apostoli-paradosi\">Shipping and delivery</a></p>",
+      "it": "<p>Prepariamo l'ordine entro 1–2 giorni lavorativi dal pagamento. Con ACS Courier la consegna avviene di solito in 2–5 giorni lavorativi; con ACS Express entro le 12:00 del giorno lavorativo successivo alla spedizione. <a href=\"/it/apostoli-paradosi\">Spedizione e consegna</a></p>"
+    }
+  },
+  {
+    "slug": "hdc-track-order",
+    "action": "create",
+    "order": 6,
+    "q": {
+      "el": "Πώς παρακολουθώ την παραγγελία μου;",
+      "en": "How do I track my order?",
+      "it": "Come posso seguire il mio ordine?"
+    },
+    "a": {
+      "el": "<p>Στη σελίδα <a href=\"/logariasmos/entopismos\">Εντοπισμός παραγγελίας</a>, με τον αριθμό της παραγγελίας (HDC-…) και το email σας. Δεν χρειάζεται λογαριασμός. Μόλις φύγει το δέμα, εμφανίζεται εκεί και ο αριθμός αποστολής της ACS.</p>",
+      "en": "<p>On the <a href=\"/en/logariasmos/entopismos\">order tracking</a> page, with your order number (HDC-…) and email. No account needed. Once the parcel ships, the ACS tracking number appears there too.</p>",
+      "it": "<p>Nella pagina <a href=\"/it/logariasmos/entopismos\">traccia ordine</a>, con il numero d'ordine (HDC-…) e la vostra email, senza bisogno di un account. Quando il pacco parte, compare anche il numero di spedizione ACS.</p>"
+    }
+  },
+  {
+    "slug": "hdc-prices-vat",
+    "action": "create",
+    "order": 7,
+    "q": {
+      "el": "Οι τιμές περιλαμβάνουν ΦΠΑ;",
+      "en": "Do prices include VAT?",
+      "it": "I prezzi includono l'IVA?"
+    },
+    "a": {
+      "el": "<p>Ναι. Όλες οι τιμές είναι τελικές, με ΦΠΑ 24%. Τα μεταφορικά φαίνονται χωριστά, στο καλάθι.</p>",
+      "en": "<p>Yes. All prices are final and include 24% VAT. Shipping is shown separately in the cart.</p>",
+      "it": "<p>Sì. Tutti i prezzi sono finali e includono l'IVA greca al 24%. La spedizione è indicata a parte nel carrello.</p>"
+    }
+  },
+  {
+    "slug": "hdc-invoice",
+    "action": "create",
+    "order": 8,
+    "q": {
+      "el": "Μπορώ να πάρω τιμολόγιο;",
+      "en": "Can I get an invoice?",
+      "it": "Posso ricevere una fattura?"
+    },
+    "a": {
+      "el": "<p>Ναι. Στην ολοκλήρωση της παραγγελίας επιλέξτε «Θέλω τιμολόγιο» και συμπληρώστε το ΑΦΜ και την επωνυμία.</p>",
+      "en": "<p>Yes. At checkout tick “I want an invoice” and enter your VAT number (ΑΦΜ) and company name.</p>",
+      "it": "<p>Sì. Al checkout selezionate “Voglio la fattura” e indicate partita IVA (ΑΦΜ) e ragione sociale.</p>"
+    }
+  },
+  {
+    "slug": "hdc-account-needed",
+    "action": "create",
+    "order": 9,
+    "q": {
+      "el": "Χρειάζομαι λογαριασμό για να παραγγείλω;",
+      "en": "Do I need an account to order?",
+      "it": "Serve un account per ordinare?"
+    },
+    "a": {
+      "el": "<p>Όχι. Μπορείτε να παραγγείλετε ως επισκέπτης. Με λογαριασμό βλέπετε όλες τις παραγγελίες σας σε ένα σημείο και συμπληρώνετε πιο γρήγορα τα στοιχεία στην επόμενη αγορά.</p>",
+      "en": "<p>No, you can order as a guest. With an account you see all your orders in one place and check out faster next time.</p>",
+      "it": "<p>No, potete ordinare come ospiti. Con un account vedete tutti i vostri ordini in un unico posto e completate più velocemente il prossimo acquisto.</p>"
+    }
+  },
+  {
+    "slug": "hdc-m12-m18-mx-fuel",
+    "action": "create",
+    "order": 10,
+    "q": {
+      "el": "Ποια η διαφορά M12, M18 και MX FUEL;",
+      "en": "What is the difference between M12, M18 and MX FUEL?",
+      "it": "Che differenza c'è tra M12, M18 e MX FUEL?"
+    },
+    "a": {
+      "el": "<p>Είναι οι τρεις πλατφόρμες μπαταρίας της Milwaukee:</p><ul><li><strong>M12:</strong> 12V, για μικρά, ελαφριά εργαλεία και δουλειά σε στενούς χώρους.</li><li><strong>M18:</strong> 18V, η βασική πλατφόρμα, με τη μεγαλύτερη γκάμα εργαλείων.</li><li><strong>MX FUEL:</strong> για βαρύ εξοπλισμό εργοταξίου, που μέχρι σήμερα δούλευε με βενζίνη ή ρεύμα.</li></ul><p>Μέσα στην ίδια πλατφόρμα, κάθε μπαταρία ταιριάζει σε κάθε εργαλείο. Για παράδειγμα, μια μπαταρία M18 δουλεύει σε όλα τα εργαλεία M18. Οι μπαταρίες διαφορετικών πλατφορμών δεν είναι συμβατές μεταξύ τους.</p>",
+      "en": "<p>They are Milwaukee's three battery platforms:</p><ul><li><strong>M12:</strong> 12V, for compact, lightweight tools and tight spaces.</li><li><strong>M18:</strong> 18V, the core platform with the widest range of tools.</li><li><strong>MX FUEL:</strong> for heavy jobsite equipment that used to run on petrol or mains power.</li></ul><p>Within a platform, every battery fits every tool – any M18 battery works in any M18 tool. Batteries are not interchangeable between platforms.</p>",
+      "it": "<p>Sono le tre piattaforme batteria di Milwaukee:</p><ul><li><strong>M12:</strong> 12V, per utensili compatti e leggeri e spazi ristretti.</li><li><strong>M18:</strong> 18V, la piattaforma principale, con la gamma più ampia di utensili.</li><li><strong>MX FUEL:</strong> per le attrezzature pesanti da cantiere che finora funzionavano a benzina o a corrente.</li></ul><p>All'interno della stessa piattaforma ogni batteria è compatibile con ogni utensile: qualsiasi batteria M18 funziona con qualsiasi utensile M18. Le batterie di piattaforme diverse non sono intercambiabili.</p>"
+    }
+  },
+  {
+    "slug": "hdc-tool-only-or-kit",
+    "action": "create",
+    "order": 11,
+    "q": {
+      "el": "Τι σημαίνει «σκέτο εργαλείο» και τι «κιτ»;",
+      "en": "What does “bare tool” and “kit” mean?",
+      "it": "Cosa significano “solo corpo” e “kit”?"
+    },
+    "a": {
+      "el": "<p>Το τέλος του κωδικού Milwaukee δείχνει τι περιέχει η συσκευασία. Το <strong>-0</strong> σημαίνει σκέτο εργαλείο, χωρίς μπαταρία και φορτιστή, για όσους έχουν ήδη μπαταρίες της ίδιας πλατφόρμας. Τα τρία ψηφία σημαίνουν κιτ: για παράδειγμα, το <strong>-502</strong> έχει 2 μπαταρίες 5.0Ah και φορτιστή. Το <strong>X</strong> στο τέλος σημαίνει ότι περιλαμβάνεται θήκη. Στη σελίδα κάθε προϊόντος μπορείτε να αλλάξετε ανάμεσα σε σκέτο και κιτ.</p>",
+      "en": "<p>The end of the Milwaukee code tells you what is in the box. <strong>-0</strong> means bare tool, without battery or charger – ideal if you already own batteries of the same platform. Three digits mean a kit: for example <strong>-502</strong> includes 2 × 5.0Ah batteries and a charger. An <strong>X</strong> at the end means a case is included. On each product page you can switch between the bare tool and the kits.</p>",
+      "it": "<p>La parte finale del codice Milwaukee indica il contenuto della confezione. <strong>-0</strong> significa solo corpo, senza batteria né caricabatterie: ideale se avete già batterie della stessa piattaforma. Tre cifre indicano un kit: ad esempio <strong>-502</strong> comprende 2 batterie da 5.0Ah e caricabatterie. La <strong>X</strong> finale indica che è inclusa una valigetta. In ogni pagina prodotto potete passare dal solo corpo ai kit.</p>"
+    }
+  },
+  {
+    "slug": "hdc-fuel-one-key",
+    "action": "create",
+    "order": 12,
+    "q": {
+      "el": "Τι σημαίνουν FUEL και ONE-KEY;",
+      "en": "What do FUEL and ONE-KEY mean?",
+      "it": "Cosa significano FUEL e ONE-KEY?"
+    },
+    "a": {
+      "el": "<p>Τα εργαλεία <strong>FUEL</strong> συνδυάζουν μοτέρ χωρίς ψήκτρες (brushless) POWERSTATE, μπαταρίες REDLITHIUM και ηλεκτρονικά REDLINK PLUS. Έτσι δίνουν περισσότερη ισχύ, μεγαλύτερη αυτονομία και μεγαλύτερη διάρκεια ζωής. Τα εργαλεία <strong>ONE-KEY</strong> συνδέονται με την εφαρμογή της Milwaukee, για ρυθμίσεις, καταγραφή και εντοπισμό των εργαλείων σας.</p>",
+      "en": "<p><strong>FUEL</strong> tools combine a POWERSTATE brushless motor, REDLITHIUM batteries and REDLINK PLUS electronics for more power, runtime and durability. <strong>ONE-KEY</strong> tools connect to Milwaukee's app for settings, inventory and tool tracking.</p>",
+      "it": "<p>Gli utensili <strong>FUEL</strong> uniscono motore brushless POWERSTATE, batterie REDLITHIUM ed elettronica REDLINK PLUS per più potenza, autonomia e durata. Gli utensili <strong>ONE-KEY</strong> si collegano all'app Milwaukee per impostazioni, inventario e localizzazione.</p>"
+    }
+  },
+  {
+    "slug": "hdc-warranty",
+    "action": "create",
+    "order": 13,
+    "q": {
+      "el": "Τι εγγύηση έχουν τα εργαλεία;",
+      "en": "What warranty do the tools have?",
+      "it": "Che garanzia hanno gli utensili?"
+    },
+    "a": {
+      "el": "<p>Κάθε προϊόν καλύπτεται από τη νόμιμη εγγύηση δύο ετών και από την εγγύηση του κατασκευαστή Milwaukee. Για οποιοδήποτε πρόβλημα, επικοινωνήστε μαζί μας ή φέρτε το εργαλείο στο κατάστημα, μαζί με το παραστατικό αγοράς. <a href=\"/eggyiseis\">Εγγυήσεις</a></p>",
+      "en": "<p>Every product is covered by the two-year legal guarantee and by Milwaukee's manufacturer warranty. If something goes wrong, contact us or bring the tool to the store with your proof of purchase. <a href=\"/en/eggyiseis\">Warranty</a></p>",
+      "it": "<p>Ogni prodotto è coperto dalla garanzia legale di due anni e dalla garanzia del produttore Milwaukee. In caso di problemi contattateci o portate l'utensile in negozio con lo scontrino o la fattura. <a href=\"/it/eggyiseis\">Garanzia</a></p>"
+    }
+  },
+  {
+    "slug": "hdc-returns",
+    "action": "create",
+    "order": 14,
+    "q": {
+      "el": "Μπορώ να επιστρέψω ένα προϊόν;",
+      "en": "Can I return a product?",
+      "it": "Posso restituire un prodotto?"
+    },
+    "a": {
+      "el": "<p>Ναι, μέσα σε 14 ημέρες από την παραλαβή, χωρίς αιτιολογία. Στείλτε μας email ή τηλεφωνήστε μας με τον αριθμό της παραγγελίας και θα σας πούμε πώς να το επιστρέψετε. Αν το φέρετε στο κατάστημα στον Πειραιά, η επιστροφή δεν σας κοστίζει τίποτα. <a href=\"/epistrofes\">Πολιτική επιστροφών</a></p>",
+      "en": "<p>Yes, within 14 days of receipt, no reason needed. Email or call us with your order number and we will tell you how to send it back – or bring it to the Piraeus store at no cost. <a href=\"/en/epistrofes\">Returns policy</a></p>",
+      "it": "<p>Sì, entro 14 giorni dal ricevimento, senza bisogno di motivazione. Scriveteci o chiamateci con il numero d'ordine e vi diremo come restituirlo, oppure portatelo gratuitamente nel negozio del Pireo. <a href=\"/it/epistrofes\">Politica di reso</a></p>"
+    }
+  },
+  {
+    "slug": "hdc-wrong-or-defective",
+    "action": "create",
+    "order": 15,
+    "q": {
+      "el": "Ήρθε λάθος ή ελαττωματικό προϊόν. Τι κάνω;",
+      "en": "I received a wrong or faulty item. What should I do?",
+      "it": "Ho ricevuto un prodotto sbagliato o difettoso. Cosa faccio?"
+    },
+    "a": {
+      "el": "<p>Ενημερώστε μας το συντομότερο, στο 210 422 02 39 ή στο info@kolleris.com. Αν η συσκευασία έφτασε χτυπημένη, στείλτε μας και φωτογραφίες. Θα το αντικαταστήσουμε ή θα σας επιστρέψουμε τα χρήματα, και όλα τα μεταφορικά τα αναλαμβάνουμε εμείς.</p>",
+      "en": "<p>Let us know as soon as possible on +30 210 422 02 39 or at info@kolleris.com, with photos if the packaging was damaged. We will replace it or refund you, and we cover all shipping costs.</p>",
+      "it": "<p>Avvisateci il prima possibile al +30 210 422 02 39 o a info@kolleris.com, con foto se l'imballo era danneggiato. Lo sostituiremo o vi rimborseremo, e tutte le spese di spedizione sono a nostro carico.</p>"
+    }
+  }
+]
