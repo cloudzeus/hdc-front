@@ -67,6 +67,8 @@ export type ProductDetail = {
    * «Τεχνικά χαρακτηριστικά» block is the manufacturer's spec source.
    */
   longDescriptionEl: string | null;
+  /** The English long description: its «Technical specifications» block labels the spec table on non-Greek pages. */
+  longDescriptionEn: string | null;
   /** Category → group → subgroup, as far as the synced tree resolves them. */
   categoryChain: Array<{ name: string; slug: string }>;
   /** Classification codes, for the compare scope. */
@@ -227,6 +229,8 @@ export const getProductBySlug = cache(
       isOneKey: product.isOneKey,
       longDescriptionEl:
         product.translations.find((t) => t.locale === "el")?.longDescription ?? null,
+      longDescriptionEn:
+        product.translations.find((t) => t.locale === "en")?.longDescription ?? null,
       categoryChain: [category, group, subgroup]
         .filter((c): c is NonNullable<typeof c> => c != null)
         .map((c) => ({ name: pick(c), slug: c.slug })),

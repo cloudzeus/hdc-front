@@ -1,6 +1,12 @@
 /**
  * The manufacturer's spec lines at the end of a Milwaukee description.
  *
+ * The English description carries the same block as «Technical specifications:»
+ * (1.652 of the 1.832 products that have the Greek one), with the same numbers
+ * and English labels, sometimes as "- " list lines. The PDP shows that one on
+ * the English and Italian pages; every fact the code reasons about (kit
+ * contents, key numbers) is still read from the Greek block.
+ *
  * Why not HDCtool's `specifications[]`: that table was filled by AI and is
  * wrong for Milwaukee — for M18 FPD3-502X it says 135 Nm and 0–1800 rpm where
  * Milwaukee says 158 Nm and 0–2100 (spec §8.4). The "Τεχνικά χαρακτηριστικά:"
@@ -9,7 +15,7 @@
 
 export type TechRow = { label: string; value: string };
 
-const HEADING = /Τεχνικά χαρακτηριστικά:\s*\n/;
+const HEADING = /(Τεχνικά χαρακτηριστικά|Technical specifications)\s*:\s*\n/i;
 
 export function parseTechBlock(description: string | null | undefined): TechRow[] {
   if (!description) return [];
@@ -24,7 +30,7 @@ export function parseTechBlock(description: string | null | undefined): TechRow[
       const clean = line.replace(/\r$/, "");
       const i = clean.indexOf(":");
       if (i <= 0) return null;
-      const label = clean.slice(0, i).trim();
+      const label = clean.slice(0, i).replace(/^\s*[-–•]\s*/, "").trim();
       const value = clean.slice(i + 1).trim();
       // "-" is how the source says "not applicable" — a bare tool's battery rows.
       return label && value && value !== "-" ? { label, value } : null;

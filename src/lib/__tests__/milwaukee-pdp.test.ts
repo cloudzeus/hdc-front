@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   boxFacts,
+  localizeBoxFacts,
   chargerModel,
   descriptionParagraphs,
   formatSpecValue,
@@ -271,5 +272,40 @@ describe("inTheBox", () => {
         batteries: CATALOGUE,
       }),
     ).toEqual([]);
+  });
+});
+
+describe("English spec rows", () => {
+  it("specTable drops the English code rows too", () => {
+    const rows = specTable(
+      [
+        { label: "Manufacturer code", value: "4933479860" },
+        { label: "EAN", value: "4058546376543" },
+        { label: "Capacity (kg)", value: "68" },
+      ],
+      "en",
+    );
+    expect(rows.map((r) => r.label)).toEqual(["Capacity"]);
+  });
+
+  it("localizeBoxFacts takes the words from the English rows and keeps the Greek counts", () => {
+    const greek = boxFacts([
+      { label: "Αρ. παρεχόμενων μπαταριών", value: "2" },
+      { label: "Χωρητικότητα μπαταρίας (Ah)", value: "5.0" },
+      { label: "Βασικός εξοπλισμός", value: "κλιπ ζώνης, πλαϊνή λαβή" },
+      { label: "Παραδίδεται σε", value: "HD Box" },
+    ]);
+    const local = localizeBoxFacts(greek, [
+      { label: "Standard equipment", value: "belt clip, side handle" },
+      { label: "Supplied in", value: "HD box" },
+    ]);
+    expect(local.batteries).toEqual({ count: 2, ah: 5 });
+    expect(local.accessories).toEqual(["belt clip", "side handle"]);
+    expect(local.case).toBe("HD box");
+  });
+
+  it("localizeBoxFacts leaves the facts alone without English rows", () => {
+    const greek = boxFacts([{ label: "Βασικός εξοπλισμός", value: "κλιπ ζώνης" }]);
+    expect(localizeBoxFacts(greek, [])).toEqual(greek);
   });
 });

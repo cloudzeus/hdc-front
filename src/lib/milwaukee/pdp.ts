@@ -184,7 +184,7 @@ export function formatSpecValue(value: string, locale: Locale): string {
  */
 export function specTable(rows: TechRow[], locale: Locale = "el"): TechRow[] {
   return rows
-    .filter((r) => !/^(Κωδικός|EAN)/i.test(r.label))
+    .filter((r) => !/^(Κωδικός|EAN|Manufacturer code|Product code|Code\b)/i.test(r.label))
     .map((r) => {
       const unit = labelUnit(r.label);
       let value = formatSpecValue(r.value, locale);
@@ -223,24 +223,51 @@ export function chargerModel(value: string): string {
     .trim();
 }
 
+/** «Παραδίδεται σε» / "Supplied in", "Delivered in". */
+const CASE_LABEL = /^((Παραδίδεται|Παρέχεται)(\s+σε)?|(Supplied|Delivered) in)$/i;
+/** «Βασικός εξοπλισμός» / "Standard equipment", "Basic equipment". */
+const ACCESSORIES_LABEL = /^((Βασικός|Στάνταρ) εξοπλισμός|(Standard|Basic) equipment)/i;
+
+const splitItems = (value: string) =>
+  value
+    .split(/[,;]/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+
 export function boxFacts(rows: TechRow[]): BoxFacts {
   const find = (label: RegExp) => rows.find((r) => label.test(r.label))?.value.trim();
 
   const kit = kitFromTechBlock(rows);
   const charger = find(/φορτιστ/i);
-  const caseValue = find(/^(Παραδίδεται|Παρέχεται)(\s+σε)?$/i);
-  const accessories = find(/^(Βασικός|Στάνταρ) εξοπλισμός/i);
+  const caseValue = find(CASE_LABEL);
+  const accessories = find(ACCESSORIES_LABEL);
 
   return {
     batteries: kit ? { count: kit.batteries, ah: kit.ah } : null,
     charger: charger && !NEGATIVE.test(charger) ? chargerModel(charger) : null,
     case: caseValue && !NEGATIVE.test(caseValue) ? caseValue : null,
-    accessories: accessories
-      ? accessories
-          .split(/[,;]/)
-          .map((s) => s.trim())
-          .filter(Boolean)
-      : [],
+    accessories: accessories ? splitItems(accessories) : [],
+  };
+}
+
+/**
+ * The box facts in the page's language.
+ *
+ * The counts and the charger model stay as read from the Greek block (the
+ * charger model is Latin anyway); the case and the accessory list are words,
+ * so they come from the English block when the page is not Greek and that
+ * block names them. Otherwise the Greek words stay — better than nothing.
+ */
+export function localizeBoxFacts(facts: BoxFacts, localRows: TechRow[]): BoxFacts {
+  if (localRows.length === 0) return facts;
+  const find = (label: RegExp) => localRows.find((r) => label.test(r.label))?.value.trim();
+  const caseValue = find(CASE_LABEL);
+  const accessories = find(ACCESSORIES_LABEL);
+  return {
+    ...facts,
+    case: facts.case && caseValue && !NEGATIVE.test(caseValue) ? caseValue : facts.case,
+    accessories:
+      facts.accessories.length > 0 && accessories ? splitItems(accessories) : facts.accessories,
   };
 }
 

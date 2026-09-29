@@ -47,3 +47,29 @@ describe("kitFromTechBlock", () => {
     expect(kitFromTechBlock(bare)).toBeNull();
   });
 });
+
+// The actual tail of M18 FPD3-502X's English description in HDCtool.
+const FPD3_KIT_EN = `…for transport and storage.
+
+Technical specifications:
+- Manufacturer code: 4933479860
+- EAN: 4058546376543
+- Max torque: 158 Nm
+- No-load speed gear 2: 0-2100 rpm
+- Standard equipment: belt clip, side handle
+- Supplied in: HD box`;
+
+describe("parseTechBlock — English and variant headings", () => {
+  it("reads the English block and drops the list dashes", () => {
+    const rows = parseTechBlock(FPD3_KIT_EN);
+    expect(rows[0]).toEqual({ label: "Manufacturer code", value: "4933479860" });
+    expect(rows).toContainEqual({ label: "Max torque", value: "158 Nm" });
+    expect(rows).toContainEqual({ label: "Supplied in", value: "HD box" });
+  });
+
+  it("reads «Τεχνικά Χαρακτηριστικά» with a capital, as 15 products write it", () => {
+    expect(parseTechBlock("…\n\nΤεχνικά Χαρακτηριστικά:\nΒάρος (kg): 2,2")).toEqual([
+      { label: "Βάρος (kg)", value: "2,2" },
+    ]);
+  });
+});

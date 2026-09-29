@@ -38,6 +38,7 @@ import { parseModel } from "@/lib/milwaukee/model";
 import {
   ahLabel,
   boxFacts,
+  localizeBoxFacts,
   descriptionParagraphs,
   inTheBox,
   keyNumbers,
@@ -113,6 +114,9 @@ export default async function ProductPage({ params }: PageProps) {
   const platform = product.platform;
   const model = parseModel(product.erpName);
   const techRows = parseTechBlock(product.longDescriptionEl);
+  // What the spec table and the box words show. Greek facts, local labels:
+  // there is no Italian block, so Italian gets the English one.
+  const localTechRows = locale === "el" ? [] : parseTechBlock(product.longDescriptionEn);
   const kit =
     product.modelContent === "kit" ? (kitFromTechBlock(techRows) ?? model?.kit ?? null) : null;
 
@@ -289,10 +293,10 @@ export default async function ProductPage({ params }: PageProps) {
   let paragraphs = descriptionParagraphs(product.longDescription);
   if (paragraphs.length === 0 && locale !== "el") paragraphs = descriptionParagraphs(product.longDescriptionEl);
   const photo = product.images[1]?.url ?? null;
-  const specs = specTable(techRows, locale);
+  const specs = specTable(localTechRows.length > 0 ? localTechRows : techRows, locale);
   const half = Math.ceil(specs.length / 2);
   const box = inTheBox({
-    facts: boxFacts(techRows),
+    facts: localizeBoxFacts(boxFacts(techRows), localTechRows),
     platform,
     isTool: product.modelRoot != null,
     kitFallback: product.modelContent === "kit" ? (model?.kit ?? null) : null,
