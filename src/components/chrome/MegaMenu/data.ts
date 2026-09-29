@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { MegaMenuData, MenuPlatform } from "@/lib/catalog/mega-menu-core";
 import { readPlatformCookie, writePlatformCookie } from "@/lib/catalog/platform-cookie";
 
@@ -73,18 +73,38 @@ export function usePlatformChoice(active: boolean) {
     writePlatformCookie(next);
   };
 
-  return [plat, choose] as const;
+  /*
+   * The same read, on demand: the header calls it in the same update that
+   * opens the panel, so the roots render in the remembered platform's order
+   * from the first frame. Re-ordered a frame later, React would move the
+   * focused root in the DOM — and the browser drops the focus of a moved
+   * element.
+   */
+  const sync = () => setPlat(readPlatformCookie() ?? "all");
+
+  return [plat, choose, sync] as const;
 }
+
+/** The visitor asked for less motion. Browser only; false on the server. */
+export const reducedMotion = (): boolean =>
+  typeof window !== "undefined" &&
+  (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false);
+
+export const EASE = "cubic-bezier(0.2, 0.8, 0.2, 1)";
 
 /**
  * A number that runs from its last value to the next (mockup `tween`: 380 ms,
  * ease-out cubic). With reduced motion it simply changes.
+ *
+ * `fromZero`: the first value also runs up from 0, as the mockup's big
+ * counters do. Off for the counts in the rows, which appear as they are and
+ * only run when the platform changes them.
  */
-export function useTween(target: number, duration = 380): number {
-  // From 0 on first show, as the mockup's counter does; afterwards from
-  // whatever is on screen, so an interrupted run carries on smoothly.
-  const [shown, setShown] = useState(0);
-  const current = useRef(0);
+export function useTween(target: number, duration = 380, fromZero = true): number {
+  // From 0 (or the target) on first show; afterwards from whatever is on
+  // screen, so an interrupted run carries on smoothly.
+  const [shown, setShown] = useState(fromZero ? 0 : target);
+  const current = useRef(fromZero ? 0 : target);
 
   useEffect(() => {
     const start = current.current;
@@ -93,7 +113,7 @@ export function useTween(target: number, duration = 380): number {
       current.current = value;
       setShown(value);
     };
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+    if (reducedMotion()) {
       put(target);
       return;
     }
@@ -110,4 +130,52 @@ export function useTween(target: number, duration = 380): number {
   }, [target, duration]);
 
   return shown;
+}
+
+/**
+ * FLIP for a list that re-orders: when `trigger` changes (the platform), every
+ * element carrying `data-flip` slides from where it was to where it is now,
+ * and the ones that were not there fade in. Positions are `offsetTop`, so a
+ * scrolled column measures the same. Nothing moves under reduced motion.
+ */
+export function useFlip(box: React.RefObject<HTMLElement | null>, trigger: string) {
+  const last = useRef(new Map<string, number>());
+  const lastTrigger = useRef(trigger);
+
+  useLayoutEffect(() => {
+    const root = box.current;
+    if (!root) return;
+    const items = [...root.querySelectorAll<HTMLElement>("[data-flip]")];
+    const now = new Map(items.map((el) => [el.dataset.flip!, el.offsetTop]));
+
+    if (lastTrigger.current !== trigger && !reducedMotion() && typeof root.animate === "function") {
+      for (const el of items) {
+        const before = last.current.get(el.dataset.flip!);
+        const after = now.get(el.dataset.flip!)!;
+        if (before === undefined) {
+          el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 260, easing: EASE });
+        } else if (before !== after) {
+          el.animate(
+            [{ transform: `translateY(${before - after}px)` }, { transform: "none" }],
+            { duration: 380, easing: EASE },
+          );
+        }
+      }
+    }
+    lastTrigger.current = trigger;
+    last.current = now;
+  });
+}
+
+/** Warms the browser cache with the photos a hover is about to ask for. */
+const warmed = new Set<string>();
+export function preloadImages(urls: Array<string | null | undefined>) {
+  if (typeof window === "undefined") return;
+  for (const url of urls) {
+    if (!url || warmed.has(url)) continue;
+    warmed.add(url);
+    const img = new Image();
+    img.decoding = "async";
+    img.src = url;
+  }
 }

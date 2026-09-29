@@ -6,9 +6,11 @@ import {
   formatCount,
   menuHref,
   menuName,
+  neutralCount,
   orderGroups,
   rootHeroTop,
   rootSequence,
+  rowFit,
   splitRoots,
   topFor,
   type Counts,
@@ -37,30 +39,65 @@ describe("menuName", () => {
   });
 });
 
+describe("rowFit", () => {
+  it("counts the products tied to no platform", () => {
+    expect(neutralCount(c(58, 12, 21, 2))).toBe(23);
+    expect(neutralCount(c(2, 0, 2))).toBe(0);
+  });
+
+  it("is fit with the platform, uni with platform-free products, off with neither", () => {
+    expect(rowFit(c(409, 117, 256, 11), "M12")).toBe("fit");
+    expect(rowFit(c(271), "M18")).toBe("uni");
+    expect(rowFit(c(43, 0, 2), "M12")).toBe("uni"); // 41 corded tools fit anything
+    expect(rowFit(c(1, 0, 1), "MX")).toBe("off"); // one M18 compressor: nothing for MX
+    expect(rowFit(c(1, 0, 1), "all")).toBe("fit");
+  });
+
+  it("does not call a row of other platforms' tools «fits all» for a stray neutral one", () => {
+    // 49 M12 + 59 M18 drills and 2 without a model code: nothing for MX.
+    expect(rowFit(c(110, 49, 59), "MX")).toBe("off");
+    // PACKOUT: 161 platform-free cases and 2 M12 radios still fit an M18.
+    expect(rowFit(c(163, 2, 0), "M18")).toBe("uni");
+  });
+});
+
 describe("splitRoots", () => {
   const roots = [
     { id: "battery", c: c(409, 117, 256, 11) },
     { id: "hand", c: c(528, 6, 0, 0) },
     { id: "drill", c: c(271) },
     { id: "light", c: c(58, 12, 21, 2) },
+    { id: "air", c: c(1, 0, 1, 0) },
   ];
 
   it("keeps the curated order for ΟΛΕΣ", () => {
-    const { fit, uni } = splitRoots(roots, "all");
-    expect(fit.map((r) => r.id)).toEqual(["battery", "hand", "drill", "light"]);
+    const { fit, uni, off } = splitRoots(roots, "all");
+    expect(fit.map((r) => r.id)).toEqual(["battery", "hand", "drill", "light", "air"]);
     expect(uni).toEqual([]);
+    expect(off).toEqual([]);
   });
 
   it("puts the roots with the platform first, most products first", () => {
-    const { fit, uni } = splitRoots(roots, "M18");
-    expect(fit.map((r) => r.id)).toEqual(["battery", "light"]);
+    const { fit, uni, off } = splitRoots(roots, "M18");
+    expect(fit.map((r) => r.id)).toEqual(["battery", "light", "air"]);
     expect(uni.map((r) => r.id)).toEqual(["hand", "drill"]);
+    expect(off).toEqual([]);
     expect(rootSequence(roots, "M12").map((r) => r.id)).toEqual([
       "battery",
       "light",
       "hand",
       "drill",
+      "air",
     ]);
+  });
+
+  it("dims, never hides, the roots with only other platforms' products", () => {
+    const { fit, uni, off } = splitRoots(roots, "MX");
+    expect(fit.map((r) => r.id)).toEqual(["battery", "light"]);
+    expect(uni.map((r) => r.id)).toEqual(["hand", "drill"]);
+    expect(off.map((r) => r.id)).toEqual(["air"]);
+    // Every root is still there, once.
+    expect(rootSequence(roots, "MX")).toHaveLength(roots.length);
   });
 });
 
@@ -70,19 +107,33 @@ describe("orderGroups", () => {
     { id: "b", c: c(1, 0, 1) },
     { id: "c", c: c(110, 49, 59) },
     { id: "d", c: c(10, 10, 0) },
+    { id: "e", c: c(30) },
   ];
+  const rows = (plat: Parameters<typeof orderGroups>[1]) =>
+    orderGroups(groups, plat).map((g) => [g.group.id, g.n, g.fit]);
 
-  it("sorts by count and dims the empty ones at the end", () => {
-    expect(orderGroups(groups, "M18", false).map((g) => [g.group.id, g.n])).toEqual([
-      ["c", 59],
-      ["a", 6],
-      ["b", 1],
-      ["d", 0],
+  it("sorts by count, then the platform-free ones, and dims the empty ones at the end", () => {
+    expect(rows("M18")).toEqual([
+      ["c", 59, "fit"],
+      ["a", 6, "fit"],
+      ["b", 1, "fit"],
+      ["e", 30, "uni"],
+      ["d", 0, "off"],
     ]);
   });
 
-  it("counts totals in a universal root", () => {
-    expect(orderGroups(groups, "MX", true).map((g) => g.n)).toEqual([110, 14, 10, 1]);
+  it("counts totals where nothing is of the platform, and 0 where nothing fits", () => {
+    expect(rows("MX")).toEqual([
+      ["e", 30, "uni"],
+      ["a", 0, "off"],
+      ["b", 0, "off"],
+      ["c", 0, "off"],
+      ["d", 0, "off"],
+    ]);
+  });
+
+  it("is one list by count for ΟΛΕΣ", () => {
+    expect(rows("all").map(([id]) => id)).toEqual(["c", "e", "a", "d", "b"]);
   });
 });
 

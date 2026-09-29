@@ -304,6 +304,12 @@
     color: #fff;
     font-family: var(--hdc-font);
   }
+  /* Tablets (600–1023px) get the drawer too, a little wider. */
+  @media (min-width: 600px) {
+    .hdc-mmenu {
+      width: 400px;
+    }
+  }
   .hdc-mmenu-top {
     height: 56px;
     flex-shrink: 0;

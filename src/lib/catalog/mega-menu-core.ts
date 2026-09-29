@@ -16,8 +16,9 @@ import { searchKey, upGreek } from "@/lib/greek";
  *    column the sync derives from the model code), never from HDCtool;
  *  - a root or group without products is not shown;
  *  - picking a platform splits the roots into «ΓΙΑ ΤΗΝ M18 ΣΑΣ» (the roots
- *    with M18 products, most first) and «ΤΑΙΡΙΑΖΟΥΝ ΣΕ ΟΛΑ» (the rest, with
- *    their total counts);
+ *    with M18 products, most first), «ΤΑΙΡΙΑΖΟΥΝ ΣΕ ΟΛΑ» (products tied to no
+ *    platform, with their total counts) and, dimmed, «ΓΙΑ ΑΛΛΕΣ ΠΛΑΤΦΟΡΜΕΣ»
+ *    (only other platforms' products) — see `rowFit`;
  *  - names are set in capitals without tonos, « - » becomes « · ».
  */
 
@@ -121,48 +122,81 @@ export const shownCount = (c: Counts, plat: MenuPlatform): number =>
 
 // ── Ordering ──────────────────────────────────────────────────────────────
 
+/** Products with no battery platform at all: they fit every platform. */
+export const neutralCount = (c: Counts): number =>
+  Math.max(0, c.all - c.M12 - c.M18 - c.MX);
+
+/**
+ * How a row (root or group) stands with the platform picked:
+ *
+ *  - `fit`: it has products of that platform («ΟΛΕΣ»: every row is `fit`);
+ *  - `uni`: none of that platform, and mostly products tied to no platform at
+ *    all (drill bits, hand tools, PACKOUT, corded tools) — «ΤΑΙΡΙΑΖΟΥΝ ΣΕ
+ *    ΟΛΑ», with its total;
+ *  - `off`: none of that platform and mostly OTHER platforms' products (the
+ *    drills group when MX FUEL is picked: 108 M12/M18 drills and 2 without a
+ *    model code). Calling it «fits every platform» would be false: it is
+ *    shown dimmed, never hidden, so the menu keeps its shape and says what
+ *    is missing.
+ */
+export type RowFit = "fit" | "uni" | "off";
+
+export function rowFit(c: Counts, plat: MenuPlatform): RowFit {
+  if (plat === "all" || c[plat] > 0) return "fit";
+  const neutral = neutralCount(c);
+  return neutral > 0 && neutral * 2 >= c.all ? "uni" : "off";
+}
+
 /**
  * The roots column. «ΟΛΕΣ»: one list in the curated order. A platform: the
- * roots that have it, most products first, then the rest in curated order.
+ * roots that have it, most products first; then the ones that fit every
+ * platform; then, dimmed, the ones that only have other platforms' products —
+ * both of those in curated order.
  */
 export function splitRoots<T extends { c: Counts }>(
   roots: T[],
   plat: MenuPlatform,
-): { fit: T[]; uni: T[] } {
-  if (plat === "all") return { fit: [...roots], uni: [] };
+): { fit: T[]; uni: T[]; off: T[] } {
+  if (plat === "all") return { fit: [...roots], uni: [], off: [] };
   const fit = roots
     .map((root, index) => ({ root, index }))
     .filter(({ root }) => root.c[plat] > 0)
     .sort((a, b) => b.root.c[plat] - a.root.c[plat] || a.index - b.index)
     .map(({ root }) => root);
-  const uni = roots.filter((root) => !(root.c[plat] > 0));
-  return { fit, uni };
+  const uni = roots.filter((root) => rowFit(root.c, plat) === "uni");
+  const off = roots.filter((root) => rowFit(root.c, plat) === "off");
+  return { fit, uni, off };
 }
 
 /** The keyboard's ↑↓ order: exactly the order the column shows. */
 export function rootSequence<T extends { c: Counts }>(roots: T[], plat: MenuPlatform): T[] {
-  const { fit, uni } = splitRoots(roots, plat);
-  return fit.concat(uni);
+  const { fit, uni, off } = splitRoots(roots, plat);
+  return fit.concat(uni, off);
 }
 
+export type GroupRow<T> = { group: T; n: number; fit: RowFit };
+
 /**
- * The groups column: groups with products for the platform, most first, and
- * the empty ones dimmed at the end «so it shows what is missing». In a
- * universal root every group counts its total.
+ * The groups column: the groups with products for the platform, most first;
+ * then the ones that fit every platform, with their totals; then, dimmed at
+ * the end «so it shows what is missing», the ones with only other platforms'
+ * products, at 0. `n` is the number the row prints.
  */
 export function orderGroups<T extends { c: Counts }>(
   groups: T[],
   plat: MenuPlatform,
-  universal: boolean,
-): Array<{ group: T; n: number }> {
-  const rows = groups.map((group, index) => ({
-    group,
-    index,
-    n: universal ? group.c.all : countFor(group.c, plat),
-  }));
-  const live = rows.filter((r) => r.n > 0).sort((a, b) => b.n - a.n || a.index - b.index);
-  const dead = rows.filter((r) => r.n === 0);
-  return live.concat(dead).map(({ group, n }) => ({ group, n }));
+): Array<GroupRow<T>> {
+  const rows = groups.map((group, index) => {
+    const fit = rowFit(group.c, plat);
+    const n = fit === "fit" ? countFor(group.c, plat) : fit === "uni" ? group.c.all : 0;
+    return { group, index, n, fit };
+  });
+  const byCount = (a: { n: number; index: number }, b: { n: number; index: number }) =>
+    b.n - a.n || a.index - b.index;
+  const pick = (fit: RowFit) => rows.filter((r) => r.fit === fit);
+  return [...pick("fit").sort(byCount), ...pick("uni").sort(byCount), ...pick("off")].map(
+    ({ group, n, fit }) => ({ group, n, fit }),
+  );
 }
 
 /** How full each battery on the switch is: the platform's share, in %. */
@@ -187,10 +221,9 @@ export function topFor(group: Pick<MegaGroup, "top">, plat: MenuPlatform, univer
  * photo of the best product in its biggest group for the platform.
  */
 export function rootHeroTop(root: MegaRoot, plat: MenuPlatform): MegaTop | null {
-  const universal = isUniversal(root.c, plat);
-  for (const { group, n } of orderGroups(root.groups, plat, universal)) {
-    if (n === 0) break;
-    const top = topFor(group, plat, universal);
+  for (const { group, fit } of orderGroups(root.groups, plat)) {
+    if (fit === "off") break;
+    const top = topFor(group, plat, fit !== "fit");
     if (top) return top;
   }
   return null;

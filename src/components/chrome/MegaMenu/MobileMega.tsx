@@ -1,13 +1,11 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import {
-  MENU_PLATFORMS,
   countFor,
   formatCount,
-  isUniversal,
   menuHref,
   orderGroups,
   platformName,
@@ -17,13 +15,21 @@ import {
   type MegaMenuData,
   type MegaRoot,
   type MenuPlatform,
+  type RowFit,
 } from "@/lib/catalog/mega-menu-core";
+import { useFlip, useTween } from "./data";
+import { PlatformSwitch } from "./PlatformSwitch";
 
 /**
- * The mega menu on phones and tablets, inside the drawer (mockup megamenu.html
- * «ΣΤΟ ΚΙΝΗΤΟ»): the battery switch pinned on top as four chips, the roots —
- * split per platform as on the desktop — and, one tap in, a root's own screen
- * with a small stage and its groups. Screens slide in one inside the other.
+ * The mega menu on phones and tablets (below 1024px), inside the drawer
+ * (mockup megamenu.html «ΣΤΟ ΚΙΝΗΤΟ»): the battery switch pinned on top as
+ * four chips, the roots — split per platform as on the desktop — and, one tap
+ * in, a root's own screen with a small stage and its groups.
+ *
+ * The drill-down is deliberate: a root's screen slides in from the right with
+ * its back bar pinned to the top of the scroll (it never scrolls away), and
+ * going back slides the list in from the left, with the focus on the root
+ * that was opened. No screen is ever wider than the drawer.
  */
 
 export function MobileMegaSwitch({
@@ -33,22 +39,11 @@ export function MobileMegaSwitch({
   plat: MenuPlatform;
   onPlat: (p: MenuPlatform) => void;
 }) {
-  const t = useTranslations("chrome.MegaMenu");
-  return (
-    <div className="hdc-mm-pb" role="group" aria-label={t("diakoptis")}>
-      {MENU_PLATFORMS.map((p) => (
-        <button
-          key={p}
-          type="button"
-          className={p === plat ? "is-on" : undefined}
-          aria-pressed={p === plat}
-          onClick={() => onPlat(p)}
-        >
-          {platformName(p, t("oles"))}
-        </button>
-      ))}
-    </div>
-  );
+  return <PlatformSwitch variant="chips" plat={plat} onPlat={onPlat} />;
+}
+
+function Count({ n, format }: { n: number; format: (n: number) => string }) {
+  return <>{format(useTween(n, 380, false))}</>;
 }
 
 export function MobileMegaScreens({
@@ -58,6 +53,7 @@ export function MobileMegaScreens({
   onRoot,
   onNavigate,
   allLabel,
+  direction,
 }: {
   data: MegaMenuData;
   plat: MenuPlatform;
@@ -66,23 +62,36 @@ export function MobileMegaScreens({
   onNavigate: () => void;
   /** «ΚΑΤΗΓΟΡΙΕΣ», the heading of the one list when no platform is picked. */
   allLabel: string;
+  /** Which way the last move went: a root's screen in, or back to the list. */
+  direction: "in" | "back";
 }) {
   const t = useTranslations("chrome.MegaMenu");
   const locale = useLocale();
   const fmt = (n: number) => formatCount(n, locale);
   const label = platformName(plat, t("oles"));
   const [failed, setFailed] = useState<string | null>(null);
+  const listRef = useRef<HTMLDivElement | null>(null);
 
   const root = rootId ? data.roots.find((r) => r.id === rootId) : undefined;
 
+  // The rows slide to their new places when the platform re-orders them.
+  useFlip(listRef, `${root ? "root" : "list"}:${plat}`);
+
   if (!root) {
-    const { fit, uni } = splitRoots(data.roots, plat);
-    const row = (r: MegaRoot, uniRow: boolean) => {
-      const count = fmt(uniRow ? r.c.all : countFor(r.c, plat));
-      const className = `hdc-mm-pr${uniRow ? " is-uni" : ""}`;
+    const { fit, uni, off } = splitRoots(data.roots, plat);
+    const row = (r: MegaRoot, kind: RowFit) => {
+      const count = <Count n={shownCount(r.c, plat)} format={fmt} />;
+      const className = `hdc-mm-pr${kind === "fit" ? "" : ` is-${kind}`}`;
       // A root without groups has no screen of its own: it is a plain link.
       return r.groups.length ? (
-        <button key={r.id} type="button" className={className} onClick={() => onRoot(r.id)}>
+        <button
+          key={r.id}
+          type="button"
+          className={className}
+          data-root={r.id}
+          data-flip={`r:${r.id}`}
+          onClick={() => onRoot(r.id)}
+        >
           <span className="n">{r.name}</span>
           <span className="c">{count}</span>
         </button>
@@ -91,7 +100,9 @@ export function MobileMegaScreens({
           key={r.id}
           href={menuHref(r.href, plat, r.c)}
           prefetch={false}
-          className={className}
+          className={`${className} is-link`}
+          data-root={r.id}
+          data-flip={`r:${r.id}`}
           onClick={onNavigate}
         >
           <span className="n">{r.name}</span>
@@ -99,53 +110,82 @@ export function MobileMegaScreens({
         </Link>
       );
     };
+    const heading = (key: string, text: string) => (
+      <h6 key={key} className="hdc-mm-h6" data-flip={`h:${key}`}>
+        {text}
+      </h6>
+    );
     return (
-      <div className="hdc-mm-screen" key={`list:${plat}`}>
+      <div
+        className={`hdc-mm-screen${direction === "back" ? " is-back" : ""}`}
+        key="list"
+        ref={listRef}
+      >
         {plat === "all" ? (
           <>
-            <h6 className="hdc-mm-h6">{allLabel}</h6>
-            {fit.map((r) => row(r, false))}
+            {heading("fit", allLabel)}
+            {fit.map((r) => row(r, "fit"))}
           </>
         ) : (
           <>
-            <h6 className="hdc-mm-h6">{t("gia_tin", { platform: label })}</h6>
-            {fit.map((r) => row(r, false))}
-            {uni.length > 0 && <h6 className="hdc-mm-h6">{t("tairiazoun_se_ola")}</h6>}
-            {uni.map((r) => row(r, true))}
+            {fit.length > 0 && heading("fit", t("gia_tin", { platform: label }))}
+            {fit.map((r) => row(r, "fit"))}
+            {uni.length > 0 && heading("uni", t("tairiazoun_se_ola"))}
+            {uni.map((r) => row(r, "uni"))}
+            {off.length > 0 && heading("off", t("alles_platformes"))}
+            {off.map((r) => row(r, "off"))}
           </>
         )}
       </div>
     );
   }
 
-  const universal = isUniversal(root.c, plat);
   const hero = rootHeroTop(root, plat);
   const image = hero?.image ?? root.image;
+  const groups = orderGroups(root.groups, plat);
+  const firstUni = groups.findIndex((g) => g.fit === "uni");
 
   return (
-    <div className="hdc-mm-screen is-inner" key={`root:${root.id}`}>
-      <button type="button" className="hdc-mm-back" onClick={() => onRoot(null)} autoFocus>
-        {t("oles_oi_katigories")}
-      </button>
+    <div className="hdc-mm-screen is-inner" key={`root:${root.id}`} ref={listRef}>
+      <div className="hdc-mm-backbar">
+        <button type="button" className="hdc-mm-back" onClick={() => onRoot(null)} autoFocus>
+          {t("oles_oi_katigories")}
+        </button>
+      </div>
       <div className="hdc-mm-hero" aria-hidden>
-        <div className="big">{fmt(shownCount(root.c, plat))}</div>
+        <div className="big">
+          <Count n={shownCount(root.c, plat)} format={fmt} />
+        </div>
         {image && failed !== image && (
           // eslint-disable-next-line @next/next/no-img-element -- CDN WebP; the optimiser is off
-          <img src={image} alt="" onError={() => setFailed(image)} />
+          <img key={image} src={image} alt="" onError={() => setFailed(image)} />
         )}
       </div>
       <h2 className="hdc-mm-t">{root.name}</h2>
-      {orderGroups(root.groups, plat, universal).map(({ group, n }) => (
-        <Link
-          key={group.id}
-          href={menuHref(group.href, plat, group.c)}
-          prefetch={false}
-          className={`hdc-mm-gr${n ? "" : " is-dim"}`}
-          onClick={onNavigate}
-        >
-          <span className="n">{group.name}</span>
-          <span className="c">{fmt(n)}</span>
-        </Link>
+      <p className="hdc-mm-tmeta">
+        {t("proionta", { n: shownCount(root.c, plat) })}
+        {plat !== "all" && countFor(root.c, plat) > 0
+          ? ` ${t("gia_platforma", { platform: label })}`
+          : ""}
+      </p>
+      {groups.map(({ group, n, fit }, k) => (
+        <Fragment key={group.id}>
+          {plat !== "all" && k === firstUni && k > 0 && (
+            <h6 className="hdc-mm-h6" data-flip="h:uni">
+              {t("tairiazoun_se_ola")}
+            </h6>
+          )}
+          <Link
+            href={menuHref(group.href, plat, group.c)}
+            prefetch={false}
+            data-flip={`g:${group.id}`}
+            className={`hdc-mm-gr${fit === "fit" ? "" : fit === "uni" ? " is-uni" : " is-dim"}`}
+            onClick={onNavigate}
+          >
+            <span className="n">{group.name}</span>
+            <span className="c">{fmt(n)}</span>
+          </Link>
+        </Fragment>
       ))}
       <Link
         href={menuHref(root.href, plat, root.c)}

@@ -1,10 +1,20 @@
 /*
- * HDC mega menu — docs/design/mockups/megamenu.html, ported one to one.
+ * HDC mega menu — docs/design/mockups/megamenu.html.
  *
- * Desktop (from 1024px): the black panel that drops under the red header, with
- * the battery switch, three columns (roots, groups, stage) and the strip.
- * Phones and tablets: the same menu inside the drawer (.hdc-mm-pb, -pr, -gr…),
- * from the mockup's phone frames.
+ * Desktop (from 1024px, touch screens included): the black panel that drops
+ * under the red header, with the battery switch, three columns (roots, groups,
+ * stage) and the strip. Below 1024px, phones and tablets alike: the same menu
+ * inside the drawer (.hdc-mm-pb, -pr, -gr…), from the mockup's phone frames.
+ *
+ * Adaptive rather than one breakpoint:
+ *  - the panel's inner wrap is a size container (`mm`); the switch, the
+ *    columns and the strip follow the width the panel really has. The stage
+ *    narrows first and then gives way, before the groups get cramped; the
+ *    groups reflow from three columns to one on their own (auto-fill);
+ *  - the panel never grows past the window (dvh): the switch and the strip
+ *    stay put while the roots and the groups scroll inside their columns, and
+ *    short windows get a lower switch and strip;
+ *  - long Greek names wrap (balanced), they never overflow.
  *
  * Every font size is a fluid --fs-* token (tokens.css). Motion is 200–500 ms
  * and switched off entirely under prefers-reduced-motion.
@@ -38,7 +48,9 @@
     letter-spacing: inherit;
     white-space: nowrap;
     cursor: pointer;
-    transition: background-color 0.15s, box-shadow 0.15s;
+    transition:
+      background-color 0.15s,
+      box-shadow 0.15s;
   }
   .hdc-nav--mega > a:hover,
   .hdc-nav--mega > button:hover {
@@ -72,6 +84,17 @@
       gap: 5px;
     }
   }
+  /* 1024–1179: the five items, the search and the three icons only fit when
+     the items set a notch narrower (the type size stays). */
+  @media (max-width: 1179px) {
+    .hdc-nav--mega > a,
+    .hdc-nav--mega > button {
+      padding: 0 6px;
+      gap: 4px;
+      font-stretch: 78%;
+      letter-spacing: 0.02em;
+    }
+  }
 
   /* ── Layer: panel + the dimmed page under it ────────────────────────── */
   .hdc-mm-layer {
@@ -87,6 +110,7 @@
     right: 0;
     top: 0;
     height: 100vh;
+    height: 100dvh;
     border: 0;
     padding: 0;
     background: rgba(10, 10, 10, 0.6);
@@ -102,7 +126,12 @@
   /* ── Panel (mockup `.mega`) ─────────────────────────────────────────── */
   .hdc-mm {
     position: relative;
+    display: flex;
+    flex-direction: column;
+    /* Never past the window: the header is sticky, the panel hangs under it. */
     max-height: calc(100vh - var(--header-h, 118px));
+    max-height: calc(100dvh - var(--header-h, 118px));
+    /* Only when the window is too short even for the shrunken columns. */
     overflow-y: auto;
     overscroll-behavior: contain;
     background-color: var(--hdc-ink);
@@ -125,6 +154,14 @@
       clip-path: inset(0 0 0 0);
     }
   }
+  .hdc-mm-wrap {
+    width: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    container: mm / inline-size;
+  }
   .hdc-mm a,
   .hdc-mm button {
     color: inherit;
@@ -143,15 +180,16 @@
 
   /* ── Battery switch (mockup `.batbar`) ──────────────────────────────── */
   .hdc-mm-batbar {
-    display: flex;
+    flex: none;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
-    gap: 18px;
+    column-gap: 18px;
     height: 96px;
     border-bottom: 1px solid #262626;
   }
   .hdc-mm-q {
-    width: 190px;
-    flex-shrink: 0;
+    max-width: 190px;
     font-weight: 900;
     font-stretch: 150%;
     font-size: var(--fs-20);
@@ -168,11 +206,13 @@
     color: #8a8a8a;
   }
   .hdc-mm-bats {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 206px));
     gap: 18px;
   }
   .hdc-mm-batwrap {
     position: relative;
+    min-width: 0;
     padding-right: 10px;
   }
   /* The terminal nub at the battery's end. */
@@ -180,7 +220,7 @@
     content: "";
     position: absolute;
     right: 2px;
-    top: 19px;
+    top: calc(50% - 9px);
     width: 8px;
     height: 18px;
     background: #5a5a5a;
@@ -194,16 +234,19 @@
   }
   .hdc-mm .hdc-mm-bat {
     position: relative;
-    width: 196px;
+    width: 100%;
     height: 56px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 8px;
     padding: 0 14px;
     overflow: hidden;
     white-space: nowrap;
     border: 2px solid #5a5a5a;
-    transition: border-color 0.2s;
+    transition:
+      border-color 0.2s,
+      background-color 0.25s var(--hdc-ease);
   }
   .hdc-mm-bat .fill {
     position: absolute;
@@ -220,28 +263,36 @@
     font-size: var(--fs-20);
     letter-spacing: -0.03em;
   }
-  .hdc-mm-bat > span:not(.fill) {
+  .hdc-mm-bat .n {
     position: relative;
     font-weight: 700;
     font-stretch: 87.5%;
     font-size: var(--fs-13);
     color: #aaa;
+    font-variant-numeric: tabular-nums;
   }
   .hdc-mm .hdc-mm-bat:hover {
     border-color: #fff;
+  }
+  .hdc-mm .hdc-mm-bat:active {
+    transform: translateY(1px);
   }
   .hdc-mm .hdc-mm-bat.is-on {
     border-color: var(--hdc-red);
     background: var(--hdc-red);
   }
+  .hdc-mm .hdc-mm-bat.is-on:focus-visible {
+    outline-color: #fff;
+    outline-offset: 2px;
+  }
   .hdc-mm-bat.is-on .fill {
     background: rgba(0, 0, 0, 0.18);
   }
-  .hdc-mm-bat.is-on > span:not(.fill) {
+  .hdc-mm-bat.is-on .n {
     color: #ffe1e3;
   }
   .hdc-mm-tot {
-    margin-left: auto;
+    min-width: 0;
     text-align: right;
   }
   .hdc-mm-tot b {
@@ -263,28 +314,31 @@
   }
 
   /* ── Columns ────────────────────────────────────────────────────────── */
-  .hdc-mm-cols {
-    display: grid;
-    grid-template-columns: 430px minmax(0, 1fr) 420px;
-    min-height: 560px;
-  }
-
-  /* Roots (mockup `.roots`, `.root`) */
   /*
-   * The panel sits under a sticky header, so it cannot grow past the window
-   * the way the mockup's page does. The two lists scroll inside their own
-   * columns instead, and the stage — with its price and «ΔΕΙΤΕ ΤΟ» — stays
-   * in view. 160px = battery bar + strip + red border.
+   * 560px tall when the window allows (the mockup), shrinking with it down to
+   * 15rem; the roots and the groups scroll inside their own columns, so the
+   * switch above and the strip below never scroll away. Widths: the roots and
+   * the stage take their comfortable size, the groups get the rest.
    */
+  .hdc-mm-cols {
+    flex: 0 1 560px;
+    min-height: 15rem;
+    display: grid;
+    grid-template-columns: minmax(16rem, 20rem) minmax(0, 1fr) minmax(16rem, 22rem);
+    grid-template-rows: minmax(0, 1fr);
+  }
   .hdc-mm-roots,
   .hdc-mm-groups {
-    max-height: max(320px, calc(100vh - var(--header-h, 118px) - 160px));
+    min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-width: thin;
     scrollbar-color: #444 transparent;
   }
+
+  /* Roots (mockup `.roots`, `.root`) */
   .hdc-mm-roots {
+    position: relative;
     border-right: 1px solid #262626;
     /* Room inside the scroll box for the sweep's run-in on the left. */
     margin-left: -24px;
@@ -326,16 +380,23 @@
   .hdc-mm-root.is-on::before {
     transform: scaleX(1);
   }
+  .hdc-mm .hdc-mm-root:focus-visible {
+    outline-offset: -2px;
+  }
   .hdc-mm-root .n {
     position: relative;
+    min-width: 0;
     font-weight: 800;
     font-stretch: 125%;
     font-size: var(--fs-15);
     letter-spacing: -0.005em;
     line-height: 1.15;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
   }
   .hdc-mm-root .c {
     position: relative;
+    flex-shrink: 0;
     font-weight: 700;
     font-stretch: 87.5%;
     font-size: var(--fs-13);
@@ -349,8 +410,17 @@
   .hdc-mm-root.is-uni .n {
     color: #bdbdbd;
   }
+  /* Only other platforms' products: dimmed, still reachable. */
+  .hdc-mm-root.is-off .n,
+  .hdc-mm-root.is-off .c {
+    color: #5c5c5c;
+  }
   .hdc-mm-root.is-uni:hover .n,
-  .hdc-mm-root.is-uni.is-on .n {
+  .hdc-mm-root.is-uni.is-on .n,
+  .hdc-mm-root.is-off:hover .n,
+  .hdc-mm-root.is-off:hover .c,
+  .hdc-mm-root.is-off.is-on .n,
+  .hdc-mm-root.is-off.is-on .c {
     color: #fff;
   }
 
@@ -359,12 +429,15 @@
     padding: 26px 30px 24px;
     border-right: 1px solid #262626;
     min-width: 0;
+    container: groups / inline-size;
   }
   .hdc-mm-groups h3 {
     max-width: 560px;
     margin-bottom: 6px;
-    font-size: var(--fs-30);
+    /* Scales with its column, between the 22 and 30 of the type scale. */
+    font-size: clamp(var(--fs-22), 6cqi, var(--fs-30));
     overflow-wrap: anywhere;
+    text-wrap: balance;
   }
   .hdc-mm-meta {
     margin-bottom: 20px;
@@ -382,14 +455,15 @@
   }
   .hdc-mm-glist {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0 28px;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+    column-gap: 28px;
   }
   .hdc-mm .hdc-mm-g {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 10px;
+    min-height: 44px;
     padding: 10px 0;
     border-bottom: 1px solid #262626;
     font-weight: 500;
@@ -401,28 +475,59 @@
     animation: hdc-mm-rise 0.34s var(--hdc-ease) forwards;
     transition:
       color 0.15s,
-      padding 0.2s var(--hdc-ease);
+      padding 0.2s var(--hdc-ease),
+      box-shadow 0.2s var(--hdc-ease);
   }
-  .hdc-mm-g span {
+  .hdc-mm-g .n {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    text-wrap: pretty;
+  }
+  .hdc-mm-g .c {
     flex-shrink: 0;
     color: #8a8a8a;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
   }
   .hdc-mm .hdc-mm-g:hover,
+  .hdc-mm .hdc-mm-g.is-on,
   .hdc-mm .hdc-mm-g:focus-visible {
     color: var(--hdc-red);
     padding-left: 8px;
-    outline: none;
+    box-shadow: inset 0 -1px 0 var(--hdc-red);
   }
-  .hdc-mm-g:hover span {
+  .hdc-mm .hdc-mm-g:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: -2px;
+  }
+  .hdc-mm-g:hover .c,
+  .hdc-mm-g.is-on .c {
     color: #fff;
+  }
+  .hdc-mm .hdc-mm-g.is-uni {
+    color: #bdbdbd;
   }
   .hdc-mm .hdc-mm-g.is-dim {
     color: #555;
   }
-  .hdc-mm-g.is-dim span {
+  .hdc-mm-g.is-dim .c {
     color: #444;
+  }
+  .hdc-mm .hdc-mm-g.is-dim:hover {
+    color: #8a8a8a;
+    box-shadow: inset 0 -1px 0 #444;
+  }
+  /* «ΤΑΙΡΙΑΖΟΥΝ ΣΕ ΟΛΑ» across the grid, over the platform-free groups. */
+  .hdc-mm-gsep {
+    grid-column: 1 / -1;
+    padding: 16px 0 4px;
+    font-weight: 700;
+    font-stretch: 87.5%;
+    font-size: var(--fs-11);
+    letter-spacing: 0.12em;
+    color: #8a8a8a;
+    opacity: 0;
+    animation: hdc-mm-rise 0.34s var(--hdc-ease) forwards;
   }
   @keyframes hdc-mm-rise {
     from {
@@ -436,6 +541,8 @@
   }
   .hdc-mm .hdc-mm-allcat {
     display: inline-flex;
+    align-items: center;
+    min-height: 46px;
     margin-top: 22px;
     padding: 13px 20px;
     background: #fff;
@@ -444,13 +551,17 @@
     font-stretch: 110%;
     font-size: var(--fs-13);
     letter-spacing: 0.04em;
+    transition:
+      background-color 0.15s,
+      color 0.15s;
   }
   .hdc-mm .hdc-mm-allcat:hover {
     background: var(--hdc-red);
     color: #fff;
   }
   .hdc-mm .hdc-mm-allcat:focus-visible {
-    outline-color: var(--hdc-red);
+    outline: 2px solid var(--hdc-red);
+    outline-offset: 2px;
   }
 
   /* Stage (mockup `.stage`) */
@@ -459,6 +570,8 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    min-height: 0;
+    container: stage / inline-size;
   }
   .hdc-mm-big {
     position: absolute;
@@ -468,9 +581,11 @@
     text-align: center;
     font-weight: 900;
     font-stretch: 150%;
-    font-size: var(--fs-210);
+    /* The mockup's 210, smaller when the stage narrows. */
+    font-size: min(var(--fs-210), 55cqi);
     letter-spacing: -0.06em;
     line-height: 1;
+    white-space: nowrap;
     color: transparent;
     -webkit-text-stroke: 2px rgba(255, 255, 255, 0.14);
     user-select: none;
@@ -479,16 +594,16 @@
   }
   .hdc-mm-shot {
     position: relative;
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 330px;
-    padding: 30px 30px 0;
+    flex: 1 1 330px;
+    min-height: 8rem;
   }
+  /* Centred in whatever height the column leaves it. */
   .hdc-mm-shot img {
+    position: absolute;
+    inset: 30px 30px 6px;
+    margin: auto;
     max-width: 78%;
-    max-height: 290px;
+    max-height: min(290px, calc(100% - 36px));
     object-fit: contain;
     background: #fff;
     padding: 18px;
@@ -498,6 +613,10 @@
   }
   .hdc-mm-shot img.in {
     animation: hdc-mm-swing 0.5s var(--hdc-ease) both;
+  }
+  .hdc-mm-shot img.out {
+    animation: hdc-mm-swing-out 0.34s var(--hdc-ease) both;
+    pointer-events: none;
   }
   @keyframes hdc-mm-swing {
     from {
@@ -509,9 +628,27 @@
       transform: rotate(-4deg);
     }
   }
+  @keyframes hdc-mm-swing-out {
+    from {
+      opacity: 1;
+      transform: rotate(-4deg);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(-50px) rotate(-12deg) scale(0.9);
+    }
+  }
   .hdc-mm-cap {
     position: relative;
+    flex: none;
     padding: 0 28px 26px;
+    animation: hdc-mm-capin 0.3s var(--hdc-ease) both;
+  }
+  @keyframes hdc-mm-capin {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
   }
   .hdc-mm-cap .k {
     margin-bottom: 8px;
@@ -520,6 +657,7 @@
     font-size: var(--fs-11);
     letter-spacing: 0.12em;
     color: #8a8a8a;
+    overflow-wrap: anywhere;
   }
   .hdc-mm-tag {
     background: var(--hdc-red);
@@ -532,6 +670,11 @@
     font-stretch: 115%;
     font-size: var(--fs-16);
     line-height: 1.25;
+    overflow-wrap: anywhere;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
   .hdc-mm-cap .code {
     font-weight: 400;
@@ -541,8 +684,10 @@
   }
   .hdc-mm-cap .row {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
+    gap: 8px 12px;
     margin-top: 12px;
   }
   .hdc-mm-cap .p {
@@ -550,8 +695,13 @@
     font-stretch: 130%;
     font-size: var(--fs-28);
     letter-spacing: -0.03em;
+    white-space: nowrap;
   }
   .hdc-mm .hdc-mm-cap .go {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-left: auto;
     background: var(--hdc-red);
     padding: 12px 16px;
     font-weight: 800;
@@ -566,14 +716,18 @@
 
   /* Strip (mockup `.strip`) */
   .hdc-mm-strip {
+    flex: none;
     display: flex;
     align-items: center;
     height: 58px;
+    overflow-x: auto;
+    scrollbar-width: none;
     border-top: 1px solid #262626;
     font-weight: 700;
     font-stretch: 87.5%;
     font-size: var(--fs-14);
     letter-spacing: 0.06em;
+    white-space: nowrap;
   }
   .hdc-mm .hdc-mm-strip a {
     display: flex;
@@ -581,6 +735,7 @@
     height: 100%;
     padding: 0 22px;
     border-right: 1px solid #262626;
+    transition: color 0.15s;
   }
   .hdc-mm .hdc-mm-strip a:first-child {
     padding-left: 0;
@@ -595,10 +750,10 @@
   }
   .hdc-mm-strip .kb {
     margin-left: auto;
+    padding-left: 16px;
     color: #6b6b6b;
     font-weight: 500;
     letter-spacing: 0;
-    white-space: nowrap;
   }
   .hdc-mm-strip .kb b {
     border: 1px solid #444;
@@ -607,33 +762,198 @@
     color: #aaa;
   }
 
-  /* Narrower desktops (1024–1279): the side columns give way. */
-  @media (max-width: 1279px) {
+  /* ── The panel's own width (container `mm`) ─────────────────────────── */
+  /* ~1100–1260px of panel (1150–1300px windows): side columns narrow. */
+  @container mm (max-width: 1180px) {
     .hdc-mm-cols {
-      grid-template-columns: 320px minmax(0, 1fr) 300px;
+      grid-template-columns: minmax(15rem, 18rem) minmax(0, 1fr) minmax(15rem, 18rem);
     }
     .hdc-mm-bats {
       gap: 10px;
     }
-    .hdc-mm-q {
-      width: 150px;
-    }
     .hdc-mm .hdc-mm-bat {
-      width: 150px;
       padding: 0 10px;
     }
     .hdc-mm-bat b {
       font-size: var(--fs-17);
     }
-    .hdc-mm-glist {
-      grid-template-columns: 1fr;
+    .hdc-mm-q {
+      max-width: 150px;
+    }
+    .hdc-mm-groups {
+      padding: 24px 24px 22px;
+    }
+    .hdc-mm-cap {
+      padding: 0 22px 22px;
     }
     .hdc-mm-strip .kb {
       display: none;
     }
   }
+  /* Under ~1000px of panel (a 1024px window): the stage gives way, so the
+     groups keep two readable columns. */
+  @container mm (max-width: 999px) {
+    .hdc-mm-cols {
+      grid-template-columns: minmax(15rem, 22rem) minmax(0, 1fr);
+    }
+    .hdc-mm-stage {
+      display: none;
+    }
+    .hdc-mm-groups {
+      border-right: 0;
+    }
+    .hdc-mm-batbar {
+      column-gap: 14px;
+    }
+    .hdc-mm-q {
+      max-width: 128px;
+      font-size: var(--fs-17);
+    }
+    .hdc-mm-q small {
+      display: none;
+    }
+    .hdc-mm-tot b {
+      font-size: var(--fs-28);
+    }
+  }
 
-  /* ── Phones and tablets: inside the drawer (mockup phone frames) ─────── */
+  /* ── Short windows: a lower switch and strip, more room for the lists ── */
+  @media (max-height: 760px) {
+    .hdc-mm-batbar {
+      height: 76px;
+    }
+    .hdc-mm .hdc-mm-bat {
+      height: 48px;
+    }
+    .hdc-mm-q small {
+      display: none;
+    }
+    .hdc-mm-strip {
+      height: 46px;
+    }
+    .hdc-mm-groups {
+      padding-top: 20px;
+    }
+    .hdc-mm-cap {
+      padding-bottom: 18px;
+    }
+    .hdc-mm-big {
+      top: 20px;
+    }
+  }
+
+  /* ── Touch screens (a tablet in landscape): 44px targets ────────────── */
+  @media (pointer: coarse) {
+    .hdc-mm .hdc-mm-root {
+      min-height: 44px;
+    }
+  }
+
+  /* ── Loading and failure ─────────────────────────────────────────────── */
+  .hdc-mm-sk {
+    display: block;
+    height: 12px;
+    background: linear-gradient(90deg, #1c1c1c 0 40%, #2c2c2c 50%, #1c1c1c 60% 100%) 0 0 /
+      300% 100%;
+    animation: hdc-mm-shimmer 1.4s linear infinite;
+  }
+  @keyframes hdc-mm-shimmer {
+    from {
+      background-position: 100% 0;
+    }
+    to {
+      background-position: 0 0;
+    }
+  }
+  .hdc-mm-sk-row {
+    display: flex;
+    align-items: center;
+    min-height: 38px;
+    padding-right: 22px;
+  }
+  .hdc-mm-sk-row.is-g {
+    min-height: 44px;
+    padding-right: 0;
+    border-bottom: 1px solid #262626;
+  }
+  .hdc-mm-sk-row.is-m {
+    min-height: 46px;
+    padding: 0 14px;
+    border-bottom: 1px solid #1f1f1f;
+  }
+  .hdc-mm-sk-h {
+    width: 60%;
+    height: 28px;
+    margin-bottom: 12px;
+  }
+  .hdc-mm-sk-meta {
+    width: 40%;
+    margin-bottom: 26px;
+  }
+  .hdc-mm-sk-tot {
+    width: 7rem;
+    height: 34px;
+    margin-left: auto;
+  }
+  .hdc-mm-sk-shot {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 58%;
+    height: 58%;
+    transform: rotate(-4deg);
+  }
+  .hdc-mm.is-skel .hdc-mm-bat,
+  .hdc-mm-pb.is-skel .hdc-mm-sk-chip {
+    border-color: #2c2c2c;
+  }
+  .hdc-mm.is-skel .hdc-mm-batwrap::after {
+    background: #2c2c2c;
+  }
+  .hdc-mm.is-skel .hdc-mm-q {
+    color: #5c5c5c;
+  }
+  .hdc-mm-fail {
+    padding: 48px 0 56px;
+    max-width: 40rem;
+  }
+  .hdc-mm-fail h3 {
+    margin-bottom: 10px;
+    font-size: var(--fs-30);
+  }
+  .hdc-mm-fail p {
+    margin-bottom: 24px;
+    font-stretch: 87.5%;
+    font-size: var(--fs-15);
+    color: #aaa;
+  }
+  .hdc-mm-fail-acts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+  .hdc-mm-fail-acts .hdc-mm-allcat {
+    margin-top: 0;
+  }
+  .hdc-mm .hdc-mm-retry {
+    min-height: 46px;
+    padding: 0 20px;
+    background: var(--hdc-red);
+    font-weight: 800;
+    font-stretch: 110%;
+    font-size: var(--fs-13);
+    letter-spacing: 0.04em;
+    transition: background-color 0.15s;
+  }
+  .hdc-mm .hdc-mm-retry:hover {
+    background: var(--hdc-red-d);
+  }
+
+  /* ── Below 1024px: inside the drawer (mockup phone frames) ──────────── */
+  .hdc-mmenu .hdc-mmenu-body {
+    overflow-x: hidden;
+  }
   .hdc-mm-pb {
     flex-shrink: 0;
     display: grid;
@@ -642,13 +962,16 @@
     padding: 12px;
     border-bottom: 1px solid #262626;
   }
-  .hdc-mm-pb button {
+  .hdc-mm-pb button,
+  .hdc-mm-sk-chip {
     height: 44px;
+    border: 2px solid #5a5a5a;
+  }
+  .hdc-mm-pb button {
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0 2px;
-    border: 2px solid #5a5a5a;
     background: transparent;
     color: #fff;
     font-family: var(--hdc-font);
@@ -660,18 +983,38 @@
     white-space: nowrap;
     overflow: hidden;
     cursor: pointer;
+    transition:
+      background-color 0.2s var(--hdc-ease),
+      border-color 0.2s var(--hdc-ease);
+  }
+  .hdc-mm-pb button:active {
+    transform: translateY(1px);
   }
   .hdc-mm-pb button.is-on {
     background: var(--hdc-red);
     border-color: var(--hdc-red);
   }
   .hdc-mm-screen {
+    position: relative;
     animation: hdc-mm-slide 0.26s var(--hdc-ease) both;
+  }
+  .hdc-mm-screen.is-back {
+    animation-name: hdc-mm-slide-back;
   }
   @keyframes hdc-mm-slide {
     from {
       opacity: 0;
       transform: translateX(28px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes hdc-mm-slide-back {
+    from {
+      opacity: 0;
+      transform: translateX(-28px);
     }
     to {
       opacity: 1;
@@ -705,13 +1048,25 @@
     font-size: var(--fs-12-5);
     line-height: 1.2;
     cursor: pointer;
+    transition: background-color 0.15s;
+  }
+  .hdc-mm-pr:hover,
+  .hdc-mm-pr:active,
+  .hdc-mm-gr:hover,
+  .hdc-mm-gr:active {
+    background: #1a1a1a;
   }
   .hdc-mm-pr.is-uni {
     color: #bdbdbd;
   }
+  .hdc-mm-pr.is-off,
+  .hdc-mm-pr.is-off .c {
+    color: #5c5c5c;
+  }
   .hdc-mm-pr .n {
     min-width: 0;
     overflow-wrap: anywhere;
+    text-wrap: balance;
   }
   .hdc-mm-pr .c {
     flex-shrink: 0;
@@ -720,11 +1075,24 @@
     font-size: var(--fs-12);
     color: #8a8a8a;
     white-space: nowrap;
+    font-variant-numeric: tabular-nums;
   }
   .hdc-mm-pr .c::after {
     content: " ›";
     color: var(--hdc-red);
     font-size: var(--fs-16);
+  }
+  /* A root without groups is a straight link: an arrow, not a chevron. */
+  .hdc-mm-pr.is-link .c::after {
+    content: " →";
+    font-size: var(--fs-13);
+  }
+  /* The way back stays at the top of the scroll. */
+  .hdc-mm-backbar {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--hdc-ink);
   }
   .hdc-mm-back {
     width: 100%;
@@ -743,12 +1111,21 @@
     font-size: var(--fs-13);
     letter-spacing: 0.06em;
     cursor: pointer;
+    transition: color 0.15s;
+  }
+  .hdc-mm-back:hover,
+  .hdc-mm-back:active {
+    color: #fff;
   }
   .hdc-mm-back::before {
     content: "‹";
     color: var(--hdc-red);
     font-size: var(--fs-22);
     line-height: 1;
+    transition: transform 0.2s var(--hdc-ease);
+  }
+  .hdc-mm-back:hover::before {
+    transform: translateX(-3px);
   }
   .hdc-mm-hero {
     position: relative;
@@ -781,14 +1158,23 @@
     border-bottom: 4px solid var(--hdc-red);
     box-shadow: 0 12px 18px rgba(0, 0, 0, 0.6);
     transform: rotate(-4deg);
+    animation: hdc-mm-swing 0.45s var(--hdc-ease) both;
   }
   .hdc-mm-t {
-    padding: 12px 14px 4px;
+    padding: 12px 14px 2px;
     font-weight: 900;
     font-stretch: 140%;
     font-size: var(--fs-19);
     line-height: 1.05;
     overflow-wrap: anywhere;
+    text-wrap: balance;
+  }
+  .hdc-mm-tmeta {
+    padding: 0 14px 8px;
+    font-weight: 500;
+    font-stretch: 87.5%;
+    font-size: var(--fs-12);
+    color: #8a8a8a;
   }
   .hdc-mm-gr {
     display: flex;
@@ -802,6 +1188,7 @@
     font-stretch: 87.5%;
     font-size: var(--fs-14);
     line-height: 1.25;
+    transition: background-color 0.15s;
   }
   .hdc-mm-gr .n {
     min-width: 0;
@@ -811,6 +1198,10 @@
     flex-shrink: 0;
     color: #8a8a8a;
     font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .hdc-mm-gr.is-uni {
+    color: #bdbdbd;
   }
   .hdc-mm-gr.is-dim {
     color: #555;
@@ -845,12 +1236,19 @@
     .hdc-mm *::after,
     .hdc-mm-backdrop,
     .hdc-mm-screen,
+    .hdc-mm-screen *,
+    .hdc-mm-pb *,
+    .hdc-mm-sk,
     .hdc-nav--mega > button i {
       animation: none !important;
       transition: none !important;
     }
-    .hdc-mm .hdc-mm-g {
+    .hdc-mm .hdc-mm-g,
+    .hdc-mm-gsep {
       opacity: 1;
+    }
+    .hdc-mm-shot img.out {
+      display: none;
     }
   }
 }

@@ -11,7 +11,9 @@ import {
 } from "@/lib/catalog/mega-menu-core";
 import { isHdcNavActive, type HdcNavKey } from "@/lib/hdc-nav";
 import { loadMegaMenu, usePlatformChoice } from "./data";
+import { neighbour, type Direction } from "./keys";
 import { MegaPanel } from "./MegaPanel";
+import { MegaFailed, MegaSkeleton } from "./MegaStates";
 
 /**
  * The header's five items and the mega menu they open (mockup megamenu.html).
@@ -25,10 +27,19 @@ import { MegaPanel } from "./MegaPanel";
  *    that way it also closes when the pointer has left header and panel
  *    for a moment; opened by click it stays until dismissed.
  *
- * It closes on Esc (focus returns to the item), a click outside, a followed
- * link and a route change. ↑↓ walk the roots, → enters the groups, ← returns.
+ * It closes on Esc (focus returns to the item), a click outside, focus
+ * leaving header and panel, a followed link and a route change. On the items,
+ * ←→ move along the header (and switch the open menu with them), ↓ enters.
+ * In the panel ↑↓ walk the roots, → enters the groups, where the arrows move
+ * on the grid as it is laid out on screen, and ← at its edge returns.
  *
- * The data is fetched on first intent, not shipped with every page.
+ * Touch screens from 1024px get this same panel, opened and driven by taps
+ * (hover intent listens to a mouse only); below 1024px the header hands over
+ * to the drawer (MobileMenu), tablets included — one model per width.
+ *
+ * The data is fetched on first intent, not shipped with every page. While it
+ * is on its way the panel opens on a skeleton of itself; if it fails, the
+ * panel says so and offers another try and the page itself.
  */
 
 const MENU_KEYS: MegaNavKey[] = ["battery", "accessories", "packout", "hand"];
@@ -53,10 +64,13 @@ export function HeaderMega({
   const panelId = useId();
 
   const [data, setData] = useState<MegaMenuData | null>(null);
+  const [failed, setFailed] = useState(false);
   const [open, setOpen] = useState(false);
+  /** The item the menu was opened from (and returns focus to). */
+  const [openKey, setOpenKey] = useState<MegaNavKey | null>(null);
   const [openedBy, setOpenedBy] = useState<"hover" | "click">("click");
   const [currentId, setCurrentId] = useState<string | null>(null);
-  const [plat, choosePlat] = usePlatformChoice(open);
+  const [plat, choosePlat, syncPlat] = usePlatformChoice(open);
 
   const navRef = useRef<HTMLElement | null>(null);
   const panelWrapRef = useRef<HTMLDivElement | null>(null);
@@ -70,6 +84,7 @@ export function HeaderMega({
   /** A root to focus once the panel has rendered (opened from the keyboard). */
   const focusAfterRender = useRef<string | null>(null);
   const [focusTick, setFocusTick] = useState(0);
+  const focusRetry = useRef(false);
 
   const clearTimers = () => {
     if (openTimer.current) window.clearTimeout(openTimer.current);
@@ -90,42 +105,93 @@ export function HeaderMega({
     });
   };
 
+  const fallback = (key: MegaNavKey, by: "hover" | "click") => {
+    // No root for this item: it behaves as the link it replaces.
+    const item = items.find((i) => i.key === key);
+    if (item && by === "click") router.push(item.href);
+  };
+
   /*
    * Opening needs the data. It is usually in memory already (idle warm-up,
-   * hover); when it is not, the menu opens as soon as it arrives — unless
-   * something else was asked for in the meantime.
+   * hover); when it is not, the panel opens on its skeleton and fills in as
+   * soon as the data arrives — for the item asked for last, if the pointer
+   * or the arrows moved on meanwhile.
    */
   const openOn = (key: MegaNavKey, by: "hover" | "click", focus = false) => {
     clearTimers();
     const token = ++intent.current;
     intentBy.current = by;
     trigger.current = key;
-    loadMegaMenu(locale).then((menu) => {
-      if (token !== intent.current) return;
-      const rootId = menu?.nav[key];
-      if (!menu || !rootId) {
-        // No tree, or no root for this item: it behaves as the link it replaces.
-        const item = items.find((i) => i.key === key);
-        if (item && by === "click") router.push(item.href);
+
+    const show = (menu: MegaMenuData) => {
+      const want = trigger.current ?? key;
+      const rootId = menu.nav[want as MegaNavKey];
+      if (!rootId) {
+        setOpen(false);
+        fallback(want as MegaNavKey, by);
         return;
       }
       setData(menu);
+      setFailed(false);
       setOpenedBy(by);
+      setOpenKey(want as MegaNavKey);
       setCurrentId(rootId);
       setOpen(true);
-      if (focus) focusAfterRender.current = rootId;
+      if (focus) {
+        focusAfterRender.current = rootId;
+        setFocusTick((n) => n + 1);
+      }
+    };
+
+    if (!open) syncPlat();
+    if (data) {
+      show(data);
+      return;
+    }
+    setOpenedBy(by);
+    setOpenKey(key);
+    setCurrentId(null);
+    setFailed(false);
+    setOpen(true);
+    loadMegaMenu(locale).then((menu) => {
+      if (token !== intent.current) {
+        if (menu) setData(menu);
+        return;
+      }
+      if (menu) show(menu);
+      else {
+        setFailed(true);
+        if (focus) {
+          focusRetry.current = true;
+          setFocusTick((n) => n + 1);
+        }
+      }
     });
   };
 
+  const retry = () => {
+    if (trigger.current) openOn(trigger.current as MegaNavKey, "click", true);
+  };
+
+
   useEffect(() => {
+    if (!open) return;
+    const panel = document.getElementById(panelId);
+    if (failed) {
+      // Opened from the keyboard onto a failure: the retry button takes it.
+      if (focusRetry.current) {
+        focusRetry.current = false;
+        panel?.querySelector<HTMLElement>("[data-autofocus]")?.focus();
+      }
+      return;
+    }
     const rootId = focusAfterRender.current;
-    if (!open || !rootId) return;
+    if (!rootId) return;
+    const row = panel?.querySelector<HTMLElement>(`[data-root="${rootId}"]`);
+    if (!row) return; // not rendered yet (skeleton): the next render tries again
     focusAfterRender.current = null;
-    document
-      .getElementById(panelId)
-      ?.querySelector<HTMLElement>(`[data-root="${rootId}"]`)
-      ?.focus();
-  }, [open, currentId, focusTick, panelId]);
+    row.focus();
+  }, [open, currentId, focusTick, panelId, failed]);
 
   // Any navigation closes it.
   const [seenPath, setSeenPath] = useState(pathname);
@@ -134,9 +200,10 @@ export function HeaderMega({
     setOpen(false);
   }
 
-  // Warm the data when the browser is idle, on desktops only.
+  // Warm the data when the browser is idle, wherever this header is shown
+  // (from 1024px — a tablet in landscape as much as a desktop).
   useEffect(() => {
-    if (!window.matchMedia?.("(min-width: 1024px) and (pointer: fine)").matches) return;
+    if (!window.matchMedia?.("(min-width: 1024px)").matches) return;
     const idle = window.requestIdleCallback
       ? window.requestIdleCallback(() => loadMegaMenu(locale), { timeout: 4000 })
       : window.setTimeout(() => loadMegaMenu(locale), 2500);
@@ -159,7 +226,7 @@ export function HeaderMega({
     }
   };
 
-  /* ── Outside click, keys ─────────────────────────────────────────────── */
+  /* ── Outside click, focus leaving, keys ─────────────────────────────── */
   useEffect(() => {
     if (!open) return;
     const inside = (target: EventTarget | null) =>
@@ -167,6 +234,12 @@ export function HeaderMega({
       (navRef.current?.contains(target) || panelWrapRef.current?.contains(target));
 
     const onDown = (e: PointerEvent) => {
+      if (!inside(e.target)) close();
+    };
+
+    // Tab past the last link (or Shift+Tab before the first item): the menu
+    // does not stay open behind the focus.
+    const onFocusIn = (e: FocusEvent) => {
       if (!inside(e.target)) close();
     };
 
@@ -183,39 +256,58 @@ export function HeaderMega({
         (active.tagName === "INPUT" || active.tagName === "TEXTAREA" || active.isContentEditable);
       if (typing) return;
       if (active && active !== document.body && !inside(active)) return;
+      // The switch is a radiogroup and moves on its own arrows.
+      if (active instanceof HTMLElement && active.closest('[role="radiogroup"]')) return;
 
       const panel = document.getElementById(panelId);
       const focusRoot = (id: string) =>
         panel?.querySelector<HTMLElement>(`[data-root="${id}"]`)?.focus();
+      const inGrid = active instanceof HTMLElement && active.hasAttribute("data-gnav");
+
+      // In the groups: the nearest link on screen in the arrow's direction.
+      if (inGrid && e.key.startsWith("Arrow")) {
+        const links = [...(panel?.querySelectorAll<HTMLElement>("[data-gnav]") ?? [])];
+        const boxes = links.map((el) => {
+          const b = el.getBoundingClientRect();
+          return { x: b.left, y: b.top, w: b.width, h: b.height };
+        });
+        const dir = e.key.slice(5).toLowerCase() as Direction;
+        const next = neighbour(boxes, links.indexOf(active as HTMLElement), dir);
+        e.preventDefault();
+        if (next >= 0) links[next].focus();
+        else if (dir === "left") focusRoot(current.id);
+        return;
+      }
+
+      const seq = rootSequence(data.roots, plat);
+      const go = (next: (typeof seq)[number] | undefined) => {
+        if (!next) return;
+        setCurrentId(next.id);
+        focusRoot(next.id);
+      };
+      const at = seq.findIndex((r) => r.id === current.id);
 
       if (e.key === "ArrowDown" || e.key === "ArrowUp") {
         e.preventDefault();
-        const seq = rootSequence(data.roots, plat);
-        const at = seq.findIndex((r) => r.id === current.id);
-        const next =
-          e.key === "ArrowDown" ? seq[Math.min(seq.length - 1, at + 1)] : seq[Math.max(0, at - 1)];
-        if (next) {
-          setCurrentId(next.id);
-          focusRoot(next.id);
-        }
+        go(e.key === "ArrowDown" ? seq[Math.min(seq.length - 1, at + 1)] : seq[Math.max(0, at - 1)]);
+      } else if ((e.key === "Home" || e.key === "End") && active?.hasAttribute("data-root")) {
+        e.preventDefault();
+        go(e.key === "Home" ? seq[0] : seq[seq.length - 1]);
       } else if (e.key === "ArrowRight") {
-        const first = panel?.querySelector<HTMLElement>("[data-group]");
-        if (first && !(active instanceof HTMLElement && active.hasAttribute("data-group"))) {
+        const first = panel?.querySelector<HTMLElement>("[data-gnav]");
+        if (first) {
           e.preventDefault();
           first.focus();
-        }
-      } else if (e.key === "ArrowLeft") {
-        if (active instanceof HTMLElement && active.hasAttribute("data-group")) {
-          e.preventDefault();
-          focusRoot(current.id);
         }
       }
     };
 
     document.addEventListener("pointerdown", onDown);
+    document.addEventListener("focusin", onFocusIn);
     document.addEventListener("keydown", onKey);
     return () => {
       document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("focusin", onFocusIn);
       document.removeEventListener("keydown", onKey);
     };
   }, [open, data, current, plat, panelId, close]);
@@ -229,12 +321,12 @@ export function HeaderMega({
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
     closeTimer.current = null;
     if (open) {
-      // Already open: the header behaves as a tab strip.
+      // Already open: the header behaves as a tab strip (and a panel still
+      // loading will open on this item).
+      trigger.current = key;
+      setOpenKey(key);
       const rootId = data?.nav[key];
-      if (rootId) {
-        trigger.current = key;
-        setCurrentId(rootId);
-      }
+      if (rootId) setCurrentId(rootId);
       return;
     }
     if (openTimer.current) window.clearTimeout(openTimer.current);
@@ -261,13 +353,14 @@ export function HeaderMega({
 
   const onItemClick = (e: React.MouseEvent, key: MegaNavKey) => {
     const rootId = data?.nav[key];
-    if (open && rootId && rootId === current?.id && openedBy === "click") {
+    if (open && openKey === key && openedBy === "click" && (!rootId || rootId === current?.id)) {
       close();
       return;
     }
     if (open && rootId) {
-      // Opened by hover, clicked: it now stays.
+      // Opened by hover (or on another item), clicked: it now stays, here.
       trigger.current = key;
+      setOpenKey(key);
       setOpenedBy("click");
       setCurrentId(rootId);
       return;
@@ -277,6 +370,27 @@ export function HeaderMega({
   };
 
   const onItemKey = (e: React.KeyboardEvent, key: MegaNavKey) => {
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      // Along the header, as a menubar: the open menu follows the focus.
+      e.preventDefault();
+      e.stopPropagation();
+      const keys = items.filter((i) => isMenuKey(i.key)).map((i) => i.key as MegaNavKey);
+      const at = keys.indexOf(key);
+      const next = keys[(at + (e.key === "ArrowRight" ? 1 : -1) + keys.length) % keys.length];
+      triggers.current.get(next)?.focus();
+      if (open) {
+        trigger.current = next;
+        setOpenKey(next);
+        const rootId = data?.nav[next];
+        if (rootId) setCurrentId(rootId);
+      }
+      return;
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
     if (e.key !== "ArrowDown") return;
     // ↓ on an item enters the menu at its root; the document's ↑↓ take over there.
     e.preventDefault();
@@ -284,14 +398,21 @@ export function HeaderMega({
     const rootId = data?.nav[key];
     if (open && rootId) {
       trigger.current = key;
+      setOpenKey(key);
       focusAfterRender.current = rootId;
       setCurrentId(rootId);
       setFocusTick((n) => n + 1);
     } else openOn(key, "click", true);
   };
 
-  const activeKey =
-    open && current ? MENU_KEYS.find((k) => data?.nav[k] === current.id) : undefined;
+  // The item drawn as open: the one whose root is on show (↑↓ may walk the
+  // panel onto another item's root), else the one it was opened from.
+  const activeKey = !open
+    ? undefined
+    : current
+      ? MENU_KEYS.find((k) => data?.nav[k] === current.id)
+      : (openKey ?? undefined);
+  const openItem = items.find((i) => i.key === openKey);
 
   return (
     <>
@@ -328,8 +449,8 @@ export function HeaderMega({
               type="button"
               className={on ? "is-on" : undefined}
               data-current={current ? "true" : undefined}
-              aria-expanded={on}
-              aria-controls={on ? panelId : undefined}
+              aria-expanded={open && openKey === key}
+              aria-controls={open && openKey === key ? panelId : undefined}
               onPointerEnter={(e) => onItemEnter(e, key)}
               onPointerLeave={onItemLeave}
               onFocus={warm}
@@ -350,9 +471,9 @@ export function HeaderMega({
       <div
         ref={panelWrapRef}
         className="hdc-mm-layer"
-        data-open={open && current ? "true" : "false"}
+        data-open={open ? "true" : "false"}
       >
-        {open && data && current && (
+        {open && (
           <>
             <button
               type="button"
@@ -361,18 +482,34 @@ export function HeaderMega({
               aria-hidden
               onClick={() => close()}
             />
-            <MegaPanel
-              id={panelId}
-              data={data}
-              plat={plat}
-              onPlat={onPlat}
-              current={current}
-              onSelect={selectRoot}
-              onNavigate={() => close()}
-              packoutHref={packoutHref}
-              onPointerEnter={onRegionEnter}
-              onPointerLeave={onRegionLeave}
-            />
+            {data && current ? (
+              <MegaPanel
+                id={panelId}
+                data={data}
+                plat={plat}
+                onPlat={onPlat}
+                current={current}
+                onSelect={selectRoot}
+                onNavigate={() => close()}
+                packoutHref={packoutHref}
+                onPointerEnter={onRegionEnter}
+                onPointerLeave={onRegionLeave}
+              />
+            ) : (
+              <div onPointerEnter={onRegionEnter} onPointerLeave={onRegionLeave}>
+                {failed ? (
+                  <MegaFailed
+                    id={panelId}
+                    onRetry={retry}
+                    href={openItem?.href ?? "/katalogos"}
+                    label={openItem?.label ?? ""}
+                    onNavigate={() => close()}
+                  />
+                ) : (
+                  <MegaSkeleton id={panelId} />
+                )}
+              </div>
+            )}
           </>
         )}
       </div>

@@ -513,7 +513,11 @@
       "pliktrologio": "Naviga con",
       "kleisimo_me": "chiudi con",
       "oles_oi_katigories": "TUTTE LE CATEGORIE",
-      "fortosi": "Caricamento categorie…"
+      "fortosi": "Caricamento categorie…",
+      "alles_platformes": "PER ALTRE PIATTAFORME",
+      "apotychia": "IL MENU NON SI È CARICATO",
+      "apotychia_sub": "Riprova, oppure vai direttamente alla pagina.",
+      "xana": "RIPROVA"
     },
     "MobileMenu": {
       "menoy": "Menu",

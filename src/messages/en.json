@@ -513,7 +513,11 @@
       "pliktrologio": "Navigate with",
       "kleisimo_me": "close with",
       "oles_oi_katigories": "ALL CATEGORIES",
-      "fortosi": "Loading categories…"
+      "fortosi": "Loading categories…",
+      "alles_platformes": "FOR OTHER PLATFORMS",
+      "apotychia": "THE MENU DID NOT LOAD",
+      "apotychia_sub": "Try again, or go straight to the page.",
+      "xana": "TRY AGAIN"
     },
     "MobileMenu": {
       "menoy": "Menu",

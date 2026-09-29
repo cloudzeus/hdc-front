@@ -513,7 +513,11 @@
       "pliktrologio": "Πλοήγηση με",
       "kleisimo_me": "κλείσιμο με",
       "oles_oi_katigories": "ΟΛΕΣ ΟΙ ΚΑΤΗΓΟΡΙΕΣ",
-      "fortosi": "Φόρτωση κατηγοριών…"
+      "fortosi": "Φόρτωση κατηγοριών…",
+      "alles_platformes": "ΓΙΑ ΑΛΛΕΣ ΠΛΑΤΦΟΡΜΕΣ",
+      "apotychia": "ΤΟ MENU ΔΕΝ ΦΟΡΤΩΣΕ",
+      "apotychia_sub": "Δοκιμάστε ξανά ή πηγαίνετε κατευθείαν στη σελίδα.",
+      "xana": "ΔΟΚΙΜΑΣΤΕ ΞΑΝΑ"
     },
     "MobileMenu": {
       "menoy": "Μενού",
