@@ -13,6 +13,7 @@ import {
 import { DEFAULT_VAT_RATE } from "@/lib/format";
 import { milwaukeeFields } from "@/lib/milwaukee/product-fields";
 import { isShopProduct } from "@/lib/sync/shop-filter";
+import { milwaukeeKey, milwaukeeNameIndex, withMilwaukeeNames } from "@/lib/sync/milwaukee-names";
 import {
   hdctool,
   HDCTOOL_MAX_LIMIT,
@@ -112,6 +113,19 @@ export async function syncCategories(): Promise<SyncResult> {
     const startedAt = Date.now();
     const { categories } = await hdctool.categories();
 
+    // English/Italian names from the Milwaukee tree, where the general feed
+    // only has the Greek copied across. A failure here is not a reason to
+    // skip the sync: the names then stay as the feed has them.
+    let milwaukeeNames = new Map<string, { en: string; it: string }>();
+    try {
+      milwaukeeNames = milwaukeeNameIndex((await hdctool.milwaukeeCategories()).data ?? []);
+    } catch (error) {
+      console.warn(
+        "[sync:categories] Milwaukee tree unavailable, keeping the feed's names:",
+        error instanceof Error ? error.message : error,
+      );
+    }
+
     const taken = new Set(
       (await prisma.category.findMany({ select: { slug: true } })).map((c) => c.slug),
     );
@@ -132,13 +146,21 @@ export async function syncCategories(): Promise<SyncResult> {
           existing.get(node.id) ??
           uniqueSlug(node.nameGreek, `${node.erpType}-${node.erpCode}`, taken);
 
+        const names = withMilwaukeeNames(
+          {
+            en: node.nameEnglish || node.nameGreek || node.erpCode,
+            it: node.nameItalian || node.nameGreek || node.erpCode,
+          },
+          milwaukeeNames.get(milwaukeeKey(node.erpType, node.erpCode)),
+        );
+
         const data = {
           erpCode: node.erpCode,
           erpType: node.erpType,
           slug,
           nameEl: node.nameGreek || node.nameEnglish || node.erpCode,
-          nameEn: node.nameEnglish || node.nameGreek || node.erpCode,
-          nameIt: node.nameItalian || node.nameGreek || node.erpCode,
+          nameEn: names.en,
+          nameIt: names.it,
           mainImage: node.mainImage || null,
           heroImage: node.heroImage || null,
           order: node.order ?? 0,

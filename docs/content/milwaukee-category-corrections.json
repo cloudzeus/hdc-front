@@ -1,0 +1,328 @@
+{
+  "_note": "Checked English/Italian names for Greek Milwaukee category names, keyed by the exact Greek name. They override the machine translation and replace an existing value when it was wrong. Used by scripts/hdctool/translate-milwaukee-categories.ts.",
+  "ΓΚΑΖΟΤΑΝΑΛΙΕΣ": {
+    "en": "Water Pump Pliers",
+    "it": "Pinze regolabili a pappagallo"
+  },
+  "ΣΩΛΗΝΟΚΑΒΟΥΡΕΣ": {
+    "en": "Pipe Wrenches",
+    "it": "Chiavi giratubi"
+  },
+  "ΔΙΠΛΑ ΖΗΤΑ": {
+    "en": "Double Offset Ring Spanners",
+    "it": "Chiavi poligonali doppie piegate"
+  },
+  "ΔΙΠΛΑ": {
+    "en": "Double Open-End Spanners",
+    "it": "Chiavi a forchetta doppie"
+  },
+  "ΑΠΛΑ": {
+    "en": "Standard",
+    "it": "Standard"
+  },
+  "ΔΙΑΣΤΑΣΗ": {
+    "en": "Dimensional Measurement",
+    "it": "Misurazione dimensionale"
+  },
+  "ΥΠΟΔΟΧΗ SDS-MAX": {
+    "en": "SDS-Max Accessories",
+    "it": "Accessori SDS-Max"
+  },
+  "ΥΠΟΔΟΧΗ SDS-PLUS": {
+    "en": "SDS-Plus Accessories",
+    "it": "Accessori SDS-Plus"
+  },
+  "ΤΡΥΠΗΜΑ": {
+    "en": "Drilling",
+    "it": "Foratura"
+  },
+  "ΚΡΟΥΣΗΣ": {
+    "en": "Impact Screwdrivers",
+    "it": "Cacciaviti a percussione"
+  },
+  "ΜΕΤΑΛΛΟΥ": {
+    "en": "Metal",
+    "it": "Metallo"
+  },
+  "ΞΥΛΟΥ - ΑΛΟΥΜΙΝΙΟΥ": {
+    "en": "Wood – Aluminium",
+    "it": "Legno – Alluminio"
+  },
+  "ΟΦΙΟΕΙΔΗ": {
+    "en": "Auger Bits",
+    "it": "Punte a tortiglione"
+  },
+  "ΑΚΙΔΑΣ": {
+    "en": "Brad Point Bits",
+    "it": "Punte per legno con centratore"
+  },
+  "ΦΤΕΡΟΥ": {
+    "en": "Spade Bits",
+    "it": "Punte piatte"
+  },
+  "ΣΕΙΡΑ IMPACT": {
+    "en": "Impact Series",
+    "it": "Serie Impact"
+  },
+  "ΣΤΡΟΓΓΥΛΗ ΥΠΟΔΟΧΗ": {
+    "en": "Round Shank",
+    "it": "Gambo cilindrico"
+  },
+  "ΕΞΩΛΚΕΙΣ": {
+    "en": "Pullers",
+    "it": "Estrattori"
+  },
+  "ΕΡΓΑΛΕΙΑ ΕΛΕΓΧΟΥ - ΣΥΓΚΡΑΤΗΣΗΣ": {
+    "en": "Inspection & Pick-Up Tools",
+    "it": "Utensili di ispezione e presa"
+  },
+  "ΒΑΡΙΟΠΟΥΛΕΣ": {
+    "en": "Sledgehammers",
+    "it": "Mazze"
+  },
+  "ΜΑΤΣΟΛΕΣ": {
+    "en": "Mallets",
+    "it": "Mazzuole"
+  },
+  "ΓΩΝΙΑΚΑ ΚΛΕΙΔΙΑ - ΤΑΦ - ΓΑΜΑ": {
+    "en": "L-Keys – T-Handle Keys",
+    "it": "Chiavi a L – Chiavi a T"
+  },
+  "ΕΞΟΠΛΙΣΜΟΣ ΚΗΠΟΥ - ΟΙΚΟΔΟΜΗΣ ΧΕΙΡΟΣ": {
+    "en": "Garden & Construction Hand Tools",
+    "it": "Attrezzi manuali da giardino e cantiere"
+  },
+  "ΕΡΓΑΛΕΙΟΘΗΚΕΣ-ΣΚΑΦΑΚΙΑ-ΚΟΥΤΙΑ ΑΠΟΘΗΚΕΥΣΗΣ": {
+    "en": "Toolboxes – Organisers – Storage Boxes",
+    "it": "Cassette portautensili – Organizer – Contenitori"
+  },
+  "ΚΑΡΟΤΙΕΡΕΣ - ΑΝΑΔΕΥΤΗΡΕΣ": {
+    "en": "Core Drills – Mixers",
+    "it": "Carotatrici – Miscelatori"
+  },
+  "ΠΙΣΤΟΛΕΤΑ ΕΞΑΓΩΝΗ ΥΠΟΔΟΧΗ": {
+    "en": "Hex Shank Hammers",
+    "it": "Martelli con attacco esagonale"
+  },
+  "ΠΡΟΣΤΑΣΙΑ ΑΝΩ ΑΚΡΩΝ": {
+    "en": "Hand & Arm Protection"
+  },
+  "ΠΡΟΣΤΑΣΙΑ ΚΑΤΩ ΑΚΡΩΝ": {
+    "en": "Foot & Leg Protection"
+  },
+  "ΕΚΚΕΝΤΡΑ ΤΡΙΒΕΙΑ Φ125": {
+    "en": "Random Orbital Sanders Ø125",
+    "it": "Levigatrici rotorbitali Ø125"
+  },
+  "ΠΑΛΜΙΚΑ ΤΡΙΒΕΙΑ": {
+    "en": "Orbital Sanders",
+    "it": "Levigatrici orbitali"
+  },
+  "ΚΡΑΝΗ ΠΡΟΣΤΑΣΙΑΣ": {
+    "en": "Safety Helmets",
+    "it": "Caschi di protezione"
+  },
+  "ΚΡΟΥΣΤΙΚΑ ΔΡΑΠΑΝΑ": {
+    "en": "Hammer Drills",
+    "it": "Trapani a percussione"
+  },
+  "ΜΕΤΡΑ - ΜΕΤΡΟΤΑΙΝΙΕΣ - ΤΡΟΧΟΙ ΜΕΤΡΗΣΗΣ": {
+    "en": "Tape Measures – Measuring Tapes – Measuring Wheels",
+    "it": "Metri – Rotelle metriche – Odometri"
+  },
+  "ΜΠΟΥΦΑΝ - ΚΑΠΑΡΤΙΝΕΣ": {
+    "en": "Jackets – Raincoats",
+    "it": "Giacche – Impermeabili"
+  },
+  "ΜΥΤΟΤΣΙΜΠΙΔΑ - ΠΛΑΤΥΤΣΙΜΠΙΔΑ": {
+    "en": "Long Nose Pliers – Flat Nose Pliers",
+    "it": "Pinze a becchi lunghi – Pinze a becchi piatti"
+  },
+  "ΠΕΝΣΕΣ GRIP - ΣΚΥΛΕΣ": {
+    "en": "Locking Pliers",
+    "it": "Pinze autobloccanti"
+  },
+  "ΠΙΣΤΟΛΙΑ ΘΕΡΜΟΚΟΛΛΗΣΗΣ": {
+    "en": "Hot Glue Guns",
+    "it": "Pistole per colla a caldo"
+  },
+  "ΠΛΑΓΙΟΚΟΦΤΕΣ": {
+    "en": "Side Cutters",
+    "it": "Tronchesi laterali"
+  },
+  "ΣΕΤ ΜΕ ΚΑΡΥΔΑΚΙΑ ΚΑΙ ΚΑΣΤΑΝΙΑ ΜΕΤΡΙΚΟ": {
+    "en": "Metric Socket & Ratchet Sets",
+    "it": "Set di bussole metriche con cricchetto"
+  },
+  "ΣΕΤ ΜΕ ΚΑΡΥΔΑΚΙΑ ΚΑΙ ΚΑΣΤΑΝΙΑΣ ΜΕΤΡΙΚΟ": {
+    "en": "Metric Socket & Ratchet Sets",
+    "it": "Set di bussole metriche con cricchetto"
+  },
+  "ΣΕΤ ΜΕ ΚΑΡΥΔΑΚΙΑ ΜΟΝΟ": {
+    "en": "Socket Sets",
+    "it": "Set di sole bussole"
+  },
+  "ΣΚΑΠΤΙΚΑ ΠΙΣΤΟΛΕΤΑ SDS-MAX": {
+    "en": "SDS-Max Demolition Hammers",
+    "it": "Martelli demolitori SDS-Max"
+  },
+  "ΣΚΑΦΑΚΙΑ - ΚΟΥΤΙΑ ΑΠΟΘΗΚΕΥΣΗΣ - ΣΥΡΤΑΡΟΘΗΚΕΣ": {
+    "en": "Organisers – Storage Boxes – Drawer Units",
+    "it": "Organizer – Contenitori – Cassettiere"
+  },
+  "ΣΚΟΥΠΕΣ ΜΠΑΤΑΡΙΑΣ": {
+    "en": "Cordless Vacuums",
+    "it": "Aspiratori a batteria"
+  },
+  "ΣΚΟΥΠΕΣ ΥΓΡΩΝ - ΣΤΕΡΕΩΝ": {
+    "en": "Wet/Dry Vacuums",
+    "it": "Aspiratori solidi-liquidi"
+  },
+  "ΣΤΑΘΕΡΑ ΔΙΣΚΟΠΡΙΟΝΑ - ΦΑΛΤΣΟΠΡΙΟΝΑ - ΞΥΛΟΥ ΑΛΟΥΜΙΝ": {
+    "en": "Table Saws – Mitre Saws – Wood & Aluminium",
+    "it": "Seghe circolari da banco – Troncatrici – Legno e alluminio"
+  },
+  "ΤΑΜΠΑΚΙΕΡΕΣ - ORGANIZER": {
+    "en": "Small Parts Organisers",
+    "it": "Organizer portaminuterie"
+  },
+  "ΑΛΛΕΝ - ALLEN ΜΕΤΡΙΚΑ": {
+    "en": "Metric Allen Keys",
+    "it": "Chiavi a brugola metriche"
+  },
+  "ΑΛΦΑΔΙΑ - ΜΟΙΡΟΓΝΩΜΟΝΙΑ": {
+    "en": "Levels – Protractors",
+    "it": "Livelle – Goniometri"
+  },
+  "ΕΠΙΓΟΝΑΤΙΔΕΣ": {
+    "en": "Knee Pads",
+    "it": "Ginocchiere"
+  },
+  "ΕΡΓΑΛΕΙΟΘΗΚΕΣ ΜΕ ΡΟΔΕΣ": {
+    "en": "Wheeled Toolboxes",
+    "it": "Cassette portautensili con ruote"
+  },
+  "ΕΡΓΑΛΕΙΟΘΗΚΕΣ ΠΛΑΤΗΣ (BACKPACK)": {
+    "en": "Tool Backpacks",
+    "it": "Zaini porta utensili"
+  },
+  "ΚΑΡΒΙΔΙΟΥ": {
+    "en": "Carbide",
+    "it": "Metallo duro"
+  },
+  "ΚΑΡΟΤΣΙΑ ΔΙΤΡΟΧΑ": {
+    "en": "Two-Wheel Hand Trucks",
+    "it": "Carrelli a due ruote"
+  },
+  "ΚΑΡΥΔΑΚΙΑ 6ΓΩΝΑ": {
+    "en": "6-Point Sockets",
+    "it": "Bussole esagonali"
+  },
+  "ΚΙΜΩΛΙΕΣ - ΝΗΜΑ ΣΤΑΘΜΗΣ": {
+    "en": "Chalk Lines – Plumb Lines",
+    "it": "Tracciatori a polvere – Fili a piombo"
+  },
+  "ΦΑΚΟΙ ΚΕΦΑΛΗΣ": {
+    "en": "Head Torches",
+    "it": "Lampade frontali"
+  },
+  "ΦΑΚΟΙ ΧΕΙΡΟΣ": {
+    "en": "Hand Torches",
+    "it": "Torce portatili"
+  },
+  "ΚΟΙΝΑ ΤΣΟΚ": {
+    "en": "Standard Chucks",
+    "it": "Mandrini standard"
+  },
+  "ΛΟΙΠΑ": {
+    "en": "Other",
+    "it": "Altri"
+  },
+  "ΛΟΙΠΟΙ": {
+    "en": "Other",
+    "it": "Altri"
+  },
+  "ΠΙΣΤΟΛΕΤΑ SDS-PLUS 2-ΛΕΙΤ": {
+    "en": "SDS-Plus 2-Mode Rotary Hammers",
+    "it": "Tassellatori SDS-Plus 2 funzioni"
+  },
+  "ΠΙΣΤΟΛΕΤΑ SDS-PLUS 3-ΛΕΙΤ": {
+    "en": "SDS-Plus 3-Mode Rotary Hammers",
+    "it": "Tassellatori SDS-Plus 3 funzioni"
+  },
+  "ΡΙΓΕΣ - ΓΩΝΙΕΣ": {
+    "en": "Rulers – Squares",
+    "it": "Righelli – Squadre"
+  },
+  "ΕΞΑΡΤΗΜΑΤΑ & ΑΝΤΑΛΛΑΚΤΙΚΑ ΣΚΟΥΠΩΝ": {
+    "it": "Accessori e ricambi per aspiratori"
+  },
+  "ΘΗΚΕΣ ΤΑΚΤΟΠΟΙΗΣΗΣ ΕΡΓΑΛΕΙΟΦΟΡΩΝ": {
+    "it": "Inserti organizzatori per carrelli porta utensili"
+  },
+  "ΙΣΙΑ": {
+    "it": "A taglio"
+  },
+  "ΚΑΡΥΔΑΚΙΑ IMPACT": {
+    "it": "Bussole Impact"
+  },
+  "ΚΑΤΣΑΒΙΔΙ ΚΑΡΥΔΑΚΙ": {
+    "it": "Cacciaviti a bussola"
+  },
+  "ΚΑΤΣΑΒΙΔΙΑ ΝΑΝΟΙ": {
+    "it": "Cacciaviti corti"
+  },
+  "ΜΕΤΑΛΙΚΕΣ ΕΡΓΑΛΕΙΟΘΗΚΕΣ": {
+    "en": "Metal Toolboxes",
+    "it": "Cassette portautensili in metallo"
+  },
+  "ΜΠΟΥΛΟΝΟΚΛΕΙΔΑ 1": {
+    "it": "Avvitatori a massa battente 1\""
+  },
+  "ΠΡΟΒΟΛΕΙΣ - ΣΥΝΕΡΓΕΙΟΥ": {
+    "it": "Fari da officina"
+  },
+  "ΣΕΤ - ΕΞΩΛΚΕΩΝ": {
+    "it": "Set di estrattori"
+  },
+  "ΣΕΤ - ΚΑΤΣΑΒΙΔΙΩΝ": {
+    "it": "Set di cacciaviti"
+  },
+  "ΣΕΤ - ΠΕΝΣΙΚΩΝ": {
+    "it": "Set di pinze"
+  },
+  "ΣΕΤ ΜΕ ΔΥΟ ΕΡΓΑΛΕΙΑ": {
+    "it": "Kit con due utensili"
+  },
+  "ΦΑΛΤΣΕΤΕΣ": {
+    "it": "Taglierini"
+  },
+  "ΦΥΣΕΡΑ": {
+    "it": "Soffiatori"
+  },
+  "ΩΤΟΑΣΠΙΔΕΣ": {
+    "it": "Protezioni auricolari"
+  },
+  "ΕΛΕΓΚΤΕΣ ΤΑΣΗΣ - ΦΑΣΗΣ - ΜΑΓΝΗΤΤΙΚΟΙ ΑΙΣΘΗΤΗΡΕΣ": {
+    "it": "Tester di tensione – fase – rilevatori magnetici"
+  },
+  "ΕΞΑΡΤΗΜΑΤΑ ΑΝΤΑΛΛΑΚΤΙΚΑ": {
+    "it": "Accessori e ricambi"
+  },
+  "ΔΙΣΚΟΠΡΙΟΝΑ ΞΥΛΟΥ-ΑΛΟΥΜΙΝΙΟΥ": {
+    "en": "Wood & Aluminium Circular Saws",
+    "it": "Seghe circolari per legno e alluminio"
+  },
+  "ΠΡΟΒΟΛΕΙΣ ΣΥΝΕΡΓΕΙΟΥ": {
+    "it": "Fari da officina"
+  },
+  "ΠΕΝΣΕΣ ΣΥΣΦΙΞΗΣ (ΠΡΕΣΣΕΣ)": {
+    "it": "Pinze crimpatrici"
+  },
+  "ΜΕΤΑΛΛΙΚΟΙ ΔΙΣΚΟΙ ΓΩΝΙΑΚΩΝ ΤΡΟΧΩΝ": {
+    "en": "Metal Discs for Angle Grinders"
+  },
+  "ΠΡΙΤΣΙΝΑΔΟΡΟΙ": {
+    "en": "Rivet Guns"
+  }
+}
