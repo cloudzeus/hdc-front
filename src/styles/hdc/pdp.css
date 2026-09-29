@@ -481,6 +481,85 @@
     display: none;
   }
 
+  /* Size picker (.sizes) — gloves, clothing, boots. The .opt language in
+     square buttons: grey hairline, 3px red border and ✓ corner on the size
+     shown, dashed and grey for a size out of stock. Every size is a link. */
+  .hdc-pdp-sizes {
+    margin-top: 22px;
+  }
+  .hdc-pdp-sizes-lbl {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 4px 12px;
+    margin-bottom: 10px;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-14);
+    letter-spacing: 0.06em;
+  }
+  .hdc-pdp-sizes-lbl .s {
+    font-weight: 500;
+    font-size: var(--fs-12);
+    letter-spacing: 0.04em;
+    color: var(--hdc-g5);
+  }
+  .hdc-pdp-sizes-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .hdc-pdp-size {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 58px;
+    min-height: 48px;
+    padding: 0 14px;
+    border: 1px solid var(--hdc-g3);
+    color: var(--hdc-ink);
+    font-weight: 800;
+    font-stretch: 115%;
+    font-size: var(--fs-15);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  a.hdc-pdp-size:hover {
+    border-color: var(--hdc-ink);
+  }
+  .hdc-pdp-size.on {
+    padding: 0 12px;
+    border: 3px solid var(--hdc-red);
+    cursor: default;
+  }
+  .hdc-pdp-size.on::before {
+    content: "✓";
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--hdc-red);
+    color: #fff;
+    font-size: var(--fs-10);
+  }
+  .hdc-pdp-size.out {
+    border-style: dashed;
+    color: var(--hdc-g5);
+    font-weight: 600;
+  }
+  .hdc-pdp-size.out.on {
+    border-style: solid;
+  }
+
   /* Price box (.pricebox, .avail, .cta, .subacts) */
   .hdc-pdp-pricebox {
     margin-top: 22px;
@@ -1209,6 +1288,10 @@
     }
     .hdc-pdp-variants {
       order: 3;
+    }
+    .hdc-pdp-sizes {
+      order: 3;
+      margin: 0 0 12px;
     }
     .hdc-pdp-chips {
       display: grid;

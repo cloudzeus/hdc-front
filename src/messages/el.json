@@ -63,7 +63,9 @@
       "paradosi_1_3": "Παράδοση 1–3 εργάσιμες",
       "choris_eikona": "Χωρίς εικόνα",
       "grigori_provoli": "Γρήγορη προβολή",
-      "sygkrisi": "Σύγκριση"
+      "sygkrisi": "Σύγκριση",
+      "megethi": "{count, plural, one {# μέγεθος} other {# μεγέθη}}",
+      "epilogi_megethous": "ΕΠΙΛΟΓΗ ΜΕΓΕΘΟΥΣ"
     }
   },
   "plp": {
@@ -304,7 +306,13 @@
       "proigoumeni": "Προηγούμενη φωτογραφία",
       "epomeni": "Επόμενη φωτογραφία",
       "megethynsi": "Μεγέθυνση",
-      "kleisimo": "Κλείσιμο"
+      "kleisimo": "Κλείσιμο",
+      "megethos": "ΜΕΓΕΘΟΣ",
+      "megethos_epilogi": "Επιλογή μεγέθους",
+      "megethi_diathesima": "{available} ΑΠΟ {total} ΣΕ ΑΠΟΘΕΜΑ",
+      "megethi_kamia": "ΠΑΡΑΔΟΣΗ 1–3 ΕΡΓΑΣΙΜΕΣ",
+      "megethos_kodikos": "Μέγεθος {size} · κωδικός {code}",
+      "megethos_paraggelia": "Μέγεθος {size} · κωδικός {code} · παράδοση 1–3 εργάσιμες"
     }
   },
   "orders": {

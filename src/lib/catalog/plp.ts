@@ -6,6 +6,7 @@ import { activeCampaignsWhere } from "@/lib/offers/coverage";
 import { sharedCatalogue } from "@/lib/catalog/shared-cache";
 import type { Locale } from "@/i18n/routing";
 import { nameWithoutSize } from "@/lib/catalog/variant-name";
+import { withFamilies } from "@/lib/catalog/variants";
 import { scopeKeyOf } from "@/lib/compare/options";
 import { searchWhere } from "@/lib/catalog/search-query";
 import { DEFAULT_VAT_RATE } from "@/lib/format";
@@ -252,7 +253,64 @@ type ResolvedFilters = {
   brandMtrmarks: number[];
   /** Live campaigns, only when `?sale=1`; null otherwise or when none is live. */
   campaigns: Prisma.ProductWhereInput | null;
+  /** Size families whose OTHER sizes match `?q=` (see `searchFamiliesOf`). */
+  searchFamilies: string[];
+  /** Size families with at least one size in stock (see `familyStockClause`). */
+  stockedFamilies: string[];
 };
+
+/** Families with any size in stock — a few dozen keys at most. */
+async function stockedFamiliesOf(): Promise<string[]> {
+  const rows = await prisma.product.findMany({
+    where: { isActive: true, inStock: true, variantGroup: { not: null } },
+    distinct: ["variantGroup"],
+    select: { variantGroup: true },
+  });
+  return rows.map((r) => r.variantGroup).filter((g): g is string => !!g);
+}
+
+/**
+ * The availability filter, read per size family.
+ *
+ * The card of a family speaks for all its sizes, so «Άμεσα διαθέσιμα» has to
+ * as well: HI-DEX gloves whose 9/L is on the shelf are in stock even when the
+ * 7/S that leads the family is not — and a filter that hid them while the card
+ * said «Σε απόθεμα» would contradict itself.
+ */
+function familyStockClause(
+  avail: PlpParams["avail"],
+  stockedFamilies: string[],
+): Prisma.ProductWhereInput | null {
+  const plain = stockClause(avail);
+  if (!plain || stockedFamilies.length === 0) return plain;
+  if (avail === "in-stock") {
+    return { OR: [{ inStock: true }, { variantGroup: { in: stockedFamilies } }] };
+  }
+  return {
+    inStock: false,
+    OR: [{ variantGroup: null }, { variantGroup: { notIn: stockedFamilies } }],
+  };
+}
+
+/**
+ * Size families found through a size that is not the lead.
+ *
+ * The listing shows one card per family — the lead, the smallest size — and
+ * the text search reads each code's own name. «hi-dex 9/l» matches the 9/L,
+ * which is not listed, and not the 7/S, which is: without this the family
+ * would vanish from exactly the search that names it.
+ */
+async function searchFamiliesOf(q: string | undefined): Promise<string[]> {
+  const words = q ? searchWhere(q) : null;
+  if (!words) return [];
+  const rows = await prisma.product.findMany({
+    where: { AND: [{ isActive: true, isVariantLead: false }, ...words.AND] },
+    distinct: ["variantGroup"],
+    select: { variantGroup: true },
+    take: 200,
+  });
+  return rows.map((r) => r.variantGroup).filter((g): g is string => !!g);
+}
 
 /** Null for an unknown category slug — the caller's 404. */
 async function resolveFilters(params: PlpParams): Promise<ResolvedFilters | null> {
@@ -260,10 +318,12 @@ async function resolveFilters(params: PlpParams): Promise<ResolvedFilters | null
   if (!category) return null;
 
   const needsBrands = Boolean(params.brandScopeSlug || params.brand?.length);
-  const [sub, brands, campaigns] = await Promise.all([
+  const [sub, brands, campaigns, searchFamilies, stockedFamilies] = await Promise.all([
     resolveSubScope(params.sub),
     needsBrands ? getLinkedBrands() : Promise.resolve<LinkedBrand[]>([]),
     params.sale ? activeCampaignsWhere() : Promise.resolve(null),
+    searchFamiliesOf(params.q),
+    stockedFamiliesOf(),
   ]);
 
   const ticked = new Set(params.brand ?? []);
@@ -276,6 +336,8 @@ async function resolveFilters(params: PlpParams): Promise<ResolvedFilters | null
       : null,
     brandMtrmarks: brands.filter((b) => ticked.has(b.slug)).map((b) => b.mtrmark),
     campaigns,
+    searchFamilies,
+    stockedFamilies,
   };
 }
 
@@ -335,7 +397,7 @@ function buildWhere(
   }
 
   if (exclude !== "avail") {
-    const stock = stockClause(params.avail);
+    const stock = familyStockClause(params.avail, filters.stockedFamilies);
     if (stock) and.push(stock);
   }
   and.push(...hdcFilterClauses(params, exclude));
@@ -366,7 +428,14 @@ function buildWhere(
    */
   if (params.q) {
     const words = searchWhere(params.q);
-    if (words) and.push(...words.AND);
+    if (words) {
+      // The lead matches, or one of its other sizes does.
+      if (filters.searchFamilies.length) {
+        and.push({ OR: [{ AND: words.AND }, { variantGroup: { in: filters.searchFamilies } }] });
+      } else {
+        and.push(...words.AND);
+      }
+    }
   }
 
   return { AND: and };
@@ -458,7 +527,7 @@ export async function getPlpData(
 
   const brandByMtrmark = brandLookup(linkedBrands, locale);
 
-  const products: ProductCardData[] = rows.map((row) => {
+  const cards: ProductCardData[] = rows.map((row) => {
     const translated = row.translations.find((t) => t.locale === locale)?.name;
     const brand = row.mtrmark != null ? brandByMtrmark.get(row.mtrmark) : undefined;
     return {
@@ -485,6 +554,7 @@ export async function getPlpData(
       oneKey: row.isOneKey,
     };
   });
+  const products = await withFamilies(cards, (i) => rows[i].variantGroup);
 
   const facets = await getFacets(facetKeyOf(params), locale, extraWhere ?? null);
 
@@ -725,6 +795,12 @@ const getFacets = sharedCatalogue(
     for (const row of byStock) {
       allCount += row._count._all;
       if (row.inStock) inStockCount += row._count._all;
+    }
+    // A family counts as in stock when any of its sizes is (familyStockClause).
+    if (filters.stockedFamilies.length > 0) {
+      inStockCount = await prisma.product.count({
+        where: { AND: [whereForAvail, familyStockClause("in-stock", filters.stockedFamilies)!] },
+      });
     }
 
     const activeBrands = new Set(params.brand ?? []);

@@ -1,21 +1,22 @@
 import "server-only";
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
-import type { Locale } from "@/i18n/routing";
+import { compareSizeLabels, sizeDisplayLabel } from "@/lib/catalog/size-family";
 
 /**
- * Τα αδέλφια ενός προϊόντος — τα ίδια παπούτσια σε άλλο νούμερο.
+ * Τα αδέλφια ενός προϊόντος — τα ίδια γάντια σε άλλο μέγεθος.
  *
  * Επιστρέφει ΟΛΑ τα μεγέθη της ομάδας, όχι μόνο τα διαθέσιμα: ένα νούμερο που
  * απλώς λείπει από τη λίστα είναι αόρατο, και ο πελάτης δεν μαθαίνει ποτέ ότι
- * το 45 υπάρχει αλλά τελείωσε. Το `inStock` το λέει, και ο επιλογέας το δείχνει
- * απενεργοποιημένο — «υπάρχει, δεν το έχουμε τώρα» αντί για σιωπή.
+ * το XL υπάρχει αλλά τελείωσε. Το `inStock` το λέει, και ο επιλογέας το δείχνει
+ * διαφορετικά — «υπάρχει, κατόπιν παραγγελίας» αντί για σιωπή.
  */
 export type VariantOption = {
   slug: string;
+  /** Όπως το γράφει το όνομα — «8/M» στα γάντια, «XXL», «42». */
   label: string;
-  /** Η σειρά που όρισε ο χειριστής στο HDCtool — 36 πριν από 37, S πριν από M. */
-  order: number;
+  /** Ο κωδικός κατασκευαστή αυτού του μεγέθους. */
+  code: string;
   inStock: boolean;
   /** Το νόημα του «M»: άλλο στα ρούχα, άλλο στα γάντια. */
   family: string | null;
@@ -23,11 +24,7 @@ export type VariantOption = {
 };
 
 export const variantsOf = cache(
-  async (
-    product: { id: string; variantGroup: string | null },
-    locale: Locale,
-  ): Promise<VariantOption[]> => {
-    void locale;
+  async (product: { id: string; variantGroup: string | null }): Promise<VariantOption[]> => {
     if (!product.variantGroup) return [];
 
     const rows = await prisma.product.findMany({
@@ -35,45 +32,100 @@ export const variantsOf = cache(
       select: {
         id: true,
         slug: true,
+        name: true,
         code: true,
+        code2: true,
         qty: true,
         inStock: true,
-        sizes: { select: { label: true, family: true, order: true }, orderBy: { order: "asc" } },
+        sizes: { select: { label: true, family: true }, orderBy: { order: "asc" } },
       },
     });
 
     const options: VariantOption[] = [];
     for (const row of rows) {
-      const size = row.sizes[0];
-      // Χωρίς ετικέτα δεν υπάρχει τι να πατήσει κανείς. Δεν θα έπρεπε να συμβεί
-      // — η ομάδα χτίζεται πάνω στην ανάθεση μεγέθους — αλλά μια γραμμή χωρίς
-      // ετικέτα ως κενό κουμπί είναι χειρότερη από μια γραμμή που λείπει.
-      if (!size) continue;
+      const label = sizeDisplayLabel(row.name, row.sizes.map((s) => s.label));
+      // Χωρίς ετικέτα δεν υπάρχει τι να πατήσει κανείς — ένα κενό κουμπί είναι
+      // χειρότερο από μια γραμμή που λείπει.
+      if (!label) continue;
       options.push({
         slug: row.slug,
-        label: size.label,
-        order: size.order,
+        label,
+        code: row.code2 || row.code,
         inStock: row.inStock && Number(row.qty ?? 0) > 0,
-        family: size.family,
+        family: row.sizes[0]?.family ?? null,
         current: row.id === product.id,
       });
     }
 
     /*
-     * Διπλά νούμερα: κρατά ένα, και προτιμά αυτό με απόθεμα.
+     * Διπλά νούμερα: κρατά ένα, και προτιμά το τρέχον, μετά αυτό με απόθεμα.
      * ─────────────────────────────────────────────────────────────────────
      * Ο κατάλογος έχει πραγματικές διπλοκαταχωρίσεις — δύο MTRL για το ίδιο
-     * είδος, ίδιο όνομα, ίδιος MPN, ίδιο νούμερο. Δύο κουμπιά «42» δίπλα-δίπλα
-     * είναι ερώτηση χωρίς απάντηση για τον πελάτη.
+     * είδος, ίδιο όνομα, ίδιο νούμερο. Δύο κουμπιά «42» δίπλα-δίπλα είναι
+     * ερώτηση χωρίς απάντηση για τον πελάτη.
      */
     const byLabel = new Map<string, VariantOption>();
     for (const option of options) {
       const kept = byLabel.get(option.label);
-      if (!kept || (!kept.inStock && option.inStock) || option.current) {
-        byLabel.set(option.label, kept?.current ? kept : option);
+      if (!kept || option.current || (!kept.current && !kept.inStock && option.inStock)) {
+        byLabel.set(option.label, option);
       }
     }
 
-    return [...byLabel.values()].sort((a, b) => a.order - b.order || a.label.localeCompare(b.label, "el"));
+    return [...byLabel.values()].sort((a, b) => compareSizeLabels(a.label, b.label));
   },
 );
+
+/** What a card that stands for a whole size family says about it. */
+export type FamilySummary = {
+  /** How many sizes the family has (active codes). */
+  count: number;
+  /** Whether ANY size is in stock — the card speaks for all of them. */
+  inStock: boolean;
+};
+
+/**
+ * Size count and stock per family, for a page of cards in one query.
+ *
+ * A family card that showed the lead's own stock would say «Παράδοση 1–3
+ * εργάσιμες» for gloves whose 9/L is on the shelf, because the 7/S is not.
+ */
+export async function familySummaries(
+  groups: Array<string | null | undefined>,
+): Promise<Map<string, FamilySummary>> {
+  const wanted = [...new Set(groups.filter((g): g is string => !!g))];
+  const out = new Map<string, FamilySummary>();
+  if (wanted.length === 0) return out;
+
+  const rows = await prisma.product.groupBy({
+    by: ["variantGroup", "inStock"],
+    where: { isActive: true, variantGroup: { in: wanted } },
+    _count: { _all: true },
+  });
+  for (const row of rows) {
+    if (!row.variantGroup) continue;
+    const prev = out.get(row.variantGroup) ?? { count: 0, inStock: false };
+    out.set(row.variantGroup, {
+      count: prev.count + row._count._all,
+      inStock: prev.inStock || row.inStock,
+    });
+  }
+  return out;
+}
+
+/**
+ * The cards, each with its family's summary when it stands for one. `groupOf`
+ * reads the family from the card's source row, in the same order.
+ */
+export async function withFamilies<T extends { sizes?: FamilySummary | null }>(
+  cards: T[],
+  groupOf: (index: number) => string | null | undefined,
+): Promise<T[]> {
+  const summaries = await familySummaries(cards.map((_, i) => groupOf(i)));
+  if (summaries.size === 0) return cards;
+  return cards.map((card, i) => {
+    const group = groupOf(i);
+    const summary = group ? summaries.get(group) : undefined;
+    return summary && summary.count > 1 ? { ...card, sizes: summary } : card;
+  });
+}

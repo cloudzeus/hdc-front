@@ -8,6 +8,7 @@ import { HdcBuyActions } from "@/components/pdp/hdc/HdcBuyActions";
 import { HdcGallery, type GalleryTag } from "@/components/pdp/hdc/HdcGallery";
 import { HdcSection } from "@/components/pdp/hdc/HdcSection";
 import { HdcSectionNav } from "@/components/pdp/hdc/HdcSectionNav";
+import { HdcSizePicker } from "@/components/pdp/hdc/HdcSizePicker";
 import { HdcProductCard } from "@/components/product/HdcProductCard";
 import { QuickViewProvider } from "@/components/product/QuickViewProvider";
 import { Zone } from "@/components/zones/Zone";
@@ -20,6 +21,7 @@ import { FREE_SHIPPING_THRESHOLD_NET } from "@/lib/cart/options";
 import { getModelVariants, type ModelVariant } from "@/lib/catalog/hdc-pdp";
 import { isBattery } from "@/lib/hdc-nav";
 import { getProductBySlug } from "@/lib/catalog/pdp";
+import { variantsOf } from "@/lib/catalog/variants";
 import {
   getCatalogueStats,
   getMenuTree,
@@ -132,6 +134,7 @@ export default async function ProductPage({ params }: PageProps) {
     variants,
     batteries,
     offer,
+    sizes,
   ] = await Promise.all([
     getMenuTree(locale),
     getTopBrands(locale),
@@ -147,6 +150,8 @@ export default async function ProductPage({ params }: PageProps) {
       { slug: product.slug, brandSlug: product.brand?.slug ?? null, unitNet: product.priceNet },
       locale,
     ),
+    /* The same product in its other sizes — gloves, clothing, boots. */
+    variantsOf(product),
   ]);
 
   /* The same-battery band: the platform's battery first, then bare tools. */
@@ -517,6 +522,25 @@ export default async function ProductPage({ params }: PageProps) {
                 </div>
               </div>
             )}
+
+            <HdcSizePicker
+              options={sizes}
+              label={t("megethos")}
+              status={
+                sizes.some((s) => s.inStock)
+                  ? t("megethi_diathesima", {
+                      available: sizes.filter((s) => s.inStock).length,
+                      total: sizes.length,
+                    })
+                  : t("megethi_kamia")
+              }
+              navLabel={t("megethos_epilogi")}
+              titleOf={(s) =>
+                s.inStock
+                  ? t("megethos_kodikos", { size: s.label, code: s.code })
+                  : t("megethos_paraggelia", { size: s.label, code: s.code })
+              }
+            />
 
             <div className="hdc-pdp-pricebox">
               <p className="hdc-pdp-pr">

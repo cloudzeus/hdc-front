@@ -1,3 +1,5 @@
+import { stripSizeToken } from "@/lib/catalog/size-family";
+
 /**
  * Το όνομα χωρίς το νούμερο.
  *
@@ -24,14 +26,7 @@ export function nameWithoutSize(
 ): string {
   const label = options.sizeLabel?.trim();
   if (!options.variantGroup || !label) return name;
-
-  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const cleaned = name
-    .replace(new RegExp(`(^|\\s)(No\\s+)?${escaped}(?=\\s|$)`, "i"), " ")
-    .replace(/\s+/g, " ")
-    .trim();
-
-  // Αν έμεινε σχεδόν τίποτα, το αρχικό όνομα ήταν κυρίως το νούμερο — καλύτερα
-  // ένα όνομα με το νούμερο μέσα παρά μια κάρτα χωρίς όνομα.
-  return cleaned.length >= 3 ? cleaned : name;
+  /* Η ίδια ανάγνωση του μεγέθους με την ομαδοποίηση (`size-family.ts`): και
+     «No 36», και «8/M», «10 (XL)», «XXL» για ετικέτα 2XL. */
+  return stripSizeToken(name, [label]);
 }

@@ -3,6 +3,7 @@ import { randomBytes } from "node:crypto";
 import { cookies } from "next/headers";
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
+import { onePerFamily } from "@/lib/catalog/size-family";
 import type { Locale } from "@/i18n/routing";
 import { grossAmount, netAmount } from "@/lib/format";
 import { discountedNet, offerBadgeFor } from "@/lib/offers/badges";
@@ -336,15 +337,19 @@ export const getCartCrossSell = cache(
   async (locale: Locale, excludeProductIds: string[], limit = 4) => {
     const inCart = await prisma.product.findMany({
       where: { id: { in: excludeProductIds } },
-      select: { mtrgroup: true, mtrcategory: true },
+      select: { mtrgroup: true, mtrcategory: true, variantGroup: true },
     });
+    // Not the gloves in the basket again in another size.
+    const families = [
+      ...new Set(inCart.map((p) => p.variantGroup).filter((g): g is string => g != null)),
+    ];
 
     const groups = [...new Set(inCart.map((p) => p.mtrgroup).filter((g): g is number => g != null))];
     const categories = [
       ...new Set(inCart.map((p) => p.mtrcategory).filter((c): c is number => c != null)),
     ];
 
-    const rows = await prisma.product.findMany({
+    const fetched = await prisma.product.findMany({
       where: {
         isActive: true,
         inStock: true,
@@ -353,9 +358,13 @@ export const getCartCrossSell = cache(
         ...(groups.length
           ? { OR: [{ mtrgroup: { in: groups } }, { mtrcategory: { in: categories } }] }
           : {}),
+        ...(families.length
+          ? { AND: [{ OR: [{ variantGroup: null }, { variantGroup: { notIn: families } }] }] }
+          : {}),
       },
       orderBy: [{ onSale: "desc" }, { mtrl: "desc" }],
-      take: limit,
+      // Over-fetched: one size per family is kept below.
+      take: limit * 4,
       select: {
         id: true,
         slug: true,
@@ -367,8 +376,10 @@ export const getCartCrossSell = cache(
         vatRate: true,
         images: { where: { isFeature: true }, take: 1, select: { url: true } },
         translations: { select: { locale: true, name: true } },
+        variantGroup: true,
       },
     });
+    const rows = onePerFamily(fetched).slice(0, limit);
 
     const brandRows = await prisma.brand.findMany({
       where: { mtrmark: { in: rows.map((r) => r.mtrmark).filter((m): m is number => m != null) } },

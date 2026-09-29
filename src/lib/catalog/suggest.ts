@@ -6,6 +6,8 @@ import { searchKey } from "@/lib/greek";
 import { displayName } from "@/lib/milwaukee/display";
 import { parseModel } from "@/lib/milwaukee/model";
 import { getFeaturedProducts } from "@/lib/catalog/queries";
+import { onePerFamily } from "@/lib/catalog/size-family";
+import { nameWithoutSize } from "@/lib/catalog/variant-name";
 import {
   didYouMeanText,
   groupByModel,
@@ -79,6 +81,8 @@ const CARD = {
   inStock: true,
   images: { where: { isFeature: true }, take: 1, select: { url: true } },
   translations: { select: { locale: true, name: true } },
+  variantGroup: true,
+  sizes: { select: { label: true }, orderBy: { order: "asc" }, take: 1 },
 } as const;
 
 const VARIANT = {
@@ -137,6 +141,8 @@ type CardRow = {
   inStock: boolean;
   images: { url: string }[];
   translations: { locale: string; name: string }[];
+  variantGroup?: string | null;
+  sizes?: { label: string }[];
 };
 
 /** The translated name — unless it is a placeholder HDCtool left mid-run. */
@@ -163,10 +169,15 @@ function toProduct(row: CardRow, locale: Locale): SuggestProduct {
 }
 
 function toTile(row: CardRow, locale: Locale): SuggestTile {
+  /* A tile stands for its whole size family (the lead): no «8/M» in the name. */
+  const name = nameWithoutSize(localName(row, locale), {
+    variantGroup: row.variantGroup,
+    sizeLabel: row.sizes?.[0]?.label,
+  });
   return {
     id: row.id,
     slug: row.slug,
-    name: displayName(localName(row, locale), row.code2),
+    name: displayName(name, row.code2),
     sku: row.code2 || row.code,
     image: row.images[0]?.url ?? null,
     priceNet: num(row.priceNet),
@@ -216,10 +227,22 @@ export async function getSuggestions(
   if (!words) return empty;
   const tokens = queryTokens(query);
   const match = { AND: [{ isActive: true }, ...words.AND] };
+  /* One hit per size family, as the results page counts them: the lead, or
+     any family one of whose other sizes matches («hi-dex 9/l»). The exact-code
+     lookup is not filtered — a pasted code is that size and no other. */
+  const leadMatch = { AND: [match, { isVariantLead: true }] };
 
   // ── Round-trip 1: everything that depends only on the query ─────────────
-  const [exactRow, modelRows, accessoryRows, total, byClass, byPlatform, namedCategories] =
-    await Promise.all([
+  const [
+    exactRow,
+    modelRows,
+    accessoryHits,
+    leadTotal,
+    followerFamilies,
+    byClass,
+    byPlatform,
+    namedCategories,
+  ] = await Promise.all([
       // Exact code — indexed equality, so this costs nothing even when it misses.
       prisma.product.findFirst({ where: exactCodeWhere(query), select: VARIANT }),
       // Just enough of every model match to rank the roots.
@@ -241,16 +264,23 @@ export async function getSuggestions(
         where: { AND: [match, { modelRoot: null }] },
         // In stock first: suggesting something we cannot ship is a wasted tile.
         orderBy: [{ inStock: "desc" }, { qty: "desc" }, { mtrl: "desc" }],
-        take: ACCESSORY_LIMIT,
+        // Over-fetched: five sizes of one glove fold into one tile below.
+        take: ACCESSORY_LIMIT * 4,
         select: CARD,
       }),
-      prisma.product.count({ where: match }),
+      prisma.product.count({ where: leadMatch }),
+      prisma.product.findMany({
+        where: { AND: [match, { isVariantLead: false }] },
+        distinct: ["variantGroup"],
+        select: { variantGroup: true },
+        take: 200,
+      }),
       prisma.product.groupBy({
         by: ["cccSubgroup2", "mtrgroup"],
-        where: match,
+        where: leadMatch,
         _count: { _all: true },
       }),
-      prisma.product.groupBy({ by: ["platform"], where: match, _count: { _all: true } }),
+      prisma.product.groupBy({ by: ["platform"], where: leadMatch, _count: { _all: true } }),
       prisma.category.findMany({
         where: { productCount: { gt: 0 }, nameEl: { contains: query, mode: "insensitive" } },
         orderBy: { productCount: "desc" },
@@ -258,6 +288,21 @@ export async function getSuggestions(
         select: { slug: true, nameEl: true, nameEn: true, nameIt: true, productCount: true },
       }),
     ]);
+
+  const accessoryRows = onePerFamily(accessoryHits).slice(0, ACCESSORY_LIMIT);
+  // The results page's count: leads that match, plus families found through
+  // another size (plp.ts `searchFamiliesOf`).
+  const families = followerFamilies.map((r) => r.variantGroup).filter((g): g is string => !!g);
+  const total = families.length
+    ? await prisma.product.count({
+        where: {
+          AND: [
+            { isActive: true, isVariantLead: true },
+            { OR: [{ AND: words.AND }, { variantGroup: { in: families } }] },
+          ],
+        },
+      })
+    : leadTotal;
 
   const ranked = groupByModel(
     modelRows.map((row) => ({

@@ -68,6 +68,12 @@ export async function HdcProductCard({
 
   const href = `/proion/${product.slug}`;
 
+  /* A card for a size family speaks for all its sizes: how many there are,
+     whether ANY is on the shelf, and a button that opens the page to choose
+     one — «ΣΤΟ ΚΑΛΑΘΙ» here would add whichever size is the lead. */
+  const family = product.sizes && product.sizes.count > 1 ? product.sizes : null;
+  const inStock = family ? family.inStock : product.inStock;
+
   return (
     <article className={`hdc-card${isNew ? " hdc-card--flat" : ""}`}>
       <div className="hdc-card-img">
@@ -89,7 +95,10 @@ export async function HdcProductCard({
         {!isNew && (
           <FavouriteButton productId={product.id} initial={favourite} className="hdc-card-fav" />
         )}
-        {quickView && <HdcQuickViewButton slug={product.slug} label={t("grigori_provoli")} />}
+        {/* Not for a size family: the quick view would add the lead's size unseen. */}
+        {quickView && !family && (
+          <HdcQuickViewButton slug={product.slug} label={t("grigori_provoli")} />
+        )}
         <Link href={href} className="hdc-card-media" prefetch={false} tabIndex={-1} aria-hidden>
           {product.image ? (
             <Image
@@ -114,6 +123,7 @@ export async function HdcProductCard({
         <p className="hdc-card-code">
           {product.sku}
           {content && ` · ${content}`}
+          {family && ` · ${t("megethi", { count: family.count })}`}
         </p>
         <p className="hdc-card-price">
           {finalNet != null ? formatPrice(finalNet, locale, ctx) : "—"}
@@ -123,11 +133,11 @@ export async function HdcProductCard({
         </p>
         {!isNew && (
           <p
-            className={`hdc-card-avail ${product.inStock ? "hdc-card-avail--ok" : "hdc-card-avail--wait"}`}
+            className={`hdc-card-avail ${inStock ? "hdc-card-avail--ok" : "hdc-card-avail--wait"}`}
           >
             ●{" "}
-            {product.inStock
-              ? showsExactQty(product.qty)
+            {inStock
+              ? !family && showsExactQty(product.qty)
                 ? t("se_apothema_tem", { qty: product.qty })
                 : t("se_apothema")
               : t("paradosi_1_3")}
@@ -141,11 +151,17 @@ export async function HdcProductCard({
             label={t("sygkrisi")}
           />
         )}
-        <AddToCartButton
-          productId={product.id}
-          disabled={finalNet == null}
-          className="hdc-card-add"
-        />
+        {family ? (
+          <Link href={href} className="hdc-card-add" prefetch={false}>
+            {t("epilogi_megethous")}
+          </Link>
+        ) : (
+          <AddToCartButton
+            productId={product.id}
+            disabled={finalNet == null}
+            className="hdc-card-add"
+          />
+        )}
       </div>
     </article>
   );

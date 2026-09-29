@@ -63,7 +63,9 @@
       "paradosi_1_3": "Delivery in 1–3 working days",
       "choris_eikona": "No image",
       "grigori_provoli": "Quick view",
-      "sygkrisi": "Compare"
+      "sygkrisi": "Compare",
+      "megethi": "{count, plural, one {# size} other {# sizes}}",
+      "epilogi_megethous": "CHOOSE SIZE"
     }
   },
   "plp": {
@@ -304,7 +306,13 @@
       "proigoumeni": "Previous photo",
       "epomeni": "Next photo",
       "megethynsi": "Enlarge",
-      "kleisimo": "Close"
+      "kleisimo": "Close",
+      "megethos": "SIZE",
+      "megethos_epilogi": "Choose a size",
+      "megethi_diathesima": "{available} OF {total} IN STOCK",
+      "megethi_kamia": "DELIVERY IN 1–3 WORKING DAYS",
+      "megethos_kodikos": "Size {size} · code {code}",
+      "megethos_paraggelia": "Size {size} · code {code} · delivery in 1–3 working days"
     }
   },
   "orders": {

@@ -1254,6 +1254,24 @@ export async function syncProductsByMtrl(mtrls: number[]): Promise<TargetedSyncR
     }
   }
 
+  /*
+   * Families and leads after every delta, not just nightly.
+   *
+   * Writing a product resets its `variantGroup` to what HDCtool sent, which for
+   * most gloves is nothing; a new size arrives as a lead of its own; a lead that
+   * is de-listed takes its whole family out of the listings. Left to the nightly
+   * reconcile, each of those shows as duplicate or missing cards for a day. The
+   * pass is two reads and a handful of writes, and a failure here must not fail
+   * the delivery that has already been written.
+   */
+  if (processed > 0 || removed > 0) {
+    try {
+      await refreshVariantLeads();
+    } catch (error) {
+      console.error("[catalog-sync] variant leads refresh failed", error);
+    }
+  }
+
   return {
     processed, created, updated, removed,
     failed: errors.length,

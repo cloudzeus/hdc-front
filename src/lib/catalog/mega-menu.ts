@@ -65,9 +65,10 @@ const load = sharedCatalogue(
           parent: { select: { erpCode: true } },
         },
       }),
+      // One per size family, as the listings the menu links to count them.
       prisma.product.groupBy({
         by: ["mtrcategory", "mtrgroup", "platform", "inStock"],
-        where: { isActive: true },
+        where: { isActive: true, isVariantLead: true },
         _count: { _all: true },
       }),
       prisma.$queryRaw<RawTop[]>(Prisma.sql`
@@ -81,7 +82,7 @@ const load = sharedCatalogue(
                 ORDER BY i."isFeature" DESC, i."order" ASC
                 LIMIT 1
              ) img ON TRUE
-       WHERE p."isActive" = TRUE AND p."mtrgroup" IS NOT NULL
+       WHERE p."isActive" = TRUE AND p."isVariantLead" = TRUE AND p."mtrgroup" IS NOT NULL
        ORDER BY p."mtrcategory", p."mtrgroup", p."platform",
                 p."inStock" DESC, p."priceNet" DESC NULLS LAST, p."code2" ASC
     `),

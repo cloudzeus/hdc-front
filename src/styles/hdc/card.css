@@ -210,6 +210,10 @@
   .hdc-card-add:hover {
     background: var(--hdc-red-d);
   }
+  /* «ΕΠΙΛΟΓΗ ΜΕΓΕΘΟΥΣ» on a size-family card is a link to the product page. */
+  a.hdc-card-add {
+    display: block;
+  }
 
   @media (max-width: 767px) {
     .hdc-card-body {

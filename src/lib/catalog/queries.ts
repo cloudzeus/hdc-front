@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { sharedCatalogue } from "@/lib/catalog/shared-cache";
 import type { Locale } from "@/i18n/routing";
 import { nameWithoutSize } from "@/lib/catalog/variant-name";
+import { withFamilies, type FamilySummary } from "@/lib/catalog/variants";
 
 /**
  * Read queries against the local catalogue projection.
@@ -227,6 +228,13 @@ export type ProductCardData = {
   scopeKey?: string | null;
   /** ONE-KEY tool: the card adds a second tag under the platform. */
   oneKey?: boolean;
+  /**
+   * The size family this card stands for (gloves, clothing, boots), when it
+   * has more than one size: the card says how many, speaks for the stock of
+   * all of them, and sends to the product page to pick one instead of adding
+   * whichever size happens to be the lead.
+   */
+  sizes?: FamilySummary | null;
 };
 
 const PRODUCT_CARD_SELECT = {
@@ -366,8 +374,10 @@ export const getFeaturedProducts = sharedCatalogue(
     const [rows, brands] = await Promise.all([
       prisma.product.findMany({
         // Over-fetch so there is enough to spread across categories.
+        // One card per size family, as in every listing.
         where: {
           isActive: true,
+          isVariantLead: true,
           inStock: true,
           priceNet: { gt: 0 },
           ...(requireImage ? { images: { some: { isFeature: true } } } : {}),
@@ -404,7 +414,10 @@ export const getFeaturedProducts = sharedCatalogue(
       }
     }
 
-    return picked.map((row) => toCard(row, locale, brands));
+    return withFamilies(
+      picked.map((row) => toCard(row, locale, brands)),
+      (i) => picked[i].variantGroup,
+    );
   },
 );
 
@@ -424,10 +437,13 @@ export const getProductsByCode2 = sharedCatalogue(
       getBrandsByMtrmark(locale),
     ]);
     const byCode = new Map((rows as ProductRow[]).map((row) => [row.code2, row]));
-    return codes
+    const picked = codes
       .map((code) => byCode.get(code))
-      .filter((row): row is ProductRow => row != null)
-      .map((row) => toCard(row, locale, brands));
+      .filter((row): row is ProductRow => row != null);
+    return withFamilies(
+      picked.map((row) => toCard(row, locale, brands)),
+      (i) => picked[i].variantGroup,
+    );
   },
 );
 
@@ -449,6 +465,7 @@ export const getHomeNewArrivals = sharedCatalogue(
   ): Promise<{ products: ProductCardData[]; placeholder: boolean }> => {
     const where = {
       isActive: true,
+      isVariantLead: true,
       inStock: true,
       priceNet: { gt: 0 },
       images: { some: { isFeature: true } },
@@ -476,7 +493,10 @@ export const getHomeNewArrivals = sharedCatalogue(
     ]);
 
     return {
-      products: (rows as ProductRow[]).map((row) => toCard(row, locale, brands)),
+      products: await withFamilies(
+        (rows as ProductRow[]).map((row) => toCard(row, locale, brands)),
+        (i) => (rows as ProductRow[])[i].variantGroup,
+      ),
       placeholder,
     };
   },
@@ -607,6 +627,7 @@ export const getSameBatteryTools = sharedCatalogue(
       prisma.product.findMany({
         where: {
           isActive: true,
+          isVariantLead: true,
           inStock: true,
           platform,
           modelContent: "bare",

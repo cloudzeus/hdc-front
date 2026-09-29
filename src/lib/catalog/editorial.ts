@@ -3,6 +3,8 @@ import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import type { Locale } from "@/i18n/routing";
 import type { ProductCardData } from "@/lib/catalog/queries";
+import { nameWithoutSize } from "@/lib/catalog/variant-name";
+import { withFamilies } from "@/lib/catalog/variants";
 import { scopeKeyOf } from "@/lib/compare/options";
 
 /**
@@ -36,6 +38,8 @@ const CARD = {
   firstListedAt: true,
   images: { where: { isFeature: true }, take: 1, select: { url: true } },
   translations: { select: { locale: true, name: true } },
+  variantGroup: true,
+  sizes: { select: { label: true }, orderBy: { order: "asc" }, take: 1 },
 } as const;
 
 function num(value: unknown): number | null {
@@ -68,7 +72,11 @@ function toCard(
     id: row.id,
     mtrl: row.mtrl,
     slug: row.slug,
-    name: row.translations.find((t) => t.locale === locale)?.name?.trim() || row.name,
+    /* A card stands for its whole size family: no «8/M» in its name. */
+    name: nameWithoutSize(row.translations.find((t) => t.locale === locale)?.name?.trim() || row.name, {
+      variantGroup: row.variantGroup,
+      sizeLabel: row.sizes[0]?.label,
+    }),
     sku: row.code2 || row.code,
     brandName: brand?.name ?? null,
     brandSlug: brand?.slug ?? null,
@@ -145,7 +153,8 @@ export const getNewArrivals = cache(
 
     const [rows, brands, last30, last90, lastYear, total] = await Promise.all([
       prisma.product.findMany({
-        where: { isActive: true, firstListedAt: { not: null } },
+        // One card per size family, as in every listing.
+        where: { isActive: true, isVariantLead: true, firstListedAt: { not: null } },
         orderBy: [{ firstListedAt: "desc" }, { mtrl: "desc" }],
         // Enough rows to fill `periodLimit` months even when one month is thin.
         take: periodLimit * perPeriod * 4,
@@ -175,9 +184,9 @@ export const getNewArrivals = cache(
     `;
     const countByMonth = new Map(monthCounts.map((r) => [r.month, Number(r.n)]));
 
-    const periods: ArrivalPeriod[] = [...buckets.entries()]
+    const periods: ArrivalPeriod[] = await Promise.all([...buckets.entries()]
       .slice(0, periodLimit)
-      .map(([key, items]) => {
+      .map(async ([key, items]) => {
         const [year, month] = key.split("-").map(Number);
         return {
           key,
@@ -191,9 +200,12 @@ export const getNewArrivals = cache(
                 .filter((n): n is string => !!n),
             ),
           ].slice(0, 6),
-          products: items.slice(0, perPeriod).map((row) => toCard(row, brands, locale)),
+          products: await withFamilies(
+            items.slice(0, perPeriod).map((row) => toCard(row, brands, locale)),
+            (i) => items[i].variantGroup,
+          ),
         };
-      });
+      }));
 
     return {
       periods,
@@ -233,6 +245,7 @@ export const getOffers = cache(
   async (locale: Locale, limit = 24): Promise<OffersView> => {
     const where = {
       isActive: true,
+      isVariantLead: true,
       onSale: true,
       priceList: { not: null },
       priceNet: { not: null },
@@ -249,7 +262,10 @@ export const getOffers = cache(
       brandMap(locale),
     ]);
 
-    const products = rows.map((row) => toCard(row, brands, locale));
+    const products = await withFamilies(
+      rows.map((row) => toCard(row, brands, locale)),
+      (i) => rows[i].variantGroup,
+    );
     const percents = products
       .filter((p) => p.priceListNet != null && p.priceNet != null && p.priceListNet > 0)
       .map((p) => Math.round((1 - p.priceNet! / p.priceListNet!) * 100));
