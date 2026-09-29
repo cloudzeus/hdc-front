@@ -6,7 +6,7 @@ import { HdcCompareCheckbox } from "@/components/product/HdcCompareCheckbox";
 import { HdcQuickViewButton } from "@/components/product/HdcQuickViewButton";
 import { Link } from "@/i18n/navigation";
 import { favouriteIds } from "@/lib/account/favourite-ids";
-import { availabilityOf, isLastPiece } from "@/lib/catalog/availability";
+import { availabilityLabelKey, availabilityOf } from "@/lib/catalog/availability";
 import type { ProductCardData } from "@/lib/catalog/queries";
 import { formatPrice } from "@/lib/format";
 import { displayName, platformTag } from "@/lib/milwaukee/display";
@@ -142,14 +142,7 @@ export async function HdcProductCard({
           <p
             className={`hdc-card-avail ${availability === "stock" ? "hdc-card-avail--ok" : "hdc-card-avail--wait"}`}
           >
-            ●{" "}
-            {availability === "stock"
-              ? !family && isLastPiece(product.qty)
-                ? t("teleftaio")
-                : t("se_apothema")
-              : availability === "supplier"
-                ? t("diathesimo_3_5")
-                : t("paradosi_1_3")}
+            ● {t(availabilityLabelKey(availability, family ? null : product.qty))}
           </p>
         )}
         {compare && (

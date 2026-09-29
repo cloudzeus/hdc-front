@@ -14,7 +14,7 @@ import type { Locale } from "@/i18n/routing";
 import { getCart, getDeliveryPostcode, getMiniCart } from "@/lib/cart/cart";
 import { getCartLineExtras, getHdcCrossSell } from "@/lib/cart/hdc-cart";
 import { freeShippingProgress } from "@/lib/cart/options";
-import { isLastPiece, orderAvailability } from "@/lib/catalog/availability";
+import { availabilityLabelKey, orderAvailability } from "@/lib/catalog/availability";
 import {
   getCatalogueStats,
   getMenuTree,
@@ -113,14 +113,7 @@ export default async function CartPage({
       image: line.image,
       quantity: line.quantity,
       inStock: line.inStock,
-      availability:
-        line.availability === "stock"
-          ? isLastPiece(line.availableQty)
-            ? t("teleftaio")
-            : t("se_apothema")
-          : line.availability === "supplier"
-            ? t("diathesimo_3_5")
-            : t("paradosi_1_3"),
+      availability: t(availabilityLabelKey(line.availability, line.availableQty)),
       overStock: line.overStock ? t("overstock", { qty: line.availableQty }) : null,
       unitPrice: formatPrice(line.unitNetFinal, locale, { vatRate: line.vatRate }),
       unitWas:

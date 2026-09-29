@@ -20,7 +20,7 @@ import { getMiniCart } from "@/lib/cart/cart";
 import { FREE_SHIPPING_THRESHOLD_NET } from "@/lib/cart/options";
 import { getModelVariants, type ModelVariant } from "@/lib/catalog/hdc-pdp";
 import { isBattery } from "@/lib/hdc-nav";
-import { availabilityOf, isLastPiece } from "@/lib/catalog/availability";
+import { availabilityLabelKey, availabilityOf } from "@/lib/catalog/availability";
 import { getProductBySlug } from "@/lib/catalog/pdp";
 import { variantsOf } from "@/lib/catalog/variants";
 import {
@@ -291,14 +291,7 @@ export default async function ProductPage({ params }: PageProps) {
   // Our stock «Σε απόθεμα», no number («Τελευταίο τεμάχιο» at one); the
   // supplier's «Διαθέσιμο · 3–5 εργάσιμες»; neither «Παράδοση 1–3 εργάσιμες».
   const availability = availabilityOf(product);
-  const stockLine =
-    availability === "stock"
-      ? isLastPiece(product.qty)
-        ? t("teleftaio")
-        : t("se_apothema")
-      : availability === "supplier"
-        ? t("diathesimo_3_5")
-        : t("paradosi");
+  const stockLine = t(availabilityLabelKey(availability, product.qty));
 
   // ── Sections ─────────────────────────────────────────────────────────────
   let paragraphs = descriptionParagraphs(product.longDescription);

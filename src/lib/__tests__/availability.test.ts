@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { availabilityOf, isLastPiece, orderAvailability } from "@/lib/catalog/availability";
+import {
+  availabilityLabelKey,
+  availabilityOf,
+  isLastPiece,
+  orderAvailability,
+} from "@/lib/catalog/availability";
 
 describe("availabilityOf", () => {
   it("our stock wins", () => {
@@ -37,5 +42,26 @@ describe("orderAvailability", () => {
   });
   it("supplier outranks on order", () => {
     expect(orderAvailability(["order", "supplier"])).toBe("supplier");
+  });
+  it("an empty order promises nothing extra: stock", () => {
+    expect(orderAvailability([])).toBe("stock");
+  });
+});
+
+describe("availabilityLabelKey", () => {
+  it("our stock, no number", () => {
+    expect(availabilityLabelKey("stock", 5)).toBe("se_apothema");
+    expect(availabilityLabelKey("stock", 0)).toBe("se_apothema");
+    expect(availabilityLabelKey("stock", null)).toBe("se_apothema");
+  });
+  it("the last piece only at exactly one", () => {
+    expect(availabilityLabelKey("stock", 1)).toBe("teleftaio");
+  });
+  it("the supplier's, whatever our quantity", () => {
+    expect(availabilityLabelKey("supplier", 1)).toBe("diathesimo_3_5");
+    expect(availabilityLabelKey("supplier", 0)).toBe("diathesimo_3_5");
+  });
+  it("neither", () => {
+    expect(availabilityLabelKey("order", 1)).toBe("paradosi_1_3");
   });
 });

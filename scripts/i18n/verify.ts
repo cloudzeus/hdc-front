@@ -23,6 +23,7 @@
 import ts from "typescript";
 import { readFileSync, globSync, existsSync } from "node:fs";
 import path from "node:path";
+import { AVAILABILITY_LABEL_KEYS } from "../../src/lib/catalog/availability";
 
 type Tree = { [k: string]: string | Tree };
 
@@ -136,6 +137,13 @@ export function findProblems(): Problem[] {
           const pattern = templatePattern(arg);
           if (!keys.some((k) => pattern.test(k)))
             problems.push({ file: where, detail: `${ns}.${arg.getText()} — κανένα κλειδί δεν ταιριάζει` });
+        } else if (
+          ts.isCallExpression(arg) &&
+          ts.isIdentifier(arg.expression) &&
+          arg.expression.text === "availabilityLabelKey"
+        ) {
+          // `t(availabilityLabelKey(…))` — any of the availability lines.
+          for (const key of AVAILABILITY_LABEL_KEYS) check(key, " (μέσω availabilityLabelKey)");
         } else if (ts.isElementAccessExpression(arg) && ts.isIdentifier(arg.expression)) {
           // `UNITS[i]` — the index is unknown, so every element must exist.
           const elements = arrayElements(arg.expression.text);
