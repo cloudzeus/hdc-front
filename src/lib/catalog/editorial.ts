@@ -34,6 +34,7 @@ const CARD = {
   vatRate: true,
   qty: true,
   inStock: true,
+  supplierAvailable: true,
   erpInsertedAt: true,
   firstListedAt: true,
   images: { where: { isFeature: true }, take: 1, select: { url: true } },
@@ -86,6 +87,7 @@ function toCard(
     vatRate: num(row.vatRate) ?? 24,
     qty: num(row.qty) ?? 0,
     inStock: row.inStock,
+    supplierAvailable: row.supplierAvailable,
     scopeKey: scopeKeyOf(row),
   };
 }

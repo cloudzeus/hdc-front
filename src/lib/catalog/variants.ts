@@ -1,6 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
+import type { Availability } from "@/lib/catalog/availability";
 import { compareSizeLabels, sizeDisplayLabel } from "@/lib/catalog/size-family";
 
 /**
@@ -83,11 +84,16 @@ export type FamilySummary = {
   /** Whether ANY size is in stock — the card speaks for all of them. */
   inStock: boolean;
   /**
-   * Where the card opens: the smallest size that is in stock, or null when
-   * none is (the card then opens its own, the lead). The card keeps the
-   * lead's picture and price so it does not change with every stock update;
-   * only the link follows the stock, so "Σε απόθεμα" on the card is what the
-   * shopper lands on.
+   * The family's availability: our stock in any size, else the supplier's in
+   * any size, else to order. See `lib/catalog/availability.ts`.
+   */
+  availability: Availability;
+  /**
+   * Where the card opens: the smallest size in our stock, else the smallest
+   * the supplier has, or null when neither (the card then opens its own, the
+   * lead). The card keeps the lead's picture and price so it does not change
+   * with every stock update; only the link follows the stock, so what the
+   * card promises is what the shopper lands on.
    */
   openSlug: string | null;
 };
@@ -96,21 +102,29 @@ type FamilyMember = {
   slug: string;
   name: string;
   inStock: boolean;
+  supplierAvailable: boolean;
   qty: unknown;
   sizes: Array<{ label: string }>;
 };
 
-/** One family's summary: size count, any stock, and the smallest size in stock. Pure. */
+/**
+ * One family's summary: size count, availability, and the smallest size that
+ * has it — ours first, then the supplier's. Pure.
+ */
 export function summarizeFamily(members: FamilyMember[]): FamilySummary {
-  // The same test as the card's «Σε απόθεμα», so the two never disagree.
-  const inStockMembers = members.filter((m) => m.inStock);
   const labelOf = (m: FamilyMember) =>
     sizeDisplayLabel(m.name, m.sizes.map((x) => x.label)) ?? m.sizes[0]?.label ?? "";
-  const first = [...inStockMembers].sort((a, b) => compareSizeLabels(labelOf(a), labelOf(b)))[0];
+  const bySize = (list: FamilyMember[]) =>
+    [...list].sort((a, b) => compareSizeLabels(labelOf(a), labelOf(b)))[0];
+  // The same tests as the card's availability line, so the two never disagree.
+  const ours = members.filter((m) => m.inStock);
+  const theirs = members.filter((m) => !m.inStock && m.supplierAvailable);
+  const open = ours.length > 0 ? bySize(ours) : theirs.length > 0 ? bySize(theirs) : undefined;
   return {
     count: members.length,
-    inStock: inStockMembers.length > 0,
-    openSlug: first?.slug ?? null,
+    inStock: ours.length > 0,
+    availability: ours.length > 0 ? "stock" : theirs.length > 0 ? "supplier" : "order",
+    openSlug: open?.slug ?? null,
   };
 }
 
@@ -134,6 +148,7 @@ export async function familySummaries(
       name: true,
       variantGroup: true,
       inStock: true,
+      supplierAvailable: true,
       qty: true,
       sizes: { select: { label: true }, orderBy: { order: "asc" } },
     },

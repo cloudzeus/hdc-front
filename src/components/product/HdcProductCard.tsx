@@ -6,12 +6,12 @@ import { HdcCompareCheckbox } from "@/components/product/HdcCompareCheckbox";
 import { HdcQuickViewButton } from "@/components/product/HdcQuickViewButton";
 import { Link } from "@/i18n/navigation";
 import { favouriteIds } from "@/lib/account/favourite-ids";
+import { availabilityOf, isLastPiece } from "@/lib/catalog/availability";
 import type { ProductCardData } from "@/lib/catalog/queries";
 import { formatPrice } from "@/lib/format";
 import { displayName, platformTag } from "@/lib/milwaukee/display";
 import { parseModel } from "@/lib/milwaukee/model";
 import { discountedNet, offerBadgeFor } from "@/lib/offers/badges";
-import { showsExactQty } from "@/lib/stock-display";
 
 /**
  * The HDC product card — a SERVER component (mockups: home.html `.card`,
@@ -66,15 +66,20 @@ export async function HdcProductCard({
         ? t("kit", { count: model.kit.batteries, ah: model.kit.ah.toFixed(1) })
         : null;
 
-  /* A family card opens its smallest size in stock, so "Σε απόθεμα" on the
-     card is what the shopper lands on; otherwise its own page. */
+  /* A family card opens its smallest size in stock (ours, else the
+     supplier's), so what the card promises is what the shopper lands on;
+     otherwise its own page. */
   const href = `/proion/${product.sizes?.openSlug ?? product.slug}`;
 
   /* A card for a size family speaks for all its sizes: how many there are,
      whether ANY is on the shelf, and a button that opens the page to choose
      one — «ΣΤΟ ΚΑΛΑΘΙ» here would add whichever size is the lead. */
   const family = product.sizes && product.sizes.count > 1 ? product.sizes : null;
-  const inStock = family ? family.inStock : product.inStock;
+  /* Our stock «Σε απόθεμα» with no number («Τελευταίο τεμάχιο» at one); the
+     supplier's «Διαθέσιμο · 3–5 εργάσιμες»; neither «Παράδοση 1–3 εργάσιμες». */
+  const availability =
+    family?.availability ??
+    availabilityOf({ inStock: product.inStock, supplierAvailable: product.supplierAvailable });
 
   return (
     <article className={`hdc-card${isNew ? " hdc-card--flat" : ""}`}>
@@ -135,14 +140,16 @@ export async function HdcProductCard({
         </p>
         {!isNew && (
           <p
-            className={`hdc-card-avail ${inStock ? "hdc-card-avail--ok" : "hdc-card-avail--wait"}`}
+            className={`hdc-card-avail ${availability === "stock" ? "hdc-card-avail--ok" : "hdc-card-avail--wait"}`}
           >
             ●{" "}
-            {inStock
-              ? !family && showsExactQty(product.qty)
-                ? t("se_apothema_tem", { qty: product.qty })
+            {availability === "stock"
+              ? !family && isLastPiece(product.qty)
+                ? t("teleftaio")
                 : t("se_apothema")
-              : t("paradosi_1_3")}
+              : availability === "supplier"
+                ? t("diathesimo_3_5")
+                : t("paradosi_1_3")}
           </p>
         )}
         {compare && (

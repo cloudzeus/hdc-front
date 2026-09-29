@@ -8,6 +8,7 @@ const glove = (size: string, inStock: boolean, slug = `gantia-${size.replace("/"
   slug,
   name: `ΓΑΝΤΙΑ HI-DEX LEVEL B ${size}`,
   inStock,
+  supplierAvailable: false,
   qty: inStock ? 5 : 0,
   sizes: [{ label: size.split("/")[1] ?? size }],
 });
@@ -20,12 +21,32 @@ describe("summarizeFamily — where a size-family card opens", () => {
       glove("8/M", true),
       glove("11/XXL", false),
     ]);
-    expect(s).toEqual({ count: 4, inStock: true, openSlug: "gantia-8-m" });
+    expect(s).toEqual({ count: 4, inStock: true, availability: "stock", openSlug: "gantia-8-m" });
   });
 
   it("has no opening size when nothing is in stock", () => {
     const s = summarizeFamily([glove("7/S", false), glove("8/M", false)]);
     expect(s.inStock).toBe(false);
+    expect(s.availability).toBe("order");
     expect(s.openSlug).toBeNull();
+  });
+
+  it("with none of ours, opens the smallest size the supplier has", () => {
+    const s = summarizeFamily([
+      { ...glove("7/S", false), supplierAvailable: false },
+      { ...glove("9/L", false), supplierAvailable: true },
+      { ...glove("8/M", false), supplierAvailable: true },
+    ]);
+    expect(s.availability).toBe("supplier");
+    expect(s.openSlug).toBe("gantia-8-m");
+  });
+
+  it("our stock outranks the supplier's", () => {
+    const s = summarizeFamily([
+      { ...glove("7/S", false), supplierAvailable: true },
+      { ...glove("10/XL", true), supplierAvailable: false },
+    ]);
+    expect(s.availability).toBe("stock");
+    expect(s.openSlug).toBe("gantia-10-xl");
   });
 });
