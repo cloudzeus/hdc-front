@@ -65,7 +65,9 @@
       "grigori_provoli": "Quick view",
       "sygkrisi": "Compare",
       "megethi": "{count, plural, one {# size} other {# sizes}}",
-      "epilogi_megethous": "CHOOSE SIZE"
+      "epilogi_megethous": "CHOOSE SIZE",
+      "diathesimo_3_5": "Available · 3–5 working days",
+      "teleftaio": "Last one in stock"
     }
   },
   "plp": {
@@ -120,7 +122,7 @@
       "filtra": "Filters",
       "katharismos": "Clear",
       "diathesimotita": "Availability",
-      "se_apothema": "In stock",
+      "se_apothema": "Available",
       "paradosi": "Delivery in 1–3 working days",
       "periechomeno": "Contents",
       "sketo": "Bare tool",
@@ -312,7 +314,10 @@
       "megethi_diathesima": "{available} OF {total} IN STOCK",
       "megethi_kamia": "DELIVERY IN 1–3 WORKING DAYS",
       "megethos_kodikos": "Size {size} · code {code}",
-      "megethos_paraggelia": "Size {size} · code {code} · delivery in 1–3 working days"
+      "megethos_paraggelia": "Size {size} · code {code} · delivery in 1–3 working days",
+      "diathesimo_3_5": "Available · delivery in 3–5 working days",
+      "teleftaio": "Last one in stock",
+      "megethos_3_5": "Size {size} · code {code} · delivery in 3–5 working days"
     }
   },
   "orders": {
@@ -585,7 +590,8 @@
       "mipos_ennoeite": "Did you mean",
       "posotita": "Quantity",
       "ligotera": "One less",
-      "perissotera": "One more"
+      "perissotera": "One more",
+      "ergasimes_3_5": "3–5 working days"
     },
     "SiteFooter": {
       "katastima": "SHOP",
@@ -715,7 +721,9 @@
       "apaiteitai_apodochi": "You must accept the terms.",
       "energopoieitai": "The button is enabled once you accept the terms.",
       "synolo_me_fpa": "Total incl. VAT",
-      "synecheia": "CONTINUE"
+      "synecheia": "CONTINUE",
+      "ship_courier_meta_3_5": "Nationwide · 3–5 working days",
+      "ship_pickup_meta_3_5": "Heavy Duty Centre · ready in 3–5 working days"
     }
   },
   "catalogue": {
@@ -841,7 +849,11 @@
       "prostethike": "ADDED",
       "sto_kalathi": "ADD TO CART",
       "kit": "Kit",
-      "sketo": "Bare tool"
+      "sketo": "Bare tool",
+      "diathesimo_3_5": "Available · 3–5 working days",
+      "teleftaio": "Last one in stock",
+      "paradosi_1_3": "Delivery in 1–3 working days",
+      "olokliri_3_5": "Your order ships in 3–5 working days: one or more items come from our supplier."
     }
   },
   "brands": {

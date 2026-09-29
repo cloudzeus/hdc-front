@@ -65,7 +65,9 @@
       "grigori_provoli": "Γρήγορη προβολή",
       "sygkrisi": "Σύγκριση",
       "megethi": "{count, plural, one {# μέγεθος} other {# μεγέθη}}",
-      "epilogi_megethous": "ΕΠΙΛΟΓΗ ΜΕΓΕΘΟΥΣ"
+      "epilogi_megethous": "ΕΠΙΛΟΓΗ ΜΕΓΕΘΟΥΣ",
+      "diathesimo_3_5": "Διαθέσιμο · 3–5 εργάσιμες",
+      "teleftaio": "Τελευταίο τεμάχιο"
     }
   },
   "plp": {
@@ -120,7 +122,7 @@
       "filtra": "Φίλτρα",
       "katharismos": "Καθαρισμός",
       "diathesimotita": "Διαθεσιμότητα",
-      "se_apothema": "Σε απόθεμα",
+      "se_apothema": "Διαθέσιμα",
       "paradosi": "Παράδοση 1–3 εργάσιμες",
       "periechomeno": "Περιεχόμενο",
       "sketo": "Σκέτο εργαλείο",
@@ -312,7 +314,10 @@
       "megethi_diathesima": "{available} ΑΠΟ {total} ΣΕ ΑΠΟΘΕΜΑ",
       "megethi_kamia": "ΠΑΡΑΔΟΣΗ 1–3 ΕΡΓΑΣΙΜΕΣ",
       "megethos_kodikos": "Μέγεθος {size} · κωδικός {code}",
-      "megethos_paraggelia": "Μέγεθος {size} · κωδικός {code} · παράδοση 1–3 εργάσιμες"
+      "megethos_paraggelia": "Μέγεθος {size} · κωδικός {code} · παράδοση 1–3 εργάσιμες",
+      "diathesimo_3_5": "Διαθέσιμο · παράδοση 3–5 εργάσιμες",
+      "teleftaio": "Τελευταίο τεμάχιο",
+      "megethos_3_5": "Μέγεθος {size} · κωδικός {code} · παράδοση 3–5 εργάσιμες"
     }
   },
   "orders": {
@@ -585,7 +590,8 @@
       "mipos_ennoeite": "Μήπως εννοείτε",
       "posotita": "Ποσότητα",
       "ligotera": "Ένα λιγότερο",
-      "perissotera": "Ένα περισσότερο"
+      "perissotera": "Ένα περισσότερο",
+      "ergasimes_3_5": "3–5 εργάσιμες"
     },
     "SiteFooter": {
       "katastima": "ΚΑΤΑΣΤΗΜΑ",
@@ -715,7 +721,9 @@
       "apaiteitai_apodochi": "Απαιτείται αποδοχή των όρων.",
       "energopoieitai": "Το κουμπί ενεργοποιείται μόλις αποδεχτείτε τους όρους.",
       "synolo_me_fpa": "Σύνολο με ΦΠΑ",
-      "synecheia": "ΣΥΝΕΧΕΙΑ"
+      "synecheia": "ΣΥΝΕΧΕΙΑ",
+      "ship_courier_meta_3_5": "Πανελλαδικά · 3–5 εργάσιμες",
+      "ship_pickup_meta_3_5": "Heavy Duty Centre · έτοιμη σε 3–5 εργάσιμες"
     }
   },
   "catalogue": {
@@ -841,7 +849,11 @@
       "prostethike": "ΠΡΟΣΤΕΘΗΚΕ",
       "sto_kalathi": "ΣΤΟ ΚΑΛΑΘΙ",
       "kit": "Κιτ",
-      "sketo": "Σκέτο εργαλείο"
+      "sketo": "Σκέτο εργαλείο",
+      "diathesimo_3_5": "Διαθέσιμο · 3–5 εργάσιμες",
+      "teleftaio": "Τελευταίο τεμάχιο",
+      "paradosi_1_3": "Παράδοση 1–3 εργάσιμες",
+      "olokliri_3_5": "Η παραγγελία φεύγει σε 3–5 εργάσιμες: ένα ή περισσότερα είδη έρχονται από τον προμηθευτή."
     }
   },
   "brands": {
