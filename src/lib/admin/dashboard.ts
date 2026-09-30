@@ -45,6 +45,8 @@ export type RecentOrder = {
   acsVoucherNo: string | null;
   acsPickupDate: string | null;
   erpError: string | null;
+  /** Order.supplierOrder — παγωμένο στην τοποθέτηση: πάει ολόκληρη στον προμηθευτή (3–5 εργάσιμες). */
+  supplierOrder: boolean;
   /** Loaded up front so expanding a row costs no round-trip. Eight orders of a
    *  handful of lines each is far cheaper than a request per expand. */
   lines: Array<{ sku: string; name: string; quantity: number; lineGross: number }>;
@@ -123,6 +125,7 @@ export async function getDashboard(): Promise<DashboardData> {
         acsVoucherNo: true,
         acsPickupDate: true,
         erpError: true,
+        supplierOrder: true,
         lines: {
           select: { sku: true, name: true, quantity: true, lineGross: true },
           orderBy: { id: "asc" },
@@ -209,6 +212,7 @@ export async function getDashboard(): Promise<DashboardData> {
       acsVoucherNo: o.acsVoucherNo,
       acsPickupDate: o.acsPickupDate,
       erpError: o.erpError,
+      supplierOrder: o.supplierOrder,
       lines: o.lines.map((l) => ({
         sku: l.sku,
         name: l.name,

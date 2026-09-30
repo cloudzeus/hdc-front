@@ -24,6 +24,7 @@ import { ADMIN_LOCALE } from "@/lib/admin/locale";
 import { SHIPPING_METHODS } from "@/lib/cart/options";
 import { chargeableWeight } from "@/lib/shipping/acs-tariff";
 import { PostageCorrection } from "@/components/admin/PostageCorrection";
+import { SupplierOrderBadge, XmlOnlyBadge } from "@/components/admin/OrderBadges";
 
 export const dynamic = "force-dynamic";
 
@@ -220,7 +221,12 @@ export default async function OrderDetailPage({
   return (
     <PageShell
       title={order.orderNumber}
-      description={`${when(order.createdAt)} · ${STATUS_LABEL[order.status] ?? order.status}`}
+      description={
+        <>
+          {`${when(order.createdAt)} · ${STATUS_LABEL[order.status] ?? order.status}`}
+          {order.supplierOrder && <SupplierOrderBadge className="ml-2 align-middle" />}
+        </>
+      }
       actions={
         <Link
           href="/admin/orders"
@@ -305,18 +311,21 @@ export default async function OrderDetailPage({
                               />
                             )}
                             <div className="min-w-0">
-                              {product?.slug ? (
-                                <a
-                                  href={`/proion/${product.slug}`}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="hover:underline"
-                                >
-                                  {line.name}
-                                </a>
-                              ) : (
-                                <div>{line.name}</div>
-                              )}
+                              <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+                                {product?.slug ? (
+                                  <a
+                                    href={`/proion/${product.slug}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="hover:underline"
+                                  >
+                                    {line.name}
+                                  </a>
+                                ) : (
+                                  <span>{line.name}</span>
+                                )}
+                                {line.xmlCode && <XmlOnlyBadge />}
+                              </div>
                               <div className="numeral text-[11px] text-k-text-3">
                                 {line.brand ? `${line.brand} · ` : ""}
                                 {line.sku}

@@ -24,6 +24,7 @@ import type { RecentOrder } from "@/lib/admin/dashboard";
 import { formatMoney } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { SupplierOrderBadge } from "@/components/admin/OrderBadges";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
@@ -350,7 +351,10 @@ export function OrdersTable({
                     )}
                   </td>
                   <td className="px-3 py-2.5">
-                    <Badge className={s.className}>{s.label}</Badge>
+                    <div className="flex flex-wrap items-center gap-1">
+                      <Badge className={s.className}>{s.label}</Badge>
+                      {o.supplierOrder && <SupplierOrderBadge />}
+                    </div>
                   </td>
                   <td className="numeral px-3 py-2.5 text-right text-[12.5px] text-k-ink">
                     {formatMoney(o.totalGross, ADMIN_LOCALE)}
