@@ -844,14 +844,11 @@ function SourceRail({
  * `logo-symbol-white.png`) είναι σήματα της Kolleris και δεν προσφέρονται εδώ.
  */
 const HDC_MARKS = [
-  {
-    src: "/brand/hdc-lockup.png",
-    name: "Milwaukee Heavy Duty Centre",
-    dark: true,
-  },
+  /* Μόνο το αρχείο των 440px (79 KB): το πλήρες `hdc-lockup.png` είναι 569 KB,
+     βαρύ για ένα σήμα που σε banner πιάνει λίγες εκατοντάδες pixel. */
   {
     src: "/brand/hdc-lockup-440.png",
-    name: "Milwaukee Heavy Duty Centre — μικρό αρχείο",
+    name: "Milwaukee Heavy Duty Centre",
     dark: true,
   },
 ] as const;
