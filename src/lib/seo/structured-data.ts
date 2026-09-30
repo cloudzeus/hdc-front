@@ -81,7 +81,8 @@ export function storeMapUrl(env: Record<string, string | undefined> = process.en
 
 export function siteJsonLd(locale: Locale) {
   const origin = siteOrigin();
-  const sameAs = [...SHOP.sameAs, ...storeSameAs()];
+  // The HDC's own profiles (SHOP.social) and any given in the environment.
+  const sameAs = [...new Set([...SHOP.sameAs, ...Object.values(CONFIG.social), ...storeSameAs()])];
 
   return {
     "@context": "https://schema.org",

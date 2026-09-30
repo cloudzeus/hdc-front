@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { SHOP } from "@/config/shop";
 import { siteJsonLd, storeMapUrl, storeSameAs } from "@/lib/seo/structured-data";
 
 describe("store structured data", () => {
@@ -23,5 +24,6 @@ describe("store structured data", () => {
     expect(store.logo).toMatch(/\/brand\/hdc-lockup-440\.png$/);
     expect(store.hasMap).toMatch(/^https:\/\//);
     expect(store.areaServed).toMatchObject({ "@type": "Country", identifier: "GR" });
+    expect(store.sameAs).toEqual(expect.arrayContaining([SHOP.social.facebook, SHOP.social.instagram]));
   });
 });
