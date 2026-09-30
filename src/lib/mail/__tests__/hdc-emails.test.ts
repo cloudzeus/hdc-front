@@ -137,6 +137,7 @@ vi.mock("@/auth", () => ({
 }));
 vi.mock("next/headers", () => ({ headers: async () => new Headers({ "user-agent": "Mozilla/5.0 (Windows) Chrome/140" }) }));
 
+process.env.AUTH_SECRET = "test-only-secret-for-image-signatures";
 process.env.BANK_TRANSFER_IBAN = "GR0000000000000000000000000";
 process.env.BANK_TRANSFER_BANK = "Τράπεζα Δοκιμής";
 
@@ -209,7 +210,9 @@ describe("HDC email templates", () => {
       // Pictures: never WebP (Outlook for Windows cannot show it).
       expect(html).not.toMatch(/\.webp/i);
       for (const [, src] of html.matchAll(/<img[^>]+src="([^"]+)"/g)) {
-        expect(src).toMatch(/^https:\/\/milwaukeetoolshdc\.gr\/(api\/mail\/img\/\d+\/[A-Za-z0-9_-]+\.jpg|brand\/hdc-lockup-440\.png)$/);
+        expect(src).toMatch(
+          /^https:\/\/milwaukeetoolshdc\.gr\/(api\/mail\/img\/\d+\/[A-Za-z0-9_-]+\.[A-Za-z0-9_-]{22}\.jpg|brand\/hdc-lockup-440\.png)$/,
+        );
       }
 
       // The plain-text part exists and carries the message.
@@ -255,6 +258,19 @@ describe("HDC email templates", () => {
     expect(unbalanced(result.email.html)).toBeNull();
   });
 
+  it("only the confirmation shows availability per line", async () => {
+    const labels = /Σε απόθεμα|Τελευταίο τεμάχιο|Διαθέσιμο · 3–5|Παράδοση 1–3/;
+    const show = async (id: string) => {
+      const r = await previewEmail(id, { locale: "el", realOrders: true, admin: { email: "a@example.gr" } });
+      if (!r.ok) throw new Error(r.error);
+      return r.email.text;
+    };
+    expect(await show("order-confirmation")).toMatch(labels);
+    for (const id of ["order-shipped", "order-delivered", "order-status", "payment-success", "internal-order", "review-request"]) {
+      expect(await show(id)).not.toMatch(labels);
+    }
+  });
+
   it("links follow the reader's language", async () => {
     const result = await previewEmail("order-shipped", { locale: "it", realOrders: true, admin: { email: "a@example.gr" } });
     expect(result.ok && result.email.html).toContain("/it/checkout/epibebaiosi/HDC-20260930-0012");
@@ -270,12 +286,28 @@ describe("HDC email templates", () => {
   });
 });
 
+const lastSegment = (url: string) => url.split("/").at(-1)!;
+
 describe("email pictures", () => {
-  it("CDN pictures become JPEG through our route, and decode back", () => {
+  it("CDN pictures become signed JPEG addresses on our route, and decode back", () => {
     const src = `${CDN}/4933478449/primary 0.webp`;
     const url = mailImageUrl(src, 340, "https://milwaukeetoolshdc.gr");
-    expect(url).toMatch(/^https:\/\/milwaukeetoolshdc\.gr\/api\/mail\/img\/340\/[A-Za-z0-9_-]+\.jpg$/);
-    expect(decodeMailImage(url.split("/").at(-1)!)).toBe(new URL(src).href);
+    expect(url).toMatch(/^https:\/\/milwaukeetoolshdc\.gr\/api\/mail\/img\/340\/[A-Za-z0-9_-]+\.[A-Za-z0-9_-]{22}\.jpg$/);
+    expect(decodeMailImage(lastSegment(url), 340)).toBe(new URL(src).href);
+  });
+
+  it("an address without our signature, or signed for another width, is refused", () => {
+    const url = mailImageUrl(`${CDN}/a.webp`, 340, "https://x.gr");
+    const [b64] = lastSegment(url).split(".");
+    expect(decodeMailImage(`${b64}.jpg`, 340)).toBeNull();
+    expect(decodeMailImage(`${b64}.${"A".repeat(22)}.jpg`, 340)).toBeNull();
+    expect(decodeMailImage(lastSegment(url), 600)).toBeNull();
+  });
+
+  it("a CDN address with a query, fragment, port or credentials is not proxied", () => {
+    for (const src of [`${CDN}/a.webp?x=1`, `${CDN}/a.webp#x`, "https://kolleris.b-cdn.net:8443/a.webp", "https://u:p@kolleris.b-cdn.net/a.webp"]) {
+      expect(mailImageUrl(src, 340, "https://x.gr")).toBe("");
+    }
   });
 
   it("a WebP from a host we do not proxy is dropped, not sent broken", () => {
@@ -285,8 +317,78 @@ describe("email pictures", () => {
 
   it("the route refuses addresses outside our CDNs", () => {
     const evil = Buffer.from("https://169.254.169.254/latest").toString("base64url");
-    expect(decodeMailImage(`${evil}.jpg`)).toBeNull();
-    expect(decodeMailImage("../../etc/passwd")).toBeNull();
+    expect(decodeMailImage(`${evil}.${"A".repeat(22)}.jpg`, 340)).toBeNull();
+    expect(decodeMailImage("../../etc/passwd", 340)).toBeNull();
+  });
+
+  it("a picture that resolves to nothing leaves no empty src or href", async () => {
+    const { renderCampaignEmail } = await import("@/lib/newsletter/campaign");
+    const bad = "https://example.com/picture.webp";
+    const email = renderCampaignEmail("nl-offers", {
+      campaign: { eyebrow: "E", discount: "-10%", title: "T", text: "X", url: "", valid_until: "", image: bad },
+      products: [
+        { id: "1", slug: "s", name: "M18 FUEL ΔΡΑΠΑΝΟ", code: "1", brand: "", image: bad, price: "1 €", priceOld: "", discount: "", stockLabel: "", url: "https://x.gr/p" },
+      ],
+    });
+    expect(email.html).not.toMatch(/(src|href)=""/);
+    expect(email.html).not.toContain("<img class=\"card-img\"");
+
+    const news = renderCampaignEmail("nl-news", {
+      campaign: { eyebrow: "", discount: "", title: "", text: "", url: "", valid_until: "" },
+      products: [],
+      news: {
+        issue: { label: "N", number: "", title: "Τίτλος", intro: "" },
+        hero: { eyebrow: "", title_before: "Hero", title_accent: "", title_after: "", text: "", image: bad, image_alt: "", cta: "Go", url: "" },
+        articles: [{ id: "a", title: "A", excerpt: "", tag: "", image: bad, url: "", cta: "" }],
+      },
+    });
+    expect(news.html).not.toMatch(/(src|href)=""/);
+
+    const original = ORDER.lines[0].imageUrl;
+    ORDER.lines[0].imageUrl = bad;
+    try {
+      const order = await previewEmail("order-confirmation", { locale: "el", realOrders: true, admin: { email: "a@example.gr" } });
+      expect(order.ok && order.email.html).not.toMatch(/(src|href)=""/);
+    } finally {
+      ORDER.lines[0].imageUrl = original;
+    }
+  });
+});
+
+describe("/api/mail/img", () => {
+  const route = () => import("@/app/api/mail/img/[w]/[file]/route");
+  const call = async (w: string, file: string) =>
+    (await route()).GET(new Request("https://x.gr/"), { params: Promise.resolve({ w, file }) });
+
+  it("answers 404 without a valid signature, and never fetches", async () => {
+    const fetchSpy = vi.fn();
+    vi.stubGlobal("fetch", fetchSpy);
+    try {
+      const b64 = Buffer.from(`${CDN}/a.webp`).toString("base64url");
+      expect((await call("340", `${b64}.jpg`)).status).toBe(404);
+      expect((await call("340", `${b64}.${"A".repeat(22)}.jpg`)).status).toBe(404);
+      expect((await call("999", `${b64}.jpg`)).status).toBe(404);
+      expect(fetchSpy).not.toHaveBeenCalled();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("follows no redirect and refuses a body declared over 10 MB", async () => {
+    const fetchSpy = vi.fn(async (_url: string, init: RequestInit) => {
+      expect(init.redirect).toBe("error");
+      return new Response("x", {
+        headers: { "content-type": "image/webp", "content-length": String(11 * 1024 * 1024) },
+      });
+    });
+    vi.stubGlobal("fetch", fetchSpy);
+    try {
+      const url = mailImageUrl(`${CDN}/too-big-${Date.now()}.webp`, 144, "https://x.gr");
+      expect((await call("144", lastSegment(url))).status).toBe(404);
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });
 

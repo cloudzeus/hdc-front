@@ -86,6 +86,7 @@ function load(): Env {
   });
   hb.registerHelper("eq", (a: unknown, b: unknown) => a === b);
   hb.registerHelper("or", (...args: unknown[]) => args.slice(0, -1).some(Boolean));
+  hb.registerHelper("and", (...args: unknown[]) => args.slice(0, -1).every(Boolean));
   hb.registerHelper("minus", (a: number, b: number) => Number(a) - Number(b));
   hb.registerHelper("inc", (a: number) => Number(a) + 1);
 

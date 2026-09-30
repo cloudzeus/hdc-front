@@ -122,6 +122,8 @@ const ZONE_LABEL: Record<string, string> = {
 
 /** What checkout stored about the postage, see `LivePostageQuote`. */
 type StoredQuote = {
+  /** The customer's language, frozen at checkout; alone when there was no quote (pickup). */
+  locale?: string;
   zone?: string;
   zoneLabel?: string;
   etaDays?: string;
@@ -433,7 +435,9 @@ export default async function OrderDetailPage({
                 {quote.correction.notified ? " · ο πελάτης ενημερώθηκε με email" : " · χωρίς email στον πελάτη"}
               </p>
             )}
-            {quote ? (
+            {/* A priced quote always says where its price came from; the object can
+                also carry only the customer's language (checkout, lib/mail/hdc/order-view). */}
+            {quote?.source ? (
               <dl className="grid gap-x-6 gap-y-2 px-4 py-3 text-[13px] sm:grid-cols-2">
                 <Field label="Πηγή τιμής">
                   {quote.source === "acs" ? "ACS (ζωντανή τιμή)" : "Πίνακας τιμών"}

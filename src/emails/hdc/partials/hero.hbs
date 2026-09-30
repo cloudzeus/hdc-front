@@ -1,16 +1,16 @@
 <!-- HERO -->
 <tr><td bgcolor="$INK" style="background-color:$INK;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
-    <td class="stack px" {{#if hero.image}}width="300" {{/if}}valign="middle" style="{{#if hero.image}}width:300px; {{/if}}padding:36px {{#if hero.image}}16{{else}}24{{/if}}px 36px 24px;">
+    <td class="stack px" {{#if (img hero.image 600)}}width="300" {{/if}}valign="middle" style="{{#if (img hero.image 600)}}width:300px; {{/if}}padding:36px {{#if (img hero.image 600)}}16{{else}}24{{/if}}px 36px 24px;">
       {{#if hero.badge}}<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="background-color:$RED; padding:5px 10px; font-family:$FONT; font-size:12px; line-height:14px; font-weight:800; letter-spacing:0.06em; color:#ffffff;">{{hero.badge}}</td></tr></table>{{/if}}
       {{#if hero.big}}<p class="hero-num" style="margin:16px 0 0; font-family:$FONT; font-size:64px; line-height:60px; font-weight:900; letter-spacing:-0.03em; color:#ffffff;">{{hero.big}}</p>{{/if}}
       {{#if hero.title}}<h1 class="h1" style="margin:{{#if hero.big}}10{{else}}16{{/if}}px 0 0; font-family:$FONT; font-size:30px; line-height:32px; font-weight:900; letter-spacing:-0.01em; text-transform:uppercase; color:#ffffff;">{{hero.title}}</h1>{{/if}}
       {{#if hero.text}}<p style="margin:14px 0 0; font-family:$FONT; font-size:16px; line-height:24px; color:$G3;">{{hero.text}}</p>{{/if}}
-      {{#if hero.cta}}<p style="margin:18px 0 0; font-family:$FONT; font-size:13px; line-height:16px; font-weight:800; letter-spacing:0.06em;"><a href="{{hero.url}}" style="color:#ffffff; text-decoration:none;">{{hero.cta}}&nbsp;&rarr;</a></p>{{/if}}
+      {{#if (and hero.cta hero.url)}}<p style="margin:18px 0 0; font-family:$FONT; font-size:13px; line-height:16px; font-weight:800; letter-spacing:0.06em;"><a href="{{hero.url}}" style="color:#ffffff; text-decoration:none;">{{hero.cta}}&nbsp;&rarr;</a></p>{{/if}}
     </td>
-    {{#if hero.image}}
+    {{#if (img hero.image 600)}}
     <td class="stack" width="300" valign="middle" bgcolor="$G1" style="width:300px; background-color:$G1;" align="center">
-      <a href="{{hero.url}}" style="text-decoration:none;"><img src="{{img hero.image 600}}" width="300" alt="{{hero.image_alt}}" style="display:block; width:100%; max-width:300px; height:auto; border:0; outline:none; font-family:$FONT; font-size:14px; color:$G5;"></a>
+      {{#if hero.url}}<a href="{{hero.url}}" style="text-decoration:none;">{{/if}}<img src="{{img hero.image 600}}" width="300" alt="{{hero.image_alt}}" style="display:block; width:100%; max-width:300px; height:auto; border:0; outline:none; font-family:$FONT; font-size:14px; color:$G5;">{{#if hero.url}}</a>{{/if}}
     </td>
     {{/if}}
   </tr></table>

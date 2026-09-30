@@ -16,6 +16,8 @@
  * an empty frame is better than a broken icon in a customer's inbox.
  */
 
+import { createHmac, timingSafeEqual } from "node:crypto";
+
 /** The only widths the route answers — @2x of the 72px line, 170px card and 300px hero. */
 export const MAIL_IMAGE_WIDTHS = [144, 340, 600] as const;
 export type MailImageWidth = (typeof MAIL_IMAGE_WIDTHS)[number];
@@ -33,17 +35,49 @@ function toBase64Url(s: string): string {
   return Buffer.from(s, "utf8").toString("base64url");
 }
 
-/** The source URL inside `{base64url}.jpg`, or null when it is not one of ours. */
-export function decodeMailImage(file: string): string | null {
-  const match = /^([A-Za-z0-9_-]{8,2048})\.jpg$/.exec(file);
-  if (!match) return null;
+/**
+ * Only addresses WE wrote into an email are served: each carries an HMAC of
+ * its width and source, keyed with a server secret (never printed). Without
+ * it anyone could make the server fetch and convert any CDN picture at any
+ * width, over and over.
+ */
+function secret(): string {
+  return process.env.MAIL_IMAGE_SECRET?.trim() || process.env.AUTH_SECRET?.trim() || "";
+}
+
+function sign(width: number, source: string): string | null {
+  const key = secret();
+  if (!key) return null;
+  return createHmac("sha256", key).update(`mail-img:${width}:${source}`).digest("base64url").slice(0, 22);
+}
+
+/**
+ * A plain CDN file address: https, an allowed host, no port, no credentials,
+ * no query, no fragment.
+ */
+function cleanSource(raw: string): URL | null {
   let url: URL;
   try {
-    url = new URL(Buffer.from(match[1], "base64url").toString("utf8"));
+    url = new URL(raw);
   } catch {
     return null;
   }
   if (url.protocol !== "https:" || !isAllowedImageHost(url.hostname)) return null;
+  if (url.port || url.username || url.password || url.search || url.hash) return null;
+  return url;
+}
+
+/** The source URL inside `{base64url}.{signature}.jpg`, or null when it is not one we signed. */
+export function decodeMailImage(file: string, width: number): string | null {
+  const match = /^([A-Za-z0-9_-]{8,2048})\.([A-Za-z0-9_-]{22})\.jpg$/.exec(file);
+  if (!match) return null;
+  const url = cleanSource(Buffer.from(match[1], "base64url").toString("utf8"));
+  if (!url) return null;
+  const expected = sign(width, url.href);
+  if (!expected) return null;
+  const a = Buffer.from(expected);
+  const b = Buffer.from(match[2]);
+  if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
   return url.href;
 }
 
@@ -68,7 +102,11 @@ export function mailImageUrl(src: string | null | undefined, width: MailImageWid
   }
   if (url.protocol !== "https:" && url.protocol !== "http:") return "";
   if (url.protocol === "https:" && isAllowedImageHost(url.hostname)) {
-    return `${origin.replace(/\/$/, "")}/api/mail/img/${width}/${toBase64Url(url.href)}.jpg`;
+    const clean = cleanSource(url.href);
+    const signature = clean ? sign(width, clean.href) : null;
+    // Unsignable (odd address, or no secret configured): no picture rather than a broken one.
+    if (!clean || !signature) return "";
+    return `${origin.replace(/\/$/, "")}/api/mail/img/${width}/${toBase64Url(clean.href)}.${signature}.jpg`;
   }
   if (/\.webp$/i.test(url.pathname)) return "";
   return url.href;

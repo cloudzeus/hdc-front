@@ -60,12 +60,16 @@ export async function buildOrderEmail(
   if (!order) return null;
   const locale = options.locale ?? orderLocale(order);
   const money = (n: unknown) => formatMoney(Number(n), locale);
-  const view = await buildOrderView(order, locale);
+  const receipt =
+    options.preview?.receipt ||
+    (options.trigger === "payment" && order.paymentStatus === "PAID" && alreadyConfirmed(order));
+  // Availability per line belongs to the confirmation only: it is today's stock.
+  const view = await buildOrderView(order, locale, { availability: !receipt });
   if (options.preview?.supplier) view.supplier = true;
   const count = order.lines.length;
   const total = money(order.totalGross);
 
-  if (options.preview?.receipt || (options.trigger === "payment" && view.paid && alreadyConfirmed(order))) {
+  if (receipt) {
     const method = paymentLabel(locale, order.paymentMethod);
     const email = renderEmail({
       template: "payment-success",

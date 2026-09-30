@@ -124,7 +124,15 @@ async function lineFacts(order: OrderWithLines) {
 export async function buildOrderView(
   order: OrderWithLines,
   locale: Locale,
-  options: { prices?: boolean } = {},
+  options: {
+    prices?: boolean;
+    /**
+     * The per-line availability badge. Only the order confirmation shows it —
+     * it is today's stock, which by the time an order ships or changes
+     * status says nothing true about THIS order.
+     */
+    availability?: boolean;
+  } = {},
 ) {
   const money = (n: unknown) => formatMoney(Number(n), locale);
   const facts = await lineFacts(order);
@@ -139,7 +147,7 @@ export async function buildOrderView(
 
   const items: OrderItemView[] = priced.map(({ line, unitBefore, lineBefore }) => {
     const product = line.productId ? facts.get(line.productId) : undefined;
-    const availability = product
+    const availability = product && options.availability
       ? lineAvailability({
           inStock: product.inStock,
           supplierAvailable: product.supplierAvailable,
