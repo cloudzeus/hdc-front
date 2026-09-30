@@ -142,12 +142,17 @@ describe("καταχώριση στο SoftOne", () => {
     const r = await actions.milwaukeeRegisterInErp("a", { fingerprint: "fp", code: "4933478911", acceptWithdrawal: "yes" });
     expect(r).toMatchObject({ ok: true, reused: false, jobId: expect.any(String) });
     expect(hdc.registerInErp).toHaveBeenCalledWith("ops@hdc.test", "a", { fingerprint: "fp", code: "4933478911" });
-    expect(auditCreate).not.toHaveBeenCalled();
+    // Γραμμή «ξεκίνησε» αμέσως (αν πέσει η διεργασία, το audit το ξέρει)· το αποτέλεσμα όταν τελειώσει.
+    expect(auditCreate).toHaveBeenCalledTimes(1);
+    expect(auditCreate).toHaveBeenCalledWith({
+      data: expect.objectContaining({ action: "milwaukee.erp.register.started", entityId: "a" }),
+    });
 
     // Δεύτερο κλικ όσο τρέχει: η ίδια εργασία, όχι δεύτερη καταχώριση.
     const again = await actions.milwaukeeRegisterInErp("a", { fingerprint: "fp", code: "4933478911" });
     expect(again).toMatchObject({ ok: true, reused: true, jobId: r.ok ? r.jobId : "" });
     expect(hdc.registerInErp).toHaveBeenCalledTimes(1);
+    expect(auditCreate).toHaveBeenCalledTimes(1);
 
     finish({ ok: true, mode: "created", mtrl: 55, code: "4933478911", eshopListed: false, alerts: [], warnings: [] });
     await flush();
@@ -165,9 +170,12 @@ describe("καταχώριση στο SoftOne", () => {
     await actions.milwaukeeRegisterInErp("a", { fingerprint: "fp", acceptWithdrawal: true });
     expect(hdc.registerInErp).toHaveBeenCalledWith("ops@hdc.test", "a", { fingerprint: "fp", acceptWithdrawal: true });
     await flush();
-    expect(auditCreate).toHaveBeenCalledTimes(1);
-    expect(auditCreate).toHaveBeenCalledWith({
-      data: expect.objectContaining({ diff: expect.objectContaining({ ok: false, error: "Άλλαξαν τα στοιχεία" }) }),
+    expect(auditCreate).toHaveBeenCalledTimes(2);
+    expect(auditCreate).toHaveBeenLastCalledWith({
+      data: expect.objectContaining({
+        action: "milwaukee.erp.register",
+        diff: expect.objectContaining({ ok: false, error: "Άλλαξαν τα στοιχεία" }),
+      }),
     });
   });
 });
@@ -188,6 +196,20 @@ describe("μακριές ενέργειες ως εργασίες", () => {
       expect(r).toMatchObject({ ok: true, reused: false, jobId: expect.any(String) });
     }
     expect(hdc.bulkActivate).toHaveBeenCalledWith("ops@hdc.test", ["a", "b"]);
+  });
+
+  it("ενεργοποίηση: ίδιο σύνολο ids → η ίδια εργασία· άλλο σύνολο → 409", async () => {
+    hdc.bulkActivate.mockImplementation(() => new Promise(() => {}));
+    const first = await actions.milwaukeeBulkActivate(["b", "a"]);
+    const same = await actions.milwaukeeBulkActivate(["a", "b", "a"]);
+    expect(first).toMatchObject({ ok: true, reused: false });
+    expect(same).toMatchObject({ ok: true, reused: true, jobId: first.ok ? first.jobId : "" });
+    expect(await actions.milwaukeeBulkActivate(["a"])).toEqual({
+      ok: false,
+      status: 409,
+      error: "Τρέχει ήδη μια ενεργοποίηση· δοκιμάστε σε λίγο",
+    });
+    expect(hdc.bulkActivate).toHaveBeenCalledTimes(1);
   });
 
   it("η ίδια ενέργεια από άλλον χρήστη όσο τρέχει: 409", async () => {

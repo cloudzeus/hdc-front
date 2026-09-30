@@ -79,10 +79,12 @@ function background(
   auditAction: string,
   base: Record<string, unknown>,
   summary: (result: Record<string, unknown>) => Record<string, unknown> = () => ({}),
+  key: string | null = null,
 ): JobStarted {
   const started = startJob({
     kind,
     itemId,
+    key,
     actor: actor.email,
     run,
     onFinish: (job: JobView) => {
@@ -256,6 +258,8 @@ export async function milwaukeeBulkActivate(ids: unknown): Promise<JobStarted> {
       activated: r.activated,
       skipped: Array.isArray(r.skipped) ? r.skipped.map((x: { id?: unknown }) => x.id) : [],
     }),
+    // Ίδια εργασία μόνο για το ίδιο σύνολο προϊόντων.
+    [...list].sort().join(","),
   );
 }
 
@@ -327,10 +331,19 @@ export async function milwaukeeRegisterInErp(id: string, input: unknown): Promis
     ...(typeof code === "string" && code ? { code } : {}),
     ...(acceptWithdrawal === true ? { acceptWithdrawal: true } : {}),
   };
-  return background(actor, "erp-register", id, () => hdc.registerInErp(actor.email, id, body), "milwaukee.erp.register", body, (r) => ({
-    mode: r.mode,
-    mtrl: r.mtrl,
-    code: r.code,
-    alerts: r.alerts,
-  }));
+  const started = background(
+    actor,
+    "erp-register",
+    id,
+    () => hdc.registerInErp(actor.email, id, body),
+    "milwaukee.erp.register",
+    body,
+    (r) => ({ mode: r.mode, mtrl: r.mtrl, code: r.code, alerts: r.alerts }),
+  );
+  // Γραμμή και στην εκκίνηση: αν η διεργασία πέσει πριν τελειώσει η εργασία
+  // (επανεκκίνηση, deploy), το audit δείχνει ότι μια καταχώριση ξεκίνησε.
+  if (started.ok && !started.reused) {
+    await audit(actor, "milwaukee.erp.register.started", id, { ...body, jobId: started.jobId });
+  }
+  return started;
 }

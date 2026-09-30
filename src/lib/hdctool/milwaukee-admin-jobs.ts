@@ -15,6 +15,11 @@ import type { MilwaukeeResult } from "@/lib/hdctool/milwaukee-admin";
  * ζει όσο η διεργασία, και αυτό αρκεί — το αποτέλεσμα γράφεται ούτως ή άλλως
  * στο HDCtool και στο audit log. Με πολλά containers ο browser πρέπει να
  * ρωτά το ίδιο· με ένα (σήμερα) δεν τίθεται θέμα.
+ *
+ * Επανεκκίνηση ή rolling deploy χάνει τις εργασίες που τρέχουν: η κλήση προς
+ * το HDCtool κόβεται ή τελειώνει χωρίς να τη δει κανείς, και το ρώτημα του
+ * browser παίρνει 404. Γι' αυτό η καταχώριση στο SoftOne γράφει γραμμή audit
+ * και όταν ξεκινά, και ο browser ζητά νέα προεπισκόπηση πριν από νέα δοκιμή.
  */
 
 export type JobKind = "erp-register" | "bulk-activate" | "analyze" | "translate" | "official-search";
@@ -38,7 +43,12 @@ export const JOB_TTL_MS = 30 * 60 * 1000;
 /** Ανώτατο πλήθος εργασιών στη μνήμη· πρώτα φεύγουν οι παλαιότερες που τελείωσαν. */
 export const MAX_JOBS = 200;
 
-type Job = Omit<JobView, "startedAt" | "finishedAt"> & { startedAt: number; finishedAt: number | null };
+type Job = Omit<JobView, "startedAt" | "finishedAt"> & {
+  startedAt: number;
+  finishedAt: number | null;
+  /** Τι ακριβώς κάνει (π.χ. τα ids της ενεργοποίησης, ταξινομημένα)· `null` όταν αρκεί το item. */
+  key: string | null;
+};
 
 const state = globalThis as unknown as { __hdcMilwaukeeJobs?: Map<string, Job> };
 
@@ -47,7 +57,8 @@ function jobs(): Map<string, Job> {
   return state.__hdcMilwaukeeJobs;
 }
 
-function view(job: Job): JobView {
+function view({ key: _key, ...job }: Job): JobView {
+  void _key;
   return {
     ...job,
     startedAt: new Date(job.startedAt).toISOString(),
@@ -73,16 +84,21 @@ function prune(now: number) {
 }
 
 /**
- * Ίδια ενέργεια = ίδιο είδος και ίδιο item. Η ενεργοποίηση είναι μία τη φορά
- * για όλο το HDCtool (409 εκεί), άρα ανεξάρτητη από item.
+ * Ίδια δουλειά = ίδιο είδος και ίδιο item. Η ενεργοποίηση είναι μία τη φορά
+ * για όλο το HDCtool (409 εκεί), άρα κάθε ενεργοποίηση που τρέχει «πιάνει»
+ * τη θέση· ίδια όμως είναι μόνο με το ίδιο σύνολο ids (`key`).
  */
-function sameWork(job: Job, kind: JobKind, itemId: string | null) {
+function sameSlot(job: Job, kind: JobKind, itemId: string | null) {
   return job.status === "running" && job.kind === kind && (kind === "bulk-activate" || job.itemId === itemId);
 }
+
+const BUSY_ACTIVATION = "Τρέχει ήδη μια ενεργοποίηση· δοκιμάστε σε λίγο";
 
 export type StartJob = {
   kind: JobKind;
   itemId: string | null;
+  /** Τι ακριβώς κάνει: η επαναχρησιμοποίηση θέλει ίδιο `key` (π.χ. ίδια ids). */
+  key?: string | null;
   actor: string;
   run: () => Promise<MilwaukeeResult<object>>;
   /** Μετά το τέλος (επιτυχία ή αποτυχία): π.χ. η καταγραφή στο audit. Δεν επηρεάζει την εργασία. */
@@ -98,8 +114,11 @@ export type StartResult = { ok: true; job: JobView; reused: boolean } | { ok: fa
 export function startJob(input: StartJob): StartResult {
   const now = Date.now();
   prune(now);
-  const running = [...jobs().values()].find((j) => sameWork(j, input.kind, input.itemId));
+  const key = input.key ?? null;
+  const running = [...jobs().values()].find((j) => sameSlot(j, input.kind, input.itemId));
   if (running) {
+    // Άλλα ids: το αποτέλεσμα εκείνης δεν αφορά αυτό το αίτημα (ψεύτικο «Ενεργοποιήθηκε»).
+    if (running.key !== key) return { ok: false, error: BUSY_ACTIVATION };
     if (running.actor !== input.actor) {
       return { ok: false, error: `Τρέχει ήδη η ίδια ενέργεια από ${running.actor}· δοκιμάστε σε λίγο` };
     }
@@ -110,6 +129,7 @@ export function startJob(input: StartJob): StartResult {
     id: randomUUID(),
     kind: input.kind,
     itemId: input.itemId,
+    key,
     actor: input.actor,
     startedAt: now,
     finishedAt: null,
@@ -135,7 +155,7 @@ export function startJob(input: StartJob): StartResult {
     try {
       await input.onFinish?.(view(job));
     } catch (error) {
-      console.error("[admin/milwaukee] job onFinish", job.kind, (error as Error).message);
+      console.error("[admin/milwaukee] job onFinish", job.kind, error instanceof Error ? error.message : String(error));
     }
   })();
 

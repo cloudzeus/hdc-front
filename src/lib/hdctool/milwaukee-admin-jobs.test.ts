@@ -82,12 +82,33 @@ describe("εργασίες Milwaukee", () => {
     expect(later.reused).toBe(false);
   });
 
-  it("η ενεργοποίηση είναι μία τη φορά, ανεξάρτητα από item", () => {
+  it("ενεργοποίηση: ίδια ids → η ίδια εργασία· άλλα ids όσο τρέχει → άρνηση", () => {
     const d = deferred<{ ok: true }>();
-    const first = startJob({ kind: "bulk-activate", itemId: null, actor: "x", run: () => d.promise });
-    const again = startJob({ kind: "bulk-activate", itemId: null, actor: "x", run: () => d.promise });
-    if (!first.ok || !again.ok) throw new Error("δεν ξεκίνησαν");
-    expect(again.job.id).toBe(first.job.id);
+    const run = vi.fn(() => d.promise);
+    const first = startJob({ kind: "bulk-activate", itemId: null, key: "a,b", actor: "x", run });
+    const same = startJob({ kind: "bulk-activate", itemId: null, key: "a,b", actor: "x", run });
+    if (!first.ok || !same.ok) throw new Error("δεν ξεκίνησαν");
+    expect(same.reused).toBe(true);
+    expect(same.job.id).toBe(first.job.id);
+
+    // Άλλο σύνολο, ακόμη και από τον ίδιο χρήστη: όχι ψεύτικο «Ενεργοποιήθηκε».
+    expect(startJob({ kind: "bulk-activate", itemId: null, key: "a", actor: "x", run })).toEqual({
+      ok: false,
+      error: "Τρέχει ήδη μια ενεργοποίηση· δοκιμάστε σε λίγο",
+    });
+    expect(run).toHaveBeenCalledTimes(1);
+  });
+
+  it("εξαίρεση που δεν είναι Error: το μήνυμα ως κείμενο", async () => {
+    const r = startJob({
+      kind: "analyze",
+      itemId: "z",
+      actor: "x",
+      run: () => Promise.reject("χάλασε"),
+    });
+    await flush();
+    if (!r.ok) throw new Error("δεν ξεκίνησε");
+    expect(getJob(r.job.id)).toMatchObject({ status: "failed", error: "χάλασε" });
   });
 
   it("μια εργασία που τελείωσε σβήνεται μετά από 30′", async () => {

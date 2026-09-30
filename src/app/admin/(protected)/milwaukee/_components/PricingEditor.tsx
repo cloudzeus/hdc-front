@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -69,6 +70,8 @@ export function PricingEditor({
   onChange: (next: PricingState) => void;
   disabled?: boolean;
 }) {
+  // Μοναδικό όνομα ομάδας: δύο επεξεργαστές στη σελίδα δεν μοιράζονται τα radio.
+  const group = useId();
   const priceW = previewPriceW(value, costNet, suggestion, currentPriceW);
   // Στην «Πρόταση» το UTBL02 ακολουθεί την πρόταση (το HDCtool απορρίπτει χειροκίνητη τιμή).
   const followsSuggestion = value.mode === "SUGGESTED";
@@ -89,7 +92,7 @@ export function PricingEditor({
           >
             <input
               type="radio"
-              name="xml-pricing-mode"
+              name={group}
               value={m.key}
               checked={value.mode === m.key}
               onChange={() => onChange({ ...value, mode: m.key })}

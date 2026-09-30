@@ -77,9 +77,11 @@ function sleep(ms: number, signal?: AbortSignal) {
  */
 export async function runJob<T extends object>(
   start: () => Promise<JobStart>,
-  { signal, onReused, intervalMs = 2500, maxWaitMs = 8 * 60_000 }: {
+  { signal, onReused, lostMessage, intervalMs = 2500, maxWaitMs = 8 * 60_000 }: {
     signal?: AbortSignal;
     onReused?: () => void;
+    /** Μήνυμα όταν η εργασία χάθηκε (404: επανεκκίνηση ή deploy του hdc-front). */
+    lostMessage?: string;
     intervalMs?: number;
     maxWaitMs?: number;
   } = {},
@@ -103,7 +105,7 @@ export async function runJob<T extends object>(
         return (r.job.result ?? { ok: false, error: r.job.error ?? "Η εργασία απέτυχε" }) as Result<T>;
       }
     } else if (r.status === 404) {
-      return r;
+      return lostMessage ? { ok: false, status: 404, error: lostMessage } : r;
     } else if (++misses >= 5) {
       return { ok: false, error: `Η κατάσταση της εργασίας δεν διαβάζεται: ${r.error}` };
     }
