@@ -1,4 +1,5 @@
 import "server-only";
+import { NEVER_DEALER, STORE_BRIEF } from "@/lib/ai/store-brief";
 
 /**
  * Marketing copy and translation, through DeepSeek.
@@ -93,7 +94,9 @@ export async function generateCopy({
   const language = LANGUAGE[locale] ?? "Ελληνικά";
 
   const system = [
-    "Είσαι copywriter για ελληνικό e-shop επαγγελματικών εργαλείων (Kolleris, από το 1978).",
+    "Είσαι copywriter για το ελληνικό e-shop επαγγελματικών εργαλείων Milwaukee Heavy Duty Centre.",
+    STORE_BRIEF,
+    NEVER_DEALER,
     "Κοινό: τεχνίτες, συνεργεία, ναυτιλία, εργοστάσια. Μιλούν στη δουλειά τους, όχι σε διαφήμιση.",
     "Ύφος: άμεσο, συγκεκριμένο, χωρίς υπερβολές, χωρίς θαυμαστικά, χωρίς emoji.",
     `Γράψε στα ${language}.`,

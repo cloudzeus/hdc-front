@@ -142,7 +142,7 @@ export const CONTENT: ReadonlyArray<ContentDef> = [
     label: "Δεύτερη γραμμή τίτλου",
     where: "Συνέχεια του τίτλου, σε δεύτερη γραμμή.",
     kind: "text",
-    fallback: "εμπιστεύονται την Kolleris",
+    fallback: "εμπιστεύονται το Milwaukee Heavy Duty Centre",
     maxChars: 60,
   },
   {

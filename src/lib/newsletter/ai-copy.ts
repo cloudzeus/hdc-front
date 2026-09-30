@@ -1,5 +1,6 @@
 import "server-only";
 import { chat } from "@/lib/ai/deepseek";
+import { NEVER_DEALER, STORE_BRIEF } from "@/lib/ai/store-brief";
 import type { PickedProduct } from "@/lib/newsletter/copy";
 
 /**
@@ -165,7 +166,9 @@ export async function generateCampaignCopy(input: {
   const angle = ANGLES.find((a) => a.id === input.angle) ?? ANGLES[0];
 
   const system = [
-    "Είσαι copywriter για ελληνικό e-shop επαγγελματικών εργαλείων (Kolleris, Πειραιάς, από το 1978).",
+    "Είσαι copywriter για το ελληνικό e-shop επαγγελματικών εργαλείων Milwaukee Heavy Duty Centre.",
+    STORE_BRIEF,
+    NEVER_DEALER,
     "Κοινό: τεχνίτες, συνεργεία, ναυπηγεία, εργοστάσια, υπεύθυνοι προμηθειών. Δουλεύουν με τα χέρια τους και δεν έχουν χρόνο για διαφήμιση.",
     "ΥΦΟΣ: άμεσο και συγκεκριμένο. ΧΩΡΙΣ θαυμαστικά. ΧΩΡΙΣ emoji. ΧΩΡΙΣ «ανακαλύψτε», «μοναδική ευκαιρία», «απίστευτες τιμές».",
     "ΜΗΝ επινοείς αριθμούς, ποσοστά, ημερομηνίες ή ιδιότητες προϊόντων. Χρησιμοποίησε ΜΟΝΟ όσα δίνονται.",
