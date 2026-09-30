@@ -268,6 +268,36 @@ export async function writeArticle(
   return { ...value, ...usage };
 }
 
+const recheckSchema = z.object({
+  results: z.array(z.object({ claim: z.string(), supported: z.boolean() })).max(50),
+});
+
+/**
+ * The claims the verifier flagged while saying they are supported, asked
+ * once more on their own. Returns the ones the re-check calls supported;
+ * any doubt (no answer, a claim it does not return) keeps a claim a fact.
+ */
+export async function recheckClaims(
+  pack: FactPack,
+  claims: string[],
+  chat: Chat,
+): Promise<{ supported: string[]; tokens: number }> {
+  if (claims.length === 0) return { supported: [], tokens: 0 };
+  const system = [
+    "Είσαι αυστηρός ελεγκτής γεγονότων. Για ΚΑΘΕ ισχυρισμό της λίστας, απάντησε αν στηρίζεται ΠΛΗΡΩΣ από το ΠΑΚΕΤΟ ΣΤΟΙΧΕΙΩΝ (και το «λεξικό τεχνολογιών» του).",
+    "Αν έστω και ένα μέρος του ισχυρισμού δεν στηρίζεται, supported=false.",
+    'Απάντησε ΜΟΝΟ με JSON: {"results":[{"claim":"ο ισχυρισμός όπως δόθηκε","supported":true}]}',
+  ].join("\n");
+  const user = `ΠΑΚΕΤΟ ΣΤΟΙΧΕΙΩΝ (JSON):\n${JSON.stringify(promptPack(pack))}\n\n---\n\nΙΣΧΥΡΙΣΜΟΙ:\n${claims.map((c) => `- ${c}`).join("\n")}`;
+  try {
+    const { value, tokens } = await withRetry(chat, { system, user, maxTokens: 1500, temperature: 0 }, (reply) => recheckSchema.parse(extractJson(reply)));
+    const yes = new Set(value.results.filter((r) => r.supported).map((r) => r.claim.trim()));
+    return { supported: claims.filter((c) => yes.has(c.trim())), tokens };
+  } catch (error) {
+    return { supported: [], tokens: (error as { tokens?: number }).tokens ?? 0 };
+  }
+}
+
 /** What the writer gets back when a draft fails: its own JSON, and exactly what to fix. */
 export function revisionPrompt(
   pack: FactPack,

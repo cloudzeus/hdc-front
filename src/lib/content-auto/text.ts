@@ -316,6 +316,24 @@ export function modelMentions(text: string): ModelMention[] {
   return out;
 }
 
+/**
+ * Each model mention of a sentence with the words that follow it, up to the
+ * next model mention or the end: «…M18 FBLG3-0 ή κιτ M18 FBLG3-802 με δύο
+ * μπαταρίες» gives the -0 only «ή κιτ». Upper-cased, like `modelMentions`.
+ */
+export function modelSpans(sentence: string): Array<ModelMention & { after: string }> {
+  const upper = normalizeModelText(sentence.toUpperCase().replace(/[™®]/g, ""));
+  const matches = [...upper.matchAll(MODEL_MENTION)].filter((m) => !NOT_A_MODEL.has(m[2]));
+  // A battery («M18 B5», «M18 HB8», «M18 FB8») is part of what is said, not the next product.
+  const isBattery = (m: RegExpMatchArray) => /^(B|HB|FB|HNRG|NRG|XC|HD)\d/.test(m[2]);
+  return matches.map((m, i) => {
+    const root = `${m[1]} ${m[2]}`;
+    const next = matches.slice(i + 1).find((n) => !isBattery(n));
+    const end = next ? next.index! : upper.length;
+    return { root, full: m[3] ? `${root}-${m[3]}` : null, after: upper.slice(m.index! + m[0].length, end) };
+  });
+}
+
 /** Article numbers and EANs: 8 to 13 digits standing alone. */
 export function codeMentions(text: string): string[] {
   return [...new Set(text.match(/(?<![\d.,])\d{8,13}(?![\d.,]?\d)/g) ?? [])];

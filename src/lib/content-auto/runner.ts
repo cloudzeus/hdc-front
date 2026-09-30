@@ -19,6 +19,7 @@ import {
   linkTargets,
   namesFrom,
   reclassify,
+  selfContradicting,
   sanitizeMetadata,
   textGates,
   visibleText,
@@ -29,7 +30,7 @@ import {
 import { insertInlineImages, pickHeroPhoto, uploadHero, type InlineCandidate } from "@/lib/content-auto/images";
 import { eligibleTopic, topicOrder, type TopicPayload } from "@/lib/content-auto/planner";
 import { articleSlug, modelMentions } from "@/lib/content-auto/text";
-import { reviseArticle, verifyArticle, writeArticle, type Chat, type StyleExample } from "@/lib/content-auto/writer";
+import { recheckClaims, reviseArticle, verifyArticle, writeArticle, type Chat, type StyleExample } from "@/lib/content-auto/writer";
 
 /**
  * One run of the automatic writer (spec §2):
@@ -402,6 +403,15 @@ async function doRun(run: Run, options: ExecuteOptions, state: State): Promise<R
       }
       verifierError = error instanceof Error ? error.message : String(error);
     }
+    // Findings whose own reason says «supported» are asked once more; dropped only if the re-check agrees.
+    let rechecked: string[] = [];
+    const doubtful = (unsupported ?? []).filter(selfContradicting).map((u) => u.claim);
+    if (unsupported && doubtful.length) {
+      const again = await recheckClaims(pack, doubtful, chat);
+      verifierTokens += again.tokens;
+      rechecked = again.supported;
+      unsupported = unsupported.filter((u) => !rechecked.includes(u.claim));
+    }
     state.tokens += verifierTokens;
     check();
     // A «fact» with no number, unit, code, feature, kit or store word in it is advice.
@@ -422,7 +432,7 @@ async function doRun(run: Run, options: ExecuteOptions, state: State): Promise<R
       existing,
       unsupported,
     });
-    return { hero, heroProduct, heroAlt, placed, draft, dropped, alts, unsupported, reclassified, verifierTokens, verifierError, slug, gates };
+    return { hero, heroProduct, heroAlt, placed, draft, dropped, alts, unsupported, reclassified, rechecked, verifierTokens, verifierError, slug, gates };
   };
 
   let current = await evaluate(written);
@@ -445,6 +455,7 @@ async function doRun(run: Run, options: ExecuteOptions, state: State): Promise<R
       problems: failing.map((g) => ({ gate: g.id, problems: g.problems })),
       advice: current.gates.flatMap((g) => g.notes ?? []),
       reclassifiedAsAdvice: current.reclassified,
+      droppedAfterRecheck: current.rechecked,
       droppedMetadata: current.dropped,
       verifierError: current.verifierError,
     });

@@ -18,6 +18,7 @@ import {
   reclassify,
   runGates,
   sanitizeMetadata,
+  selfContradicting,
   uniqueGate,
   verifierGate,
   type Catalogue,
@@ -232,6 +233,15 @@ describe("gate · a bare tool comes without batteries", () => {
   it("reads the alt texts", () => {
     expect(bareKitGate(goodDraft(), ["Milwaukee M18 FPD3-0X με δύο μπαταρίες 5,0 Ah"]).ok).toBe(false);
   });
+  it("looks only from the bare model to the next model: a kit named after it keeps its batteries", () => {
+    const answer = "Ο M18 FBLG3 σε δύο εκδόσεις: σκέτο εργαλείο M18 FBLG3-0 ή κιτ M18 FBLG3-802 με δύο μπαταρίες 8,0 Ah.";
+    expect(bareKitGate({ ...goodDraft(), answer }).problems).toEqual([]);
+    // …but batteries right after the bare model still fail, even with a kit later in the sentence.
+    const wrong = "Το M18 FBLG3-0 με δύο μπαταρίες 8,0 Ah, όπως και το M18 FBLG3-802.";
+    expect(bareKitGate({ ...goodDraft(), answer: wrong }).ok).toBe(false);
+    // A battery model is part of the claim, not the next product.
+    expect(bareKitGate({ ...goodDraft(), answer: "Το M18 FBLG3-0 παίρνει 2 x M18 FB8 στο σετ." }).ok).toBe(false);
+  });
 });
 
 describe("gate · AI tells", () => {
@@ -386,6 +396,24 @@ describe("verifier findings: deterministic reclassification", () => {
     expect(reclassified).toEqual(["Σε αποθήκη καθαρίζει ράφια"]);
     expect(verifierGate(items).ok).toBe(false);
     expect(reclassify(null).items).toBeNull();
+  });
+});
+
+describe("self-contradicting verifier findings", () => {
+  it.each([
+    "Η περιγραφή αποδίδει στο -802 δύο μπαταρίες, που στηρίζονται από το πακέτο.",
+    "Το στοιχείο υπάρχει στο πακέτο.",
+    "The claim is supported by the pack.",
+  ])("«%s» says the claim is supported: ask again", (reason) => {
+    expect(selfContradicting({ claim: "x", reason })).toBe(true);
+  });
+  it.each([
+    "Δεν στηρίζεται από το πακέτο.",
+    "Ο ισχυρισμός δε στηρίζεται.",
+    "Unsupported by the pack.",
+    "Το πακέτο δεν αναφέρει χρόνο λειτουργίας.",
+  ])("«%s» is an ordinary finding", (reason) => {
+    expect(selfContradicting({ claim: "x", reason })).toBe(false);
   });
 });
 

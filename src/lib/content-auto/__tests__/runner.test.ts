@@ -340,6 +340,34 @@ describe("executeRun", () => {
     expect((db.runUpdates[0].detail as { savedAttempt: number }).savedAttempt).toBe(0);
   });
 
+  it("re-asks a finding that says it is supported; drops it only if the re-check agrees", async () => {
+    for (const agrees of [true, false]) {
+      db.articleWrites = [];
+      db.runUpdates = [];
+      db.open = true;
+      setRun("manual-publish");
+      const finding = { claim: "Το κιτ M18 FPD3-502X έχει δύο μπαταρίες 5,0 Ah", reason: "Στηρίζονται από το πακέτο.", kind: "fact" };
+      const calls: string[] = [];
+      const chat = vi.fn<Chat>(async ({ temperature, system }) => {
+        if (temperature !== 0) return { text: JSON.stringify(article()), usage: { promptTokens: 1, completionTokens: 1 } };
+        if (system.includes('"results"')) {
+          calls.push("recheck");
+          return { text: JSON.stringify({ results: [{ claim: finding.claim, supported: agrees }] }), usage: { promptTokens: 1, completionTokens: 1 } };
+        }
+        calls.push("verify");
+        return { text: JSON.stringify({ unsupported: [finding] }), usage: { promptTokens: 1, completionTokens: 1 } };
+      });
+      const out = await executeRun("run1", { chat, deadlineMs: 5_000 });
+      expect(calls.slice(0, 2)).toEqual(["verify", "recheck"]);
+      if (agrees) {
+        expect(out.outcome).toBe("PUBLISHED");
+        expect((db.runUpdates[0].detail as { attempts: Array<{ droppedAfterRecheck: string[] }> }).attempts[0].droppedAfterRecheck).toEqual([finding.claim]);
+      } else {
+        expect(out.failedGates).toContain("verifier");
+      }
+    }
+  });
+
   it("stops at the first attempt that passes", async () => {
     setRun("manual-draft");
     const chat = chatWith(article());

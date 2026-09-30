@@ -5,6 +5,7 @@ import {
   DUPLICATE_AT,
   codeMentions,
   modelMentions,
+  modelSpans,
   similarity,
   unsupportedNumbers,
 } from "@/lib/content-auto/text";
@@ -168,7 +169,7 @@ export function forbiddenGate(draft: Draft, alts: string[] = []): GateResult {
 
 const BARE_MODEL = /-0[XC]?$/;
 const BATTERY_CLAIM = folded(
-  `\\d\\s*[x×]?\\s*μπαταρ|${start}(?:μια|μιασ|ενα|δυο|τρεισ|τρια|τεσσερισ)\\s+μπαταρ|\\d\\s?ah${end}|${start}φορτιστ|m12-18\\s?f?c|${start}charger|\\d\\s*[x×]?\\s*batter`,
+  `\\d\\s*[x×]?\\s*μπαταρ|\\d\\s*[x×]\\s*m1[28]\\s?(?:b|hb|fb)\\d|${start}(?:μια|μιασ|ενα|δυο|τρεισ|τρια|τεσσερισ)\\s+μπαταρ|\\d\\s?ah${end}|${start}φορτιστ|m12-18\\s?f?c|${start}charger|\\d\\s*[x×]?\\s*batter`,
 );
 
 /**
@@ -180,13 +181,18 @@ export function bareKitGate(draft: Draft, alts: string[] = []): GateResult {
   const problems: string[] = [];
   const sentences = readable(allText(draft, alts)).split(/(?<=[.!;?·])\s+|\n+/);
   for (const sentence of sentences) {
-    const bare = modelMentions(sentence).filter((m) => m.full && BARE_MODEL.test(m.full));
+    const bare = modelSpans(sentence).filter((m) => m.full && BARE_MODEL.test(m.full));
     if (!bare.length) continue;
-    const text = searchKey(sentence);
     // «χωρίς», or the reader's own batteries: «αν έχετε», «έχετε ήδη», «δικές σας μπαταρίες».
-    if (/(?<!\p{L})(χωρισ|without)(?!\p{L})|εχετε\s+ηδη|(?<!\p{L})αν\s+εχετε|δικεσ\s+σασ\s+μπαταριεσ/u.test(text)) continue;
-    const claim = BATTERY_CLAIM.exec(text);
-    if (claim) problems.push(`Το ${bare[0].full} είναι σκέτο εργαλείο, αλλά η πρόταση γράφει «${claim[0].trim()}»: «${sentence.trim().slice(0, 140)}»`);
+    if (/(?<!\p{L})(χωρισ|without)(?!\p{L})|εχετε\s+ηδη|(?<!\p{L})αν\s+εχετε|δικεσ\s+σασ\s+μπαταριεσ/u.test(searchKey(sentence))) continue;
+    // Only what follows the bare model, up to the next model: a kit named after it keeps its batteries.
+    for (const m of bare) {
+      const claim = BATTERY_CLAIM.exec(searchKey(m.after));
+      if (claim) {
+        problems.push(`Το ${m.full} είναι σκέτο εργαλείο, αλλά η πρόταση γράφει «${claim[0].trim()}»: «${sentence.trim().slice(0, 140)}»`);
+        break;
+      }
+    }
   }
   return gate("bareKit", problems);
 }
@@ -456,6 +462,16 @@ export function reclassify(
     return { ...u, kind: "advice" as const };
   });
   return { items, reclassified };
+}
+
+/**
+ * A finding whose own reason says the claim IS supported («…στηρίζονται από
+ * το πακέτο»): the verifier contradicts itself, and the claim is asked again.
+ * «δεν στηρίζεται» and «unsupported» do not count.
+ */
+export function selfContradicting(u: Unsupported): boolean {
+  const reason = searchKey(u.reason ?? "");
+  return /(?<!(δεν|δε|μη|not)\s)(?<!\p{L})στηριζ|(?<!δεν\s)υπαρχει\s+στο\s+πακετο|(?<!un|not\s)(?<!\p{L})supported/u.test(reason);
 }
 
 export function verifierGate(unsupported: Unsupported[] | null): GateResult {
