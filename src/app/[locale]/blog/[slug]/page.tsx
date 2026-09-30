@@ -5,12 +5,11 @@ import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { SiteChrome } from "@/components/chrome/SiteChrome";
 import { SiteFooter } from "@/components/chrome/SiteFooter";
-import { BlogMissingNotice } from "@/components/blog/BlogMissingNotice";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getMiniCart } from "@/lib/cart/cart";
-import { BlogMethodMissing, getBlogPost } from "@/lib/blog/blog";
-import type { BlogPost } from "@/lib/blog/contract";
+import { getBlogPost } from "@/lib/blog/blog";
+import { blogPostMetadata, loadBlogPost } from "@/lib/blog/post-page";
 import {
   getCatalogueStats,
   getMenuTree,
@@ -27,29 +26,24 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { slug, locale } = await params;
-  try {
-    const post = await getBlogPost(slug, locale);
-    if (!post) return {};
-    return {
-      title: post.title,
-      description: post.shortDescription ?? undefined,
-      openGraph: {
-        title: post.title,
-        type: "article",
-        publishedTime: post.publishedAt,
-        images: post.image ? [post.image.url] : undefined,
-      },
-    };
-  } catch {
-    // The endpoint is not there yet; the page itself explains that.
-    return { title: "Blog" };
-  }
+  const post = await loadBlogPost(() => getBlogPost(slug, locale));
+  // No post (or no posts endpoint yet): the page is a 404, see below.
+  return post ? blogPostMetadata(post, locale) : {};
 }
 
 export default async function BlogPostPage({ params }: PageProps) {
   const t = await getTranslations("blog.page");
   const { locale, slug } = await params;
   setRequestLocale(locale);
+
+  /*
+   * A 404 for any slug that is not a post — also while HDCtool has no posts
+   * endpoint: a "not yet wired" page for every URL anyone types is an endless
+   * supply of soft 404s. (Under [locale]/loading.tsx the page streams, so the
+   * status stays 200 and Next marks the not-found page `noindex`.)
+   */
+  const post = await loadBlogPost(() => getBlogPost(slug, locale));
+  if (!post) notFound();
 
   const [menuTree, brands, stats, rootCategories, miniCart] = await Promise.all(
     [
@@ -61,20 +55,7 @@ export default async function BlogPostPage({ params }: PageProps) {
     ],
   );
 
-  let post: BlogPost | null = null;
-  let missing: string | null = null;
-  try {
-    post = await getBlogPost(slug, locale);
-  } catch (error) {
-    if (error instanceof BlogMethodMissing) missing = error.endpoint;
-    else throw error;
-  }
-
-  // A real 404 only once the endpoint exists — otherwise every article URL
-  // would look permanently dead rather than not-yet-wired.
-  if (!missing && !post) notFound();
-
-  const date = post ? new Date(post.publishedAt) : null;
+  const date = new Date(post.publishedAt);
 
   return (
     <>
@@ -103,12 +84,8 @@ export default async function BlogPostPage({ params }: PageProps) {
             >
               BLOG
             </Link>
-            {post && (
-              <>
-                <span className="text-k-red">/</span>
-                <span className="truncate text-white">{post.title}</span>
-              </>
-            )}
+            <span className="text-k-red">/</span>
+            <span className="truncate text-white">{post.title}</span>
           </nav>
 
           {post && (
@@ -122,7 +99,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                 </p>
               )}
               <p className="t-brand-count mt-5 flex flex-wrap items-center gap-2.5 text-white/45">
-                {date && !Number.isNaN(date.getTime()) && (
+                {!Number.isNaN(date.getTime()) && (
                   <time dateTime={post.publishedAt}>
                     {date.toLocaleDateString(locale, {
                       day: "2-digit",
@@ -151,37 +128,31 @@ export default async function BlogPostPage({ params }: PageProps) {
 
         <section className="band-base">
           <div className="shell-x py-8 lg:py-12">
-            {missing ? (
-              <BlogMissingNotice endpoint={missing} />
-            ) : (
-              post && (
-                <article className="mx-auto max-w-[70ch]">
-                  {post.image && (
-                    <span className="relative mb-8 block h-[240px] overflow-hidden bg-k-surface-2 lg:mb-10 lg:h-[420px]">
-                      <Image
-                        src={post.image.url}
-                        alt=""
-                        fill
-                        priority
-                        sizes="(max-width: 1024px) 100vw, 70ch"
-                        className="object-cover"
-                      />
-                    </span>
-                  )}
-
-                  {/*
-                    HDCtool's editor is the only writer and sanitises on the way
-                    in; this renders what it stored. If the editor ever opens to
-                    untrusted authors, sanitise HERE too — the storefront must
-                    not be the only place that trusts it.
-                  */}
-                  <div
-                    className="prose-kolleris"
-                    dangerouslySetInnerHTML={{ __html: post.content }}
+            <article className="mx-auto max-w-[70ch]">
+              {post.image && (
+                <span className="relative mb-8 block h-[240px] overflow-hidden bg-k-surface-2 lg:mb-10 lg:h-[420px]">
+                  <Image
+                    src={post.image.url}
+                    alt=""
+                    fill
+                    priority
+                    sizes="(max-width: 1024px) 100vw, 70ch"
+                    className="object-cover"
                   />
-                </article>
-              )
-            )}
+                </span>
+              )}
+
+              {/*
+                HDCtool's editor is the only writer and sanitises on the way
+                in; this renders what it stored. If the editor ever opens to
+                untrusted authors, sanitise HERE too — the storefront must
+                not be the only place that trusts it.
+              */}
+              <div
+                className="prose-kolleris"
+                dangerouslySetInnerHTML={{ __html: post.content }}
+              />
+            </article>
           </div>
         </section>
 
