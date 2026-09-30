@@ -16,10 +16,7 @@
     "db:studio": "prisma studio",
     "reconcile:catalog": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env scripts/reconcile-catalog.ts",
     "backfill:milwaukee": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env scripts/backfill-milwaukee-fields.ts",
-    "content:import": "tsx --env-file=.env scripts/content/import-content.ts",
-    "emails:build": "node emails/build.mjs",
-    "emails:docs": "node emails/docs-gen.mjs",
-    "emails:upload": "node emails/mailgun/upload-templates.mjs"
+    "content:import": "tsx --env-file=.env scripts/content/import-content.ts"
   },
   "engines": {
     "node": "24.x"
