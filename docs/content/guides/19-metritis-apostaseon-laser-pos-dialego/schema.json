@@ -1,0 +1,138 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/metritis-apostaseon-laser-pos-dialego#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/metritis-apostaseon-laser-pos-dialego",
+      "url": "{{SITE_URL}}/blog/metritis-apostaseon-laser-pos-dialego",
+      "headline": "Μετρητής αποστάσεων laser: πώς διαλέγω και πώς λειτουργεί",
+      "description": "Πώς διαλέγεις μετρητή αποστάσεων laser: εμβέλεια, ακρίβεια, λειτουργίες εμβαδού, όγκου και Πυθαγόρειου, οθόνη, IP54. Πώς λειτουργεί και πότε θέλει στόχο.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "μετρητής αποστάσεων laser, αποστασιόμετρο laser, μετρητής αποστάσεων laser πώς λειτουργεί, μετροταινία laser, πώς διαλέγω μετρητή αποστάσεων, ψηφιακό μέτρο laser, μετρητης αποστασεων laser, metritis apostaseon laser, μετρητής αποστάσεων Milwaukee, μετρητής αποστάσεων Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Μετρητής αποστάσεων laser"
+        },
+        {
+          "@type": "Thing",
+          "name": "Αποστασιόμετρο"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "LDM 30"
+        },
+        {
+          "@type": "Thing",
+          "name": "LDM 45"
+        },
+        {
+          "@type": "Thing",
+          "name": "LDM 50"
+        },
+        {
+          "@type": "Thing",
+          "name": "LDM 100"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/50-m-laser-distance-meter/ldm-50/",
+        "https://www.milwaukeetool.eu/en-eu/100-m-laser-distance-meter/ldm-100/"
+      ],
+      "wordCount": 1003
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/metritis-apostaseon-laser-pos-dialego#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/metritis-apostaseon-laser-pos-dialego#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Πώς λειτουργεί ο μετρητής αποστάσεων laser;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Στέλνει μια δέσμη laser στον στόχο και μετρά πόσο χρόνο ή πόση διαφορά φάσης χρειάζεται το φως για να επιστρέψει. Από αυτό υπολογίζει την απόσταση σε κλάσματα του δευτερολέπτου. Γι' αυτό μετρά γρήγορα και με ένα άτομο, χωρίς να κρατά κανείς την άλλη άκρη."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πόσο ακριβής είναι ένας μετρητής αποστάσεων laser;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Οι επαγγελματικοί μετρητές έχουν συνήθως ακρίβεια της τάξης του ενάμισι έως δύο χιλιοστών σε κανονικές συνθήκες. Η ακρίβεια μπορεί να πέσει σε δυνατό ήλιο, σε πολύ σκούρες, γυαλιστερές ή διάφανες επιφάνειες και στα όρια της εμβέλειας."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Γιατί ο μετρητής δεν μετρά έξω στον ήλιο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το δυνατό φως του ήλιου δυσκολεύει τον αισθητήρα να ξεχωρίσει την επιστροφή της δέσμης, ειδικά σε μεγάλες αποστάσεις. Βοηθά μια πλάκα στόχου, η σκιά, ή ένας μετρητής με κάμερα και ψηφιακή μεγέθυνση για να βλέπεις πού σημαδεύεις."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι η μέτρηση με Πυθαγόρειο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι έμμεση μέτρηση ύψους ή απόστασης όταν δεν μπορείς να σημαδέψεις απευθείας το σημείο. Μετράς δύο ή τρεις αποστάσεις από την ίδια θέση και ο μετρητής υπολογίζει την τρίτη πλευρά. Είναι χρήσιμη σε προσόψεις και ψηλά ταβάνια, με μικρότερη ακρίβεια από την απευθείας μέτρηση."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι εμβέλεια χρειάζομαι;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Για διαμερίσματα και εσωτερικούς χώρους αρκούν 30–50 m. Για μεγάλες αίθουσες, αποθήκες, εργοτάξια και εξωτερικές μετρήσεις, 80–100 m ή περισσότερο. Η εμβέλεια που δηλώνεται ισχύει σε καλές συνθήκες· έξω είναι συνήθως μικρότερη χωρίς στόχο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Αντικαθιστά ο μετρητής laser τη μετροταινία;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Όχι εντελώς. Ο μετρητής laser κερδίζει σε μεγάλες αποστάσεις, ύψη, εμβαδά και όταν δουλεύεις μόνος. Η μετροταινία παραμένει πιο πρακτική για μικρές μετρήσεις, κοπές υλικών, εξωτερικές διαστάσεις αντικειμένων και σημάδια πάνω σε ξύλο ή προφίλ."
+          }
+        }
+      ]
+    }
+  ]
+}

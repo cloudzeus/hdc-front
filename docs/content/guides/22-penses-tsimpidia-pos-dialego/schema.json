@@ -1,0 +1,131 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/penses-tsimpidia-pos-dialego#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/penses-tsimpidia-pos-dialego",
+      "url": "{{SITE_URL}}/blog/penses-tsimpidia-pos-dialego",
+      "headline": "Πένσες και τσιμπίδια: ποια χρειάζομαι και πώς διαλέγω",
+      "description": "Πένσα, μυτοτσίμπιδο, πλαγιοκόφτης, γκαζοτανάλια, γκριπ, απογυμνωτής, κόφτης καλωδίων: τι κάνει το καθένα και πώς διαλέγεις. Πένσες ηλεκτρολόγου 1000V.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "πένσα, πένσα ηλεκτρολόγου, πένσα γκριπ, γκαζοτανάλια, πλαγιοκόφτης, μυτοτσίμπιδο, κόφτης καλωδίων, απογυμνωτής καλωδίων, πενσα ηλεκτρολογου, pensa, πένσες Milwaukee, πένσες Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Πένσες"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πλαγιοκόφτες"
+        },
+        {
+          "@type": "Thing",
+          "name": "Γκαζοτανάλιες"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "VDE"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/7-in-1-wire-stripping-pliers/",
+        "https://www.milwaukeetool.eu/en-eu/hand-tools/pliers-snips-and-scissors/vde-pliers/",
+        "https://www.milwaukeetool.eu/en-eu/hand-tools/pliers-snips-and-scissors/locking-pliers/"
+      ],
+      "wordCount": 1005
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/penses-tsimpidia-pos-dialego#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/penses-tsimpidia-pos-dialego#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Ποια είναι η διαφορά πένσας και μυτοτσίμπιδου;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Η πένσα έχει κοντά, φαρδιά σαγόνια για δυνατό κράτημα, λύγισμα και κόψιμο σύρματος. Το μυτοτσίμπιδο έχει μακριά, λεπτά σαγόνια για να πιάνει μικρά αντικείμενα σε στενά σημεία και να σχηματίζει θηλιές σε σύρματα. Στις περισσότερες εργαλειοθήκες χρειάζονται και τα δύο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι η πένσα γκριπ;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι πένσα που κλειδώνει. Ρυθμίζεις το άνοιγμα με μια βίδα, κλείνεις τις λαβές και τα σαγόνια μένουν σφιγμένα χωρίς να κρατάς. Χρησιμεύει ως μικρή μέγγενη, για συγκράτηση κομματιών στη συγκόλληση και για χαλασμένες βίδες και παξιμάδια."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Γκαζοτανάλια ή σωληνοκάβουρας;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Η γκαζοτανάλια ρυθμίζεται σε πολλά ανοίγματα και πιάνει σωλήνες, ρακόρ και παξιμάδια σε υδραυλικά και συνεργεία. Ο σωληνοκάβουρας είναι βαρύτερος και φτιαγμένος για σιδηροσωλήνες, όπου τα δόντια του «δαγκώνουν» όσο αυξάνεται η δύναμη. Για επιχρωμιωμένα εξαρτήματα χρειάζεται προστασία, για να μη χαραχτούν."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει VDE στις πένσες;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι ένδειξη ότι η μόνωση της πένσας έχει ελεγχθεί και πιστοποιηθεί για εργασία κοντά σε μέρη υπό τάση έως 1000 V AC. Οι πένσες VDE είναι για ηλεκτρολόγους. Η σωστή πρακτική είναι πάντα η απομόνωση του κυκλώματος πριν από την εργασία."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Μπορώ να κόψω καλώδιο με πλαγιοκόφτη;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Λεπτά χάλκινα καλώδια ναι. Για χοντρά καλώδια ισχύος χρησιμοποίησε κόφτη καλωδίων, που κόβει καθαρά χωρίς να συνθλίβει τον αγωγό. Μην κόβεις ατσάλινο σύρμα ή ντίζες με πλαγιοκόφτη χαλκού, γιατί χαλάει η κόψη."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι απογυμνωτή χρειάζομαι;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Έναν απογυμνωτή που καλύπτει τις διατομές που συναντάς, π.χ. από 0,75 έως 6 mm² για οικιακές εγκαταστάσεις. Οι αυτόματοι απογυμνωτές κάνουν γρήγορη και σταθερή δουλειά, οι απογυμνωτές τύπου πένσας συνδυάζουν συνήθως και κοπή, πρεσάρισμα ή σχηματισμό θηλιάς."
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/kleidia-karydakia-kastanies-pos-dialego#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/kleidia-karydakia-kastanies-pos-dialego",
+      "url": "{{SITE_URL}}/blog/kleidia-karydakia-kastanies-pos-dialego",
+      "headline": "Γερμανοπολύγωνα, καρυδάκια και καστάνιες: πώς διαλέγω κλειδιά",
+      "description": "Πώς διαλέγεις κλειδιά: γερμανοπολύγωνα με ή χωρίς καστάνια, καρυδάκια 6 ή 12 γωνιών, καρέ 1/4, 3/8, 1/2, καστάνιες, γαλλικό, δυναμόκλειδο, impact.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "γερμανοπολύγωνα, γερμανοπολύγωνα καστάνιας, καρυδάκια σετ, καρυδάκια αέρος, καστάνια κλειδί, γαλλικό κλειδί, δυναμόκλειδο, πώς διαλέγω καρυδάκια, germanopolygona, karydakia, καρυδάκια Milwaukee, εργαλεία συνεργείου Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Γερμανοπολύγωνα κλειδιά"
+        },
+        {
+          "@type": "Thing",
+          "name": "Καρυδάκια"
+        },
+        {
+          "@type": "Thing",
+          "name": "Καστάνιες"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "SHOCKWAVE"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/3-8-drive-ratchet/",
+        "https://www.milwaukeetool.eu/en-eu/accessories/fastening/shockwave-impact-rated-sockets/",
+        "https://www.milwaukeetool.eu/en-eu/hand-tools/spanners-and-wrenches/spanners/"
+      ],
+      "wordCount": 1006
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/kleidia-karydakia-kastanies-pos-dialego#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/kleidia-karydakia-kastanies-pos-dialego#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Τι είναι τα γερμανοπολύγωνα κλειδιά;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι κλειδιά με ανοιχτό στόμιο (γερμανικό) στη μία άκρη και κλειστό πολύγωνο στην άλλη, στο ίδιο μέγεθος. Το πολύγωνο πιάνει σταθερά για το δυνατό σφίξιμο και λύσιμο, το ανοιχτό μπαίνει γρήγορα σε σημεία όπου δεν χωράει κλειστό κλειδί. Είναι το βασικό σετ κλειδιών κάθε συνεργείου."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Αξίζουν τα γερμανοπολύγωνα με καστάνια;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ναι, για μηχανικούς και όποιον δουλεύει σε στενούς χώρους. Η καστάνια στο πολύγωνο σε αφήνει να σφίγγεις χωρίς να βγάζεις και να ξαναβάζεις το κλειδί σε κάθε κίνηση. Για πολύ δυνατό λύσιμο κολλημένων παξιμαδιών, ένα απλό πολύγωνο είναι πιο ανθεκτικό."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Καρυδάκια 6 ή 12 γωνιών;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Τα καρυδάκια 6 γωνιών πιάνουν τις επίπεδες πλευρές του παξιμαδιού και δεν στρογγυλεύουν εύκολα τις ακμές, γι' αυτό είναι καλύτερα για δυνατή ροπή και κολλημένα παξιμάδια. Τα 12 γωνιών μπαίνουν σε περισσότερες θέσεις, χρήσιμο σε στενούς χώρους, αλλά είναι λιγότερο κατάλληλα για πολύ μεγάλη ροπή."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει καρέ 1/4, 3/8 και 1/2;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι το μέγεθος της τετράγωνης υποδοχής όπου μπαίνει το καρυδάκι στην καστάνια ή στο μπουλονόκλειδο. Το 1/4 είναι για μικρά παξιμάδια και ακρίβεια, το 3/8 για τη γενική μηχανική δουλειά και το 1/2 για μεγάλα μπουλόνια και μεγάλη ροπή. Για φορτηγά υπάρχουν 3/4 και 1 ίντσας."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι τα καρυδάκια αέρος ή impact;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι καρυδάκια για μπουλονόκλειδα αέρος και μπαταρίας. Έχουν παχύτερα τοιχώματα και πιο όλκιμο χάλυβα, ώστε να αντέχουν τις κρούσεις χωρίς να ραγίζουν. Τα κοινά χρωμιωμένα καρυδάκια είναι για καστάνια χειρός και δεν πρέπει να μπαίνουν σε μπουλονόκλειδο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πότε χρειάζομαι δυναμόκλειδο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Όταν ο κατασκευαστής ορίζει συγκεκριμένη ροπή σύσφιξης, όπως σε τροχούς, κινητήρες, αναρτήσεις, ποδήλατα και σιδηροκατασκευές. Το δυναμόκλειδο σου δείχνει πότε έφτασες τη ροπή, ώστε να μη σφίξεις λίγο ή υπερβολικά. Φύλαξέ το στη χαμηλότερη ρύθμιση αν είναι τύπου ελατηρίου."
+          }
+        }
+      ]
+    }
+  ]
+}

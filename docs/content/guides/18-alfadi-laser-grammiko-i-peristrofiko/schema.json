@@ -1,0 +1,161 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/alfadi-laser-grammiko-i-peristrofiko#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/alfadi-laser-grammiko-i-peristrofiko",
+      "url": "{{SITE_URL}}/blog/alfadi-laser-grammiko-i-peristrofiko",
+      "headline": "Αλφάδι laser: γραμμικό, 360° ή περιστροφικό; Πώς διαλέγω",
+      "description": "Πώς διαλέγεις αλφάδι laser: σταυρού, 3 επιπέδων 360° ή περιστροφικό, πράσινη ή κόκκινη δέσμη, ακρίβεια mm/m, εμβέλεια, ανιχνευτής, IP. Οδηγός με πίνακα.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "αλφάδι laser, laser σταυρού, περιστροφικό laser, αλφάδι laser σταυρού, πράσινο laser ή κόκκινο, laser 360 μοιρών, πώς διαλέγω αλφάδι laser, αλφαδι λειζερ, laser stavrou, αλφάδι laser Milwaukee, αλφάδι laser Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Αλφάδι laser"
+        },
+        {
+          "@type": "Thing",
+          "name": "Laser σταυρού"
+        },
+        {
+          "@type": "Thing",
+          "name": "Περιστροφικό laser"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "CLL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 CLL4P"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 3PL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 RLOHVG300"
+        },
+        {
+          "@type": "Thing",
+          "name": "RD300G"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/alkaline-green-cross-line-laser/cll/",
+        "https://www.milwaukeetool.eu/en-eu/m12-cross-line-laser-with-4-points/m12-cll4p/",
+        "https://www.milwaukeetool.eu/en-eu/m12-green-360-176;-3-plane-laser/m12-3pl/",
+        "https://www.milwaukeetool.eu/en-eu/m18-300-m-green-horizontal-vertical-rotary-laser-with-one-key/m18-rlohvg300/",
+        "https://www.milwaukeetool.eu/range/rotary-lasers/"
+      ],
+      "wordCount": 1017
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/alfadi-laser-grammiko-i-peristrofiko#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/alfadi-laser-grammiko-i-peristrofiko#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Ποια είναι η διαφορά laser σταυρού και περιστροφικού;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το laser σταυρού προβάλλει μια οριζόντια και μια κάθετη γραμμή σε περιορισμένη γωνία, για εσωτερικές δουλειές όπως πλακάκια, ντουλάπια και κάδρα. Το περιστροφικό γυρίζει μια δέσμη 360° πολύ γρήγορα και δημιουργεί ένα επίπεδο που μετριέται με ανιχνευτή σε μεγάλες αποστάσεις, για εξωτερικούς χώρους και εργοτάξια."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πράσινο ή κόκκινο laser;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το ανθρώπινο μάτι βλέπει το πράσινο πιο καθαρά, οπότε η πράσινη γραμμή διαβάζεται καλύτερα σε φωτεινούς εσωτερικούς χώρους και σε μεγαλύτερες αποστάσεις. Το κόκκινο καταναλώνει συνήθως λιγότερη ενέργεια. Για δουλειά κυρίως μέσα σε κτίρια με φως, το πράσινο είναι πιο πρακτικό."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει ακρίβεια 0,3 mm/m;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ότι σε κάθε μέτρο απόστασης από το laser η γραμμή μπορεί να αποκλίνει έως 0,3 mm. Σε τοίχο 10 μέτρων αυτό κάνει έως 3 mm. Όσο μεγαλύτερες οι αποστάσεις που δουλεύεις, τόσο πιο σημαντική γίνεται η ακρίβεια."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Χρειάζομαι ανιχνευτή για το laser;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σε εξωτερικό χώρο με ήλιο και σε μεγάλες αποστάσεις, ναι, γιατί η γραμμή δεν φαίνεται με γυμνό μάτι. Ο ανιχνευτής εντοπίζει τη δέσμη και σου δείχνει με ήχο και ένδειξη πότε είσαι στη στάθμη. Στα περιστροφικά laser είναι σχεδόν πάντα απαραίτητος."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι η αυτορύθμιση;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι ο μηχανισμός που οριζοντιώνει μόνος του τη δέσμη όταν το laser είναι τοποθετημένο περίπου οριζόντια, μέσα σε ένα εύρος λίγων μοιρών. Αν η κλίση ξεπεράσει το εύρος, το laser σε προειδοποιεί, συνήθως με αναβόσβημα της γραμμής."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Laser 3 επιπέδων ή laser σταυρού;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το laser σταυρού αρκεί για πλακάκια, κουζίνες και κάδρα. Το laser 3 επιπέδων 360° προβάλλει γραμμές σε όλο το δωμάτιο, οριζόντια και σε δύο κάθετα επίπεδα, οπότε είναι πολύ πιο γρήγορο για γυψοσανίδες, ψευδοροφές, χωρίσματα και τετραγωνισμό χώρων."
+          }
+        }
+      ]
+    }
+  ]
+}

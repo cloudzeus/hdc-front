@@ -1,0 +1,152 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/anichneytis-tasis-kalodion-laser-pos-dialego#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/anichneytis-tasis-kalodion-laser-pos-dialego",
+      "url": "{{SITE_URL}}/blog/anichneytis-tasis-kalodion-laser-pos-dialego",
+      "headline": "Ανιχνευτής τάσης, καλωδίων ή δέσμης laser: πώς διαλέγω",
+      "description": "Ποιον ανιχνευτή χρειάζεσαι; Ανιχνευτής τάσης χωρίς επαφή, ανιχνευτής τοίχου για καλώδια και σωλήνες, δέκτης laser, πολύμετρο. Κατηγορίες CAT και ασφάλεια.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "ανιχνευτής τάσης, ανιχνευτής καλωδίων τοίχου, ανιχνευτής μετάλλων τοίχου, ανιχνευτής δέσμης laser, δοκιμαστικό τάσης χωρίς επαφή, τι σημαίνει CAT IV, πώς διαλέγω ανιχνευτή, ανιχνευτης τασης, anixneutis tasis, ανιχνευτής Milwaukee, όργανα ηλεκτρολόγου Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Ανιχνευτής τάσης"
+        },
+        {
+          "@type": "Thing",
+          "name": "Ανιχνευτής δέσμης laser"
+        },
+        {
+          "@type": "Thing",
+          "name": "Ανιχνευτής τοίχου"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "2225-20"
+        },
+        {
+          "@type": "Thing",
+          "name": "RD300G"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 RLOHVG300"
+        },
+        {
+          "@type": "Thing",
+          "name": "2217-40"
+        },
+        {
+          "@type": "Thing",
+          "name": "2235-40"
+        },
+        {
+          "@type": "Thing",
+          "name": "CAT IV"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/non-contact-voltage-detector-with-laser-thermometer/2225-20/",
+        "https://www.milwaukeetool.eu/en-eu/rotary-laser-detector-300-m-green/rd300g/",
+        "https://www.milwaukeetool.eu/en-eu/digital-multimeter/2217-40/",
+        "https://www.milwaukeetool.eu/en-eu/light-commercial-clamp-meter/2235-40/"
+      ],
+      "wordCount": 1016
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/anichneytis-tasis-kalodion-laser-pos-dialego#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/anichneytis-tasis-kalodion-laser-pos-dialego#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Αρκεί ο ανιχνευτής τάσης χωρίς επαφή για να δουλέψω σε ένα κύκλωμα;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Όχι. Ο ανιχνευτής χωρίς επαφή είναι γρήγορος δείκτης ότι υπάρχει τάση, αλλά μπορεί να μην την εντοπίσει σε θωρακισμένα καλώδια ή σε ορισμένες συνθήκες. Πριν από εργασία, το κύκλωμα απομονώνεται και η απουσία τάσης επιβεβαιώνεται με κατάλληλο όργανο επαφής. Οι ηλεκτρολογικές εργασίες γίνονται από αδειούχο ηλεκτρολόγο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει CAT III και CAT IV σε ένα όργανο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι κατηγορίες μέτρησης που δείχνουν σε ποιο σημείο μιας εγκατάστασης μπορεί να χρησιμοποιηθεί το όργανο με ασφάλεια απέναντι σε υπερτάσεις. Η CAT III αφορά διανομή μέσα στο κτίριο, όπως πίνακες. Η CAT IV αφορά την αρχή της εγκατάστασης, όπως μετρητές και παροχές. Υψηλότερη κατηγορία σημαίνει μεγαλύτερο περιθώριο ασφαλείας."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πώς βρίσκω καλώδια και σωλήνες μέσα στον τοίχο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Με ανιχνευτή τοίχου, που εντοπίζει μέταλλα, ξύλινους σκελετούς και καλώδια υπό τάση πίσω από την επιφάνεια. Συνδύασέ τον με τα σχέδια της εγκατάστασης και με λογική: τα καλώδια συνήθως ανεβαίνουν κάθετα από πρίζες και διακόπτες. Κανένας ανιχνευτής δεν εγγυάται 100% ασφάλεια."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι ο ανιχνευτής δέσμης laser;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι δέκτης που εντοπίζει τη δέσμη ενός laser όταν δεν φαίνεται με γυμνό μάτι, σε ήλιο ή μεγάλες αποστάσεις. Δείχνει με βέλη και ήχο αν είσαι πάνω, κάτω ή ακριβώς στη στάθμη. Πρέπει να είναι συμβατός με τον τύπο και το χρώμα της δέσμης του laser σου."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πολύμετρο ή αμπεροτσιμπίδα;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το πολύμετρο μετρά τάση, αντίσταση και συνέχεια, και ρεύμα μέσα στο κύκλωμα σε μικρές εντάσεις. Η αμπεροτσιμπίδα μετρά ρεύμα αγκαλιάζοντας τον αγωγό, χωρίς να ανοίξεις το κύκλωμα, κάτι πολύ πρακτικό σε πίνακες και μοτέρ. Πολλοί ηλεκτρολόγοι έχουν και τα δύο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πώς ελέγχω ότι ο ανιχνευτής τάσης δουλεύει;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Πριν και μετά από κάθε έλεγχο, δοκίμασέ τον σε γνωστή πηγή τάσης, π.χ. σε μια πρίζα που ξέρεις ότι έχει ρεύμα. Έτσι βεβαιώνεσαι ότι οι μπαταρίες και το όργανο λειτουργούν. Ένας ανιχνευτής με άδεια μπαταρία δεν δείχνει τίποτα, και αυτό είναι επικίνδυνο."
+          }
+        }
+      ]
+    }
+  ]
+}

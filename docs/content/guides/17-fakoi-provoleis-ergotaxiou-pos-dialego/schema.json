@@ -1,0 +1,156 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/fakoi-provoleis-ergotaxiou-pos-dialego#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/fakoi-provoleis-ergotaxiou-pos-dialego",
+      "url": "{{SITE_URL}}/blog/fakoi-provoleis-ergotaxiou-pos-dialego",
+      "headline": "Φακοί και προβολείς εργοταξίου: πώς διαλέγω φωτισμό εργασίας",
+      "description": "Πώς διαλέγεις φακό κεφαλής, φακό εργασίας ή προβολέα μπαταρίας: lumen, απόδοση χρωμάτων, IP, αυτονομία, στήριξη, USB ή μπαταρία εργαλείων. Οδηγός.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "προβολέας μπαταρίας, φακός κεφαλής, φακός επαναφορτιζόμενος, προβολέας εργοταξίου, φακός εργασίας led, φακός κεφαλής επαναφορτιζόμενος, πόσα lumen χρειάζομαι, προβολεας μπαταριας, fakos kefalis, προβολέας μπαταρίας Milwaukee, φακοί εργασίας Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Προβολέας εργοταξίου"
+        },
+        {
+          "@type": "Thing",
+          "name": "Φακός κεφαλής"
+        },
+        {
+          "@type": "Thing",
+          "name": "Φακός εργασίας"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "MX FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 SAL"
+        },
+        {
+          "@type": "Thing",
+          "name": "L4 HL2"
+        },
+        {
+          "@type": "Thing",
+          "name": "TRUEVIEW"
+        },
+        {
+          "@type": "Thing",
+          "name": "PACKOUT"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m18-led-stand-light/m18-sal/",
+        "https://www.milwaukeetool.eu/en-eu/usb-rechargeable-headlamp-600-160;lumens/l4-hl2/",
+        "https://www.milwaukeetool.eu/en-eu/mx-fuel-compact-site-light/mxf-tlic/",
+        "https://www.milwaukeetool.eu/systems/mx-fuel/"
+      ],
+      "wordCount": 1018
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/fakoi-provoleis-ergotaxiou-pos-dialego#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/fakoi-provoleis-ergotaxiou-pos-dialego#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Πόσα lumen χρειάζεται ένας φακός εργασίας;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Για φακό κεφαλής σε φρεάτια, ψευδοροφές και ηλεκτρικούς πίνακες αρκούν συνήθως μερικές εκατοντάδες lumen. Για φωτισμό δωματίου σε ανακαίνιση, ένας προβολέας περίπου 1.000–3.000 lumen. Για μεγάλους χώρους και εξωτερικά εργοτάξια χρειάζονται περισσότερα. Σημασία έχει και η διασπορά της δέσμης, όχι μόνο τα lumen."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Φακός USB ή με μπαταρία εργαλείων;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Οι φακοί USB είναι μικροί και φορτίζουν από φορτιστή κινητού, powerbank ή αυτοκίνητο, ιδανικοί για φακό κεφαλής και τσέπης. Οι φακοί και προβολείς με μπαταρία εργαλείων δίνουν περισσότερη ισχύ και αυτονομία και μοιράζονται τις μπαταρίες που ήδη έχεις στο συνεργείο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει IP54 σε έναν προβολέα;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το πρώτο ψηφίο δείχνει προστασία από σκόνη και το δεύτερο από νερό. Το IP54 σημαίνει προστασία από σκόνη σε σημαντικό βαθμό και από πιτσιλίσματα νερού από κάθε κατεύθυνση. Για βροχή και πλύσιμο με νερό κοίτα υψηλότερο δεύτερο ψηφίο, π.χ. IP65 ή IP67."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Γιατί μετράει η απόδοση χρωμάτων;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ένα φως με καλή απόδοση χρωμάτων δείχνει τα πραγματικά χρώματα καλωδίων, βαφών και υλικών και κουράζει λιγότερο τα μάτια. Ένα πολύ ψυχρό ή μπλε φως μπορεί να φαίνεται δυνατό αλλά να αλλοιώνει τις αποχρώσεις. Σε ηλεκτρολογικά και βαφές αυτό έχει πρακτική σημασία."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι ο αντιεκρηκτικός φακός;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι φακός πιστοποιημένος για χρήση σε χώρους με κίνδυνο έκρηξης, όπως δεξαμενές, χώροι με εύφλεκτα αέρια ή σκόνες. Αν δουλεύεις σε τέτοιο περιβάλλον, χρειάζεσαι εξοπλισμό με την κατάλληλη πιστοποίηση για τη ζώνη κινδύνου και ακολουθείς τις διαδικασίες του χώρου."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Χρειάζομαι φακό για το καπό του αυτοκινήτου;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σε συνεργεία αυτοκινήτων ναι, κάνει μεγάλη διαφορά. Οι φακοί καπό απλώνονται σε όλο το πλάτος του χώρου του κινητήρα και ρίχνουν ομοιόμορφο φως χωρίς σκιές, αφήνοντας ελεύθερα τα χέρια σου."
+          }
+        }
+      ]
+    }
+  ]
+}

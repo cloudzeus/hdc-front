@@ -1,0 +1,135 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/ergaleiothiki-apothikeysi-pos-dialego#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/ergaleiothiki-apothikeysi-pos-dialego",
+      "url": "{{SITE_URL}}/blog/ergaleiothiki-apothikeysi-pos-dialego",
+      "headline": "Εργαλειοθήκη: πώς διαλέγω πλαστική, υφασμάτινη, τροχήλατη ή εργαλειοφόρο",
+      "description": "Πώς διαλέγεις εργαλειοθήκη: πλαστική, υφασμάτινη, πλάτης, τροχήλατη, ταμπακιέρες, συρταριέρες, εργαλειοφόρος. Στεγανότητα IP, φορτίο, αρθρωτά συστήματα.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "εργαλειοθήκη, εργαλειοθήκη τροχήλατη, εργαλειοθήκη με συρτάρια, εργαλειοθήκη πλάτης, ταμπακιέρα βιδών, εργαλειοφόρος, πώς διαλέγω εργαλειοθήκη, εργαλειοθηκη, ergaleiothiki, Milwaukee PACKOUT, εργαλειοθήκη Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Εργαλειοθήκη"
+        },
+        {
+          "@type": "Thing",
+          "name": "Αρθρωτά συστήματα αποθήκευσης"
+        },
+        {
+          "@type": "Thing",
+          "name": "Εργαλειοφόρος"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "PACKOUT"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/range/packout/",
+        "https://www.milwaukeetool.eu/en-eu/packout-trolley-box/packout-trolley-box/",
+        "https://www.milwaukeetool.eu/en-eu/packout-drawer-tool-boxes/packout-drawer-tool-boxes/"
+      ],
+      "wordCount": 1008
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/ergaleiothiki-apothikeysi-pos-dialego#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/ergaleiothiki-apothikeysi-pos-dialego#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Πλαστική ή υφασμάτινη εργαλειοθήκη;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Η πλαστική προστατεύει καλύτερα τα εργαλεία από χτυπήματα, νερό και σκόνη και στοιβάζεται. Η υφασμάτινη είναι ελαφρύτερη, έχει πολλές τσέπες και ανοιχτό πάνω μέρος για γρήγορη πρόσβαση, ιδανική για εργαλεία χειρός που χρησιμοποιείς όλη μέρα. Πολλοί τεχνίτες έχουν και τα δύο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει IP65 σε μια εργαλειοθήκη;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ότι το κουτί είναι στεγανό στη σκόνη και προστατεύεται από νερό που πέφτει με πίεση από κάθε κατεύθυνση, όπως βροχή. Δεν σημαίνει ότι μπορεί να μείνει βυθισμένο σε νερό. Για εργαλεία που μένουν στην καρότσα ή στο εργοτάξιο, είναι πολύ χρήσιμη προστασία."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι το αρθρωτό σύστημα αποθήκευσης;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι εργαλειοθήκες, ταμπακιέρες, συρταριέρες και τρόλεϊ που κουμπώνουν μεταξύ τους σε μια στοίβα. Μεταφέρεις όλη τη στοίβα σαν ένα κομμάτι και ξεκουμπώνεις ό,τι χρειάζεσαι. Το πλεονέκτημα είναι ότι επεκτείνεις το σύστημα σταδιακά, με κομμάτια που ταιριάζουν πάντα μεταξύ τους."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Χρειάζομαι τροχήλατη εργαλειοθήκη;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Αν κουβαλάς βαριά εργαλεία, πολλά κουτιά ή δουλεύεις σε εργοτάξια με αποστάσεις από το αυτοκίνητο, ναι. Οι ρόδες γλιτώνουν πολύ βάρος από την πλάτη. Κοίτα μεγάλες ρόδες για ανώμαλο έδαφος, τηλεσκοπική λαβή και ικανότητα φορτίου."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι ο εργαλειοφόρος;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι τροχήλατη ντουλάπα με συρτάρια για το συνεργείο. Κρατά τα εργαλεία οργανωμένα σε θήκες τακτοποίησης, κοντά στη θέση εργασίας, και κλειδώνει. Είναι η βάση ενός οργανωμένου συνεργείου αυτοκινήτων, μηχανουργείου ή εργαστηρίου συντήρησης."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πώς οργανώνω βίδες και μικροϋλικά;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Με ταμπακιέρες με διαχωριστικά που δεν αφήνουν τα μικρά να ανακατεύονται όταν γέρνει το κουτί. Διάλεξε διαφανές καπάκι για να βλέπεις το περιεχόμενο και μετακινούμενα κουτάκια, ώστε να παίρνεις μόνο ό,τι χρειάζεσαι στη σκάλα."
+          }
+        }
+      ]
+    }
+  ]
+}
