@@ -68,6 +68,8 @@ import { absoluteUrl, pageMeta, siteOrigin } from "@/lib/seo/urls";
 import { clampDescription, sizeFamilyLd, sizedText, sizeTitleEl } from "@/lib/seo/size-variant";
 import { SHOP } from "@/config/shop";
 import { jsonLdHtml } from "@/lib/seo/json-ld";
+import { productDescription, productH1, productTitle, type ProductSeoInput } from "@/lib/seo/product-seo";
+import { seoFor } from "@/lib/seo/seo-for";
 
 type PageProps = {
   params: Promise<{ locale: Locale; slug: string }>;
@@ -86,11 +88,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
      title and the description — see src/lib/seo/size-variant.ts. */
   const sizes = await variantsOf(product);
   const currentSize = sizes.length > 1 ? sizes.find((s) => s.current) : undefined;
-  const code = product.code2 || product.sku;
 
-  let title: string | { absolute: string } = baseTitle;
-  let shareTitle = baseTitle;
-  let description = product.shortDescription ?? t("meta_description", { name: baseTitle, code });
+  let title: string | { absolute: string };
+  let shareTitle: string;
+  let description: string;
   if (currentSize && locale === "el") {
     /* Greek, the market that matters: «{name} Νο 43 · 4932498126», cut to
        fit ~60 characters with size and code intact; description ≤ 155 and
@@ -110,6 +111,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     description = product.shortDescription
       ? `${title}. ${product.shortDescription}`
       : t("meta_description_megethos", { name: baseTitle, size: currentSize.label, code: currentSize.code });
+  } else {
+    /* «Milwaukee M18 FPD3-502X Κρουστικό δραπανοκατσάβιδο | 4933479860» and a
+       description with code, model, key figure, availability and Piraeus
+       (src/lib/seo/product-seo.ts) — under the admin's override, if any. */
+    const input = productSeoInput(product, locale);
+    const seo = await seoFor("PRODUCT", product.slug, locale, {
+      h1: productH1(input),
+      title: productTitle(input),
+      description: productDescription({
+        ...input,
+        availability: availabilityOf(product),
+        qty: product.qty,
+        keySpec: keyNumbers(parseTechBlock(product.longDescriptionEl), locale)[0] ?? null,
+      }),
+    });
+    title = { absolute: seo.title };
+    shareTitle = seo.title;
+    description = seo.description;
   }
   return {
     ...pageMeta({
@@ -121,6 +140,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     }),
     title,
     description,
+  };
+}
+
+/** What the title/H1/description builders read off a product. */
+function productSeoInput(
+  product: NonNullable<Awaited<ReturnType<typeof getProductBySlug>>>,
+  locale: Locale,
+): ProductSeoInput {
+  return {
+    locale,
+    name: product.name,
+    erpName: product.erpName,
+    code2: product.code2 || product.sku,
+    greekTexts: [locale === "el" ? product.shortDescription : null, product.longDescriptionEl],
   };
 }
 
@@ -246,7 +279,14 @@ async function ProductBody({ params }: PageProps) {
   );
 
   // ── Title, tags, codes ───────────────────────────────────────────────────
-  const title = upGreek(pdpTitle(product.name, product.code2));
+  /* «Milwaukee {είδος} {μοντέλο}»: the bare tool and each kit have their own
+     H1 (src/lib/seo/product-seo.ts), under the admin's override if any. A
+     size of a family keeps its name and adds size and code after it. */
+  const h1 =
+    sizes.length > 1
+      ? `Milwaukee ${pdpTitle(product.name, product.code2)}`
+      : (await seoFor("PRODUCT", product.slug, locale, { h1: productH1(productSeoInput(product, locale)), title: "", description: "" })).h1;
+  const title = upGreek(h1);
   /* «Μέγεθος 43 · κωδικός …» for one size of a family — in the H1 and the
      JSON-LD as in the <title>. */
   const sizeCode = (size: string, code: string) => t("megethos_kodikos", { size, code });
@@ -273,7 +313,7 @@ async function ProductBody({ params }: PageProps) {
         ]
       : []),
   ];
-  const ean = product.code1 && product.code1 !== "—" ? product.code1 : null;
+  const ean = product.code1?.trim() && product.code1.trim() !== "—" ? product.code1.trim() : null;
   const code = product.code2 || product.sku;
 
   // ── Key numbers ──────────────────────────────────────────────────────────
@@ -507,17 +547,26 @@ async function ProductBody({ params }: PageProps) {
               {sizePart && <> <span className="hdc-pdp-h1-size">{sizePart}</span></>}
             </h1>
 
-            <div className="hdc-pdp-codes">
-              <span>
-                {t("kodikos")} <b>{code}</b>
-              </span>
+            {/* The codes as plain, selectable text: a double click takes the
+                number alone, for pasting into a search or an order. */}
+            <dl className="hdc-pdp-codes" aria-label={t("kodikoi")}>
+              <div>
+                <dt>{t("kodikos")}</dt>
+                <dd>{code}</dd>
+              </div>
               {model && (
-                <span>
-                  {t("montelo")} <b>{model.code}</b>
-                </span>
+                <div>
+                  <dt>{t("montelo")}</dt>
+                  <dd>{model.code}</dd>
+                </div>
               )}
-              {ean && <span>EAN {ean}</span>}
-            </div>
+              {ean && (
+                <div>
+                  <dt>EAN</dt>
+                  <dd>{ean}</dd>
+                </div>
+              )}
+            </dl>
             <p className="hdc-pdp-mcodes">{[code, model?.code].filter(Boolean).join(" · ")}</p>
 
             {average != null ? (

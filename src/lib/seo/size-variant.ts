@@ -131,7 +131,7 @@ export function sizeTitleEl(input: {
   return { title: `${cutAtWord(input.name, max - tail.length)}${tail}`, absolute: true };
 }
 
-function cutAtWord(text: string, max: number): string {
+export function cutAtWord(text: string, max: number): string {
   if (text.length <= max) return text;
   const cut = text.slice(0, max + 1);
   const space = cut.lastIndexOf(" ");

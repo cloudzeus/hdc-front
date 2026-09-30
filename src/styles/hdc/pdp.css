@@ -324,9 +324,18 @@
     font-size: var(--fs-14);
     color: var(--hdc-g5);
   }
-  .hdc-pdp-codes b {
+  .hdc-pdp-codes {
+    margin-bottom: 0;
+  }
+  .hdc-pdp-codes > div {
+    display: flex;
+    gap: 6px;
+  }
+  .hdc-pdp-codes dd {
+    margin: 0;
     color: var(--hdc-ink);
     font-weight: 700;
+    user-select: all;
   }
   .hdc-pdp-mcodes {
     display: none;
