@@ -52,11 +52,23 @@ export type RecentOrder = {
   lines: Array<{ sku: string; name: string; quantity: number; lineGross: number }>;
 };
 
+/** Οι τρεις καταστάσεις του eshop (src/lib/catalog/availability.ts) και τα μόνο-XML. */
+export const AVAILABILITY_WHERE = {
+  stock: { isActive: true, inStock: true },
+  supplier: { isActive: true, inStock: false, supplierAvailable: true },
+  order: { isActive: true, inStock: false, supplierAvailable: false },
+  xmlOnly: { isActive: true, mtrl: { lt: 0 } },
+} as const;
+
 export type DashboardData = {
   attention: AttentionItem[];
   orders: { last7: number; last30: number; revenue7: number; revenue30: number; total: number };
+  /** Πληρωμένες παραγγελίες από προμηθευτή που δεν έχουν σταλεί ακόμα. */
+  supplierOrders: number;
   recent: RecentOrder[];
   catalogue: { products: number; active: number };
+  /** Ενεργά προϊόντα ανά διαθεσιμότητα· stock + supplier + order = ενεργά. */
+  availability: { stock: number; supplier: number; order: number; xmlOnly: number };
   sync: Array<{ channel: string; lastRunAt: Date | null; lastSuccessAt: Date | null; lastStatus: string | null }>;
 };
 
@@ -69,7 +81,7 @@ export async function getDashboard(): Promise<DashboardData> {
 
   const [
     stuckOrders,
-    pendingCompanies,
+    supplierOrders,
     newMessages,
     failedSyncs,
     orders7,
@@ -81,12 +93,17 @@ export async function getDashboard(): Promise<DashboardData> {
     products,
     activeProducts,
     syncStates,
+    availStock,
+    availSupplier,
+    availOrder,
+    availXmlOnly,
   ] = await Promise.all([
     // Paid, but the ERP push failed or never happened.
     prisma.order.count({
       where: { paymentStatus: "PAID", erpPushedAt: null },
     }),
-    prisma.company.count({ where: { status: "pending" } }),
+    // Πληρωμένες, από προμηθευτή, που δεν έχουν φύγει: περιμένουν τον Παπαθεοδοσίου.
+    prisma.order.count({ where: { supplierOrder: true, paymentStatus: "PAID", shippedAt: null } }),
     prisma.contactMessage.count({ where: { status: "new" } }),
     prisma.syncState.count({ where: { lastStatus: { in: ["FAILED", "PARTIAL"] } } }),
     prisma.order.count({ where: { createdAt: { gte: from7 } } }),
@@ -138,6 +155,10 @@ export async function getDashboard(): Promise<DashboardData> {
       select: { channel: true, lastRunAt: true, lastSuccessAt: true, lastStatus: true },
       orderBy: { channel: "asc" },
     }),
+    prisma.product.count({ where: AVAILABILITY_WHERE.stock }),
+    prisma.product.count({ where: AVAILABILITY_WHERE.supplier }),
+    prisma.product.count({ where: AVAILABILITY_WHERE.order }),
+    prisma.product.count({ where: AVAILABILITY_WHERE.xmlOnly }),
   ]);
 
   const attention: AttentionItem[] = [];
@@ -152,13 +173,13 @@ export async function getDashboard(): Promise<DashboardData> {
       tone: "urgent",
     });
   }
-  if (pendingCompanies > 0) {
+  if (supplierOrders > 0) {
     attention.push({
-      id: "b2b",
-      count: pendingCompanies,
-      label: pendingCompanies === 1 ? "Αίτηση B2B σε αναμονή" : "Αιτήσεις B2B σε αναμονή",
-      detail: "Δεν μπορούν να αγοράσουν με τιμές συνεργάτη μέχρι να εγκριθούν.",
-      href: "/admin/customers?filter=pending",
+      id: "supplier",
+      count: supplierOrders,
+      label: supplierOrders === 1 ? "Παραγγελία από προμηθευτή" : "Παραγγελίες από προμηθευτή",
+      detail: "Πληρωμένες, δεν έχουν σταλεί· φεύγουν σε 3–5 εργάσιμες.",
+      href: "/admin/orders?filter=supplier",
       tone: "warn",
     });
   }
@@ -192,6 +213,7 @@ export async function getDashboard(): Promise<DashboardData> {
       revenue7: Number(sums7._sum.totalGross ?? 0),
       revenue30: Number(sums30._sum.totalGross ?? 0),
     },
+    supplierOrders,
     recent: recentRows.map((o) => ({
       orderNumber: o.orderNumber,
       createdAt: o.createdAt,
@@ -221,6 +243,7 @@ export async function getDashboard(): Promise<DashboardData> {
       })),
     })),
     catalogue: { products, active: activeProducts },
+    availability: { stock: availStock, supplier: availSupplier, order: availOrder, xmlOnly: availXmlOnly },
     sync: syncStates,
   };
 }

@@ -16,6 +16,21 @@ const dt = new Intl.DateTimeFormat("el-GR", {
 });
 
 /**
+ * Η ενότητα /admin/milwaukee έρχεται με το κομμάτι 2 του σχεδίου
+ * (docs/superpowers/specs/2026-09-30-hdc-admin-design.md §4). Μέχρι να υπάρξει,
+ * ο σύνδεσμος θα έβγαζε 404· γίνεται true μαζί με τη σελίδα.
+ */
+const MILWAUKEE_SECTION = false;
+
+/** Οι γραμμές διαθεσιμότητας του πάνελ καταλόγου, με τα λόγια του eshop. */
+const AVAILABILITY_ROWS = [
+  { key: "stock", label: "Σε απόθεμα", dot: "bg-[var(--hdc-ok)]" },
+  { key: "supplier", label: "Διαθέσιμο · 3–5 εργάσιμες", dot: "bg-[var(--hdc-wait)]" },
+  { key: "order", label: "Παράδοση 1–3 εργάσιμες", dot: "bg-k-text-5" },
+  { key: "xmlOnly", label: "Μόνο-XML", dot: "border border-k-text-4 bg-transparent" },
+] as const;
+
+/**
  * Admin home.
  *
  * Ordered by what an operator opens it to find out: is anything waiting for me,
@@ -120,6 +135,30 @@ export default async function AdminDashboard() {
                   <dd className="numeral text-k-ink">{data.catalogue.active}</dd>
                 </div>
               </dl>
+              {/* Ενεργά ανά διαθεσιμότητα, με τον κανόνα του eshop: απόθεμα, μετά
+                  προμηθευτής, μετά παραγγελία. Τα τρία πρώτα αθροίζουν στα ενεργά. */}
+              <dl className="divide-y divide-k-line border-t border-k-line text-[length:var(--fs-12-5)]">
+                {AVAILABILITY_ROWS.map((row) => (
+                  <div key={row.key} className="flex items-baseline justify-between gap-3 px-4 py-2.5">
+                    <dt className="flex items-center gap-2 text-k-text-2">
+                      <span className={`size-2 shrink-0 ${row.dot}`} aria-hidden />
+                      {row.label}
+                    </dt>
+                    <dd className="numeral text-k-ink">{data.availability[row.key]}</dd>
+                  </div>
+                ))}
+              </dl>
+              {MILWAUKEE_SECTION && (
+                <div className="border-t border-k-line px-4 py-2.5">
+                  <Link
+                    href="/admin/milwaukee"
+                    className="inline-flex items-center gap-1 text-[length:var(--fs-12)] text-k-text-3 underline-offset-2 hover:text-k-ink hover:underline"
+                  >
+                    Εργαλεία Milwaukee
+                    <ArrowRight className="size-3.5" aria-hidden />
+                  </Link>
+                </div>
+              )}
             </Panel>
 
             <Panel
