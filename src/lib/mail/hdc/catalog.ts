@@ -25,6 +25,7 @@ import type { CampaignPayload, PickedProduct } from "@/lib/newsletter/copy";
 import { localeUrl } from "@/lib/mail/hdc/render";
 import type { OrderWithLines } from "@/lib/mail/hdc/order-view";
 import { displayName } from "@/lib/milwaukee/display";
+import { buildContentRunEmail, contentAdminUrl } from "@/lib/mail/content-auto-email";
 
 /**
  * Every email the shop sends, for the admin page «Πρότυπα email» and the tests.
@@ -93,6 +94,18 @@ export const EMAIL_TEMPLATES: TemplateEntry[] = [
   { id: "admin-password-reset", name: "Επαναφορά κωδικού διαχείρισης", group: "Εσωτερικά", locales: EL, needsOrder: false, trigger: "«Ξέχασα τον κωδικό» στη σύνδεση διαχείρισης" },
   { id: "internal-order", name: "Νέα παραγγελία (προς κατάστημα)", group: "Εσωτερικά", locales: EL, needsOrder: true, trigger: "Κάθε νέα παραγγελία · accounts@ και info@" },
   { id: "internal-order-status", name: "Αλλαγή κατάστασης (προς κατάστημα)", group: "Εσωτερικά", locales: EL, needsOrder: true, trigger: "Μαζί με το email αλλαγής κατάστασης του πελάτη · info@" },
+  {
+    id: "internal-content",
+    name: "Αυτόματο άρθρο (προς κατάστημα)",
+    group: "Εσωτερικά",
+    locales: EL,
+    needsOrder: false,
+    trigger: "Κάθε εκτέλεση του αυτόματου writer · το email των ρυθμίσεων «Αυτόματα άρθρα»",
+    variants: [
+      { id: "published", label: "Δημοσιεύτηκε" },
+      { id: "draft", label: "Πρόχειρο · έλεγχοι που απέτυχαν" },
+    ],
+  },
 ];
 
 export function templateEntry(id: string): TemplateEntry | undefined {
@@ -364,6 +377,29 @@ export async function previewEmail(id: string, ctx: PreviewContext): Promise<Pre
           { assetOrigin: ctx.assetOrigin },
         );
         break;
+      case "internal-content": {
+        const draft = ctx.variant === "draft";
+        email = buildContentRunEmail(
+          {
+            outcome: draft ? "DRAFT" : "PUBLISHED",
+            topic: "Milwaukee M18 FPD3: εκδόσεις, σύγκριση, για ποιον είναι",
+            title: "Milwaukee M18 FPD3: ποια έκδοση να διαλέξετε",
+            pageUrl: `${siteOrigin()}/blog/milwaukee-m18-fpd3-poia-ekdosi`,
+            adminUrl: contentAdminUrl(),
+            problems: draft
+              ? [
+                  { title: "ΑΡΙΘΜΟΙ ΑΠΟ ΤΟ ΠΑΚΕΤΟ", text: "«135 Nm» δεν υπάρχει στο πακέτο στοιχείων" },
+                  { title: "ΜΗΚΗ", text: "Κείμενο 640 λέξεις (τουλάχιστον 700)" },
+                ]
+              : [],
+            tokens: 14_250,
+            seconds: 96,
+            trigger: "cron",
+          },
+          { assetOrigin: ctx.assetOrigin },
+        );
+        break;
+      }
       default:
         return { ok: false, error: "Άγνωστο πρότυπο." };
     }

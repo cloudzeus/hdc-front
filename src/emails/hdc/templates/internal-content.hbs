@@ -1,0 +1,4 @@
+{{> heading eyebrow=content.eyebrow title=content.title lead=content.lead}}
+{{> facts rows=content.rows}}
+{{#each content.problems}}{{> note tone="wait" title=this.title text=this.text}}{{/each}}
+{{> cta label=content.cta_label href=content.cta_href top=32 bottom=40}}
