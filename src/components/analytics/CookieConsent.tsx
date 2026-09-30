@@ -145,11 +145,13 @@ export function CookieConsent() {
     return (
       <div role="dialog" aria-label={t("aria")} aria-describedby={textId} className="hdc-consent">
         <div className="hdc-consent-in">
-          <div className="hdc-consent-copy">
+          {/* Phones get the short first layer (purposes, providers and a link
+              to the full policy), so the banner stays under a third of the
+              screen; the hidden one is left out of the description. */}
+          <div id={textId} className="hdc-consent-copy">
             <h2 className="hdc-consent-title hdc-semi">{t("titlos")}</h2>
-            <p id={textId} className="hdc-consent-text">
-              {t.rich("keimeno", { link: policyLink })}
-            </p>
+            <p className="hdc-consent-text hdc-consent-long">{t.rich("keimeno", { link: policyLink })}</p>
+            <p className="hdc-consent-text hdc-consent-short">{t.rich("keimeno_syntomo", { link: policyLink })}</p>
           </div>
           <div className="hdc-consent-actions">
             <button type="button" className="hdc-btn hdc-btn-ink" onClick={() => choose({ analytics: true, ads: true })}>

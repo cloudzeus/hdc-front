@@ -214,16 +214,49 @@
       gap: 14px;
     }
   }
+  /* The short first layer is for phones only. */
+  .hdc-consent-short {
+    display: none;
+  }
+
   @media (max-width: 767px) {
     .hdc-consent-in {
       padding: 14px 16px calc(14px + env(safe-area-inset-bottom));
     }
-    .hdc-consent-actions {
+    .hdc-consent-in-panel .hdc-consent-actions {
       flex-direction: column;
     }
-    .hdc-consent-actions .hdc-btn {
+    .hdc-consent-in-panel .hdc-consent-actions .hdc-btn {
       width: 100%;
       min-width: 0;
+    }
+
+    /* The banner on a phone: one or two lines, then the three buttons in one
+       row where they fit, otherwise two and one, all the same kind. Under
+       240px tall at 375px, instead of half the screen. */
+    .hdc-consent-in:not(.hdc-consent-in-panel) {
+      padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+      gap: 10px;
+    }
+    .hdc-consent-in:not(.hdc-consent-in-panel) .hdc-consent-title,
+    .hdc-consent-long {
+      display: none;
+    }
+    .hdc-consent-short {
+      display: block;
+      line-height: 1.45;
+    }
+    .hdc-consent-in:not(.hdc-consent-in-panel) .hdc-consent-actions {
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .hdc-consent-in:not(.hdc-consent-in-panel) .hdc-consent-actions .hdc-btn {
+      flex: 1 0 auto;
+      min-width: 0;
+      height: 44px;
+      min-height: 44px;
+      padding: 0 12px;
+      letter-spacing: 0.02em;
     }
     .hdc-foot-consent {
       display: inline-flex;
