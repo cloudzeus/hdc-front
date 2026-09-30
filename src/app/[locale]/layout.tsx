@@ -3,6 +3,8 @@ import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { getSettingNumber } from "@/lib/settings/settings";
+import { CookieConsent } from "@/components/analytics/CookieConsent";
+import { analyticsEnabled } from "@/lib/analytics/enabled";
 
 /** Pre-render all three locales at build time. */
 export function generateStaticParams() {
@@ -42,6 +44,9 @@ export default async function LocaleLayout({
       >
         {children}
       </div>
+      {/* The consent banner, translated. The consent default and the tags
+          themselves are in the root layout (GoogleAnalytics). */}
+      {analyticsEnabled() && <CookieConsent />}
     </NextIntlClientProvider>
   );
 }

@@ -643,7 +643,8 @@
       "nomika": "Legal",
       "schetika": "About us",
       "katigories": "Categories",
-      "odigoi": "Buying guides"
+      "odigoi": "Buying guides",
+      "rythmiseis_cookies": "Cookie settings"
     },
     "SiteHeader": {
       "kyria_ploigisi": "Main navigation",
@@ -1635,5 +1636,24 @@
     "katalogos": "Catalogue",
     "odigoi": "Buying guides",
     "epikoinonia": "Contact"
+  },
+  "consent": {
+    "aria": "Cookie consent",
+    "titlos": "Cookies in our shop",
+    "keimeno": "Necessary cookies keep your cart and your sign-in. If you agree, we also use Google Analytics for statistics and Google Ads for advertising and remarketing. You can change your choice at any time from “Cookie settings” at the bottom of every page. <link>Cookie policy</link>",
+    "apodochi_olon": "Accept all",
+    "mono_aparaitita": "Necessary only",
+    "rythmiseis": "Settings",
+    "rythmiseis_titlos": "Cookie settings",
+    "rythmiseis_keimeno": "Choose what you accept. You can change it at any time. <link>Cookie policy</link>",
+    "aparaitita": "Necessary",
+    "aparaitita_keimeno": "Cart, sign-in, language and payment security. The shop does not work without them.",
+    "panta_energa": "Always on",
+    "statistika": "Statistics",
+    "statistika_keimeno": "Google Analytics: which pages are read and where you get stuck, so we can improve the shop.",
+    "diafimisi": "Advertising",
+    "diafimisi_keimeno": "Google Ads: measuring our ads and showing you relevant ads on other websites (remarketing).",
+    "apothikeusi": "Save choices",
+    "kleisimo": "Close"
   }
 }

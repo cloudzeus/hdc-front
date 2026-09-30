@@ -643,7 +643,8 @@
       "nomika": "Legale",
       "schetika": "Chi siamo",
       "katigories": "Categorie",
-      "odigoi": "Guide all'acquisto"
+      "odigoi": "Guide all'acquisto",
+      "rythmiseis_cookies": "Impostazioni cookie"
     },
     "SiteHeader": {
       "kyria_ploigisi": "Navigazione principale",
@@ -1635,5 +1636,24 @@
     "katalogos": "Catalogo",
     "odigoi": "Guide all'acquisto",
     "epikoinonia": "Contatti"
+  },
+  "consent": {
+    "aria": "Consenso ai cookie",
+    "titlos": "I cookie del negozio",
+    "keimeno": "I cookie necessari mantengono il carrello e il vostro accesso. Se acconsentite, usiamo anche Google Analytics per le statistiche e Google Ads per la pubblicità e il remarketing. Potete cambiare scelta in qualsiasi momento da «Impostazioni cookie», in fondo a ogni pagina. <link>Informativa sui cookie</link>",
+    "apodochi_olon": "Accetta tutti",
+    "mono_aparaitita": "Solo necessari",
+    "rythmiseis": "Impostazioni",
+    "rythmiseis_titlos": "Impostazioni cookie",
+    "rythmiseis_keimeno": "Scegliete cosa accettare. Potete cambiarlo in qualsiasi momento. <link>Informativa sui cookie</link>",
+    "aparaitita": "Necessari",
+    "aparaitita_keimeno": "Carrello, accesso, lingua e sicurezza dei pagamenti. Senza di essi il negozio non funziona.",
+    "panta_energa": "Sempre attivi",
+    "statistika": "Statistiche",
+    "statistika_keimeno": "Google Analytics: quali pagine vengono lette e dove incontrate difficoltà, per migliorare il negozio.",
+    "diafimisi": "Pubblicità",
+    "diafimisi_keimeno": "Google Ads: misurazione dei nostri annunci e annunci pertinenti su altri siti (remarketing).",
+    "apothikeusi": "Salva le scelte",
+    "kleisimo": "Chiudi"
   }
 }

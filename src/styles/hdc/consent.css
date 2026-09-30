@@ -1,0 +1,240 @@
+/*
+ * The cookie consent banner and its settings panel
+ * (src/components/analytics/CookieConsent.tsx).
+ *
+ * Bottom of the screen, full width, white on a black rule: not a modal, so the
+ * page behind stays usable. Above the phone bottom bars of the PDP and the
+ * checkout (z-index 35) while it asks; one tap on any button clears it.
+ * Three buttons of the same kind and weight, side by side from tablet up and
+ * stacked full width on phones.
+ */
+@layer components {
+  .hdc-consent {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 60;
+    max-height: 100dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: #fff;
+    color: var(--hdc-ink);
+    border-top: 3px solid var(--hdc-ink);
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12);
+    font-family: var(--hdc-font);
+    font-size: var(--fs-14);
+  }
+  .hdc-consent:focus {
+    outline: none;
+  }
+  .hdc-consent-in {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+  .hdc-consent-in-panel {
+    max-width: 720px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .hdc-consent-copy {
+    flex: 1;
+    min-width: 0;
+  }
+  .hdc-consent-title {
+    margin: 0 0 4px;
+    font-size: var(--fs-16);
+    line-height: 1.2;
+  }
+  .hdc-consent-text {
+    margin: 0;
+    font-size: var(--fs-13);
+    line-height: 1.55;
+    color: var(--hdc-g7);
+  }
+  .hdc-consent-link {
+    color: var(--hdc-ink);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    white-space: nowrap;
+  }
+  .hdc-consent-link:hover {
+    color: var(--hdc-red);
+  }
+  .hdc-consent-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .hdc-consent-actions .hdc-btn {
+    min-width: 150px;
+  }
+  .hdc-consent :is(a, button, input):focus-visible {
+    outline: 2px solid var(--hdc-red);
+    outline-offset: 2px;
+  }
+
+  /* Settings panel */
+  .hdc-consent-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .hdc-consent-head .hdc-consent-title {
+    margin: 0;
+  }
+  .hdc-consent-x {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin-right: -10px;
+    font-size: var(--fs-24);
+    line-height: 1;
+    color: var(--hdc-ink);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+  }
+  .hdc-consent-x:hover {
+    color: var(--hdc-red);
+  }
+  .hdc-consent-rows {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--hdc-g3);
+  }
+  .hdc-consent-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 44px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--hdc-g3);
+  }
+  label.hdc-consent-row {
+    cursor: pointer;
+  }
+  .hdc-consent-row-copy {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .hdc-consent-row-label {
+    font-weight: 800;
+    font-stretch: 110%;
+    font-size: var(--fs-14);
+  }
+  .hdc-consent-row-text {
+    font-size: var(--fs-12-5);
+    line-height: 1.5;
+    color: var(--hdc-g5);
+  }
+  .hdc-consent-always {
+    flex-shrink: 0;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-12);
+    letter-spacing: 0.04em;
+    color: var(--hdc-ok);
+  }
+
+  /* The switch: a square track; off is a grey knob on white, on is white on black. */
+  .hdc-consent-switch {
+    appearance: none;
+    flex-shrink: 0;
+    position: relative;
+    width: 48px;
+    height: 26px;
+    margin: 0;
+    background: #fff;
+    border: 2px solid var(--hdc-g5);
+    border-radius: var(--hdc-radius);
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s;
+  }
+  .hdc-consent-switch::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    background: var(--hdc-g5);
+    transition: transform 0.15s, background-color 0.15s;
+  }
+  .hdc-consent-switch:checked {
+    background: var(--hdc-ink);
+    border-color: var(--hdc-ink);
+  }
+  .hdc-consent-switch:checked::after {
+    background: #fff;
+    transform: translateX(22px);
+  }
+  .hdc-consent-in-panel .hdc-consent-actions {
+    justify-content: flex-end;
+  }
+
+  /* The footer's «Ρυθμίσεις cookies»: a button that reads as the links beside it. */
+  .hdc-foot-consent {
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    transition: color 0.15s;
+  }
+  .hdc-foot-consent:hover {
+    color: #fff;
+  }
+  .hdc-foot-consent:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: -2px;
+  }
+
+  /* The same, on the cookie policy. */
+  .hdc-cp-consent {
+    margin: 0 0 20px;
+  }
+
+  @media (max-width: 1023px) {
+    .hdc-consent-in:not(.hdc-consent-in-panel) {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 14px;
+    }
+  }
+  @media (max-width: 767px) {
+    .hdc-consent-in {
+      padding: 14px 16px calc(14px + env(safe-area-inset-bottom));
+    }
+    .hdc-consent-actions {
+      flex-direction: column;
+    }
+    .hdc-consent-actions .hdc-btn {
+      width: 100%;
+      min-width: 0;
+    }
+    .hdc-foot-consent {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hdc-consent-switch,
+    .hdc-consent-switch::after {
+      transition: none;
+    }
+  }
+}

@@ -643,7 +643,8 @@
       "nomika": "Νομικά",
       "schetika": "Σχετικά με εμάς",
       "katigories": "Κατηγορίες",
-      "odigoi": "Οδηγοί αγοράς"
+      "odigoi": "Οδηγοί αγοράς",
+      "rythmiseis_cookies": "Ρυθμίσεις cookies"
     },
     "SiteHeader": {
       "kyria_ploigisi": "Κύρια πλοήγηση",
@@ -1635,5 +1636,24 @@
     "katalogos": "Κατάλογος",
     "odigoi": "Οδηγοί αγοράς",
     "epikoinonia": "Επικοινωνία"
+  },
+  "consent": {
+    "aria": "Συγκατάθεση για cookies",
+    "titlos": "Τα cookies του καταστήματος",
+    "keimeno": "Τα απαραίτητα cookies κρατούν το καλάθι και τη σύνδεσή σας. Αν συμφωνείτε, χρησιμοποιούμε επίσης το Google Analytics για στατιστικά και το Google Ads για διαφήμιση και remarketing. Αλλάζετε την επιλογή σας όποτε θέλετε από τις «Ρυθμίσεις cookies», στο κάτω μέρος κάθε σελίδας. <link>Πολιτική cookies</link>",
+    "apodochi_olon": "Αποδοχή όλων",
+    "mono_aparaitita": "Μόνο απαραίτητα",
+    "rythmiseis": "Ρυθμίσεις",
+    "rythmiseis_titlos": "Ρυθμίσεις cookies",
+    "rythmiseis_keimeno": "Διαλέξτε τι δέχεστε. Μπορείτε να το αλλάξετε όποτε θέλετε. <link>Πολιτική cookies</link>",
+    "aparaitita": "Απαραίτητα",
+    "aparaitita_keimeno": "Καλάθι, σύνδεση, γλώσσα και ασφάλεια των πληρωμών. Χωρίς αυτά το κατάστημα δεν λειτουργεί.",
+    "panta_energa": "Πάντα ενεργά",
+    "statistika": "Στατιστικά",
+    "statistika_keimeno": "Google Analytics: ποιες σελίδες διαβάζονται και πού δυσκολεύεστε, ώστε να βελτιώνουμε το κατάστημα.",
+    "diafimisi": "Διαφήμιση",
+    "diafimisi_keimeno": "Google Ads: μέτρηση των διαφημίσεών μας και σχετικές διαφημίσεις σε άλλους ιστότοπους (remarketing).",
+    "apothikeusi": "Αποθήκευση επιλογών",
+    "kleisimo": "Κλείσιμο"
   }
 }

@@ -35,6 +35,10 @@ values and are ignored on purpose: `GOOGLE_SITE_VERIFICATION`,
 `NEXT_PUBLIC_GOOGLE_MERCHANT_ID`, `GOOGLE_LOCAL_STORE_CODE`,
 `NEXT_PUBLIC_GA_MEASUREMENT_ID`.
 
-GA4 and GTM load only in production builds, after the Consent Mode default
-(analytics denied until the visitor accepts; the answer is kept in
-localStorage under `hdc-consent-v1`).
+GA4 and GTM load only in production builds, after the Consent Mode v2 default.
+The banner asks for two categories: statistics (`analytics_storage`) and
+advertising (`ad_storage`, `ad_user_data`, `ad_personalization`); both are
+denied until the visitor accepts. The answer is kept in localStorage under
+`hdc-consent-v2` for twelve months, and the footer's cookie-settings link
+reopens the panel. Every change pushes `{event: 'consent_update', analytics, ads}`
+to the dataLayer for GTM triggers.

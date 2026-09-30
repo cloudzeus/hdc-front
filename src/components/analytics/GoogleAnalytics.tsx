@@ -1,7 +1,7 @@
 import Script from "next/script";
-import { CookieConsent } from "@/components/analytics/CookieConsent";
 import { siteId } from "@/lib/seo/site-ids";
-import { GRANTED_EXPRESSION } from "@/lib/analytics/consent";
+import { CONSENT_DEFAULT_SCRIPT } from "@/lib/analytics/consent";
+import { analyticsEnabled } from "@/lib/analytics/enabled";
 
 /**
  * Google Analytics 4, με Consent Mode v2.
@@ -39,34 +39,23 @@ import { GRANTED_EXPRESSION } from "@/lib/analytics/consent";
 
 
 export function GoogleAnalytics() {
-  if (process.env.NODE_ENV !== "production") return null;
-  const MEASUREMENT_ID = siteId("gaId");
   /*
-   * The consent default and the banner are needed by Tag Manager too: with GA4
-   * moved into the container and no direct id, the container would otherwise
-   * load with no consent state at all. So they stay whenever either is on.
+   * The consent default is needed by Tag Manager too: with GA4 moved into the
+   * container and no direct id, the container would otherwise load with no
+   * consent state at all. So it stays whenever either is on.
    */
-  if (!MEASUREMENT_ID && !siteId("gtmId")) return null;
+  if (!analyticsEnabled()) return null;
+  const MEASUREMENT_ID = siteId("gaId");
 
   /*
    * Η αποθηκευμένη απάντηση διαβάζεται ΜΕΣΑ στο inline script, όχι στον
    * διακομιστή: ο διακομιστής δεν ξέρει τι έχει ο browser, και μια
    * αποθηκευμένη σελίδα θα κουβαλούσε την απάντηση άλλου επισκέπτη.
+   *
+   * Το banner (`CookieConsent`) δεν μπαίνει εδώ αλλά στο layout του
+   * καταστήματος, μέσα στις μεταφράσεις· το /admin δεν το χρειάζεται.
    */
-  const init = `
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-var granted = false;
-try { granted = ${GRANTED_EXPRESSION}; } catch (e) {}
-gtag('consent', 'default', {
-  ad_storage: 'denied',
-  ad_user_data: 'denied',
-  ad_personalization: 'denied',
-  analytics_storage: granted ? 'granted' : 'denied',
-  functionality_storage: 'granted',
-  security_storage: 'granted',
-  wait_for_update: 500
-});
+  const init = `${CONSENT_DEFAULT_SCRIPT}
 gtag('js', new Date());${
     MEASUREMENT_ID ? `\ngtag('config', ${JSON.stringify(MEASUREMENT_ID)});` : ""
   }`;
@@ -83,7 +72,6 @@ gtag('js', new Date());${
           strategy="afterInteractive"
         />
       )}
-      <CookieConsent />
     </>
   );
 }

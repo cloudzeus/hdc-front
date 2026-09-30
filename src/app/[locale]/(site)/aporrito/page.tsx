@@ -11,6 +11,8 @@ import { getEshopContent } from "@/lib/content/eshop-content";
 import { findTerm, termView } from "@/lib/content/eshop-content-map";
 import { contentMetadata } from "@/lib/content/page-meta";
 import { upGreek } from "@/lib/greek";
+import { CookieSettingsButton } from "@/components/analytics/CookieSettingsButton";
+import { analyticsEnabled } from "@/lib/analytics/enabled";
 
 /**
  * Privacy, with the cookie policy as its own section at `#cookies` (the
@@ -35,7 +37,11 @@ export async function generateMetadata({
 export default async function PrivacyPage({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const [t, content] = await Promise.all([getTranslations("content"), getEshopContent()]);
+  const [t, tc, content] = await Promise.all([
+    getTranslations("content"),
+    getTranslations("consent"),
+    getEshopContent(),
+  ]);
   const privacy = content ? termView(findTerm(content.terms, "privacy"), locale) : null;
   const cookies = content ? termView(findTerm(content.terms, "cookies"), locale) : null;
 
@@ -54,6 +60,12 @@ export default async function PrivacyPage({ params }: { params: Promise<{ locale
         <h2 id="cookies-h" className="hdc-disp">
           {upGreek(t("t_cookies"))}
         </h2>
+        {/* Change or withdraw the answer given in the banner, from here too. */}
+        {analyticsEnabled() && (
+          <p className="hdc-cp-consent">
+            <CookieSettingsButton label={tc("rythmiseis_titlos")} className="hdc-btn hdc-btn-line" />
+          </p>
+        )}
         {cookies ? (
           <>
             <ContentMeta locale={locale} greekOnly={cookies.fallback} updatedAt={cookies.updatedAt} />

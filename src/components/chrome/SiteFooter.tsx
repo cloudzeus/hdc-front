@@ -8,6 +8,8 @@ import { hoursMessageArgs } from "@/lib/contact/hours";
 import { resolveHdcNav } from "@/lib/hdc-nav";
 import { HUBS } from "@/lib/seo/hubs";
 import { FooterCategories } from "@/components/chrome/FooterCategories";
+import { CookieSettingsButton } from "@/components/analytics/CookieSettingsButton";
+import { analyticsEnabled } from "@/lib/analytics/enabled";
 
 /*
  * `prefetch={false}` on every link here: the footer is on every page, nobody
@@ -165,6 +167,14 @@ export function SiteFooter({ categories }: { categories: CategoryTile[] }) {
             <Link href="/aporrito#cookies" prefetch={false}>
               {t("cookies")}
             </Link>
+            {/* Reopens the consent panel, to change or withdraw an answer.
+                Only where the banner is mounted (see analyticsEnabled). */}
+            {analyticsEnabled() && (
+              <>
+                {" · "}
+                <CookieSettingsButton label={t("rythmiseis_cookies")} className="hdc-foot-consent" />
+              </>
+            )}
           </nav>
         </div>
       </div>
