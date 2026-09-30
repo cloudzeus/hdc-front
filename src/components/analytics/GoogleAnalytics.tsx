@@ -1,6 +1,7 @@
 import Script from "next/script";
 import { CookieConsent } from "@/components/analytics/CookieConsent";
 import { siteId } from "@/lib/seo/site-ids";
+import { GRANTED_EXPRESSION } from "@/lib/analytics/consent";
 
 /**
  * Google Analytics 4, με Consent Mode v2.
@@ -36,8 +37,6 @@ import { siteId } from "@/lib/seo/site-ids";
  * φορτώνει τίποτα.
  */
 
-/** Το κλειδί που κρατά την απάντηση του επισκέπτη. Ίδιο και στο banner. */
-export const CONSENT_STORAGE_KEY = "kolleris-consent-v1";
 
 export function GoogleAnalytics() {
   if (process.env.NODE_ENV !== "production") return null;
@@ -58,7 +57,7 @@ export function GoogleAnalytics() {
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 var granted = false;
-try { granted = localStorage.getItem(${JSON.stringify(CONSENT_STORAGE_KEY)}) === "granted"; } catch (e) {}
+try { granted = ${GRANTED_EXPRESSION}; } catch (e) {}
 gtag('consent', 'default', {
   ad_storage: 'denied',
   ad_user_data: 'denied',

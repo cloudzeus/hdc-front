@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { CONSENT_STORAGE_KEY } from "@/components/analytics/GoogleAnalytics";
+import { useState, useSyncExternalStore } from "react";
+import { CONSENT_STORAGE_KEY, readConsent } from "@/lib/analytics/consent";
 
 /**
  * Το banner συγκατάθεσης.
@@ -20,16 +20,23 @@ import { CONSENT_STORAGE_KEY } from "@/components/analytics/GoogleAnalytics";
  * banner όπου το «ναι» είναι κουμπί και το «όχι» είναι σύνδεσμος δεν συλλέγει
  * συγκατάθεση — συλλέγει κούραση, και δεν στέκει αν ελεγχθεί.
  */
-export function CookieConsent() {
-  const [visible, setVisible] = useState(false);
+/* The stored answer is read on the client only (the server cannot know it):
+   `useSyncExternalStore` with a server snapshot of «answered» renders nothing
+   on the server and during hydration, then shows the banner if needed. */
+const noSubscription = () => () => {};
+function unanswered(): boolean {
+  try {
+    // Also moves an answer given under the old Kolleris key to the new one.
+    return readConsent(localStorage) === null;
+  } catch {
+    return true;
+  }
+}
 
-  useEffect(() => {
-    try {
-      if (!localStorage.getItem(CONSENT_STORAGE_KEY)) setVisible(true);
-    } catch {
-      setVisible(true);
-    }
-  }, []);
+export function CookieConsent() {
+  const needsAnswer = useSyncExternalStore(noSubscription, unanswered, () => false);
+  const [answered, setAnswered] = useState(false);
+  const visible = needsAnswer && !answered;
 
   function answer(granted: boolean) {
     try {
@@ -41,7 +48,7 @@ export function CookieConsent() {
     w.gtag?.("consent", "update", {
       analytics_storage: granted ? "granted" : "denied",
     });
-    setVisible(false);
+    setAnswered(true);
   }
 
   if (!visible) return null;
