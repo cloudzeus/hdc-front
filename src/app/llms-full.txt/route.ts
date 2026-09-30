@@ -8,9 +8,10 @@ import { sharedCatalogue } from "@/lib/catalog/shared-cache";
  * version's article number and page, straight from the catalogue.
  *
  * Rendered on request, never at build (the build container cannot reach the
- * database), and the catalogue read is cached for a day in the same shared
- * cache as the rest of the catalogue — so it is dropped with it on a catalogue
- * revalidation, and a crawler hammering the file costs one query a day.
+ * database). The catalogue read is kept for a day in the shared catalogue
+ * cache (tagged `catalogue`), so a crawler hammering the file costs one query
+ * a day. Nothing revalidates that tag when the catalogue syncs, so a model
+ * added today appears here within 24 hours, not at once.
  */
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

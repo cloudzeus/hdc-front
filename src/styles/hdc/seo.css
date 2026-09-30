@@ -1,0 +1,328 @@
+/*
+ * SEO content: articles and buying guides (/blog, /odigoi), the platform hubs
+ * (/milwaukee, /milwaukee-m18, …) and the model pages (/montelo/…).
+ *
+ * Built on the content-page frame (content.css: band, prose, FAQ accordion,
+ * help box) with the few pieces those pages add: the article list, the
+ * short-answer box, the sources list, and the hub/model blocks (tiles,
+ * version table, key facts).
+ */
+
+@layer components {
+  /* ── Article list (/blog, /odigoi) ───────────────────────────────────── */
+  .hdc-art-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .hdc-art-card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--hdc-g3);
+    border-top: 4px solid var(--hdc-ink);
+    background: #fff;
+    color: var(--hdc-ink);
+  }
+  .hdc-art-card:hover {
+    border-top-color: var(--hdc-red);
+  }
+  .hdc-art-card img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    background: var(--hdc-g1);
+  }
+  .hdc-art-card > div {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px 18px 18px;
+  }
+  .hdc-art-card h2 {
+    margin: 0;
+    font-weight: 800;
+    font-stretch: 110%;
+    font-size: var(--fs-18);
+    line-height: 1.25;
+  }
+  .hdc-art-card:hover h2 {
+    color: var(--hdc-red);
+  }
+  .hdc-art-card p {
+    margin: 0;
+    font-size: var(--fs-14);
+    line-height: 1.55;
+    color: var(--hdc-g7);
+  }
+  .hdc-art-card small {
+    margin-top: auto;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-12);
+    letter-spacing: 0.04em;
+    color: var(--hdc-g5);
+  }
+  .hdc-art-empty {
+    padding: 48px 20px;
+    border: 1px solid var(--hdc-g3);
+    background: var(--hdc-g1);
+    text-align: center;
+    font-size: var(--fs-15);
+    color: var(--hdc-g7);
+  }
+  .hdc-art-pages {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 28px;
+  }
+  .hdc-art-pages a {
+    display: grid;
+    place-items: center;
+    min-width: 44px;
+    height: 44px;
+    padding: 0 12px;
+    border: 1px solid var(--hdc-g3);
+    font-weight: 700;
+    font-size: var(--fs-14);
+    color: var(--hdc-ink);
+  }
+  .hdc-art-pages a[aria-current="page"] {
+    border-color: var(--hdc-ink);
+    background: var(--hdc-ink);
+    color: #fff;
+  }
+
+  /* ── One article ─────────────────────────────────────────────────────── */
+  .hdc-art-hero {
+    display: block;
+    width: 100%;
+    max-width: 72ch;
+    height: auto;
+    margin: 0 0 24px;
+  }
+  .hdc-art-draft {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--hdc-wait);
+    color: #fff;
+  }
+  /* The short answer: what a snippet or an AI quotes. */
+  .hdc-answer {
+    max-width: 72ch;
+    margin: 0 0 28px;
+    padding: 18px 20px;
+    border: 1px solid var(--hdc-g3);
+    border-left: 4px solid var(--hdc-red);
+    background: var(--hdc-g1);
+    font-size: var(--fs-17);
+    line-height: 1.55;
+    color: var(--hdc-ink);
+  }
+  .hdc-answer b {
+    display: block;
+    margin-bottom: 6px;
+    font-stretch: 87.5%;
+    font-size: var(--fs-13);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--hdc-red);
+  }
+  .hdc-answer p {
+    margin: 0;
+  }
+  .hdc-sources {
+    max-width: 72ch;
+    margin-top: 36px;
+    font-size: var(--fs-13);
+    line-height: 1.5;
+    color: var(--hdc-g5);
+    overflow-wrap: anywhere;
+  }
+  .hdc-sources h2 {
+    margin: 0 0 6px;
+    font-size: var(--fs-14);
+    color: var(--hdc-ink);
+  }
+  .hdc-sources ul {
+    margin: 6px 0 0;
+    padding-left: 18px;
+  }
+  .hdc-sources a {
+    color: var(--hdc-g7);
+    text-decoration: underline;
+  }
+  .hdc-art-back {
+    margin-top: 32px;
+  }
+
+  /* ── Hubs and model pages ────────────────────────────────────────────── */
+  .hdc-hub-block {
+    margin-top: 40px;
+  }
+  .hdc-hub-block > h2 {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 0 0 16px;
+    font-weight: 800;
+    font-stretch: 120%;
+    font-size: var(--fs-22);
+    line-height: 1.2;
+    text-transform: uppercase;
+    color: var(--hdc-ink);
+  }
+  .hdc-hub-block > h2::before {
+    content: "";
+    flex: 0 0 auto;
+    width: 14px;
+    height: 0.8em;
+    background: var(--hdc-red);
+    clip-path: polygon(0 0, 100% 0, calc(100% - 5px) 100%, 0 100%);
+  }
+  .hdc-hub-tiles {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .hdc-hub-tile {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 88px;
+    padding: 14px 16px;
+    border: 1px solid var(--hdc-g3);
+    border-top: 4px solid var(--hdc-ink);
+    color: var(--hdc-ink);
+    font-weight: 800;
+    font-size: var(--fs-15);
+    line-height: 1.25;
+  }
+  .hdc-hub-tile:hover {
+    border-top-color: var(--hdc-red);
+    color: var(--hdc-red);
+  }
+  .hdc-hub-tile small {
+    font-weight: 600;
+    font-size: var(--fs-12);
+    color: var(--hdc-g5);
+  }
+  .hdc-hub-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .hdc-hub-more {
+    margin-top: 16px;
+  }
+
+  /* The versions of a model: bare, kits — with codes, price, availability. */
+  .hdc-versions {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--fs-14);
+  }
+  .hdc-versions th,
+  .hdc-versions td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--hdc-g3);
+    text-align: left;
+    vertical-align: middle;
+  }
+  .hdc-versions th {
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-12);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--hdc-g5);
+  }
+  .hdc-versions td b {
+    color: var(--hdc-ink);
+  }
+  .hdc-versions a {
+    color: var(--hdc-red);
+    font-weight: 700;
+  }
+  .hdc-versions .ok {
+    color: var(--hdc-ok);
+  }
+  .hdc-versions .wait {
+    color: var(--hdc-wait);
+  }
+  .hdc-versions .num {
+    white-space: nowrap;
+    font-weight: 800;
+    color: var(--hdc-ink);
+  }
+  .hdc-specs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 32px;
+    max-width: 80ch;
+    margin: 0;
+  }
+  .hdc-specs > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--hdc-g3);
+    font-size: var(--fs-14);
+  }
+  .hdc-specs dt {
+    color: var(--hdc-g7);
+  }
+  .hdc-specs dd {
+    margin: 0;
+    font-weight: 700;
+    text-align: right;
+    color: var(--hdc-ink);
+  }
+
+  @media (max-width: 1023px) {
+    .hdc-art-list,
+    .hdc-hub-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .hdc-hub-tiles {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 767px) {
+    .hdc-art-list,
+    .hdc-specs {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .hdc-answer {
+      font-size: var(--fs-16);
+    }
+    /* The version table as cards: one version per block, no sideways scroll. */
+    .hdc-versions thead {
+      display: none;
+    }
+    .hdc-versions,
+    .hdc-versions tbody,
+    .hdc-versions tr,
+    .hdc-versions td {
+      display: block;
+    }
+    .hdc-versions tr {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--hdc-g3);
+    }
+    .hdc-versions td {
+      padding: 2px 0;
+      border: 0;
+    }
+    .hdc-versions td[data-label]::before {
+      content: attr(data-label) ": ";
+      color: var(--hdc-g5);
+    }
+  }
+}

@@ -1,7 +1,7 @@
 import { articleIndexRoute } from "@/components/blog/article-routes";
 
-/** The blog: published articles, newest first (`ContentArticle` ARTICLE). */
-const route = articleIndexRoute("ARTICLE");
+/** The buying guides: published, newest first (`ContentArticle` GUIDE). */
+const route = articleIndexRoute("GUIDE");
 
 export const generateMetadata = route.generateMetadata;
 export default route.Page;

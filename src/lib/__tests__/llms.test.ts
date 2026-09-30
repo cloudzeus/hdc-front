@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEALER_WORDING, groupModels, llmsFullTxt, llmsTxt } from "@/lib/seo/llms";
+import { DEALER_WORDING, DEFAULT_SUMMARY_EL, greekSummary, groupModels, llmsFullTxt, llmsTxt } from "@/lib/seo/llms";
 import { brandFaq, categoryFaq } from "@/lib/seo/category-copy";
 import { SHOP } from "@/config/shop";
 import { DEFAULT_VAT_RATE } from "@/lib/format";
@@ -63,6 +63,28 @@ describe("llmsTxt", () => {
     for (const path of ["/katalogos", "/epikoinonia", "/oroi-chrisis", "/syxnes-erotiseis", "/llms-full.txt"]) {
       expect(body).toContain(`${ORIGIN}${path}`);
     }
+  });
+});
+
+describe("llmsTxt: Greek first", () => {
+  it("opens with the Greek summary, then a Greek section, then English", () => {
+    const body = llmsTxt(ORIGIN);
+    const lines = body.split("\n");
+    expect(lines[2].startsWith("> Το ")).toBe(true);
+    expect(body.indexOf("## Στα ελληνικά")).toBeLessThan(body.indexOf("## In English"));
+    expect(body).toContain(`${ORIGIN}/odigoi`);
+  });
+
+  it("uses the admin's summary when it is set", () => {
+    const body = llmsTxt(ORIGIN, { summaryEl: "Εργαλεία Milwaukee στον Πειραιά. Παραλαβή ή αποστολή." });
+    expect(body).toContain("> Εργαλεία Milwaukee στον Πειραιά.\n> Παραλαβή ή αποστολή.");
+    expect(body).not.toContain(DEFAULT_SUMMARY_EL);
+  });
+
+  it("never lets a setting put a dealer claim into the file", () => {
+    expect(greekSummary("Επίσημος αντιπρόσωπος Milwaukee στην Ελλάδα.")).toBe(DEFAULT_SUMMARY_EL);
+    expect(greekSummary("   ")).toBe(DEFAULT_SUMMARY_EL);
+    expect(DEFAULT_SUMMARY_EL).not.toMatch(DEALER_WORDING);
   });
 });
 

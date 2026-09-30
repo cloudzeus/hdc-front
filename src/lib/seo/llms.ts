@@ -35,11 +35,56 @@ const HOURS =
   `Monday to Friday ${C.hours.weekdays.open}-${C.hours.weekdays.close}; ` +
   `Saturday ${C.hours.saturday.open}-${C.hours.saturday.close}; closed on Sundays (Europe/Athens).`;
 
-export function llmsTxt(origin: string): string {
+/**
+ * The Greek summary used when the admin has not written one (setting
+ * `llms.summary.el`). Greek comes first: the store sells to Greece, and SEO and
+ * GEO target the Greek market only (owner decision, 30/9/2026).
+ */
+export const DEFAULT_SUMMARY_EL =
+  `Το ${SHOP.name} πουλά εργαλεία Milwaukee και μόνο, από κατάστημα στον Πειραιά: ` +
+  "εργαλεία μπαταρίας M12 και M18 (και M18 FUEL), εξοπλισμό MX FUEL, αποθήκευση PACKOUT, " +
+  "εξαρτήματα και εργαλεία χειρός. Παραλαβή από το κατάστημα ή αποστολή σε όλη την Ελλάδα.";
+
+/**
+ * The summary in force: the admin's, unless it is empty or claims to
+ * represent the manufacturer — then the default. A setting must not be able
+ * to put a dealer claim into the file every AI crawler reads.
+ */
+export function greekSummary(fromSetting: string | null | undefined): string {
+  const text = fromSetting?.replace(/\s+/g, " ").trim();
+  return text && !DEALER_WORDING.test(text) ? text : DEFAULT_SUMMARY_EL;
+}
+
+const HOURS_EL =
+  `Δευτέρα–Παρασκευή ${C.hours.weekdays.open}–${C.hours.weekdays.close}, ` +
+  `Σάββατο ${C.hours.saturday.open}–${C.hours.saturday.close}, Κυριακή κλειστά.`;
+
+export function llmsTxt(origin: string, options: { summaryEl?: string | null } = {}): string {
   const url = (path: string) => `${origin}${path}`;
   const search = (q: string) => url(`/anazitisi?q=${encodeURIComponent(q)}`);
+  const summary = greekSummary(options.summaryEl)
+    .split(/(?<=[.;!;])\s+/)
+    .map((line) => `> ${line}`)
+    .join("\n");
 
   return `# ${SHOP.name}
+
+${summary}
+
+## Στα ελληνικά
+
+Κατάστημα: ${SHOP.name}, ${C.street}, ${C.postcode} ${C.city}
+Τηλέφωνο: ${C.phones.map((p) => p.display).join(", ")}
+Ωράριο: ${HOURS_EL}
+Τιμές σε ευρώ, με ΦΠΑ ${DEFAULT_VAT_RATE}%.
+
+- [Κατάλογος](${url("/katalogos")}): όλες οι κατηγορίες.
+- [Αναζήτηση](${url("/anazitisi")}?q={κωδικός}): με κωδικό Milwaukee (π.χ. 4933479859), μοντέλο (π.χ. M18 FPD3) ή EAN.
+- [Οδηγοί αγοράς](${url("/odigoi")}) και [Blog](${url("/blog")}).
+- [Όλα τα μοντέλα και οι κωδικοί](${url("/llms-full.txt")}).
+- [Συχνές ερωτήσεις](${url("/syxnes-erotiseis")}), [Επικοινωνία](${url("/epikoinonia")}).
+
+## In English
 
 > Milwaukee tools and nothing else, from a store in Piraeus, Greece: M12 and
 > M18 cordless tools, MX FUEL equipment, PACKOUT storage, accessories and hand

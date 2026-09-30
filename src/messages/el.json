@@ -914,18 +914,6 @@
     }
   },
   "blog": {
-    "BlogMissingNotice": {
-      "den_echei_energopoiithei_akomi": "Δεν έχει ενεργοποιηθεί ακόμη",
-      "ta_arthra_perimenoyn_to_hdctool": "Τα άρθρα περιμένουν το HDCtool",
-      "to_periechomeno_yparchei_idi_ta": "Το περιεχόμενο υπάρχει ήδη: τα μοντέλα",
-      "el_en_it_kai": "(el/en/it) και",
-      "einai_sto_hdctool_mazi_me": "είναι στο HDCtool, μαζί με τον\n        editor τους. Λείπει δημόσιο endpoint — το",
-      "zita_cookie_session_eno_to": "ζητά cookie session, ενώ το\n        eshop κρατά bearer.",
-      "to_symvolaio_h16_h17_einai": "Το συμβόλαιο (H16–H17) είναι στο",
-      "kai_sto": "και στο",
-      "nees_afixeis": "Νέες αφίξεις",
-      "i_etaireia": "Η εταιρεία"
-    },
     "page": {
       "archiki": "Αρχική",
       "odigoi_kai_dokimes": "Οδηγοί και δοκιμές",
@@ -1566,5 +1554,23 @@
     "lead_epikoinonia": "Τηλέφωνα, email, διεύθυνση και ωράριο του Milwaukee Heavy Duty Centre στον Πειραιά.",
     "t_etaireia": "Σχετικά με εμάς",
     "lead_etaireia": "Το πρώτο Milwaukee HDC Store στην Ελλάδα, από την εταιρεία Κολλέρης, στον Πειραιά από το 1978."
+  },
+  "articles": {
+    "blog": "Blog",
+    "blog_lead": "Οδηγοί επιλογής, συγκρίσεις και τεχνικά άρθρα για τα εργαλεία Milwaukee, από το κατάστημα του Πειραιά.",
+    "blog_kanena": "Δεν υπάρχουν ακόμη δημοσιευμένα άρθρα.",
+    "odigoi": "Οδηγοί αγοράς",
+    "odigoi_lead": "Πώς διαλέγετε το σωστό εργαλείο Milwaukee: τι μετράει, τι να προσέξετε και ποια πλατφόρμα ταιριάζει στη δουλειά σας.",
+    "odigoi_kanenas": "Δεν υπάρχουν ακόμη δημοσιευμένοι οδηγοί.",
+    "syntomi_apantisi": "Σύντομη απάντηση",
+    "syxnes_erotiseis": "Συχνές ερωτήσεις",
+    "piges": "Πηγές",
+    "piges_lead": "Τα τεχνικά στοιχεία προέρχονται από τις επίσημες σελίδες της Milwaukee:",
+    "proschedio": "Πρόχειρο · δεν έχει δημοσιευτεί",
+    "ola_ta_arthra": "Όλα τα άρθρα",
+    "oloi_oi_odigoi": "Όλοι οι οδηγοί",
+    "anagnosi": "{minutes}′ ανάγνωση",
+    "selides": "Σελίδες",
+    "mono_ellinika": "Διαθέσιμο στα ελληνικά"
   }
 }

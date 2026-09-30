@@ -10,7 +10,12 @@ import { describe, expect, it } from "vitest";
  * skeleton from their own <Suspense>.
  */
 const APP = path.resolve(__dirname, "../../app");
-const DETAIL_ROUTES = ["[locale]/proion/[slug]", "[locale]/katalogos/[kathgoria]", "[locale]/blog/[slug]"];
+const DETAIL_ROUTES = [
+  "[locale]/proion/[slug]",
+  "[locale]/katalogos/[kathgoria]",
+  "[locale]/blog/[slug]",
+  "[locale]/odigoi/[slug]",
+];
 
 describe("detail routes answer a real 404", () => {
   for (const route of DETAIL_ROUTES) {

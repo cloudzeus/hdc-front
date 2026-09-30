@@ -29,11 +29,14 @@ export async function HdcContentPage({
   lead,
   jsonLd,
   help = true,
+  trail = [],
   children,
 }: {
   locale: Locale;
   title: string;
   lead?: string;
+  /** Steps between «Αρχική» and this page in the crumb (e.g. Blog). */
+  trail?: Array<{ href: string; label: string }>;
   /** Structured data for the page, printed as JSON-LD. */
   jsonLd?: object;
   help?: boolean;
@@ -68,8 +71,14 @@ export async function HdcContentPage({
       <main id="main" className="hdc-cp">
         <nav aria-label="Breadcrumb" className="hdc-wrap hdc-crumb">
           <Link href="/">{t("archiki")}</Link>
+          {trail.map((step) => (
+            <span key={step.href}>
+              <i aria-hidden>/</i>
+              <Link href={step.href}>{step.label}</Link>
+            </span>
+          ))}
           <i aria-hidden>/</i>
-          <span>{title}</span>
+          <span aria-current="page">{title}</span>
         </nav>
         <section className="hdc-band hdc-cp-band">
           <div className="hdc-wrap">
