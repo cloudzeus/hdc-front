@@ -73,11 +73,18 @@ export function ArticleEditor({ initial, canEdit }: { initial: ArticleForm; canE
   }
 
   function upload(file: File) {
+    if (file.size > 25 * 1024 * 1024) return void toast.error("Το αρχείο ξεπερνά τα 25MB.");
     const data = new FormData();
     data.set("file", file);
     data.set("slug", form.slug);
     start(async () => {
-      const result = await uploadHeroAction(data);
+      let result: Awaited<ReturnType<typeof uploadHeroAction>>;
+      try {
+        result = await uploadHeroAction(data);
+      } catch {
+        // The request itself failed (too big for the server, or the network).
+        return void toast.error("Η εικόνα δεν ανέβηκε. Δοκιμάστε μικρότερο αρχείο (έως 25MB).");
+      }
       if (!result.ok) return void toast.error(result.error);
       set("heroImageUrl", result.url);
       setUploadInfo(result.info);

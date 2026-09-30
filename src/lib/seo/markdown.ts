@@ -15,7 +15,8 @@ import { Marked, type Tokens } from "marked";
 const escapeHtml = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
-const SAFE_URL = /^(https?:\/\/|mailto:|tel:|\/(?!\/)|#)/i;
+/* `/\host` counts: browsers read a backslash after the first slash as `//host`. */
+const SAFE_URL = /^(https?:\/\/|mailto:|tel:|\/(?![/\\])|#)/i;
 
 const isExternal = (href: string) => /^https?:\/\//i.test(href);
 
@@ -25,12 +26,12 @@ const isExternal = (href: string) => /^https?:\/\//i.test(href);
  * anywhere else is dropped to its alt text — the article must not become a
  * way to hot-link, or to track readers from, somebody else's server.
  */
-function imageHosts(): Set<string> {
+export function imageHosts(): Set<string> {
   const host = process.env.BUNNY_CDN_HOSTNAME?.trim().toLowerCase();
   return new Set(host ? [host] : []);
 }
 
-function allowedImage(href: string, hosts: Set<string>): boolean {
+export function allowedImage(href: string, hosts: Set<string> = imageHosts()): boolean {
   try {
     const url = new URL(href);
     return url.protocol === "https:" && hosts.has(url.hostname.toLowerCase());

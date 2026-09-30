@@ -12,8 +12,9 @@ import { faqFromJson, stringsFromJson } from "@/lib/seo/seo-merge";
  * (`ContentArticle`, admin «SEO & Περιεχόμενο»; the drafts in docs/content are
  * imported by scripts/content/import-content.ts). Not HDCtool any more.
  *
- * Only PUBLISHED rows are public. A draft can be previewed outside production
- * with `?preview=1` (see `draftPreviewAllowed`), always `noindex`.
+ * Only PUBLISHED rows are public. A draft can be previewed with `?preview=1`
+ * by a signed-in admin who may see the SEO section (`canPreviewDrafts`),
+ * always `noindex`; anyone else gets the 404.
  *
  * Greek only: the same article answers on /en and /it for a visitor who
  * switched language, `noindex` there with the Greek canonical.
@@ -39,9 +40,15 @@ export type Article = ArticleSummary & {
   draft: boolean;
 };
 
-/** Drafts are visible (with `?preview=1`) only outside production. */
-export function draftPreviewAllowed(): boolean {
-  return process.env.NODE_ENV !== "production";
+/**
+ * May this request see drafts? Only a signed-in admin with `seo.view` — the
+ * admin session cookie is on the whole site, so the editor's «Άνοιγμα στο
+ * κατάστημα» works in production too. Read only when `?preview=1` is asked.
+ */
+export async function canPreviewDrafts(): Promise<boolean> {
+  const [{ auth }, { can }] = await Promise.all([import("@/auth"), import("@/lib/rbac")]);
+  const session = await auth().catch(() => null);
+  return can(session?.user.role, "seo.view");
 }
 
 const image = (url: string | null, alt: string | null): BlogImage | null =>
@@ -111,11 +118,12 @@ export const listArticles = cache(
 );
 
 export const getArticle = cache(
+  /** `preview`: the caller has checked `canPreviewDrafts()`. */
   async (kind: ArticleKind, slug: string, preview = false): Promise<Article | null> => {
     const row = await prisma.contentArticle.findUnique({ where: { slug } });
     if (!row || row.kind !== kind) return null;
     const draft = row.status !== "PUBLISHED" || row.publishedAt == null;
-    if (draft && !(preview && draftPreviewAllowed())) return null;
+    if (draft && !preview) return null;
     return {
       ...toSummary(row),
       seoTitle: row.seoTitle,

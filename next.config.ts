@@ -46,6 +46,17 @@ const nextConfig: NextConfig = {
     ],
   },
   serverExternalPackages: ["@node-rs/argon2"],
+  experimental: {
+    /*
+     * Image uploads go through server actions (the article hero in /admin/seo,
+     * the zone widgets, the media library): 1MB by default, so a phone photo
+     * failed before reaching the code that shrinks it. The actions refuse
+     * anything over 25MB themselves; this lets such a file arrive. The proxy
+     * buffers request bodies too, so it needs the same room.
+     */
+    serverActions: { bodySizeLimit: "26mb" },
+    proxyClientMaxBodySize: "26mb",
+  },
   /*
    * The email templates are read from disk at runtime (lib/mail/hdc/render.ts)
    * by every route that sends mail — checkout, webhooks, server actions — so

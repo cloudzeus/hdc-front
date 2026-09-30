@@ -96,6 +96,10 @@ export function jsonLdBlocks(html: string): JsonLdBlock[] {
       blocks.push({ types: [], issues: [`Μη έγκυρο JSON: ${error instanceof Error ? error.message : String(error)}`], raw });
       continue;
     }
+    if (data == null || typeof data !== "object") {
+      blocks.push({ types: [], issues: ["Κενό block: δεν περιέχει αντικείμενο."], raw });
+      continue;
+    }
     const items: Array<Record<string, unknown>> = Array.isArray(data)
       ? (data as Array<Record<string, unknown>>)
       : Array.isArray((data as Record<string, unknown>)["@graph"])
@@ -104,6 +108,10 @@ export function jsonLdBlocks(html: string): JsonLdBlock[] {
     const types: string[] = [];
     const issues: string[] = [];
     for (const item of items) {
+      if (item == null || typeof item !== "object") {
+        issues.push("Στοιχείο χωρίς περιεχόμενο.");
+        continue;
+      }
       const type = String(item["@type"] ?? "—");
       types.push(type);
       const need = (field: string, ok: unknown) => {

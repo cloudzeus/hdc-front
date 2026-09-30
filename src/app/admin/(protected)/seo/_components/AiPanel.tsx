@@ -21,13 +21,19 @@ export function AiPanel({ summary, fallback, canEdit }: { summary: string; fallb
   const [text, setText] = useState(summary);
   const [preview, setPreview] = useState<string | null>(null);
   const [path, setPath] = useState("/");
-  const [check, setCheck] = useState<{ url: string; status: number; blocks: JsonLdBlock[] } | null>(null);
+  const [check, setCheck] = useState<{
+    url: string;
+    status: number;
+    location: string | null;
+    truncated: boolean;
+    blocks: JsonLdBlock[];
+  } | null>(null);
 
   return (
     <div className="grid gap-4">
       <section className="grid gap-3 border border-k-line bg-white p-4">
         <h2 className="text-[length:var(--fs-13)] font-semibold text-k-ink">Σύνοψη του llms.txt</h2>
-        <Field id="llms-summary" label="Σύνοψη (ελληνικά)" hint="Κενό = η αυτόματη σύνοψη. Διατύπωση αντιπροσώπου απορρίπτεται και ισχύει η αυτόματη." count={{ value: text.length, max: 600 }}>
+        <Field id="llms-summary" label="Σύνοψη (ελληνικά)" hint="Κενό = η αυτόματη σύνοψη. Διατύπωση «αντιπρόσωπος» ή «επίσημος διανομέας» δεν αποθηκεύεται." count={{ value: text.length, max: 1000 }}>
           <Textarea
             id="llms-summary"
             value={text}
@@ -91,6 +97,14 @@ export function AiPanel({ summary, fallback, canEdit }: { summary: string; fallb
             <p className="font-mono text-[length:var(--fs-12)] break-all text-k-text-3">
               {check.status} · {check.url} · {check.blocks.length} blocks
             </p>
+            {check.location && (
+              <p className="text-[length:var(--fs-12)] text-[var(--hdc-wait)]">
+                Ανακατεύθυνση προς <code className="font-mono">{check.location}</code>: ελέγξτε εκείνη τη διεύθυνση.
+              </p>
+            )}
+            {check.truncated && (
+              <p className="text-[length:var(--fs-12)] text-[var(--hdc-wait)]">Η σελίδα ξεπερνά τα 2MB: διαβάστηκαν τα πρώτα 2MB.</p>
+            )}
             {check.blocks.map((b, i) => (
               <details key={i} className="border border-k-line">
                 <summary className="flex cursor-pointer flex-wrap items-center gap-2 px-3 py-2 text-[length:var(--fs-12)]">

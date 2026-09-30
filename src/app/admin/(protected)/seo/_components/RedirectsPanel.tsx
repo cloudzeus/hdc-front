@@ -4,6 +4,17 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { addRedirectAction, removeRedirectAction, testRedirectAction } from "../actions";
@@ -115,10 +126,28 @@ export function RedirectsPanel({ rows, canEdit }: { rows: RedirectRow[]; canEdit
                   </p>
                 </div>
                 {canEdit && (
-                  <Button type="button" size="sm" variant="outline" className="w-fit" disabled={pending} onClick={() => remove(r.id)}>
-                    <Trash2 aria-hidden />
-                    Αφαίρεση
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button type="button" size="sm" variant="outline" className="w-fit" disabled={pending}>
+                        <Trash2 aria-hidden />
+                        Αφαίρεση
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Αφαίρεση της ανακατεύθυνσης;</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Το {r.fromPath} δεν θα οδηγεί πια στο {r.toPath}. Οι browsers που έχουν ήδη ακολουθήσει τη 301 την
+                          κρατούν αποθηκευμένη και θα συνεχίσουν να πηγαίνουν στον παλιό προορισμό, ώσπου να καθαριστεί η
+                          μνήμη τους.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Άκυρο</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => remove(r.id)}>Αφαίρεση</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 )}
               </li>
             ))}

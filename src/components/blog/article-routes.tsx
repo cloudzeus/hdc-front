@@ -4,7 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ArticleIndexView } from "@/components/blog/ArticleIndexView";
 import { ArticleView } from "@/components/blog/ArticleView";
 import type { Locale } from "@/i18n/routing";
-import { getArticle, listArticles, type ArticleKind } from "@/lib/blog/articles";
+import { canPreviewDrafts, getArticle, listArticles, type ArticleKind } from "@/lib/blog/articles";
 import { articleMetadata, ARTICLE_PATH } from "@/lib/blog/post-page";
 import { pageMeta } from "@/lib/seo/urls";
 
@@ -26,7 +26,8 @@ const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v
 export function articleDetailRoute(kind: ArticleKind) {
   const load = async ({ params, searchParams }: DetailProps) => {
     const [{ slug, locale }, sp] = await Promise.all([params, searchParams]);
-    return { locale, article: await getArticle(kind, slug, first(sp.preview) === "1") };
+    const preview = first(sp.preview) === "1" && (await canPreviewDrafts());
+    return { locale, article: await getArticle(kind, slug, preview) };
   };
 
   async function generateMetadata(props: DetailProps): Promise<Metadata> {

@@ -54,3 +54,11 @@ describe("jsonLdBlocks", () => {
     expect(blocks[2].issues[0]).toMatch(/Μη έγκυρο JSON/);
   });
 });
+
+describe("jsonLdBlocks: odd values", () => {
+  it("tolerates a null block and null items", () => {
+    const blocks = jsonLdBlocks('<script type="application/ld+json">null</script><script type="application/ld+json">[null,{"@type":"Thing"}]</script>');
+    expect(blocks[0].issues[0]).toMatch(/Κενό/);
+    expect(blocks[1].types).toEqual(["Thing"]);
+  });
+});

@@ -11,6 +11,7 @@ import {
   type MagentoTable,
 } from "@/lib/seo/magento-redirects";
 import { createManualRedirectCache } from "@/lib/seo/manual-redirects";
+import { MOVED } from "@/lib/seo/moved-paths";
 
 // Edge-safe: authConfig carries no providers and no database access.
 const { auth } = NextAuth(authConfig);
@@ -86,6 +87,8 @@ const manualRules = createManualRedirectCache({
 
 async function manualRedirect(request: NextRequest): Promise<NextResponse | null> {
   const { pathname, searchParams } = request.nextUrl;
+  // A page is fetched with GET/HEAD; a form post or an API call is never redirected.
+  if (request.method !== "GET" && request.method !== "HEAD") return null;
   if (pathname.startsWith("/admin")) return null;
   const hit = (await manualRules())(pathname);
   if (!hit) return null;
@@ -103,10 +106,6 @@ async function manualRedirect(request: NextRequest): Promise<NextResponse | null
  * γλώσσας και τις παραμέτρους του αιτήματος. Η σελίδα της μάρκας Milwaukee
  * είναι πια η κεντρική σελίδα `/milwaukee` (σχέδιο 8, Task 8).
  */
-const MOVED: Record<string, string> = {
-  "/brands/milwaukee": "/milwaukee",
-};
-
 function movedRedirect(request: NextRequest): NextResponse | null {
   const match = /^(\/(?:en|it))?(\/.*?)\/*$/.exec(request.nextUrl.pathname);
   const to = match ? MOVED[match[2].toLowerCase()] : undefined;

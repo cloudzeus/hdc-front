@@ -73,3 +73,9 @@ describe("renderMarkdown: images", () => {
     expect(html).toMatch(/^<p>Δείτε <img [^>]+> εδώ\.<\/p>/);
   });
 });
+
+describe("renderMarkdown: backslash hosts", () => {
+  it("drops a /\\host link, which a browser reads as //host", () => {
+    expect(renderMarkdown("[x](/\\evil.example)")).not.toContain("href");
+  });
+});
