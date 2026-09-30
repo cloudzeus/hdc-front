@@ -1,0 +1,347 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/goniakoi-trochoi-m18-fuel-asfaleia#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/goniakoi-trochoi-m18-fuel-asfaleia",
+      "url": "{{SITE_URL}}/blog/goniakoi-trochoi-m18-fuel-asfaleia",
+      "headline": "Γωνιακοί τροχοί μπαταρίας M18 FUEL και ασφάλεια: RAPIDSTOP, AUTOSTOP και τι άλλο να κοιτάξεις",
+      "description": "Τι κάνουν RAPIDSTOP, AUTOSTOP, διπλή σκανδάλη και soft start στους τροχούς Milwaukee M18 FUEL. Σύγκριση FSAG125XB και FSAGSVO125X και κανόνες ασφάλειας.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "γωνιακός τροχός μπαταρίας ασφάλεια, γωνιακός τροχός με φρένο δίσκου, Milwaukee M18 FUEL γωνιακός τροχός, RAPIDSTOP Milwaukee, τροχός ασφαλείας M18 FSAGSVO125X, γωνιακός τροχός 125 μπαταρίας, γωνιακοί τροχοί Milwaukee Πειραιάς",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "RAPIDSTOP"
+        },
+        {
+          "@type": "Thing",
+          "name": "AUTOSTOP"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "FIXTEC"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FSAG125XB"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FSAGSVO125X"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-125-160;mm-braking-angle-grinder-with-slide-switch/m18-fsag125xb/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-125-mm-safety-grinder-with-variable-speed-and-one-key/m18-fsagsvo125x/"
+      ],
+      "wordCount": 1392
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/goniakoi-trochoi-m18-fuel-asfaleia#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/goniakoi-trochoi-m18-fuel-asfaleia#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Τι είναι το RAPIDSTOP στους γωνιακούς τροχούς Milwaukee;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι το φρένο του δίσκου. Μόλις αφήσετε τον διακόπτη, ο δίσκος σταματά γρήγορα αντί να συνεχίσει να γυρίζει ελεύθερα. Σύμφωνα με τη Milwaukee, ο M18 FSAG125XB σταματά τον δίσκο σε λιγότερο από 2 δευτερόλεπτα και ο M18 FSAGSVO125X σε λιγότερο από 1 δευτερόλεπτο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ποια είναι η διαφορά ανάμεσα σε RAPIDSTOP και AUTOSTOP;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το RAPIDSTOP φρενάρει τον δίσκο όταν εσείς αφήνετε τον διακόπτη. Το AUTOSTOP ενεργεί χωρίς να κάνετε τίποτα: σβήνει το εργαλείο όταν ο δίσκος μαγκώσει ή όταν ο τροχός κάνει αφύσικη κίνηση. Στον M18 FSAGSVO125X η Milwaukee αναφέρει και τα δύο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Έχει AUTOSTOP ο M18 FSAG125XB;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Στα στοιχεία της Milwaukee για τον M18 FSAG125XB δεν αναφέρεται AUTOSTOP. Αναφέρονται προστασία από κλώτσημα (anti-kickback), ομαλή εκκίνηση, προστασία από αυτόματη εκκίνηση και φρένο RAPIDSTOP. Το AUTOSTOP αναφέρεται στον τροχό ασφαλείας M18 FSAGSVO125X."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Μπορώ να βγάλω τον προφυλακτήρα για να δουλέψω πιο άνετα;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Όχι. Ο προφυλακτήρας είναι το μόνο πράγμα ανάμεσα σε εσάς και έναν δίσκο που μπορεί να σπάσει. Ρυθμίστε τη θέση του, μην τον αφαιρείτε. Στον M18 FSAGSVO125X ο προφυλακτήρας δεν αφαιρείται καθόλου και ρυθμίζεται χωρίς εργαλεία."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι στροφές πρέπει να αντέχει ο δίσκος που βάζω;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Η μέγιστη επιτρεπόμενη ταχύτητα που γράφει ο δίσκος πρέπει να είναι ίση ή μεγαλύτερη από τις μέγιστες στροφές του τροχού. Σύμφωνα με τη Milwaukee, και οι δύο τροχοί του άρθρου φτάνουν τις 8.500 rpm. Αν η ένδειξη λείπει ή δεν διαβάζεται, μη χρησιμοποιήσετε τον δίσκο."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/en/blog/m18-fuel-angle-grinder-safety-rapidstop#article",
+      "mainEntityOfPage": "{{SITE_URL}}/en/blog/m18-fuel-angle-grinder-safety-rapidstop",
+      "url": "{{SITE_URL}}/en/blog/m18-fuel-angle-grinder-safety-rapidstop",
+      "headline": "M18 FUEL cordless angle grinder safety: RAPIDSTOP, AUTOSTOP and what else to look for",
+      "description": "What RAPIDSTOP, AUTOSTOP, dual triggers and soft start do on Milwaukee M18 FUEL grinders. FSAG125XB vs FSAGSVO125X compared, plus safe-use rules.",
+      "inLanguage": "en",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "cordless angle grinder safety, angle grinder with disc brake, Milwaukee M18 FUEL angle grinder, Milwaukee RAPIDSTOP, M18 FSAGSVO125X safety grinder, 125 mm cordless angle grinder, Milwaukee angle grinders Piraeus",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "RAPIDSTOP"
+        },
+        {
+          "@type": "Thing",
+          "name": "AUTOSTOP"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "FIXTEC"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FSAG125XB"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FSAGSVO125X"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-125-160;mm-braking-angle-grinder-with-slide-switch/m18-fsag125xb/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-125-mm-safety-grinder-with-variable-speed-and-one-key/m18-fsagsvo125x/"
+      ],
+      "wordCount": 1386
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/en/blog/m18-fuel-angle-grinder-safety-rapidstop#faq",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/en/blog/m18-fuel-angle-grinder-safety-rapidstop#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is RAPIDSTOP on Milwaukee angle grinders?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It is the disc brake. As soon as you let go of the switch, the disc stops quickly instead of spinning freely. According to Milwaukee, the M18 FSAG125XB stops the disc in under 2 seconds and the M18 FSAGSVO125X in under 1 second."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between RAPIDSTOP and AUTOSTOP?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "RAPIDSTOP brakes the disc when you release the switch. AUTOSTOP acts without any input from you: it shuts the tool down when the disc binds or the grinder makes an unnatural movement. Milwaukee lists both on the M18 FSAGSVO125X."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does the M18 FSAG125XB have AUTOSTOP?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "AUTOSTOP is not listed in Milwaukee's data for the M18 FSAG125XB. What is listed is anti-kickback protection, soft start, protection against automatic start-up and the RAPIDSTOP brake. AUTOSTOP is listed on the M18 FSAGSVO125X safety grinder."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I take the guard off to work more comfortably?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. The guard is the only thing between you and a disc that can break. Adjust its position, never remove it. On the M18 FSAGSVO125X the guard cannot be removed at all and is adjusted without tools."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What speed rating does my disc need?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The maximum permitted speed marked on the disc must be equal to or higher than the grinder's maximum speed. According to Milwaukee, both grinders in this article reach 8,500 rpm. If the marking is missing or unreadable, do not use the disc."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/it/blog/smerigliatrici-m18-fuel-sicurezza-rapidstop#article",
+      "mainEntityOfPage": "{{SITE_URL}}/it/blog/smerigliatrici-m18-fuel-sicurezza-rapidstop",
+      "url": "{{SITE_URL}}/it/blog/smerigliatrici-m18-fuel-sicurezza-rapidstop",
+      "headline": "Smerigliatrici angolari a batteria M18 FUEL e sicurezza: RAPIDSTOP, AUTOSTOP e cos'altro controllare",
+      "description": "Cosa fanno RAPIDSTOP, AUTOSTOP, doppio grilletto e avvio graduale sulle smerigliatrici Milwaukee M18 FUEL. Confronto FSAG125XB/FSAGSVO125X e regole d'uso.",
+      "inLanguage": "it-IT",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "sicurezza smerigliatrice angolare a batteria, smerigliatrice angolare con freno disco, smerigliatrice Milwaukee M18 FUEL, Milwaukee RAPIDSTOP, smerigliatrice di sicurezza M18 FSAGSVO125X, smerigliatrice 125 mm a batteria, smerigliatrici Milwaukee Pireo",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "RAPIDSTOP"
+        },
+        {
+          "@type": "Thing",
+          "name": "AUTOSTOP"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "FIXTEC"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FSAG125XB"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FSAGSVO125X"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-125-160;mm-braking-angle-grinder-with-slide-switch/m18-fsag125xb/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-125-mm-safety-grinder-with-variable-speed-and-one-key/m18-fsagsvo125x/"
+      ],
+      "wordCount": 1401
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/it/blog/smerigliatrici-m18-fuel-sicurezza-rapidstop#faq",
+      "inLanguage": "it-IT",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/it/blog/smerigliatrici-m18-fuel-sicurezza-rapidstop#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Che cos'è il RAPIDSTOP sulle smerigliatrici Milwaukee?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "È il freno del disco. Appena rilasciate l'interruttore, il disco si ferma rapidamente invece di continuare a girare liberamente. Secondo Milwaukee, la M18 FSAG125XB ferma il disco in meno di 2 secondi e la M18 FSAGSVO125X in meno di 1 secondo."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Qual è la differenza tra RAPIDSTOP e AUTOSTOP?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Il RAPIDSTOP frena il disco quando siete voi a rilasciare l'interruttore. L'AUTOSTOP interviene senza che facciate nulla: spegne l'utensile quando il disco si blocca o la smerigliatrice compie un movimento anomalo. Sulla M18 FSAGSVO125X Milwaukee indica entrambi."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "La M18 FSAG125XB ha l'AUTOSTOP?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Nei dati Milwaukee della M18 FSAG125XB l'AUTOSTOP non è indicato. Sono indicati la protezione dal contraccolpo (anti-kickback), l'avvio graduale, la protezione contro l'avvio automatico e il freno RAPIDSTOP. L'AUTOSTOP è indicato sulla smerigliatrice di sicurezza M18 FSAGSVO125X."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Posso togliere la cuffia di protezione per lavorare più comodo?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. La cuffia è l'unica cosa tra voi e un disco che può rompersi. Regolatene la posizione, non toglietela mai. Sulla M18 FSAGSVO125X la cuffia non si può rimuovere affatto e si regola senza attrezzi."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Che velocità deve sopportare il disco che monto?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "La velocità massima ammessa indicata sul disco deve essere uguale o superiore alla velocità massima della smerigliatrice. Secondo Milwaukee, entrambe le smerigliatrici dell'articolo arrivano a 8.500 giri/min. Se l'indicazione manca o non si legge, non usate il disco."
+          }
+        }
+      ]
+    }
+  ]
+}

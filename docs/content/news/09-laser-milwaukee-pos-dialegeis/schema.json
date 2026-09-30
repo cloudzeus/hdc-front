@@ -1,0 +1,356 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/laser-milwaukee-pos-dialegeis#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/laser-milwaukee-pos-dialegeis",
+      "url": "{{SITE_URL}}/blog/laser-milwaukee-pos-dialegeis",
+      "headline": "Laser Milwaukee: πώς διαλέγεις (πράσινη δέσμη, σταυρός, 3 επίπεδα, περιστροφικό, κλάσεις laser)",
+      "description": "Σταυρός, 3 επίπεδα 360° ή περιστροφικό; Πώς διαλέγετε laser Milwaukee: πράσινη δέσμη, εμβέλεια, ακρίβεια, IP, μπαταρία, κλάση 2. Με πίνακα σύγκρισης.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "laser Milwaukee, πώς διαλέγω αλφάδι laser, πράσινο laser σταυρού, αλφάδι laser 360 μοιρών, περιστροφικό laser, laser κλάσης 2, laser Milwaukee Πειραιάς",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "CLL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 CLL4P"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 3PL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 RLOHVG300"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/alkaline-green-cross-line-laser/cll/",
+        "https://www.milwaukeetool.eu/en-eu/m12-cross-line-laser-with-4-points/m12-cll4p/",
+        "https://www.milwaukeetool.eu/en-eu/m12-green-360-176;-3-plane-laser/m12-3pl/",
+        "https://www.milwaukeetool.eu/en-eu/m18-300-m-green-horizontal-vertical-rotary-laser-with-one-key/m18-rlohvg300/",
+        "https://www.milwaukeetool.eu/range/rotary-lasers/"
+      ],
+      "wordCount": 1251
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/laser-milwaukee-pos-dialegeis#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/laser-milwaukee-pos-dialegeis#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Γιατί προτιμώνται τα πράσινα laser από τα κόκκινα;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σύμφωνα με τη Milwaukee, η πράσινη δέσμη έχει έως 4 φορές καλύτερη ορατότητα από την κόκκινη. Στην πράξη η γραμμή διαβάζεται πιο καθαρά, ειδικά σε φωτεινούς χώρους. Όλα τα μοντέλα που συγκρίνουμε στο άρθρο έχουν πράσινη δέσμη."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Είναι επικίνδυνο ένα laser κλάσης 2;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Η κλάση 2 αφορά laser ορατής δέσμης χαμηλής ισχύος. Σε μια στιγμιαία έκθεση το αντανακλαστικό του βλεφάρου συνήθως προστατεύει το μάτι. Αυτό όμως δεν είναι άδεια: μην κοιτάτε ποτέ μέσα στη δέσμη και μη τη στρέφετε σε ανθρώπους."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Χρειάζομαι δέκτη laser;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Μόνο όταν η γραμμή δεν φαίνεται με γυμνό μάτι, σε μεγάλες αποστάσεις ή σε έντονο φως. Σύμφωνα με τη Milwaukee, τα M12 CLL4P και M12 3PL φτάνουν τα 38 m ορατά και έως 100 m με ανιχνευτή, ενώ το M18 RLOHVG300 δουλεύει έως 300 m με τον ανιχνευτή RD300G."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ποια είναι η διαφορά ανάμεσα στο CLL και στο M12 CLL4P;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το CLL δουλεύει με 4 αλκαλικές μπαταρίες AA και προβάλλει σταυρό, με 30 m ορατή εμβέλεια και 50 m με ανιχνευτή. Το M12 CLL4P δουλεύει με μπαταρία M12, προσθέτει 4 σημεία (κατακόρυφα δάπεδο-ταβάνι και οριζόντια) και φτάνει τα 38 m ορατά και έως 100 m με ανιχνευτή, με ακρίβεια 0,3 mm/m."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει εύρος αυτορύθμισης 4°;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σημαίνει ότι το laser οριζοντιώνεται μόνο του όταν το ακουμπήσετε σε επιφάνεια με κλίση έως 4°. Με μεγαλύτερη κλίση δεν μπορεί να αυτορυθμιστεί. Το M12 CLL4P σας ειδοποιεί όταν βρίσκεται εκτός αλφαδιάς."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/en/blog/how-to-choose-a-milwaukee-laser-level#article",
+      "mainEntityOfPage": "{{SITE_URL}}/en/blog/how-to-choose-a-milwaukee-laser-level",
+      "url": "{{SITE_URL}}/en/blog/how-to-choose-a-milwaukee-laser-level",
+      "headline": "Milwaukee lasers: how to choose (green beam, cross line, 3-plane, rotary, laser classes)",
+      "description": "Cross line, 3-plane 360° or rotary? How to choose a Milwaukee laser: green beam, range, accuracy, IP rating, battery and Class 2. With a comparison table.",
+      "inLanguage": "en",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "Milwaukee laser level, how to choose a laser level, green cross line laser, 360 degree 3-plane laser, rotary laser, Class 2 laser, Milwaukee lasers Piraeus",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "CLL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 CLL4P"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 3PL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 RLOHVG300"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/alkaline-green-cross-line-laser/cll/",
+        "https://www.milwaukeetool.eu/en-eu/m12-cross-line-laser-with-4-points/m12-cll4p/",
+        "https://www.milwaukeetool.eu/en-eu/m12-green-360-176;-3-plane-laser/m12-3pl/",
+        "https://www.milwaukeetool.eu/en-eu/m18-300-m-green-horizontal-vertical-rotary-laser-with-one-key/m18-rlohvg300/",
+        "https://www.milwaukeetool.eu/range/rotary-lasers/"
+      ],
+      "wordCount": 1311
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/en/blog/how-to-choose-a-milwaukee-laser-level#faq",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/en/blog/how-to-choose-a-milwaukee-laser-level#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Why are green lasers preferred over red ones?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "According to Milwaukee, a green beam offers up to 4x better visibility than a red one. In practice the line reads more clearly, especially in bright rooms. All the models compared in this article use a green beam."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is a Class 2 laser dangerous?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Class 2 covers low-power visible-beam lasers. With brief exposure the eye's blink reflex normally protects you. That is not a licence, though: never stare into the beam and never point it at people."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do I need a laser detector?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Only when you cannot see the line with the naked eye, over long distances or in strong light. According to Milwaukee, the M12 CLL4P and M12 3PL reach 38 m visible and up to 100 m with a detector, while the M18 RLOHVG300 works up to 300 m with the RD300G detector."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between the CLL and the M12 CLL4P?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The CLL runs on 4 AA alkaline batteries and projects a cross line, with 30 m visible range and 50 m with a detector. The M12 CLL4P runs on an M12 battery, adds 4 points (floor-to-ceiling plumb and horizontal) and reaches 38 m visible and up to 100 m with a detector, with 0.3 mm/m accuracy."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What does a 4° self-levelling range mean?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It means the laser levels itself when you set it on a surface tilted by up to 4°. On a steeper tilt it cannot self-level. The M12 CLL4P warns you when it is out of level."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/it/blog/come-scegliere-una-livella-laser-milwaukee#article",
+      "mainEntityOfPage": "{{SITE_URL}}/it/blog/come-scegliere-una-livella-laser-milwaukee",
+      "url": "{{SITE_URL}}/it/blog/come-scegliere-una-livella-laser-milwaukee",
+      "headline": "Laser Milwaukee: come scegliere (raggio verde, a croce, 3 piani, rotante, classi laser)",
+      "description": "A croce, 3 piani 360° o rotante? Come scegliere un laser Milwaukee: raggio verde, portata, precisione, IP, batteria e classe 2. Con tabella di confronto.",
+      "inLanguage": "it-IT",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "livella laser Milwaukee, come scegliere una livella laser, laser a croce verde, livella laser 3 piani 360 gradi, laser rotante, laser classe 2, laser Milwaukee Pireo",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "CLL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 CLL4P"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 3PL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 RLOHVG300"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/alkaline-green-cross-line-laser/cll/",
+        "https://www.milwaukeetool.eu/en-eu/m12-cross-line-laser-with-4-points/m12-cll4p/",
+        "https://www.milwaukeetool.eu/en-eu/m12-green-360-176;-3-plane-laser/m12-3pl/",
+        "https://www.milwaukeetool.eu/en-eu/m18-300-m-green-horizontal-vertical-rotary-laser-with-one-key/m18-rlohvg300/",
+        "https://www.milwaukeetool.eu/range/rotary-lasers/"
+      ],
+      "wordCount": 1310
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/it/blog/come-scegliere-una-livella-laser-milwaukee#faq",
+      "inLanguage": "it-IT",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/it/blog/come-scegliere-una-livella-laser-milwaukee#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Perché si preferiscono i laser verdi a quelli rossi?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Secondo Milwaukee, il raggio verde offre una visibilità fino a 4 volte migliore rispetto a quello rosso. In pratica la linea si legge in modo più nitido, soprattutto negli ambienti luminosi. Tutti i modelli confrontati nell'articolo hanno il raggio verde."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Un laser di classe 2 è pericoloso?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "La classe 2 riguarda laser a raggio visibile di bassa potenza. In caso di esposizione breve il riflesso palpebrale di solito protegge l'occhio. Non è però un via libera: non fissate mai il raggio e non puntatelo mai verso le persone."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Mi serve un ricevitore laser?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Solo quando la linea non si vede a occhio nudo, su grandi distanze o con luce intensa. Secondo Milwaukee, M12 CLL4P e M12 3PL arrivano a 38 m visibili e fino a 100 m con ricevitore, mentre l'M18 RLOHVG300 lavora fino a 300 m con il ricevitore RD300G."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Qual è la differenza tra CLL e M12 CLL4P?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Il CLL funziona con 4 pile alcaline AA e proietta una croce, con 30 m di portata visibile e 50 m con ricevitore. L'M12 CLL4P funziona con batteria M12, aggiunge 4 punti (a piombo pavimento-soffitto e orizzontali) e arriva a 38 m visibili e fino a 100 m con ricevitore, con precisione di 0,3 mm/m."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Cosa significa un campo di autolivellamento di 4°?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Significa che il laser si mette in bolla da solo quando lo appoggiate su una superficie inclinata fino a 4°. Con un'inclinazione maggiore non riesce ad autolivellarsi. L'M12 CLL4P vi avvisa quando è fuori bolla."
+          }
+        }
+      ]
+    }
+  ]
+}

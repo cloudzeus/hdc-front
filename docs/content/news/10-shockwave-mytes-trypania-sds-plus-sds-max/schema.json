@@ -1,0 +1,356 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/shockwave-mytes-trypania-sds-plus-sds-max#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/shockwave-mytes-trypania-sds-plus-sds-max",
+      "url": "{{SITE_URL}}/blog/shockwave-mytes-trypania-sds-plus-sds-max",
+      "headline": "Αξεσουάρ SHOCKWAVE και τρυπάνια SDS-Plus / SDS-Max: τι να διαλέξεις",
+      "description": "Γιατί σπάνε οι απλές μύτες στο παλμικό, τι κάνουν οι SHOCKWAVE και πότε θέλετε τρυπάνι SDS-Plus ή SDS-Max. Πίνακας MX4 και πρακτικές συμβουλές.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "μύτες SHOCKWAVE, μύτες για παλμικό κατσαβίδι, τρυπάνια SDS-Plus, τρυπάνια SDS-Max, διαφορά SDS-Plus και SDS-Max, τρυπάνια μπετού 4 κοπών, αξεσουάρ Milwaukee Πειραιάς",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "SHOCKWAVE IMPACT DUTY"
+        },
+        {
+          "@type": "Thing",
+          "name": "SDS-Plus"
+        },
+        {
+          "@type": "Thing",
+          "name": "SDS-Max"
+        },
+        {
+          "@type": "Thing",
+          "name": "MX4"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "WEAR GUARD TIP"
+        },
+        {
+          "@type": "Thing",
+          "name": "SHOCK ZONE"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 ONEFHPX"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/shockwave-impact-duty-screwdriving-bits-hex/",
+        "https://uk.milwaukeetool.eu/en-gb/shockwave-impact-duty-sets/",
+        "https://uk.milwaukeetool.eu/en-gb/sds-plus-mx4-drill-bits-4-cut/",
+        "https://www.milwaukeetool.eu/en-eu/sds-max-mx4-drill-bits-4-cut/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-high-performance-4-mode-32-mm-sds-plus-hammer-with-one-key-and-fixtec-chuck/m18-onefhpx/"
+      ],
+      "wordCount": 1145
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/shockwave-mytes-trypania-sds-plus-sds-max#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/shockwave-mytes-trypania-sds-plus-sds-max#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Μπορώ να βάλω απλές μύτες σε παλμικό κατσαβίδι;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Μπαίνουν, αλλά δεν είναι φτιαγμένες για τα συνεχή χτυπήματα του παλμικού, οπότε φθείρονται ή σπάνε πιο γρήγορα. Οι μύτες SHOCKWAVE σχεδιάζονται από τη Milwaukee για κρουστική χρήση, με σκληρυμένη μύτη WEAR GUARD TIP και ζώνη SHOCK ZONE που απορροφά τις αιχμές φορτίου."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ποια είναι η διαφορά ανάμεσα σε SDS-Plus και SDS-Max;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι δύο διαφορετικά συστήματα υποδοχής. Το SDS-Plus αφορά τα ελαφρύτερα περιστροφικά πιστολέτα και τις μικρές και μεσαίες διαμέτρους, το SDS-Max τα βαρύτερα πιστολέτα και τις μεγάλες διαμέτρους. Στη σειρά MX4 της Milwaukee τα SDS-Plus πάνε από 3,5 έως 32 mm και τα SDS-Max από 12 έως 52 mm. Τα δύο συστήματα δεν είναι εναλλάξιμα."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει τρυπάνι «4 κοπών»;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ότι η κεφαλή του τρυπανιού έχει τέσσερις κόψεις από καρβίδιο. Στα SDS-Max MX4 η Milwaukee αναφέρει συμμετρική κεφαλή 4 x 90° με μύτη κεντραρίσματος 130°, ενώ στα SDS-Plus MX4 κεφαλή 4 κοπών με αιχμηρή μύτη κεντραρίσματος."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι η πιστοποίηση PGM στα τρυπάνια μπετού;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Αφορά την ακρίβεια της τρύπας, ώστε τα βύσματα και τα αγκύρια να τοποθετούνται σωστά. Η Milwaukee αναφέρει πιστοποίηση PGM για τα SDS-Plus MX4 και συμμόρφωση PGM για τα SDS-Max MX4."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Μέχρι ποια διάμετρο τρυπάει ένα πιστολέτο SDS-Plus μπαταρίας;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Εξαρτάται από το μοντέλο. Για παράδειγμα, στο M18 ONEFHPX η Milwaukee δίνει 5,0 J, μέγιστη διάμετρο 32 mm σε μπετό και ιδανικό εύρος 8–24 mm. Για μεγαλύτερες διαμέτρους κοιτάξτε το σύστημα SDS-Max."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/en/blog/shockwave-bits-sds-plus-sds-max-drill-bits#article",
+      "mainEntityOfPage": "{{SITE_URL}}/en/blog/shockwave-bits-sds-plus-sds-max-drill-bits",
+      "url": "{{SITE_URL}}/en/blog/shockwave-bits-sds-plus-sds-max-drill-bits",
+      "headline": "SHOCKWAVE accessories and SDS-Plus / SDS-Max drill bits: what to choose",
+      "description": "Why standard bits break in impact drivers, what SHOCKWAVE bits do and when you need SDS-Plus or SDS-Max. MX4 comparison table and practical tips.",
+      "inLanguage": "en",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "SHOCKWAVE bits, impact driver bits, SDS-Plus drill bits, SDS-Max drill bits, SDS-Plus vs SDS-Max, 4-cutter concrete drill bits, Milwaukee accessories Piraeus",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "SHOCKWAVE IMPACT DUTY"
+        },
+        {
+          "@type": "Thing",
+          "name": "SDS-Plus"
+        },
+        {
+          "@type": "Thing",
+          "name": "SDS-Max"
+        },
+        {
+          "@type": "Thing",
+          "name": "MX4"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "WEAR GUARD TIP"
+        },
+        {
+          "@type": "Thing",
+          "name": "SHOCK ZONE"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 ONEFHPX"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/shockwave-impact-duty-screwdriving-bits-hex/",
+        "https://uk.milwaukeetool.eu/en-gb/shockwave-impact-duty-sets/",
+        "https://uk.milwaukeetool.eu/en-gb/sds-plus-mx4-drill-bits-4-cut/",
+        "https://www.milwaukeetool.eu/en-eu/sds-max-mx4-drill-bits-4-cut/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-high-performance-4-mode-32-mm-sds-plus-hammer-with-one-key-and-fixtec-chuck/m18-onefhpx/"
+      ],
+      "wordCount": 1166
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/en/blog/shockwave-bits-sds-plus-sds-max-drill-bits#faq",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/en/blog/shockwave-bits-sds-plus-sds-max-drill-bits#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Can I use standard bits in an impact driver?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "They fit, but they are not made for the constant blows of an impact driver, so they wear or break sooner. Milwaukee designs SHOCKWAVE bits for impact use, with a hardened WEAR GUARD TIP and a SHOCK ZONE that absorbs load peaks."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between SDS-Plus and SDS-Max?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "They are two different chuck systems. SDS-Plus covers lighter rotary hammers and small to medium diameters, SDS-Max heavier hammers and large diameters. In Milwaukee's MX4 range, SDS-Plus bits run from 3.5 to 32 mm and SDS-Max bits from 12 to 52 mm. The two systems are not interchangeable."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What does a \"4-cutter\" drill bit mean?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It means the bit head has four carbide cutting edges. On SDS-Max MX4 bits Milwaukee lists a symmetrical 4 x 90° head with a 130° centering point, and on SDS-Plus MX4 bits a 4-cutter head with a sharp centering tip."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is PGM certification on concrete drill bits?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It concerns hole accuracy, so that plugs and anchors are set correctly. Milwaukee lists PGM certification for SDS-Plus MX4 bits and PGM conformity for SDS-Max MX4 bits."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What diameter can a cordless SDS-Plus hammer drill?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It depends on the model. For example, for the M18 ONEFHPX Milwaukee lists 5.0 J, a maximum of 32 mm in concrete and an optimal range of 8–24 mm. For larger diameters, look at the SDS-Max system."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/it/blog/inserti-shockwave-punte-sds-plus-sds-max#article",
+      "mainEntityOfPage": "{{SITE_URL}}/it/blog/inserti-shockwave-punte-sds-plus-sds-max",
+      "url": "{{SITE_URL}}/it/blog/inserti-shockwave-punte-sds-plus-sds-max",
+      "headline": "Accessori SHOCKWAVE e punte SDS-Plus / SDS-Max: cosa scegliere",
+      "description": "Perché gli inserti normali si rompono nell'avvitatore a impulsi, cosa fanno gli SHOCKWAVE e quando servono punte SDS-Plus o SDS-Max. Tabella MX4.",
+      "inLanguage": "it-IT",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "inserti SHOCKWAVE, inserti per avvitatore a impulsi, punte SDS-Plus, punte SDS-Max, differenza tra SDS-Plus e SDS-Max, punte per calcestruzzo 4 taglienti, accessori Milwaukee Pireo",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "SHOCKWAVE IMPACT DUTY"
+        },
+        {
+          "@type": "Thing",
+          "name": "SDS-Plus"
+        },
+        {
+          "@type": "Thing",
+          "name": "SDS-Max"
+        },
+        {
+          "@type": "Thing",
+          "name": "MX4"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "WEAR GUARD TIP"
+        },
+        {
+          "@type": "Thing",
+          "name": "SHOCK ZONE"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 ONEFHPX"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/shockwave-impact-duty-screwdriving-bits-hex/",
+        "https://uk.milwaukeetool.eu/en-gb/shockwave-impact-duty-sets/",
+        "https://uk.milwaukeetool.eu/en-gb/sds-plus-mx4-drill-bits-4-cut/",
+        "https://www.milwaukeetool.eu/en-eu/sds-max-mx4-drill-bits-4-cut/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-high-performance-4-mode-32-mm-sds-plus-hammer-with-one-key-and-fixtec-chuck/m18-onefhpx/"
+      ],
+      "wordCount": 1225
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/it/blog/inserti-shockwave-punte-sds-plus-sds-max#faq",
+      "inLanguage": "it-IT",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/it/blog/inserti-shockwave-punte-sds-plus-sds-max#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Posso usare inserti normali in un avvitatore a impulsi?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Entrano, ma non sono fatti per i colpi continui dell'avvitatore a impulsi, quindi si consumano o si rompono prima. Milwaukee progetta gli inserti SHOCKWAVE per l'uso a impulsi, con punta indurita WEAR GUARD TIP e zona SHOCK ZONE che assorbe i picchi di carico."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Qual è la differenza tra SDS-Plus e SDS-Max?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sono due sistemi di attacco diversi. L'SDS-Plus riguarda i martelli tassellatori più leggeri e i diametri piccoli e medi, l'SDS-Max i martelli più pesanti e i diametri grandi. Nella serie MX4 di Milwaukee le punte SDS-Plus vanno da 3,5 a 32 mm e le SDS-Max da 12 a 52 mm. I due sistemi non sono intercambiabili."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Cosa significa punta \"a 4 taglienti\"?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Significa che la testa della punta ha quattro taglienti in metallo duro. Sulle SDS-Max MX4 Milwaukee indica una testa simmetrica 4 x 90° con punta di centraggio a 130°, sulle SDS-Plus MX4 una testa a 4 taglienti con punta di centraggio affilata."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Che cos'è la certificazione PGM sulle punte per calcestruzzo?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Riguarda la precisione del foro, perché tasselli e ancoranti vengano posati correttamente. Milwaukee indica la certificazione PGM per le SDS-Plus MX4 e la conformità PGM per le SDS-Max MX4."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Fino a che diametro fora un martello SDS-Plus a batteria?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Dipende dal modello. Per esempio, per l'M18 ONEFHPX Milwaukee indica 5,0 J, un massimo di 32 mm nel calcestruzzo e un campo ottimale di 8–24 mm. Per diametri maggiori guardate il sistema SDS-Max."
+          }
+        }
+      ]
+    }
+  ]
+}

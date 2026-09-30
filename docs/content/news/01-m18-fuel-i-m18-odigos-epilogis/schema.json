@@ -1,0 +1,356 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/m18-fuel-i-m18-odigos-epilogis#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/m18-fuel-i-m18-odigos-epilogis",
+      "url": "{{SITE_URL}}/blog/m18-fuel-i-m18-odigos-epilogis",
+      "headline": "M18 FUEL ή απλό M18; Οδηγός επιλογής για επαγγελματίες",
+      "description": "Τι αλλάζει ανάμεσα σε M18 FUEL και απλό M18 της Milwaukee: κινητήρας, ροπή, μέγεθος, μπαταρίες. Πρακτικός οδηγός με πίνακα σύγκρισης και συχνές ερωτήσεις.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "M18 FUEL ή M18, διαφορά M18 FUEL και M18, Milwaukee M18 FUEL, κρουστικό δραπανοκατσάβιδο Milwaukee 18V, brushless εργαλεία μπαταρίας, εργαλεία Milwaukee Πειραιάς",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "POWERSTATE"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "REDLITHIUM"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLINK PLUS"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FPD3"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 BPD"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/systems/m18/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-percussion-drill/m18-fpd3/",
+        "https://www.milwaukeetool.eu/en-eu/m18-compact-percussion-drill/m18-bpd/",
+        "https://www.milwaukeetool.eu/systems/m12/fuel/",
+        "https://www.milwaukeetool.eu/en-eu/m18-high-output-50-ah-battery/m18-hb5/"
+      ],
+      "wordCount": 1178
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/m18-fuel-i-m18-odigos-epilogis#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/m18-fuel-i-m18-odigos-epilogis#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Είναι οι μπαταρίες M18 FUEL διαφορετικές από τις μπαταρίες M18;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Όχι. Δεν υπάρχει ξεχωριστή μπαταρία «FUEL». Κάθε μπαταρία M18 της Milwaukee ταιριάζει σε κάθε εργαλείο M18, είτε είναι FUEL είτε όχι. Αυτό που αλλάζει είναι η κατηγορία της μπαταρίας (REDLITHIUM, HIGH OUTPUT, FORGE), που επηρεάζει την απόδοση υπό φορτίο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Αξίζει η διαφορά του M18 FUEL για επαγγελματική χρήση;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Αν δουλεύετε καθημερινά σε μπετό, μέταλλο ή μεγάλες διαμέτρους, συνήθως ναι: στο κρουστικό δραπανοκατσάβιδο η Milwaukee δίνει 158 Nm για το FUEL έναντι 60 Nm για το compact M18, σε μικρότερο σώμα. Για ελαφριές, περιστασιακές εργασίες το απλό M18 είναι αρκετό."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει brushless στα εργαλεία Milwaukee;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σημαίνει κινητήρα χωρίς ψήκτρες (καρβουνάκια). Στα M18 FUEL είναι ο κινητήρας POWERSTATE, που σχεδιάζει και κατασκευάζει η ίδια η Milwaukee. Χωρίς ψήκτρες υπάρχει λιγότερη τριβή, λιγότερη θερμότητα και δεν χρειάζεται αλλαγή καρβουνακιών."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Μπορώ να ξεκινήσω με απλό M18 και να προσθέσω FUEL αργότερα;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ναι. Η πλατφόρμα είναι μία: οι μπαταρίες και οι φορτιστές που ήδη έχετε θα λειτουργούν και στα εργαλεία FUEL που θα προσθέσετε. Πολλοί τεχνίτες κρατούν FUEL για τα βαριά εργαλεία και απλό M18 για τα βοηθητικά."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πόσα εργαλεία υπάρχουν στην πλατφόρμα M18;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σύμφωνα με τη Milwaukee, η πλατφόρμα M18 περιλαμβάνει πάνω από 325 εργαλεία και λύσεις, όλα συμβατά με την ίδια μπαταρία 18 V."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/en/blog/m18-fuel-vs-m18-buying-guide#article",
+      "mainEntityOfPage": "{{SITE_URL}}/en/blog/m18-fuel-vs-m18-buying-guide",
+      "url": "{{SITE_URL}}/en/blog/m18-fuel-vs-m18-buying-guide",
+      "headline": "M18 FUEL or standard M18? A buying guide for professionals",
+      "description": "What really changes between Milwaukee M18 FUEL and standard M18: motor, torque, size, batteries. A practical guide with a comparison table and FAQ.",
+      "inLanguage": "en",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "M18 FUEL vs M18, difference between M18 FUEL and M18, Milwaukee M18 FUEL, Milwaukee 18V percussion drill, brushless cordless tools, Milwaukee tools Piraeus",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "POWERSTATE"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "REDLITHIUM"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLINK PLUS"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FPD3"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 BPD"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/systems/m18/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-percussion-drill/m18-fpd3/",
+        "https://www.milwaukeetool.eu/en-eu/m18-compact-percussion-drill/m18-bpd/",
+        "https://www.milwaukeetool.eu/systems/m12/fuel/",
+        "https://www.milwaukeetool.eu/en-eu/m18-high-output-50-ah-battery/m18-hb5/"
+      ],
+      "wordCount": 1209
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/en/blog/m18-fuel-vs-m18-buying-guide#faq",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/en/blog/m18-fuel-vs-m18-buying-guide#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Are M18 FUEL batteries different from M18 batteries?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. There is no separate \"FUEL\" battery. Every Milwaukee M18 battery fits every M18 tool, FUEL or not. What changes is the battery tier (REDLITHIUM, HIGH OUTPUT, FORGE), which affects performance under load."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is M18 FUEL worth the extra cost for professional use?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "If you work daily in concrete, metal or large diameters, usually yes: on the percussion drill Milwaukee lists 158 Nm for the FUEL model against 60 Nm for the compact M18, in a shorter body. For light, occasional work the standard M18 is enough."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What does brushless mean on Milwaukee tools?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It means a motor without carbon brushes. On M18 FUEL tools it is the POWERSTATE motor, which Milwaukee designs and builds itself. Without brushes there is less friction, less heat and no brushes to replace."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I start with standard M18 and add FUEL tools later?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. It is one platform: the batteries and chargers you already own will also run the FUEL tools you add. Many tradespeople keep FUEL for the heavy tools and standard M18 for the secondary ones."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many tools are there on the M18 platform?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "According to Milwaukee, the M18 platform includes more than 325 tools and solutions, all running on the same 18 V battery."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/it/blog/m18-fuel-vs-m18-guida-alla-scelta#article",
+      "mainEntityOfPage": "{{SITE_URL}}/it/blog/m18-fuel-vs-m18-guida-alla-scelta",
+      "url": "{{SITE_URL}}/it/blog/m18-fuel-vs-m18-guida-alla-scelta",
+      "headline": "M18 FUEL o M18 standard? Guida alla scelta per professionisti",
+      "description": "Cosa cambia davvero tra Milwaukee M18 FUEL e M18 standard: motore, coppia, ingombro, batterie. Guida pratica con tabella di confronto e FAQ.",
+      "inLanguage": "it-IT",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "M18 FUEL o M18, differenza tra M18 FUEL e M18, Milwaukee M18 FUEL, trapano a percussione Milwaukee 18V, utensili a batteria brushless, utensili Milwaukee Pireo",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "POWERSTATE"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "REDLITHIUM"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLINK PLUS"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FPD3"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 BPD"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/systems/m18/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-percussion-drill/m18-fpd3/",
+        "https://www.milwaukeetool.eu/en-eu/m18-compact-percussion-drill/m18-bpd/",
+        "https://www.milwaukeetool.eu/systems/m12/fuel/",
+        "https://www.milwaukeetool.eu/en-eu/m18-high-output-50-ah-battery/m18-hb5/"
+      ],
+      "wordCount": 1181
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/it/blog/m18-fuel-vs-m18-guida-alla-scelta#faq",
+      "inLanguage": "it-IT",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/it/blog/m18-fuel-vs-m18-guida-alla-scelta#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Le batterie M18 FUEL sono diverse dalle batterie M18?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Non esiste una batteria \"FUEL\" a parte. Ogni batteria Milwaukee M18 si monta su ogni utensile M18, FUEL o no. Cambia la categoria della batteria (REDLITHIUM, HIGH OUTPUT, FORGE), che incide sulle prestazioni sotto carico."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Vale la pena spendere di più per M18 FUEL in uso professionale?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Se lavorate ogni giorno su calcestruzzo, metallo o grandi diametri, di solito sì: sul trapano a percussione Milwaukee indica 158 Nm per il modello FUEL contro 60 Nm per l'M18 compatto, in un corpo più corto. Per lavori leggeri e occasionali l'M18 standard basta."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Cosa significa brushless sugli utensili Milwaukee?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Significa motore senza spazzole di carbone. Sugli M18 FUEL è il motore POWERSTATE, progettato e costruito dalla stessa Milwaukee. Senza spazzole ci sono meno attrito, meno calore e nessuna spazzola da sostituire."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Posso iniziare con l'M18 standard e aggiungere FUEL in seguito?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sì. La piattaforma è una sola: le batterie e i caricabatterie che avete già funzioneranno anche con gli utensili FUEL che aggiungerete. Molti artigiani tengono FUEL per gli utensili pesanti e M18 standard per quelli di supporto."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quanti utensili comprende la piattaforma M18?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Secondo Milwaukee, la piattaforma M18 comprende oltre 325 utensili e soluzioni, tutti alimentati dalla stessa batteria da 18 V."
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,437 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/m12-i-m18-poia-platforma#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/m12-i-m18-poia-platforma",
+      "url": "{{SITE_URL}}/blog/m12-i-m18-poia-platforma",
+      "headline": "M12 ή M18; Ποια πλατφόρμα Milwaukee για ποια δουλειά",
+      "description": "M12 ή M18 της Milwaukee; Μέγεθος, ροπή, μπαταρίες και φορτιστές, πίνακας FPD2/FPD3 και FID2/FID3 και οδηγίες ανά ειδικότητα τεχνίτη.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "M12 ή M18, διαφορά M12 και M18 Milwaukee, Milwaukee 12V ή 18V, Milwaukee M12 FUEL, M12 FID2 ή M18 FID3, εργαλεία μπαταρίας για ηλεκτρολόγους, εργαλεία Milwaukee Πειραιάς",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "POWERSTATE"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLITHIUM"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLINK PLUS"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FPD2"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FPD3"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FID2"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FID3"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12-18 FC"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12-18 C"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/systems/m12/",
+        "https://www.milwaukeetool.eu/systems/m18/",
+        "https://www.milwaukeetool.eu/systems/m12/fuel/",
+        "https://www.milwaukeetool.eu/systems/m12/redlithium-ion/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-sub-compact-percussion-drill/m12-fpd2/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-percussion-drill/m18-fpd3/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-sub-compact-1-4-impact-driver/m12-fid2/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-1-4-hex-impact-driver/m18-fid3/"
+      ],
+      "wordCount": 1298
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/m12-i-m18-poia-platforma#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/m12-i-m18-poia-platforma#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Μπαίνει μπαταρία M12 σε εργαλείο M18;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Όχι. Κάθε εργαλείο παίρνει μπαταρίες της δικής του πλατφόρμας: οι μπαταρίες M12 μπαίνουν στα εργαλεία M12 και οι μπαταρίες M18 στα εργαλεία M18. Αυτό που μοιράζονται οι δύο πλατφόρμες είναι ο φορτιστής, αφού οι M12-18 C και M12-18 FC φορτίζουν και τις δύο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Είναι το M12 αρκετό για επαγγελματική χρήση;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Για πολλές δουλειές ναι. Σύμφωνα με τη Milwaukee, το παλμικό M12 FID2 δίνει 170 Nm και σφίγγει μπουλόνια έως M14. Για μεγάλες διαμέτρους σε ξύλο, για μπετό και για συνεχή βαριά χρήση το M18 είναι η ασφαλέστερη επιλογή."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πόσα εργαλεία έχει κάθε πλατφόρμα;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σύμφωνα με τη Milwaukee, η πλατφόρμα M12 έχει περισσότερες από 125 λύσεις και η πλατφόρμα M18 πάνω από 325. Η Milwaukee χαρακτηρίζει το M12 ως το μεγαλύτερο υπο-compact σύστημα μπαταρίας."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Είναι πάντα μικρότερο ένα εργαλείο M12 από το αντίστοιχο M18;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Όχι πάντα. Σύμφωνα με τις σελίδες προϊόντων της Milwaukee, το παλμικό M18 FID3 έχει μήκος 113 mm, ενώ το M12 FID2 έχει 127 mm. Στα δράπανα ισχύει το αντίθετο: το M12 FPD2 είναι 152 mm και το M18 FPD3 175 mm."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Χρειάζομαι δύο φορτιστές αν έχω εργαλεία M12 και M18;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Όχι απαραίτητα. Οι φορτιστές διπλής πλατφόρμας M12-18 C και M12-18 FC δέχονται και μπαταρίες M12 και μπαταρίες M18, οπότε ένας φορτιστής αρκεί για όλο τον εξοπλισμό."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/en/blog/m12-vs-m18-which-milwaukee-platform#article",
+      "mainEntityOfPage": "{{SITE_URL}}/en/blog/m12-vs-m18-which-milwaukee-platform",
+      "url": "{{SITE_URL}}/en/blog/m12-vs-m18-which-milwaukee-platform",
+      "headline": "M12 or M18? Which Milwaukee platform for which job",
+      "description": "Milwaukee M12 or M18? Size, torque, batteries and chargers, an FPD2/FPD3 and FID2/FID3 comparison table and trade-by-trade advice.",
+      "inLanguage": "en",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "M12 vs M18, difference between Milwaukee M12 and M18, Milwaukee 12V or 18V, Milwaukee M12 FUEL, M12 FID2 vs M18 FID3, best cordless platform for electricians, Milwaukee tools Piraeus",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "POWERSTATE"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLITHIUM"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLINK PLUS"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FPD2"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FPD3"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FID2"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FID3"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12-18 FC"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12-18 C"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/systems/m12/",
+        "https://www.milwaukeetool.eu/systems/m18/",
+        "https://www.milwaukeetool.eu/systems/m12/fuel/",
+        "https://www.milwaukeetool.eu/systems/m12/redlithium-ion/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-sub-compact-percussion-drill/m12-fpd2/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-percussion-drill/m18-fpd3/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-sub-compact-1-4-impact-driver/m12-fid2/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-1-4-hex-impact-driver/m18-fid3/"
+      ],
+      "wordCount": 1306
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/en/blog/m12-vs-m18-which-milwaukee-platform#faq",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/en/blog/m12-vs-m18-which-milwaukee-platform#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Does an M12 battery fit an M18 tool?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Each tool takes the batteries of its own platform: M12 batteries go in M12 tools and M18 batteries in M18 tools. What the two platforms share is the charger, since the M12-18 C and M12-18 FC charge both."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is M12 enough for professional use?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "For many jobs, yes. According to Milwaukee, the M12 FID2 impact driver delivers 170 Nm and drives bolts up to M14. For large diameters in wood, for concrete and for continuous heavy use, M18 is the safer choice."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How many tools does each platform have?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "According to Milwaukee, the M12 platform has more than 125 solutions and the M18 platform more than 325. Milwaukee describes M12 as the largest sub-compact cordless system."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is an M12 tool always smaller than its M18 equivalent?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Not always. According to Milwaukee's product pages, the M18 FID3 impact driver is 113 mm long, while the M12 FID2 is 127 mm. With the drills it is the other way round: the M12 FPD2 is 152 mm and the M18 FPD3 175 mm."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do I need two chargers if I own both M12 and M18 tools?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Not necessarily. The M12-18 C and M12-18 FC dual-platform chargers accept both M12 and M18 batteries, so one charger covers all your kit."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/it/blog/m12-o-m18-quale-piattaforma-milwaukee#article",
+      "mainEntityOfPage": "{{SITE_URL}}/it/blog/m12-o-m18-quale-piattaforma-milwaukee",
+      "url": "{{SITE_URL}}/it/blog/m12-o-m18-quale-piattaforma-milwaukee",
+      "headline": "M12 o M18? Quale piattaforma Milwaukee per quale lavoro",
+      "description": "Milwaukee M12 o M18? Dimensioni, coppia, batterie e caricabatterie, tabella FPD2/FPD3 e FID2/FID3 e consigli per ogni mestiere.",
+      "inLanguage": "it-IT",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "M12 o M18, differenza tra Milwaukee M12 e M18, Milwaukee 12V o 18V, Milwaukee M12 FUEL, M12 FID2 o M18 FID3, utensili a batteria per elettricisti, utensili Milwaukee Pireo",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "POWERSTATE"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLITHIUM"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLINK PLUS"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FPD2"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FPD3"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FID2"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FID3"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12-18 FC"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12-18 C"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/systems/m12/",
+        "https://www.milwaukeetool.eu/systems/m18/",
+        "https://www.milwaukeetool.eu/systems/m12/fuel/",
+        "https://www.milwaukeetool.eu/systems/m12/redlithium-ion/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-sub-compact-percussion-drill/m12-fpd2/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-percussion-drill/m18-fpd3/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-sub-compact-1-4-impact-driver/m12-fid2/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-1-4-hex-impact-driver/m18-fid3/"
+      ],
+      "wordCount": 1330
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/it/blog/m12-o-m18-quale-piattaforma-milwaukee#faq",
+      "inLanguage": "it-IT",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/it/blog/m12-o-m18-quale-piattaforma-milwaukee#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Una batteria M12 si monta su un utensile M18?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Ogni utensile usa le batterie della propria piattaforma: le batterie M12 vanno sugli utensili M12 e le batterie M18 sugli utensili M18. Le due piattaforme condividono il caricabatterie, perché gli M12-18 C e M12-18 FC caricano entrambe."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "M12 è sufficiente per un uso professionale?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Per molti lavori sì. Secondo Milwaukee, l'avvitatore a impulsi M12 FID2 eroga 170 Nm e serra bulloni fino a M14. Per grandi diametri nel legno, per il calcestruzzo e per un uso pesante continuo, M18 è la scelta più sicura."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quanti utensili ha ciascuna piattaforma?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Secondo Milwaukee, la piattaforma M12 conta più di 125 soluzioni e la piattaforma M18 oltre 325. Milwaukee definisce M12 il più grande sistema a batteria subcompatto."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Un utensile M12 è sempre più piccolo del corrispondente M18?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Non sempre. Secondo le pagine prodotto di Milwaukee, l'avvitatore a impulsi M18 FID3 è lungo 113 mm, mentre l'M12 FID2 misura 127 mm. Con i trapani vale il contrario: l'M12 FPD2 misura 152 mm e l'M18 FPD3 175 mm."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Servono due caricabatterie se ho utensili M12 e M18?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Non necessariamente. I caricabatterie a doppia piattaforma M12-18 C e M12-18 FC accettano sia batterie M12 sia batterie M18, quindi un solo caricabatterie basta per tutta l'attrezzatura."
+          }
+        }
+      ]
+    }
+  ]
+}

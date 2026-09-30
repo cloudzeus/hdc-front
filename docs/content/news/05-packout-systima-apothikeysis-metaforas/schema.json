@@ -1,0 +1,332 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/packout-systima-apothikeysis-metaforas#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/packout-systima-apothikeysis-metaforas",
+      "url": "{{SITE_URL}}/blog/packout-systima-apothikeysis-metaforas",
+      "headline": "PACKOUT: το σύστημα αποθήκευσης και μεταφοράς της Milwaukee",
+      "description": "Πώς δουλεύει το αρθρωτό Milwaukee PACKOUT: τρόλεϊ, εργαλειοθήκες, συρταριέρες, ταμπακιέρες, IP65, φορτία και στοίβες ανά ειδικότητα τεχνίτη.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "Milwaukee PACKOUT, εργαλειοθήκη PACKOUT, τρόλεϊ εργαλειοθήκη Milwaukee, συρταριέρα PACKOUT, ταμπακιέρα PACKOUT, αρθρωτές εργαλειοθήκες, εργαλειοθήκες Milwaukee Πειραιάς",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "PACKOUT"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY TICK"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "IP65"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/range/packout/",
+        "https://www.milwaukeetool.eu/en-eu/packout-trolley-box/packout-trolley-box/",
+        "https://www.milwaukeetool.eu/en-eu/packout-boxes/packout-boxes/",
+        "https://www.milwaukeetool.eu/en-eu/packout-drawer-tool-boxes/packout-drawer-tool-boxes/",
+        "https://www.milwaukeetool.eu/systems/one-key/"
+      ],
+      "wordCount": 1232
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/packout-systima-apothikeysis-metaforas#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/packout-systima-apothikeysis-metaforas#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Κουμπώνουν όλα τα κομμάτια PACKOUT μεταξύ τους;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ναι, αυτή είναι η βασική ιδέα του συστήματος. Η Milwaukee σχεδιάζει τις εργαλειοθήκες, τις ταμπακιέρες και τα καλάθια PACKOUT ώστε να κλειδώνουν το ένα πάνω στο άλλο, ακόμη και όταν έχουν διαφορετικό αποτύπωμα. Έτσι στήνετε μια στοίβα που μετακινείται σαν ένα κομμάτι."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πόσο βάρος σηκώνει το τρόλεϊ PACKOUT;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σύμφωνα με τη Milwaukee, το τρόλεϊ PACKOUT έχει ικανότητα φορτίου έως 113 kg. Στην πράξη βάλτε τα βαριά κουτιά χαμηλά και μην ξεπερνάτε το όριο, γιατί η στοίβα πρέπει να ανεβαίνει και σκαλιά ή ράμπες."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Είναι αδιάβροχες οι εργαλειοθήκες PACKOUT;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Οι εργαλειοθήκες και το τρόλεϊ PACKOUT έχουν στεγάνωση IP65. Σε απλά λόγια, η σκόνη δεν μπαίνει μέσα και το κουτί προστατεύεται από πίδακες νερού, όπως μια δυνατή βροχή. Δεν είναι όμως φτιαγμένα για να μείνουν βυθισμένα σε νερό."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ανοίγουν τα συρτάρια όταν υπάρχουν κουτιά από πάνω;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ναι. Σύμφωνα με τη Milwaukee, τα συρτάρια των συρταριερών PACKOUT ανοίγουν και με κουτιά στοιβαγμένα από πάνω. Κάθε συρτάρι κυλά σε ατσάλινους οδηγούς με ρουλεμάν και σηκώνει έως 11 kg, ενώ μια μπάρα κλειδώματος τα κρατά κλειστά στη μεταφορά."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι η θέση ONE-KEY TICK στα κουτιά PACKOUT;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι μια ειδική θέση στερέωσης για τον ιχνηλάτη ONE-KEY TICK. Με αυτόν, το κουτί μπορεί να καταχωριστεί στην πλατφόρμα ONE-KEY της Milwaukee, τη δωρεάν πλατφόρμα απογραφής και εντοπισμού εργαλείων."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/en/blog/milwaukee-packout-modular-storage-guide#article",
+      "mainEntityOfPage": "{{SITE_URL}}/en/blog/milwaukee-packout-modular-storage-guide",
+      "url": "{{SITE_URL}}/en/blog/milwaukee-packout-modular-storage-guide",
+      "headline": "PACKOUT: Milwaukee's storage and transport system",
+      "description": "How Milwaukee's modular PACKOUT system works: trolley, tool boxes, drawer boxes, organisers, IP65, load ratings and stack ideas for each trade.",
+      "inLanguage": "en",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "Milwaukee PACKOUT, PACKOUT tool box, Milwaukee PACKOUT trolley box, PACKOUT drawer tool box, PACKOUT organiser, modular tool storage system, Milwaukee tool boxes Piraeus",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "PACKOUT"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY TICK"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "IP65"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/range/packout/",
+        "https://www.milwaukeetool.eu/en-eu/packout-trolley-box/packout-trolley-box/",
+        "https://www.milwaukeetool.eu/en-eu/packout-boxes/packout-boxes/",
+        "https://www.milwaukeetool.eu/en-eu/packout-drawer-tool-boxes/packout-drawer-tool-boxes/",
+        "https://www.milwaukeetool.eu/systems/one-key/"
+      ],
+      "wordCount": 1297
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/en/blog/milwaukee-packout-modular-storage-guide#faq",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/en/blog/milwaukee-packout-modular-storage-guide#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Do all PACKOUT pieces lock together?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, that is the core idea of the system. Milwaukee designs PACKOUT tool boxes, organisers and totes to lock onto one another, even when their footprints differ. That way you build one stack that moves as a single unit."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How much weight can the PACKOUT trolley box carry?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "According to Milwaukee, the PACKOUT trolley box has a load capacity of up to 113 kg. In practice, keep the heavy boxes at the bottom and stay within the limit, because the stack still has to go up steps and ramps."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Are PACKOUT tool boxes waterproof?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "PACKOUT tool boxes and the trolley box carry an IP65 seal. In plain words, dust cannot get in and the box is protected against water jets, such as heavy rain. They are not designed to sit submerged in water, though."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can the drawers open with boxes stacked on top?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. According to Milwaukee, the drawers on PACKOUT drawer boxes open even with boxes stacked on top. Each drawer runs on steel ball-bearing slides and holds up to 11 kg, and a locking bar keeps them shut in transit."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the ONE-KEY TICK mount on PACKOUT boxes?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It is a dedicated mounting spot for the ONE-KEY TICK tracker. With it, the box can be registered on Milwaukee's ONE-KEY platform, the free tool inventory and tracking platform."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/it/blog/packout-sistema-portautensili-modulare-milwaukee#article",
+      "mainEntityOfPage": "{{SITE_URL}}/it/blog/packout-sistema-portautensili-modulare-milwaukee",
+      "url": "{{SITE_URL}}/it/blog/packout-sistema-portautensili-modulare-milwaukee",
+      "headline": "PACKOUT: il sistema di stoccaggio e trasporto di Milwaukee",
+      "description": "Come funziona il sistema modulare Milwaukee PACKOUT: trolley, cassette, cassettiere, organizer, IP65, portate e idee di configurazione per ogni mestiere.",
+      "inLanguage": "it-IT",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "Milwaukee PACKOUT, cassetta PACKOUT, trolley PACKOUT Milwaukee, cassettiera PACKOUT, organizer PACKOUT, sistema portautensili modulare, cassette Milwaukee Pireo",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "PACKOUT"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY TICK"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "IP65"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/range/packout/",
+        "https://www.milwaukeetool.eu/en-eu/packout-trolley-box/packout-trolley-box/",
+        "https://www.milwaukeetool.eu/en-eu/packout-boxes/packout-boxes/",
+        "https://www.milwaukeetool.eu/en-eu/packout-drawer-tool-boxes/packout-drawer-tool-boxes/",
+        "https://www.milwaukeetool.eu/systems/one-key/"
+      ],
+      "wordCount": 1265
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/it/blog/packout-sistema-portautensili-modulare-milwaukee#faq",
+      "inLanguage": "it-IT",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/it/blog/packout-sistema-portautensili-modulare-milwaukee#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Tutti i pezzi PACKOUT si agganciano tra loro?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sì, è l'idea di base del sistema. Milwaukee progetta cassette, organizer e contenitori PACKOUT perché si blocchino uno sull'altro, anche quando hanno ingombri diversi. Così si crea una colonna che si sposta come un unico pezzo."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quanto peso regge il trolley PACKOUT?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Secondo Milwaukee, il trolley PACKOUT ha una capacità di carico fino a 113 kg. In pratica mettete in basso le cassette più pesanti e restate entro il limite, perché la colonna deve comunque salire gradini e rampe."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Le cassette PACKOUT sono impermeabili?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Le cassette e il trolley PACKOUT hanno una tenuta IP65. In parole semplici, la polvere non entra e la cassetta è protetta dai getti d'acqua, come una pioggia forte. Non sono però pensate per restare immerse nell'acqua."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "I cassetti si aprono anche con altre cassette sopra?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sì. Secondo Milwaukee, i cassetti delle cassettiere PACKOUT si aprono anche con cassette impilate sopra. Ogni cassetto scorre su guide in acciaio a sfera e regge fino a 11 kg, mentre una barra di blocco li tiene chiusi durante il trasporto."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Cos'è l'alloggiamento ONE-KEY TICK sulle cassette PACKOUT?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "È un punto di fissaggio dedicato al localizzatore ONE-KEY TICK. Con il TICK, la cassetta può essere registrata sulla piattaforma ONE-KEY di Milwaukee, la piattaforma gratuita di inventario e localizzazione degli utensili."
+          }
+        }
+      ]
+    }
+  ]
+}

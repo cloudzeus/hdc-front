@@ -1,0 +1,431 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/bataries-redlithium-forge-high-output#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/bataries-redlithium-forge-high-output",
+      "url": "{{SITE_URL}}/blog/bataries-redlithium-forge-high-output",
+      "headline": "Μπαταρίες Milwaukee REDLITHIUM: Ah, HIGH OUTPUT, FORGE — πώς διαλέγεις",
+      "description": "Τι σημαίνουν τα Ah και τι αλλάζει με HIGH OUTPUT και FORGE στις μπαταρίες Milwaukee REDLITHIUM. Χρόνοι φόρτισης και ποια μπαταρία για ποιο εργαλείο.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "μπαταρίες Milwaukee M18, Milwaukee FORGE μπαταρία, HIGH OUTPUT μπαταρία Milwaukee, REDLITHIUM μπαταρία, χρόνος φόρτισης μπαταρίας Milwaukee, μπαταρίες Milwaukee M12, μπαταρίες Milwaukee Πειραιάς",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLITHIUM"
+        },
+        {
+          "@type": "Thing",
+          "name": "HIGH OUTPUT"
+        },
+        {
+          "@type": "Thing",
+          "name": "FORGE"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLINK PLUS"
+        },
+        {
+          "@type": "Thing",
+          "name": "COOL-CYCLE"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 HB5"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FB12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 B5"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 DBSC"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12-18 FC"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 HB5"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/systems/m18/",
+        "https://www.milwaukeetool.eu/systems/m12/redlithium-ion/",
+        "https://www.milwaukeetool.eu/systems/m12/fuel/",
+        "https://www.milwaukeetool.eu/systems/m12/high-output/",
+        "https://www.milwaukeetool.eu/en-eu/m18-high-output-50-ah-battery/m18-hb5/",
+        "https://www.milwaukeetool.eu/en-eu/m18-forge-120-ah-battery/m18-fb12/"
+      ],
+      "wordCount": 1275
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/bataries-redlithium-forge-high-output#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/bataries-redlithium-forge-high-output#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνουν τα Ah σε μια μπαταρία Milwaukee;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Τα Ah (αμπερώρια) δείχνουν τη χωρητικότητα της μπαταρίας, δηλαδή πόση δουλειά βγάζει περίπου ανά φόρτιση. Μια μπαταρία 5,0 Ah κρατά περισσότερο από μια 2,0 Ah στο ίδιο εργαλείο. Δεν δείχνουν όμως πόση ισχύ δίνει η μπαταρία υπό φορτίο· αυτό το καθορίζει η κατηγορία (REDLITHIUM, HIGH OUTPUT, FORGE)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ποια είναι η διαφορά HIGH OUTPUT και FORGE;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Και οι δύο είναι αναβαθμισμένες κατηγορίες REDLITHIUM για M18. Η HIGH OUTPUT είναι το ενδιάμεσο επίπεδο και η FORGE το ανώτερο, που σύμφωνα με τη Milwaukee δίνει την περισσότερη ισχύ, τη γρηγορότερη φόρτιση και τη μεγαλύτερη διάρκεια ζωής μέσα στη σειρά REDLITHIUM."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ταιριάζει μια μπαταρία FORGE σε όλα τα εργαλεία M18;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ναι. Σύμφωνα με τη Milwaukee, κάθε μπαταρία M18 ταιριάζει σε κάθε εργαλείο M18, άρα και οι μπαταρίες HIGH OUTPUT και FORGE. Στα εργαλεία M12 μπαίνουν μόνο μπαταρίες M12."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πόση ώρα θέλει να φορτίσει μια μπαταρία M18 FB12;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σύμφωνα με τη Milwaukee, στον Super Charger διπλής θύρας M18 DBSC η M18 FB12 φτάνει στο 80% σε 35 λεπτά και γεμίζει σε 45 λεπτά. Στον φορτιστή M12-18 FC ο χρόνος φόρτισης είναι 130 λεπτά."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Δουλεύουν οι μπαταρίες REDLITHIUM στο κρύο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σύμφωνα με τη σελίδα M18 της Milwaukee, οι μπαταρίες REDLITHIUM λειτουργούν έως τους -20 °C, ενώ οι συμβατικές μπαταρίες σταματούν γύρω στους -6 °C."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/en/blog/milwaukee-redlithium-batteries-forge-high-output#article",
+      "mainEntityOfPage": "{{SITE_URL}}/en/blog/milwaukee-redlithium-batteries-forge-high-output",
+      "url": "{{SITE_URL}}/en/blog/milwaukee-redlithium-batteries-forge-high-output",
+      "headline": "Milwaukee REDLITHIUM batteries: Ah, HIGH OUTPUT, FORGE — how to choose",
+      "description": "What Ah means and what HIGH OUTPUT and FORGE change on Milwaukee REDLITHIUM batteries. Charge times and which battery suits which tool.",
+      "inLanguage": "en",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "Milwaukee M18 batteries, Milwaukee FORGE battery, Milwaukee HIGH OUTPUT battery, REDLITHIUM battery, Milwaukee battery charge time, Milwaukee M12 batteries, Milwaukee batteries Piraeus",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLITHIUM"
+        },
+        {
+          "@type": "Thing",
+          "name": "HIGH OUTPUT"
+        },
+        {
+          "@type": "Thing",
+          "name": "FORGE"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLINK PLUS"
+        },
+        {
+          "@type": "Thing",
+          "name": "COOL-CYCLE"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 HB5"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FB12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 B5"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 DBSC"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12-18 FC"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 HB5"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/systems/m18/",
+        "https://www.milwaukeetool.eu/systems/m12/redlithium-ion/",
+        "https://www.milwaukeetool.eu/systems/m12/fuel/",
+        "https://www.milwaukeetool.eu/systems/m12/high-output/",
+        "https://www.milwaukeetool.eu/en-eu/m18-high-output-50-ah-battery/m18-hb5/",
+        "https://www.milwaukeetool.eu/en-eu/m18-forge-120-ah-battery/m18-fb12/"
+      ],
+      "wordCount": 1296
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/en/blog/milwaukee-redlithium-batteries-forge-high-output#faq",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/en/blog/milwaukee-redlithium-batteries-forge-high-output#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What does Ah mean on a Milwaukee battery?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ah (amp-hours) is the battery's capacity, roughly how much work it delivers per charge. A 5.0 Ah battery lasts longer than a 2.0 Ah one in the same tool. It does not tell you how much power the battery delivers under load; that is set by the tier (REDLITHIUM, HIGH OUTPUT, FORGE)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between HIGH OUTPUT and FORGE?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Both are upgraded REDLITHIUM tiers for M18. HIGH OUTPUT is the middle level and FORGE the top one, which according to Milwaukee gives the most power, the fastest charging and the longest life within the REDLITHIUM range."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does a FORGE battery fit every M18 tool?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. According to Milwaukee, every M18 battery fits every M18 tool, and that includes HIGH OUTPUT and FORGE batteries. M12 tools take only M12 batteries."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How long does an M18 FB12 take to charge?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "According to Milwaukee, on the M18 DBSC dual-bay Super Charger the M18 FB12 reaches 80% in 35 minutes and is full in 45 minutes. On the M12-18 FC charger the charge time is 130 minutes."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do REDLITHIUM batteries work in the cold?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "According to Milwaukee's M18 page, REDLITHIUM batteries keep working down to -20 °C, while conventional batteries stop at around -6 °C."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/it/blog/batterie-milwaukee-redlithium-forge-high-output#article",
+      "mainEntityOfPage": "{{SITE_URL}}/it/blog/batterie-milwaukee-redlithium-forge-high-output",
+      "url": "{{SITE_URL}}/it/blog/batterie-milwaukee-redlithium-forge-high-output",
+      "headline": "Batterie Milwaukee REDLITHIUM: Ah, HIGH OUTPUT, FORGE — come scegliere",
+      "description": "Cosa indicano gli Ah e cosa cambia con HIGH OUTPUT e FORGE nelle batterie Milwaukee REDLITHIUM. Tempi di ricarica e quale batteria per quale utensile.",
+      "inLanguage": "it-IT",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "batterie Milwaukee M18, batteria Milwaukee FORGE, batteria Milwaukee HIGH OUTPUT, batteria REDLITHIUM, tempo di ricarica batteria Milwaukee, batterie Milwaukee M12, batterie Milwaukee Pireo",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLITHIUM"
+        },
+        {
+          "@type": "Thing",
+          "name": "HIGH OUTPUT"
+        },
+        {
+          "@type": "Thing",
+          "name": "FORGE"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLINK PLUS"
+        },
+        {
+          "@type": "Thing",
+          "name": "COOL-CYCLE"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 HB5"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FB12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 B5"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 DBSC"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12-18 FC"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 HB5"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/systems/m18/",
+        "https://www.milwaukeetool.eu/systems/m12/redlithium-ion/",
+        "https://www.milwaukeetool.eu/systems/m12/fuel/",
+        "https://www.milwaukeetool.eu/systems/m12/high-output/",
+        "https://www.milwaukeetool.eu/en-eu/m18-high-output-50-ah-battery/m18-hb5/",
+        "https://www.milwaukeetool.eu/en-eu/m18-forge-120-ah-battery/m18-fb12/"
+      ],
+      "wordCount": 1334
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/it/blog/batterie-milwaukee-redlithium-forge-high-output#faq",
+      "inLanguage": "it-IT",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/it/blog/batterie-milwaukee-redlithium-forge-high-output#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Cosa indicano gli Ah su una batteria Milwaukee?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Gli Ah (amperora) indicano la capacità della batteria, cioè quanto lavoro fornisce all'incirca per ogni carica. Una batteria da 5,0 Ah dura più di una da 2,0 Ah sullo stesso utensile. Non dicono però quanta potenza eroga la batteria sotto carico: quello dipende dalla categoria (REDLITHIUM, HIGH OUTPUT, FORGE)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Che differenza c'è tra HIGH OUTPUT e FORGE?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sono entrambe categorie REDLITHIUM potenziate per M18. HIGH OUTPUT è il livello intermedio e FORGE quello più alto, che secondo Milwaukee offre la massima potenza, la ricarica più rapida e la durata più lunga all'interno della gamma REDLITHIUM."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Una batteria FORGE si monta su tutti gli utensili M18?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sì. Secondo Milwaukee, ogni batteria M18 si monta su ogni utensile M18, comprese le batterie HIGH OUTPUT e FORGE. Sugli utensili M12 vanno solo batterie M12."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quanto tempo serve per ricaricare una M18 FB12?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Secondo Milwaukee, sul Super Charger a doppio alloggiamento M18 DBSC la M18 FB12 arriva all'80% in 35 minuti e si carica completamente in 45 minuti. Sul caricabatterie M12-18 FC il tempo di ricarica è di 130 minuti."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Le batterie REDLITHIUM funzionano al freddo?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Secondo la pagina M18 di Milwaukee, le batterie REDLITHIUM continuano a funzionare fino a -20 °C, mentre le batterie convenzionali si fermano intorno a -6 °C."
+          }
+        }
+      ]
+    }
+  ]
+}

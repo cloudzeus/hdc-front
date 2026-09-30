@@ -1,0 +1,434 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/kroustiko-drapanokatsavido-i-palmiko-katsavidi#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/kroustiko-drapanokatsavido-i-palmiko-katsavidi",
+      "url": "{{SITE_URL}}/blog/kroustiko-drapanokatsavido-i-palmiko-katsavidi",
+      "headline": "Κρουστικό δραπανοκατσάβιδο ή παλμικό κατσαβίδι; Ποιο χρειάζεσαι;",
+      "description": "Κρουστικό δραπανοκατσάβιδο ή παλμικό κατσαβίδι; Διαφορές, πότε κερδίζει το καθένα και σύγκριση Milwaukee M18 FPD3, M18 FID3 και M18 FQID SURGE.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "κρουστικό δραπανοκατσάβιδο ή παλμικό κατσαβίδι, διαφορά δραπανοκατσάβιδου και παλμικού, παλμικό κατσαβίδι Milwaukee, Milwaukee M18 FID3, Milwaukee M18 FPD3, υδραυλικό παλμικό κατσαβίδι SURGE, εργαλεία Milwaukee Πειραιάς",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "Κρουστικό δραπανοκατσάβιδο"
+        },
+        {
+          "@type": "Thing",
+          "name": "Παλμικό κατσαβίδι"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "M18 FPD3"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FID3"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FQID"
+        },
+        {
+          "@type": "Thing",
+          "name": "SURGE"
+        },
+        {
+          "@type": "Thing",
+          "name": "FLUID-DRIVE"
+        },
+        {
+          "@type": "Thing",
+          "name": "DRIVE CONTROL"
+        },
+        {
+          "@type": "Thing",
+          "name": "AUTOSTOP"
+        },
+        {
+          "@type": "Thing",
+          "name": "SHOCKWAVE IMPACT DUTY"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FPD2"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FID2"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-percussion-drill/m18-fpd3/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-1-4-hex-impact-driver/m18-fid3/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-surge-1-4-hex-hydraulic-impact-driver/m18-fqid/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-sub-compact-percussion-drill/m12-fpd2/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-sub-compact-1-4-impact-driver/m12-fid2/",
+        "https://www.milwaukeetool.eu/en-eu/shockwave-impact-duty-screwdriving-bits-hex/",
+        "https://uk.milwaukeetool.eu/en-gb/shockwave-impact-duty-sets/"
+      ],
+      "wordCount": 1150
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/kroustiko-drapanokatsavido-i-palmiko-katsavidi#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/kroustiko-drapanokatsavido-i-palmiko-katsavidi#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Μπορώ να τρυπήσω με παλμικό κατσαβίδι;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Για ελαφριές τρύπες ναι, με τρυπάνια που έχουν εξάγωνο στέλεχος. Το παλμικό όμως δεν έχει τσοκ, συμπλέκτη ή κρουστική λειτουργία, οπότε για τοιχοποιία, μεγάλες διαμέτρους και καθαρές τρύπες ακριβείας το κρουστικό δραπανοκατσάβιδο είναι το σωστό εργαλείο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Μπορώ να βιδώνω με κρουστικό δραπανοκατσάβιδο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ναι. Στη λειτουργία βιδώματος ο συμπλέκτης σταματά τη βίδα στο σημείο που θέλετε, κάτι χρήσιμο σε έπιπλα, μεντεσέδες και μαλακά υλικά. Για πολλές και μακριές βίδες όμως το παλμικό κουράζει λιγότερο το χέρι και τελειώνει τη δουλειά πιο άνετα."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνουν rpm, ipm και bpm;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το rpm είναι οι στροφές ανά λεπτό. Το ipm είναι οι κρούσεις ανά λεπτό ενός παλμικού, που χτυπά στη φορά περιστροφής. Το bpm είναι οι κρούσεις ανά λεπτό ενός κρουστικού δραπάνου, που χτυπά μπροστά, προς το υλικό."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Είναι το SURGE πιο αδύναμο από ένα κανονικό παλμικό κατσαβίδι;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σύμφωνα με τη Milwaukee, το M18 FQID SURGE έχει την ίδια απόδοση στο βίδωμα σε ξύλο με τα συμβατικά brushless παλμικά, με περίπου 50% λιγότερο θόρυβο. Στα μπουλόνια η Milwaukee το δίνει έως M14, ενώ το M18 FID3 έως M16."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Χρειάζομαι ειδικές μύτες για παλμικό κατσαβίδι;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Καλό είναι να χρησιμοποιείτε μύτες σχεδιασμένες για παλμικά, όπως η σειρά SHOCKWAVE IMPACT DUTY της Milwaukee. Έχουν σκληρυμένη με laser άκρη WEAR GUARD και ζώνη SHOCK ZONE που απορροφά τις αιχμές της κρούσης, ώστε να σπάνε λιγότερο."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/en/blog/percussion-drill-vs-impact-driver#article",
+      "mainEntityOfPage": "{{SITE_URL}}/en/blog/percussion-drill-vs-impact-driver",
+      "url": "{{SITE_URL}}/en/blog/percussion-drill-vs-impact-driver",
+      "headline": "Percussion drill or impact driver? Which one do you need?",
+      "description": "Percussion drill or impact driver? The differences, when each one wins, and a comparison of the Milwaukee M18 FPD3, M18 FID3 and M18 FQID SURGE.",
+      "inLanguage": "en",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "percussion drill vs impact driver, difference between drill driver and impact driver, Milwaukee impact driver, Milwaukee M18 FID3, Milwaukee M18 FPD3, SURGE hydraulic impact driver, Milwaukee tools Piraeus",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "Percussion drill"
+        },
+        {
+          "@type": "Thing",
+          "name": "Impact driver"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "M18 FPD3"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FID3"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FQID"
+        },
+        {
+          "@type": "Thing",
+          "name": "SURGE"
+        },
+        {
+          "@type": "Thing",
+          "name": "FLUID-DRIVE"
+        },
+        {
+          "@type": "Thing",
+          "name": "DRIVE CONTROL"
+        },
+        {
+          "@type": "Thing",
+          "name": "AUTOSTOP"
+        },
+        {
+          "@type": "Thing",
+          "name": "SHOCKWAVE IMPACT DUTY"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FPD2"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FID2"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-percussion-drill/m18-fpd3/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-1-4-hex-impact-driver/m18-fid3/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-surge-1-4-hex-hydraulic-impact-driver/m18-fqid/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-sub-compact-percussion-drill/m12-fpd2/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-sub-compact-1-4-impact-driver/m12-fid2/",
+        "https://www.milwaukeetool.eu/en-eu/shockwave-impact-duty-screwdriving-bits-hex/",
+        "https://uk.milwaukeetool.eu/en-gb/shockwave-impact-duty-sets/"
+      ],
+      "wordCount": 1219
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/en/blog/percussion-drill-vs-impact-driver#faq",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/en/blog/percussion-drill-vs-impact-driver#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Can I drill with an impact driver?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "For light holes, yes, using drill bits with a hex shank. An impact driver has no chuck, clutch or hammer mode, though, so for masonry, large diameters and clean precision holes the percussion drill is the right tool."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I drive screws with a percussion drill?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. In screwdriving mode the clutch stops the screw exactly where you want, which is useful on furniture, hinges and soft materials. For lots of long screws, however, an impact driver is easier on your hand and gets the job done more comfortably."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What do rpm, ipm and bpm mean?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Rpm is revolutions per minute. Ipm is impacts per minute on an impact driver, which strikes in the direction of rotation. Bpm is blows per minute on a percussion drill, which strikes forwards, into the material."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is SURGE weaker than a standard impact driver?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "According to Milwaukee, the M18 FQID SURGE matches standard brushless impact drivers for fastening into wood, while being about 50% quieter. For bolts, Milwaukee rates it up to M14, compared with M16 for the M18 FID3."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do I need special bits for an impact driver?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It is best to use bits designed for impact drivers, such as Milwaukee's SHOCKWAVE IMPACT DUTY range. They have a laser-hardened WEAR GUARD tip and a SHOCK ZONE that absorbs impact peaks, so they break less often."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/it/blog/trapano-a-percussione-o-avvitatore-a-impulsi#article",
+      "mainEntityOfPage": "{{SITE_URL}}/it/blog/trapano-a-percussione-o-avvitatore-a-impulsi",
+      "url": "{{SITE_URL}}/it/blog/trapano-a-percussione-o-avvitatore-a-impulsi",
+      "headline": "Trapano a percussione o avvitatore a impulsi? Quale ti serve?",
+      "description": "Trapano a percussione o avvitatore a impulsi? Differenze, quando vince ciascuno e confronto tra Milwaukee M18 FPD3, M18 FID3 e M18 FQID SURGE.",
+      "inLanguage": "it-IT",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "trapano a percussione o avvitatore a impulsi, differenza tra trapano avvitatore e avvitatore a impulsi, avvitatore a impulsi Milwaukee, Milwaukee M18 FID3, Milwaukee M18 FPD3, avvitatore a impulsi idraulico SURGE, utensili Milwaukee Pireo",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "Trapano a percussione"
+        },
+        {
+          "@type": "Thing",
+          "name": "Avvitatore a impulsi"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "M18 FPD3"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FID3"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FQID"
+        },
+        {
+          "@type": "Thing",
+          "name": "SURGE"
+        },
+        {
+          "@type": "Thing",
+          "name": "FLUID-DRIVE"
+        },
+        {
+          "@type": "Thing",
+          "name": "DRIVE CONTROL"
+        },
+        {
+          "@type": "Thing",
+          "name": "AUTOSTOP"
+        },
+        {
+          "@type": "Thing",
+          "name": "SHOCKWAVE IMPACT DUTY"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FPD2"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FID2"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-percussion-drill/m18-fpd3/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-1-4-hex-impact-driver/m18-fid3/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-surge-1-4-hex-hydraulic-impact-driver/m18-fqid/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-sub-compact-percussion-drill/m12-fpd2/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-sub-compact-1-4-impact-driver/m12-fid2/",
+        "https://www.milwaukeetool.eu/en-eu/shockwave-impact-duty-screwdriving-bits-hex/",
+        "https://uk.milwaukeetool.eu/en-gb/shockwave-impact-duty-sets/"
+      ],
+      "wordCount": 1236
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/it/blog/trapano-a-percussione-o-avvitatore-a-impulsi#faq",
+      "inLanguage": "it-IT",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/it/blog/trapano-a-percussione-o-avvitatore-a-impulsi#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Posso forare con un avvitatore a impulsi?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Per fori leggeri sì, con punte a gambo esagonale. L'avvitatore a impulsi però non ha mandrino, frizione né modalità percussione, quindi per muratura, grandi diametri e fori puliti di precisione lo strumento giusto è il trapano a percussione."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Posso avvitare con un trapano a percussione?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sì. In modalità avvitatura la frizione ferma la vite esattamente dove volete, cosa utile su mobili, cerniere e materiali teneri. Per molte viti lunghe, però, l'avvitatore a impulsi affatica meno la mano e porta a termine il lavoro con più comodità."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Cosa significano rpm, ipm e bpm?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Rpm sono i giri al minuto. Ipm sono gli impulsi al minuto di un avvitatore a impulsi, che colpisce nel senso di rotazione. Bpm sono i colpi al minuto di un trapano a percussione, che colpisce in avanti, verso il materiale."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "SURGE è meno potente di un avvitatore a impulsi tradizionale?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Secondo Milwaukee, l'M18 FQID SURGE offre le stesse prestazioni degli avvitatori a impulsi brushless tradizionali nell'avvitatura su legno, con circa il 50% di rumore in meno. Sui bulloni Milwaukee lo indica fino a M14, contro M16 dell'M18 FID3."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Servono inserti speciali per l'avvitatore a impulsi?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Conviene usare inserti progettati per avvitatori a impulsi, come la gamma SHOCKWAVE IMPACT DUTY di Milwaukee. Hanno una punta WEAR GUARD temprata al laser e una SHOCK ZONE che assorbe i picchi d'impulso, così si rompono meno."
+          }
+        }
+      ]
+    }
+  ]
+}

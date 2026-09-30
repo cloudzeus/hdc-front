@@ -1,0 +1,377 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/one-key-diacheirisi-ergaleion#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/one-key-diacheirisi-ergaleion",
+      "url": "{{SITE_URL}}/blog/one-key-diacheirisi-ergaleion",
+      "headline": "ONE-KEY: διαχείριση και εντοπισμός εργαλείων Milwaukee",
+      "description": "Τι είναι το Milwaukee ONE-KEY: δωρεάν πλατφόρμα cloud για απογραφή, εντοπισμό, ειδοποιήσεις και κλείδωμα εργαλείων. Λειτουργίες, μοντέλα, για ποιον αξίζει.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "Milwaukee ONE-KEY, ONE-KEY εντοπισμός εργαλείων, διαχείριση εργαλείων εργοταξίου, απογραφή εργαλείων εφαρμογή, κλείδωμα εργαλείων εξ αποστάσεως, εργαλεία ONE-KEY, εργαλεία Milwaukee Πειραιάς",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY TICK"
+        },
+        {
+          "@type": "Thing",
+          "name": "PACKOUT"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "MX FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "Bluetooth"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 ONEFHPX"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 RLOHVG300"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/systems/one-key/",
+        "https://www.milwaukeetool.eu/systems/one-key/why-one-key/digital-inventory/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-high-performance-4-mode-32-mm-sds-plus-hammer-with-one-key-and-fixtec-chuck/m18-onefhpx/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-125-mm-safety-grinder-with-variable-speed-and-one-key/m18-fsagsvo125x/",
+        "https://www.milwaukeetool.eu/en-eu/m18-300-m-green-horizontal-vertical-rotary-laser-with-one-key/m18-rlohvg300/",
+        "https://www.milwaukeetool.eu/en-eu/packout-boxes/packout-boxes/",
+        "https://www.milwaukeetool.eu/en-eu/mx-fuel-350-mm-cut-off-saw/mxf-cos350g2/",
+        "https://www.milwaukeetool.eu/en-eu/mx-fuel-25-kg-class-28-mm-hex-demolition-hammer/mxf-dh2528h/"
+      ],
+      "wordCount": 1032
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/one-key-diacheirisi-ergaleion#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/one-key-diacheirisi-ergaleion#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Κοστίζει η πλατφόρμα ONE-KEY;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σύμφωνα με τη Milwaukee, η πλατφόρμα ONE-KEY στο cloud διατίθεται δωρεάν. Δημιουργείτε λογαριασμό στην εφαρμογή, καταχωρίζετε τα εργαλεία σας και από εκεί διαχειρίζεστε το απόθεμα από υπολογιστή, tablet ή κινητό."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι μπορώ να κάνω αν χαθεί ή κλαπεί ένα εργαλείο ONE-KEY;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Μπορείτε να κλειδώσετε εξ αποστάσεως το εργαλείο ONE-KEY, ώστε να μη λειτουργεί. Η πλατφόρμα προσφέρει επίσης κοινοτική ιχνηλάτηση μέσω Bluetooth, geofencing και ειδοποιήσεις σε πραγματικό χρόνο, που η Milwaukee προορίζει για την αποτροπή απωλειών. Κανένα σύστημα δεν εγγυάται ότι θα βρεθεί το εργαλείο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι το geofencing στο ONE-KEY;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι ένα εικονικό όριο γύρω από ένα σημείο, για παράδειγμα ένα εργοτάξιο ή την αποθήκη σας. Σε συνδυασμό με τις ειδοποιήσεις της πλατφόρμας, σας βοηθά να καταλάβετε γρήγορα πότε κάτι δεν βρίσκεται εκεί που πρέπει."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πώς καταλαβαίνω αν ένα εργαλείο Milwaukee έχει ONE-KEY;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σε πολλά μοντέλα το όνομα ξεκινά με ONE, όπως το M18 ONEFHPX ή το M18 ONEID3. Υπάρχουν όμως και εξαιρέσεις, όπως ο γωνιακός τροχός ασφαλείας M18 FSAGSVO125X, οπότε η σίγουρη πληροφορία είναι στην περιγραφή του προϊόντος."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Αξίζει το ONE-KEY σε έναν μεμονωμένο τεχνίτη;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Συνήθως ναι, αφού η πλατφόρμα είναι δωρεάν. Ακόμη και με λίγα εργαλεία κρατάτε ιστορικό και υπενθυμίσεις σέρβις και μπορείτε να κλειδώσετε εξ αποστάσεως ένα εργαλείο ONE-KEY αν λείψει από το βαν."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/en/blog/milwaukee-one-key-tool-tracking-guide#article",
+      "mainEntityOfPage": "{{SITE_URL}}/en/blog/milwaukee-one-key-tool-tracking-guide",
+      "url": "{{SITE_URL}}/en/blog/milwaukee-one-key-tool-tracking-guide",
+      "headline": "ONE-KEY: Milwaukee tool management and tracking",
+      "description": "What Milwaukee ONE-KEY is: a free cloud platform for tool inventory, tracking, alerts and remote locking. Features, ONE-KEY tools and who it suits best.",
+      "inLanguage": "en",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "Milwaukee ONE-KEY, ONE-KEY tool tracking, jobsite tool management, tool inventory app, remote tool lock, ONE-KEY tools, Milwaukee tools Piraeus",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY TICK"
+        },
+        {
+          "@type": "Thing",
+          "name": "PACKOUT"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "MX FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "Bluetooth"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 ONEFHPX"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 RLOHVG300"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/systems/one-key/",
+        "https://www.milwaukeetool.eu/systems/one-key/why-one-key/digital-inventory/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-high-performance-4-mode-32-mm-sds-plus-hammer-with-one-key-and-fixtec-chuck/m18-onefhpx/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-125-mm-safety-grinder-with-variable-speed-and-one-key/m18-fsagsvo125x/",
+        "https://www.milwaukeetool.eu/en-eu/m18-300-m-green-horizontal-vertical-rotary-laser-with-one-key/m18-rlohvg300/",
+        "https://www.milwaukeetool.eu/en-eu/packout-boxes/packout-boxes/",
+        "https://www.milwaukeetool.eu/en-eu/mx-fuel-350-mm-cut-off-saw/mxf-cos350g2/",
+        "https://www.milwaukeetool.eu/en-eu/mx-fuel-25-kg-class-28-mm-hex-demolition-hammer/mxf-dh2528h/"
+      ],
+      "wordCount": 1064
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/en/blog/milwaukee-one-key-tool-tracking-guide#faq",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/en/blog/milwaukee-one-key-tool-tracking-guide#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Does the ONE-KEY platform cost anything?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "According to Milwaukee, the ONE-KEY cloud platform is free of charge. You create an account in the app, register your tools and from there manage your inventory from a computer, tablet or phone."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What can I do if a ONE-KEY tool is lost or stolen?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "You can lock the ONE-KEY tool remotely so that it will not run. The platform also offers community Bluetooth tracking, geofencing and real-time alerts, which Milwaukee intends for loss prevention. No system can guarantee the tool will be found."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is geofencing in ONE-KEY?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It is a virtual boundary around a location, for example a jobsite or your warehouse. Combined with the platform's alerts, it helps you notice quickly when something is not where it should be."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How can I tell whether a Milwaukee tool has ONE-KEY?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "On many models the name starts with ONE, such as the M18 ONEFHPX or the M18 ONEID3. There are exceptions, though, such as the M18 FSAGSVO125X safety grinder, so the reliable answer is in the product description."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is ONE-KEY worth it for a sole tradesperson?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Usually yes, since the platform is free. Even with a few tools you keep a history and service reminders, and you can remotely lock a ONE-KEY tool if it goes missing from the van."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/it/blog/one-key-gestione-e-tracciamento-utensili#article",
+      "mainEntityOfPage": "{{SITE_URL}}/it/blog/one-key-gestione-e-tracciamento-utensili",
+      "url": "{{SITE_URL}}/it/blog/one-key-gestione-e-tracciamento-utensili",
+      "headline": "ONE-KEY: gestione e localizzazione degli utensili Milwaukee",
+      "description": "Cos'è Milwaukee ONE-KEY: piattaforma cloud gratuita per inventario, localizzazione, avvisi e blocco remoto degli utensili. Funzioni, modelli, a chi serve.",
+      "inLanguage": "it-IT",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "Milwaukee ONE-KEY, ONE-KEY localizzazione utensili, gestione utensili di cantiere, app inventario utensili, blocco utensili da remoto, utensili ONE-KEY, utensili Milwaukee Pireo",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY TICK"
+        },
+        {
+          "@type": "Thing",
+          "name": "PACKOUT"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "MX FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "Bluetooth"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 ONEFHPX"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 RLOHVG300"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/systems/one-key/",
+        "https://www.milwaukeetool.eu/systems/one-key/why-one-key/digital-inventory/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-high-performance-4-mode-32-mm-sds-plus-hammer-with-one-key-and-fixtec-chuck/m18-onefhpx/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-125-mm-safety-grinder-with-variable-speed-and-one-key/m18-fsagsvo125x/",
+        "https://www.milwaukeetool.eu/en-eu/m18-300-m-green-horizontal-vertical-rotary-laser-with-one-key/m18-rlohvg300/",
+        "https://www.milwaukeetool.eu/en-eu/packout-boxes/packout-boxes/",
+        "https://www.milwaukeetool.eu/en-eu/mx-fuel-350-mm-cut-off-saw/mxf-cos350g2/",
+        "https://www.milwaukeetool.eu/en-eu/mx-fuel-25-kg-class-28-mm-hex-demolition-hammer/mxf-dh2528h/"
+      ],
+      "wordCount": 1057
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/it/blog/one-key-gestione-e-tracciamento-utensili#faq",
+      "inLanguage": "it-IT",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/it/blog/one-key-gestione-e-tracciamento-utensili#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "La piattaforma ONE-KEY è a pagamento?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Secondo Milwaukee, la piattaforma cloud ONE-KEY è gratuita. Create un account nell'app, registrate i vostri utensili e da lì gestite l'inventario da computer, tablet o telefono."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Cosa posso fare se un utensile ONE-KEY viene perso o rubato?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Potete bloccare da remoto l'utensile ONE-KEY, così che non funzioni. La piattaforma offre anche la localizzazione Bluetooth della community, il geofencing e gli avvisi in tempo reale, che Milwaukee destina alla prevenzione delle perdite. Nessun sistema garantisce che l'utensile venga ritrovato."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Cos'è il geofencing in ONE-KEY?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "È un confine virtuale attorno a un luogo, per esempio un cantiere o il vostro magazzino. Insieme agli avvisi della piattaforma, vi aiuta ad accorgervi in fretta quando qualcosa non si trova dove dovrebbe."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Come capisco se un utensile Milwaukee ha ONE-KEY?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Su molti modelli il nome inizia con ONE, come l'M18 ONEFHPX o l'M18 ONEID3. Ci sono però eccezioni, come la smerigliatrice di sicurezza M18 FSAGSVO125X, quindi l'informazione certa è nella descrizione del prodotto."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "ONE-KEY conviene anche a un artigiano che lavora da solo?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Di solito sì, visto che la piattaforma è gratuita. Anche con pochi utensili tenete uno storico e i promemoria di manutenzione, e potete bloccare da remoto un utensile ONE-KEY se sparisce dal furgone."
+          }
+        }
+      ]
+    }
+  ]
+}

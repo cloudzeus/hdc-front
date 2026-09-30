@@ -1,0 +1,392 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/mx-fuel-vareos-exoplismos-choris-kalodio#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/mx-fuel-vareos-exoplismos-choris-kalodio",
+      "url": "{{SITE_URL}}/blog/mx-fuel-vareos-exoplismos-choris-kalodio",
+      "headline": "MX FUEL: βαρύς εξοπλισμός χωρίς καλώδιο και χωρίς βενζίνη",
+      "description": "Τι είναι το Milwaukee MX FUEL: κόφτης 350 mm, κατεδαφιστικό 28 mm Hex, δονητές και φωτισμός με μπαταρία, χωρίς καυσαέρια. Στοιχεία, πίνακας και ερωτήσεις.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "Milwaukee MX FUEL, κόφτης 350 mm μπαταρίας, κατεδαφιστικό πιστολέτο μπαταρίας, μηχανήματα εργοταξίου χωρίς βενζίνη, MXF COS350G2, MXF DH2528H, μηχανήματα Milwaukee Πειραιάς",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "MX FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "MX FUEL FORGE"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "POWERSTATE"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLINK PLUS"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        },
+        {
+          "@type": "Thing",
+          "name": "RAPIDSTOP"
+        },
+        {
+          "@type": "Thing",
+          "name": "COOL-CYCLE"
+        },
+        {
+          "@type": "Thing",
+          "name": "MXF COS350G2"
+        },
+        {
+          "@type": "Thing",
+          "name": "MXF DH2528H"
+        },
+        {
+          "@type": "Thing",
+          "name": "MXF XC608"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/systems/mx-fuel/",
+        "https://www.milwaukeetool.eu/systems/mx-fuel/forge/",
+        "https://www.milwaukeetool.eu/en-eu/mx-fuel-350-mm-cut-off-saw/mxf-cos350g2/",
+        "https://www.milwaukeetool.eu/en-eu/mx-fuel-25-kg-class-28-mm-hex-demolition-hammer/mxf-dh2528h/",
+        "https://www.milwaukeetool.eu/systems/one-key/"
+      ],
+      "wordCount": 1196
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/mx-fuel-vareos-exoplismos-choris-kalodio#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/mx-fuel-vareos-exoplismos-choris-kalodio#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Τι είναι το Milwaukee MX FUEL;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι το σύστημα μπαταρίας της Milwaukee για ελαφρύ εξοπλισμό εργοταξίου, με πάνω από 25 λύσεις, όπως κόφτες, κατεδαφιστικά πιστολέτα, δονητές σκυροδέματος, φωτισμό και αντλίες. Σύμφωνα με τη Milwaukee, στοχεύει σε απόδοση αντίστοιχη με βενζινοκίνητο, ηλεκτρικό ή πνευματικό εξοπλισμό, χωρίς καυσαέρια."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Μπορώ να χρησιμοποιήσω μηχανήματα MX FUEL σε κλειστό χώρο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ναι. Επειδή δουλεύουν με μπαταρία και δεν βγάζουν καυσαέρια, η Milwaukee τα προορίζει και για εσωτερικούς χώρους, σκάμματα, τούνελ και ορυχεία. Η σκόνη από την κοπή ή την καθαίρεση παραμένει, οπότε τα μέσα ατομικής προστασίας χρειάζονται κανονικά."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πόση δουλειά βγάζει το MXF DH2528H με μία μπαταρία;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σύμφωνα με τη Milwaukee, με μία μπαταρία MXF XC608 το κατεδαφιστικό MXF DH2528H σπάει έως 2,5 τόνους σκυρόδεμα ή ανοίγει χαντάκι έως 18 μέτρα, με βάθος 20 cm και πλάτος 30 cm."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πόσο γρήγορα σταματά ο δίσκος στον κόφτη MXF COS350G2;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σύμφωνα με τη Milwaukee, το φρένο RAPIDSTOP σταματά τον δίσκο σε λιγότερο από 2 δευτερόλεπτα. Ο κόφτης έχει επίσης σύστημα προστασίας από κλότσημα (anti-kickback)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Χρειάζεται συντήρηση ο εξοπλισμός MX FUEL;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Δεν χρειάζεται τη συντήρηση ενός βενζινοκινητήρα, ούτε ανεφοδιασμό ή τράβηγμα μίζας. Χρειάζεται όμως βασική φροντίδα: στο MXF DH2528H, για παράδειγμα, μια ενδεικτική λυχνία σέρβις ανάβει κάθε 40 ώρες για γρασάρισμα."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/en/blog/mx-fuel-cordless-heavy-equipment#article",
+      "mainEntityOfPage": "{{SITE_URL}}/en/blog/mx-fuel-cordless-heavy-equipment",
+      "url": "{{SITE_URL}}/en/blog/mx-fuel-cordless-heavy-equipment",
+      "headline": "MX FUEL: heavy equipment with no cord and no petrol",
+      "description": "What Milwaukee MX FUEL is: a 350 mm cut-off saw, a 28 mm Hex breaker, vibrators and lights on battery power, with no exhaust fumes. Specs, table and FAQ.",
+      "inLanguage": "en",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "Milwaukee MX FUEL, cordless 350 mm cut-off saw, cordless demolition hammer, battery site equipment without petrol, MXF COS350G2, MXF DH2528H, Milwaukee equipment Piraeus",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "MX FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "MX FUEL FORGE"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "POWERSTATE"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLINK PLUS"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        },
+        {
+          "@type": "Thing",
+          "name": "RAPIDSTOP"
+        },
+        {
+          "@type": "Thing",
+          "name": "COOL-CYCLE"
+        },
+        {
+          "@type": "Thing",
+          "name": "MXF COS350G2"
+        },
+        {
+          "@type": "Thing",
+          "name": "MXF DH2528H"
+        },
+        {
+          "@type": "Thing",
+          "name": "MXF XC608"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/systems/mx-fuel/",
+        "https://www.milwaukeetool.eu/systems/mx-fuel/forge/",
+        "https://www.milwaukeetool.eu/en-eu/mx-fuel-350-mm-cut-off-saw/mxf-cos350g2/",
+        "https://www.milwaukeetool.eu/en-eu/mx-fuel-25-kg-class-28-mm-hex-demolition-hammer/mxf-dh2528h/",
+        "https://www.milwaukeetool.eu/systems/one-key/"
+      ],
+      "wordCount": 1217
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/en/blog/mx-fuel-cordless-heavy-equipment#faq",
+      "inLanguage": "en",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/en/blog/mx-fuel-cordless-heavy-equipment#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is Milwaukee MX FUEL?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It is Milwaukee's battery system for light site equipment, with more than 25 solutions such as cut-off saws, breakers, concrete vibrators, lighting and pumps. According to Milwaukee, it aims to match the performance of petrol, corded and pneumatic equipment, with no exhaust fumes."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I use MX FUEL equipment indoors?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Because it runs on batteries and produces no exhaust fumes, Milwaukee positions it for indoor work, trenches, tunnels and mines as well. Dust from cutting or demolition is still there, so personal protective equipment is needed as usual."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How much work does the MXF DH2528H do on one battery?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "According to Milwaukee, on one MXF XC608 battery the MXF DH2528H breaker removes up to 2.5 tonnes of concrete or digs a trench up to 18 metres long, 20 cm deep and 30 cm wide."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How quickly does the blade stop on the MXF COS350G2 cut-off saw?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "According to Milwaukee, the RAPIDSTOP brake stops the blade in under 2 seconds. The saw also has an anti-kickback system."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does MX FUEL equipment need maintenance?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It does not need petrol-engine maintenance, refuelling or pull-starting. It still needs basic care: on the MXF DH2528H, for example, a service light comes on every 40 hours as a reminder to grease it."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/it/blog/mx-fuel-attrezzature-pesanti-a-batteria#article",
+      "mainEntityOfPage": "{{SITE_URL}}/it/blog/mx-fuel-attrezzature-pesanti-a-batteria",
+      "url": "{{SITE_URL}}/it/blog/mx-fuel-attrezzature-pesanti-a-batteria",
+      "headline": "MX FUEL: attrezzature pesanti senza cavo e senza benzina",
+      "description": "Cos'è Milwaukee MX FUEL: troncatrice da 350 mm, demolitore 28 mm Hex, vibratori e luci a batteria, senza gas di scarico. Dati, tabella e domande frequenti.",
+      "inLanguage": "it-IT",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "Milwaukee MX FUEL, troncatrice a batteria 350 mm, demolitore a batteria, attrezzature da cantiere senza benzina, MXF COS350G2, MXF DH2528H, attrezzature Milwaukee Pireo",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "MX FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "MX FUEL FORGE"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "POWERSTATE"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLINK PLUS"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        },
+        {
+          "@type": "Thing",
+          "name": "RAPIDSTOP"
+        },
+        {
+          "@type": "Thing",
+          "name": "COOL-CYCLE"
+        },
+        {
+          "@type": "Thing",
+          "name": "MXF COS350G2"
+        },
+        {
+          "@type": "Thing",
+          "name": "MXF DH2528H"
+        },
+        {
+          "@type": "Thing",
+          "name": "MXF XC608"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/systems/mx-fuel/",
+        "https://www.milwaukeetool.eu/systems/mx-fuel/forge/",
+        "https://www.milwaukeetool.eu/en-eu/mx-fuel-350-mm-cut-off-saw/mxf-cos350g2/",
+        "https://www.milwaukeetool.eu/en-eu/mx-fuel-25-kg-class-28-mm-hex-demolition-hammer/mxf-dh2528h/",
+        "https://www.milwaukeetool.eu/systems/one-key/"
+      ],
+      "wordCount": 1240
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/it/blog/mx-fuel-attrezzature-pesanti-a-batteria#faq",
+      "inLanguage": "it-IT",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/it/blog/mx-fuel-attrezzature-pesanti-a-batteria#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Cos'è Milwaukee MX FUEL?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "È il sistema a batteria di Milwaukee per le attrezzature leggere da cantiere, con oltre 25 soluzioni come troncatrici, demolitori, vibratori per calcestruzzo, illuminazione e pompe. Secondo Milwaukee, punta a prestazioni equivalenti alle attrezzature a benzina, elettriche con cavo e pneumatiche, senza gas di scarico."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Posso usare le attrezzature MX FUEL al chiuso?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sì. Poiché funzionano a batteria e non producono gas di scarico, Milwaukee le destina anche a interni, trincee, gallerie e miniere. La polvere del taglio o della demolizione resta, quindi i dispositivi di protezione individuale servono come sempre."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quanto lavoro fa l'MXF DH2528H con una batteria?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Secondo Milwaukee, con una batteria MXF XC608 il demolitore MXF DH2528H frantuma fino a 2,5 tonnellate di calcestruzzo oppure scava una trincea lunga fino a 18 metri, profonda 20 cm e larga 30 cm."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "In quanto tempo si ferma il disco della troncatrice MXF COS350G2?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Secondo Milwaukee, il freno RAPIDSTOP ferma il disco in meno di 2 secondi. La troncatrice ha anche un sistema anti-contraccolpo."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Le attrezzature MX FUEL richiedono manutenzione?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Non richiedono la manutenzione di un motore a benzina, né rifornimenti né avviamento a strappo. Serve comunque una cura di base: sull'MXF DH2528H, per esempio, una spia di servizio si accende ogni 40 ore per ricordare l'ingrassaggio."
+          }
+        }
+      ]
+    }
+  ]
+}
