@@ -26,6 +26,8 @@ export type ArticleRow = {
   metaDescription: string | null;
   hasFaq: boolean;
   heroImageUrl: string | null;
+  /** AUTO: written by the automatic writer (src/lib/content-auto). */
+  source: "MANUAL" | "AUTO";
   publishedAt: string | null;
   updatedAt: string;
   updatedBy: string;
@@ -59,6 +61,7 @@ export async function listArticles(filter: {
       publishedAt: true,
       updatedAt: true,
       updatedBy: true,
+      source: true,
     },
   });
   return rows.map((r) => ({

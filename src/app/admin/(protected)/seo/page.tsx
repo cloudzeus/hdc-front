@@ -24,7 +24,9 @@ import { autoCategorySeo, autoHubSeo, autoModelSeo, autoProductSeo } from "@/lib
 import { SITE_ID_ENV, siteId, type SiteIdName } from "@/lib/seo/site-ids";
 import { siteOrigin } from "@/lib/seo/urls";
 import { getSetting } from "@/lib/settings/settings";
+import { autoOverview } from "@/lib/content-auto/admin";
 import { AiPanel } from "./_components/AiPanel";
+import { AutoPanel } from "./_components/AutoPanel";
 import { ArticleEditor } from "./_components/ArticleEditor";
 import { ArticlesList } from "./_components/ArticlesList";
 import { OverrideEditor } from "./_components/OverrideEditor";
@@ -40,6 +42,7 @@ const TABS = [
   { id: "redirects", label: "Ανακατευθύνσεις" },
   { id: "audit", label: "Έλεγχος SEO" },
   { id: "ai", label: "AI (GEO)" },
+  { id: "auto", label: "Αυτόματα άρθρα" },
   { id: "indexing", label: "Ευρετηρίαση" },
 ] as const;
 
@@ -89,6 +92,7 @@ export default async function SeoPage({ searchParams }: { searchParams: Promise<
       {tab === "redirects" && <RedirectsTab canEdit={canEdit} />}
       {tab === "audit" && <AuditTab />}
       {tab === "ai" && <AiTab canEdit={canEdit} />}
+      {tab === "auto" && <AutoTab canEdit={canEdit} />}
       {tab === "indexing" && <IndexingTab />}
     </PageShell>
   );
@@ -423,7 +427,13 @@ async function AiTab({ canEdit }: { canEdit: boolean }) {
   return <AiPanel summary={summary} fallback={DEFAULT_SUMMARY_EL} canEdit={canEdit} />;
 }
 
-// ── 8. Indexing ─────────────────────────────────────────────────────────────
+// ── 8. Automatic articles ───────────────────────────────────────────────────
+
+async function AutoTab({ canEdit }: { canEdit: boolean }) {
+  return <AutoPanel data={await autoOverview()} canEdit={canEdit} />;
+}
+
+// ── 9. Indexing ─────────────────────────────────────────────────────────────
 
 const ID_LABELS: Record<SiteIdName, string> = {
   gscVerification: "Search Console (επαλήθευση)",

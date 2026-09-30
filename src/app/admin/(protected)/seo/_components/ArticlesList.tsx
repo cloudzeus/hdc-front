@@ -159,6 +159,7 @@ export function ArticlesList({
                   {row.title}
                 </Link>
                 <p className="font-mono text-[length:var(--fs-11)] text-k-text-4">{row.slug}</p>
+                {row.source === "AUTO" && <AutoTag />}
                 {!row.hasFaq && <p className="text-[length:var(--fs-11)] text-[var(--hdc-wait)]">Χωρίς FAQ</p>}
               </td>
               <td className="px-3 py-2.5 text-k-text-2">{KIND_LABEL[row.kind]}</td>
@@ -195,6 +196,7 @@ export function ArticlesList({
             <p className="font-mono text-[length:var(--fs-11)] break-all text-k-text-4">
               {KIND_LABEL[row.kind]} · {row.slug}
             </p>
+            {row.source === "AUTO" && <AutoTag />}
             {canEdit && (
               <Button type="button" size="sm" variant="outline" className="w-fit" disabled={pending} onClick={() => toggle(row)}>
                 {row.status === "PUBLISHED" ? "Απόσυρση" : "Δημοσίευση"}
@@ -218,6 +220,15 @@ function StatusTag({ status }: { status: ArticleRow["status"] }) {
       )}
     >
       {status === "PUBLISHED" ? "Δημοσιευμένο" : "Πρόχειρο"}
+    </span>
+  );
+}
+
+/** Written by the automatic writer: withdrawn with «Απόσυρση» like any other. */
+function AutoTag() {
+  return (
+    <span className="mt-1 inline-flex w-fit border border-k-line bg-k-surface-3 px-1.5 py-px text-[length:var(--fs-11)] font-medium text-k-text-2">
+      Αυτόματο
     </span>
   );
 }
