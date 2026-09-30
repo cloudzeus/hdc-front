@@ -121,6 +121,10 @@ describe("verifyArticle", () => {
     ]);
     expect(chat.mock.calls[0][0].temperature).toBe(0);
     expect(chat.mock.calls[0][0].system).toMatch(/"advice"/);
+    // Typical tasks of the category are advice; a capability the pack does not state stays a fact.
+    expect(chat.mock.calls[0][0].system).toContain("σε συνεργείο σπρώχνει ρινίσματα");
+    expect(chat.mock.calls[0][0].system).toContain("«κόβει μπετό»");
+    expect(chat.mock.calls[0][0].system).toMatch(/λεξικό τεχνολογιών.*ΣΤΗΡΙΖΟΝΤΑΙ/);
   });
 
   it("returns none when everything is supported", async () => {

@@ -5,6 +5,7 @@ vi.mock("@/lib/prisma", () => ({ prisma: {} }));
 import {
   BOX_LABEL,
   dedupeByModel,
+  packGlossary,
   versionsOf,
   STORE_FACTS,
   isBareModel,
@@ -204,5 +205,26 @@ describe("versions: one per model code", () => {
       versions: versionsOf(products),
     };
     expect(JSON.stringify(promptPack(pack))).toContain('"εκδόσεις":{"πλήθος":1,"μοντέλα":["M18 FPD3-502X"]}');
+  });
+});
+
+describe("the glossary in the pack", () => {
+  it("adds the vetted statements the products call for, and their numbers count as supported", () => {
+    const products = [packProduct(raw(), null)];
+    const glossary = packGlossary(products);
+    expect(glossary.map((g) => g.term)).toEqual(expect.arrayContaining(["M18", "FUEL", "REDLINK PLUS"]));
+    const pack: FactPack = {
+      topic: { kind: "MODEL", title: "t", keyword: "k", keywords: [], categoryName: null },
+      articleKind: "ARTICLE",
+      products,
+      links: [],
+      store: STORE_FACTS,
+      sources: [],
+      representative: null,
+      notes: [],
+      glossary,
+    };
+    expect(JSON.stringify(promptPack(pack))).toContain("Προστατεύουν από υπερφόρτωση");
+    expect(unsupportedNumbers("δουλεύουν ως τους -20 °C", packNumbers(pack))).toEqual([]);
   });
 });

@@ -12,6 +12,7 @@ import { allowedImage } from "@/lib/seo/markdown";
 import { internalLinks } from "@/lib/seo/seo-checks";
 import { supportedNumbers } from "@/lib/content-auto/text";
 import type { TopicPayload } from "@/lib/content-auto/planner";
+import { glossaryFor, type GlossaryEntry } from "@/lib/content-auto/glossary";
 
 /**
  * The fact pack: the ONLY source the writer may use (spec §4).
@@ -66,7 +67,21 @@ export type FactPack = {
   notes: string[];
   /** Distinct model codes: what «N εκδόσεις» may say. */
   versions?: { count: number; models: string[] };
+  /** Vetted statements about the Milwaukee technologies these products use (glossary.ts). */
+  glossary?: GlossaryEntry[];
 };
+
+/** The glossary entries a pack's products call for: by platform, FUEL, ONE-KEY, and what their data names. */
+export function packGlossary(products: PackProduct[]): GlossaryEntry[] {
+  return glossaryFor(
+    products.map((p) => ({
+      platform: p.platform,
+      fuel: p.fuel,
+      oneKey: p.oneKey,
+      text: [p.name, p.model ?? "", p.kit ?? "", p.description ?? "", ...p.specs.map((r) => `${r.label} ${r.value}`), ...p.official.map((o) => `${o.name} ${o.value}`)].join(" "),
+    })),
+  );
+}
 
 export const STORE_FACTS = [
   "Το Milwaukee Heavy Duty Centre είναι κατάστημα εργαλείων Milwaukee στον Πειραιά.",
@@ -228,6 +243,7 @@ export function promptPack(pack: FactPack) {
     })),
     σύνδεσμοι: pack.links,
     κατάστημα: pack.store,
+    "λεξικό τεχνολογιών Milwaukee (επαληθευμένο)": pack.glossary?.length ? pack.glossary : undefined,
   };
 }
 
@@ -235,6 +251,7 @@ export function promptPack(pack: FactPack) {
 export function packNumbers(pack: FactPack): Set<string> {
   const texts = [
     ...pack.store,
+    ...(pack.glossary ?? []).map((g) => g.text),
     ...pack.products.flatMap((p) => [p.name, p.model ?? "", p.kit ?? "", p.description ?? ""]),
   ];
   const rows = pack.products.flatMap((p) => [...p.specs, ...p.official.map((o) => ({ label: o.name, value: o.value, unit: o.unit }))]);
@@ -401,6 +418,7 @@ export async function loadFactPack(topic: TopicForPack, options: LoadOptions = {
     representative: null,
     notes,
     versions: versionsOf(products),
+    glossary: packGlossary(products),
   };
   pack.representative = pickRepresentative(products, topic.kind);
   return pack;
