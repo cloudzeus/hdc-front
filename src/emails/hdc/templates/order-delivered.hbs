@@ -1,0 +1,9 @@
+{{> heading eyebrow=(T "delivered.eyebrow") title=(T "delivered.title") lead=(t "delivered.lead" number=order.number)}}
+{{> facts rows=delivery.rows}}
+{{> note tone="red" title=(T "delivered.check_title") text=(t "delivered.check")}}
+{{> order-items}}
+{{> cta label=(T "order.view") href=order.url}}
+<tr><td class="px dm-body" align="center" style="padding:0 24px 8px; background-color:#ffffff;">
+  <p style="margin:0; font-family:$FONT; font-size:13px; line-height:16px; font-weight:800; letter-spacing:0.06em;"><a href="{{@root.site.returns}}" style="color:$RED; text-decoration:none;">{{T "delivered.returns"}}&nbsp;&rarr;</a></p>
+</td></tr>
+{{> help lead=(t "help.order") reply=true}}

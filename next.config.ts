@@ -46,6 +46,15 @@ const nextConfig: NextConfig = {
     ],
   },
   serverExternalPackages: ["@node-rs/argon2"],
+  /*
+   * The email templates are read from disk at runtime (lib/mail/hdc/render.ts)
+   * by every route that sends mail — checkout, webhooks, server actions — so
+   * the standalone build must carry them for all routes, not only the ones the
+   * tracer happens to connect to the readdir.
+   */
+  outputFileTracingIncludes: {
+    "/**": ["./src/emails/hdc/**/*"],
+  },
 };
 
 export default withNextIntl(nextConfig);

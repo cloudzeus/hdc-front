@@ -1,0 +1,14 @@
+    <tr>
+      <td class="dm-rule" width="92" valign="top" style="width:92px; padding:16px 12px 16px 0;{{#unless @last}} border-bottom:1px solid $G3;{{/unless}}">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td class="dm-img" bgcolor="#ffffff" style="background-color:#ffffff; border:1px solid $G3; padding:4px;">
+          {{#if image}}<img class="item-img" src="{{img image 144}}" width="72" height="72" alt="" style="display:block; width:72px; height:72px; border:0; outline:none;">{{else}}<div style="width:72px; height:72px; line-height:72px; font-size:0;">&nbsp;</div>{{/if}}
+        </td></tr></table>
+      </td>
+      <td class="dm-rule" valign="top" style="padding:16px 12px 16px 0;{{#unless @last}} border-bottom:1px solid $G3;{{/unless}}">
+        <p class="dm-text" style="margin:0 0 4px; font-family:$FONT; font-size:15px; line-height:20px; font-weight:700; color:$INK;">{{#if url}}<a href="{{url}}" class="dm-text" style="color:$INK; text-decoration:none;">{{name}}</a>{{else}}{{name}}{{/if}}</p>
+        <p class="dm-muted" style="margin:0 0 4px; font-family:$FONT; font-size:13px; line-height:18px; color:$G5;">{{t "line.code"}} {{code}}{{#if unit}} · {{qty}} × {{unit}}{{else}} · {{t "line.qty"}} {{qty}}{{/if}}</p>
+        {{#if availability}}<p style="margin:0; font-family:$FONT; font-size:13px; line-height:18px; font-weight:600;">{{> availability}}</p>{{/if}}
+        {{#if action}}<p style="margin:6px 0 0; font-family:$FONT; font-size:13px; line-height:18px; font-weight:800; letter-spacing:0.06em;"><a href="{{action.href}}" style="color:$RED; text-decoration:none;">{{upper action.label}}&nbsp;&rarr;</a></p>{{/if}}
+      </td>
+      <td class="dm-rule dm-text" valign="top" align="right" style="padding:16px 0; white-space:nowrap; font-family:$FONT; font-size:16px; line-height:20px; font-weight:800; color:$INK;{{#unless @last}} border-bottom:1px solid $G3;{{/unless}}">{{total}}</td>
+    </tr>

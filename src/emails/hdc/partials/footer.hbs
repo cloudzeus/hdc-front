@@ -1,0 +1,40 @@
+<!-- FOOTER -->
+<tr><td style="height:4px; line-height:4px; font-size:4px; background-color:$RED;" bgcolor="$RED">&nbsp;</td></tr>
+{{#if @root.simple}}
+<tr><td class="px" style="padding:20px 24px 24px; background-color:$INK;" bgcolor="$INK">
+  <p style="margin:0; font-family:$FONT; font-size:12px; line-height:18px; color:$G3;">{{@root.footerWhy}}</p>
+</td></tr>
+{{else}}
+<tr><td class="px" style="padding:32px 24px 8px; background-color:$INK;" bgcolor="$INK">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+    <td class="stack" valign="top" width="300" style="width:300px; padding-right:16px;">
+      <p style="margin:0 0 10px; font-family:$FONT; font-size:13px; line-height:16px; font-weight:800; letter-spacing:0.06em; color:#ffffff;">{{T "footer.store"}}</p>
+      <p style="margin:0; font-family:$FONT; font-size:14px; line-height:22px; color:$G3;">
+        {{@root.shop.address}}<br>
+        {{@root.shop.hours}}<br>
+        {{t "footer.sunday"}}
+      </p>
+      <p style="margin:12px 0 0; font-family:$FONT; font-size:13px; line-height:16px; font-weight:800; letter-spacing:0.06em;"><a href="{{@root.shop.map}}" style="color:#ffffff; text-decoration:none;">{{T "footer.directions"}}&nbsp;&rarr;</a></p>
+    </td>
+    <td class="stack stack-gap" valign="top" width="236" style="width:236px;">
+      <p style="margin:0 0 10px; font-family:$FONT; font-size:13px; line-height:16px; font-weight:800; letter-spacing:0.06em; color:#ffffff;">{{T "footer.contact"}}</p>
+      <p style="margin:0; font-family:$FONT; font-size:14px; line-height:22px; color:$G3;">
+        <a href="tel:{{@root.shop.phone.e164}}" style="color:#ffffff; text-decoration:none; font-weight:700;">{{@root.shop.phone.display}}</a><br>
+        <a href="mailto:{{@root.shop.email}}" style="color:$G3; text-decoration:none;">{{@root.shop.email}}</a>
+      </p>
+      <p style="margin:12px 0 0; font-family:$FONT; font-size:13px; line-height:16px; font-weight:800; letter-spacing:0.06em;">
+        {{#each @root.social}}{{#unless @first}}&nbsp;&nbsp;&nbsp;{{/unless}}<a href="{{href}}" style="color:#ffffff; text-decoration:none;">{{upper label}}</a>{{/each}}
+      </p>
+    </td>
+  </tr></table>
+</td></tr>
+<tr><td class="px" style="padding:24px 24px 32px; background-color:$INK;" bgcolor="$INK">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-top:1px solid $G7; padding-top:20px;">
+    <p style="margin:0 0 10px; font-family:$FONT; font-size:13px; line-height:20px; color:$G3;">{{@root.footerWhy}}</p>
+    <p style="margin:0 0 16px; font-family:$FONT; font-size:13px; line-height:20px; color:#ffffff;">{{#if @root.newsletter}}<a href="{{@root.unsubscribe}}" style="color:#ffffff; text-decoration:underline;">{{t "footer.preferences"}}</a>&nbsp;&nbsp;·&nbsp;&nbsp;<a href="{{@root.unsubscribe}}" style="color:#ffffff; text-decoration:underline;">{{t "footer.unsubscribe"}}</a>{{else}}<a href="{{@root.site.account}}" style="color:#ffffff; text-decoration:underline;">{{t "footer.preferences"}}</a>{{/if}}</p>
+    <p style="margin:0 0 6px; font-family:$FONT; font-size:12px; line-height:18px; color:$G3;">{{th "footer.operator_html" company=@root.company.name vat=@root.company.vat gemi=@root.company.gemi}}</p>
+    <p style="margin:0 0 6px; font-family:$FONT; font-size:12px; line-height:18px; color:$G3;">{{t "footer.trademarks"}}</p>
+    <p style="margin:0; font-family:$FONT; font-size:12px; line-height:18px; color:$G3;"><a href="{{@root.site.terms}}" style="color:$G3; text-decoration:underline;">{{t "footer.terms"}}</a>&nbsp;·&nbsp;<a href="{{@root.site.privacy}}" style="color:$G3; text-decoration:underline;">{{t "footer.privacy"}}</a></p>
+  </td></tr></table>
+</td></tr>
+{{/if}}

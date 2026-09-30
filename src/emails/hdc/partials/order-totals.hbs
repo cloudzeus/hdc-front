@@ -1,0 +1,16 @@
+<!-- TOTALS -->
+<tr><td class="px dm-body" style="padding:4px 24px 0; background-color:#ffffff;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+    <td class="hide-m" width="236" style="width:236px;">&nbsp;</td>
+    <td style="border-top:1px solid $G3; padding-top:10px;" class="dm-rule">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+      {{#each order.totals}}{{> kv}}{{/each}}
+      <tr>
+        <td class="dm-text dm-rule" style="padding:12px 0 0; border-top:3px solid $INK; font-family:$FONT; font-size:16px; line-height:20px; font-weight:900; letter-spacing:0.02em; color:$INK;">{{T "order.total"}}</td>
+        <td class="dm-text dm-rule" align="right" style="padding:12px 0 0; border-top:3px solid $INK; font-family:$FONT; font-size:26px; line-height:30px; font-weight:900; letter-spacing:-0.02em; color:$INK;">{{order.total}}</td>
+      </tr>
+      <tr><td colspan="2" class="dm-muted" align="right" style="padding:4px 0 0; font-family:$FONT; font-size:12px; line-height:16px; color:$G5;">{{t "order.with_vat"}}</td></tr>
+      </table>
+    </td>
+  </tr></table>
+</td></tr>

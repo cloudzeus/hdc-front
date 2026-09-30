@@ -1,0 +1,12 @@
+{{> heading eyebrow=(T "failed.eyebrow") title=(T "failed.title") lead=(t "failed.lead" number=order.number)}}
+{{> facts rows=payment.rows}}
+{{#if payment.retry_url}}{{> cta label=(T "failed.retry") href=payment.retry_url note=(t "failed.retry_note") top=32 bottom=8}}{{/if}}
+{{#if bank}}
+<tr><td class="px dm-body" style="padding:32px 24px 0; background-color:#ffffff;">
+  {{> section-title title=(T "failed.bank_title")}}
+</td></tr>
+{{> paragraph text=bank.text}}
+{{> facts rows=bank.rows}}
+{{/if}}
+<tr><td class="dm-body" style="height:32px; line-height:32px; font-size:0; background-color:#ffffff;">&nbsp;</td></tr>
+{{> help lead=(t "help.order") reply=true}}

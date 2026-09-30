@@ -1,0 +1,12 @@
+<!-- HEADER: logo on black, red rule -->
+<tr><td class="px" style="padding:22px 24px 20px; background-color:$INK;" bgcolor="$INK">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+    <td valign="middle"><a href="{{@root.site.home}}" style="text-decoration:none;"><img src="{{@root.brand.logo}}" width="168" height="70" alt="Milwaukee Heavy Duty Centre" style="display:block; width:168px; height:70px; border:0; outline:none; color:#ffffff; font-family:$FONT; font-size:16px; font-weight:800;"></a></td>
+    {{#unless @root.simple}}
+    <!--text:skip--><td valign="middle" align="right" class="hide-m" style="font-family:$FONT; font-size:12px; line-height:16px; font-weight:800; letter-spacing:0.06em; color:#ffffff;">
+      <a href="{{@root.site.m18}}" style="color:#ffffff; text-decoration:none;">M18</a>&nbsp;&nbsp;&nbsp;<a href="{{@root.site.m12}}" style="color:#ffffff; text-decoration:none;">M12</a>&nbsp;&nbsp;&nbsp;<a href="{{@root.site.packout}}" style="color:#ffffff; text-decoration:none;">PACKOUT</a>&nbsp;&nbsp;&nbsp;<a href="{{@root.site.offers}}" style="color:#ffffff; text-decoration:none;">{{T "nav.offers"}}</a>
+    </td><!--/text:skip-->
+    {{/unless}}
+  </tr></table>
+</td></tr>
+<tr><td style="height:4px; line-height:4px; font-size:4px; background-color:$RED;" bgcolor="$RED">&nbsp;</td></tr>

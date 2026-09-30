@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="{{lang}}" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="x-apple-disable-message-reformatting">
+<meta name="format-detection" content="telephone=no, date=no, address=no, email=no, url=no">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
+<title>{{title}}</title>
+<!--[if mso]>
+<noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
+<style>table,td,a,p,span,h1,h2,h3{font-family:Arial,sans-serif !important;}</style>
+<![endif]-->
+<!--[if !mso]><!-->
+<link href="https://fonts.googleapis.com/css2?family=TikTok+Sans:opsz,wdth,wght@12..36,75..150,300..900&amp;display=swap" rel="stylesheet">
+<!--<![endif]-->
+<style>
+  /* Mobile */
+  @media only screen and (max-width: 620px) {
+    .container { width: 100% !important; }
+    .px { padding-left: 16px !important; padding-right: 16px !important; }
+    .stack { display: block !important; width: 100% !important; box-sizing: border-box !important; }
+    .stack-gap { padding-top: 20px !important; }
+    .hide-m { display: none !important; }
+    .h1 { font-size: 30px !important; line-height: 1.05 !important; }
+    .hero-num { font-size: 56px !important; }
+    .card-img { width: 120px !important; height: 120px !important; }
+    .card-price { font-size: 18px !important; }
+    .card-name { font-size: 13px !important; }
+    .item-img { width: 64px !important; height: 64px !important; }
+    .btn-cell a { display: block !important; }
+    .grid { width: 100% !important; }
+    .gcell { width: 48% !important; }
+    .ggap { width: 4% !important; }
+    .gpad { padding-left: 8px !important; padding-right: 8px !important; }
+  }
+  /* Dark mode: header, hero and footer are already black; the white body
+     turns graphite, product photos keep their white box. */
+  @media (prefers-color-scheme: dark) {
+    .dm-body { background-color: #1a1a1a !important; }
+    .dm-panel { background-color: $INK !important; border-color: $G7 !important; }
+    .dm-text { color: $G1 !important; }
+    .dm-muted { color: $G3 !important; }
+    .dm-rule { border-color: $G7 !important; }
+    .dm-ok { color: #5fbf7a !important; }
+    .dm-wait { color: #e0a526 !important; }
+    .dm-img { background-color: #ffffff !important; }
+  }
+  [data-ogsc] .dm-body { background-color: #1a1a1a !important; }
+  [data-ogsc] .dm-panel { background-color: $INK !important; }
+  [data-ogsc] .dm-text { color: $G1 !important; }
+  [data-ogsc] .dm-muted { color: $G3 !important; }
+  [data-ogsc] .dm-ok { color: #5fbf7a !important; }
+  [data-ogsc] .dm-wait { color: #e0a526 !important; }
+</style>
+</head>
+<body style="margin:0; padding:0; width:100%; background-color:$G1; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
+<!--text:skip--><div style="display:none; max-height:0; overflow:hidden; mso-hide:all; font-size:1px; line-height:1px; color:$G1;">{{preheader}}&#8199;&#65279;&#847;&#8199;&#65279;&#847;&#8199;&#65279;&#847;&#8199;&#65279;&#847;&#8199;&#65279;&#847;&#8199;&#65279;&#847;&#8199;&#65279;&#847;&#8199;&#65279;&#847;</div><!--/text:skip-->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:$G1;">
+<tr><td align="center" style="padding:0;">
+<!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
+<table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:600px; background-color:#ffffff;">
+<!--text:skip--><tr><td class="px" style="padding:10px 24px; background-color:$G1;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+    <td style="font-family:$FONT; font-size:12px; line-height:16px; color:$G5;">{{topline.left}}</td>
+    <td align="right" style="font-family:$FONT; font-size:12px; line-height:16px; color:$G5;">{{#if topline.href}}<a href="{{topline.href}}" style="color:$G5; text-decoration:underline;">{{topline.right}}</a>{{else}}{{topline.right}}{{/if}}</td>
+  </tr></table>
+</td></tr><!--/text:skip-->
+{{> header}}
+{{{body}}}
+{{> footer}}
+</table>
+<!--[if mso]></td></tr></table><![endif]-->
+</td></tr>
+</table>
+</body>
+</html>

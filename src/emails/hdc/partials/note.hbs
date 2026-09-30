@@ -1,0 +1,10 @@
+<!-- NOTE -->
+<tr><td class="px dm-body" style="padding:16px 24px 0; background-color:#ffffff;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+    <td width="4" bgcolor="{{#if (eq tone "red")}}$RED{{else if (eq tone "ok")}}$OK{{else}}$WAIT{{/if}}" style="width:4px; background-color:{{#if (eq tone "red")}}$RED{{else if (eq tone "ok")}}$OK{{else}}$WAIT{{/if}}; font-size:0; line-height:0;">&nbsp;</td>
+    <td class="dm-panel" bgcolor="$G1" style="background-color:$G1; padding:16px 18px;">
+      <p class="{{#if (eq tone "ok")}}dm-ok{{else if (eq tone "red")}}dm-text{{else}}dm-wait{{/if}}" style="margin:0 0 6px; font-family:$FONT; font-size:13px; line-height:16px; font-weight:800; letter-spacing:0.06em; color:{{#if (eq tone "red")}}$RED{{else if (eq tone "ok")}}$OK{{else}}$WAIT{{/if}};">{{title}}</p>
+      <p class="dm-text" style="margin:0; font-family:$FONT; font-size:15px; line-height:23px; color:$INK;">{{text}}</p>
+    </td>
+  </tr></table>
+</td></tr>

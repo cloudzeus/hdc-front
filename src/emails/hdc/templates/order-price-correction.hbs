@@ -1,0 +1,6 @@
+{{> heading eyebrow=(T "correction.eyebrow") title=(T "correction.title") lead=(t "correction.lead" number=order.number old=correction.previous_shipping new=correction.shipping)}}
+{{#if correction.message}}{{> paragraph text=correction.message}}{{/if}}
+{{> facts rows=correction.rows}}
+{{> cta label=(T "correction.pay") href=payment.pay_url note=(t "correction.pay_note") top=32 bottom=8}}
+<tr><td class="dm-body" style="height:24px; line-height:24px; font-size:0; background-color:#ffffff;">&nbsp;</td></tr>
+{{> help lead=(t "help.order") reply=true}}

@@ -1,0 +1,17 @@
+{{> heading eyebrow=(T "status.eyebrow") title=(T "status.title") lead=(t "status.lead" number=order.number status=status.name)}}
+<!-- STATUS -->
+<tr><td class="px dm-body" style="padding:24px 24px 0; background-color:#ffffff;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+    <td width="4" bgcolor="$RED" style="width:4px; background-color:$RED; font-size:0; line-height:0;">&nbsp;</td>
+    <td class="dm-panel" bgcolor="$G1" style="background-color:$G1; padding:18px 20px;">
+      <p class="dm-muted" style="margin:0 0 4px; font-family:$FONT; font-size:12px; line-height:16px; font-weight:800; letter-spacing:0.06em; color:$G5;">{{T "status.now"}}</p>
+      <p class="dm-text" style="margin:0; font-family:$FONT; font-size:22px; line-height:26px; font-weight:900; color:$INK;">{{status.name}}</p>
+      {{#if status.tracking}}<p class="dm-muted" style="margin:10px 0 0; font-family:$FONT; font-size:14px; line-height:20px; color:$G7;">{{t "status.tracking"}}: <a href="{{status.tracking_url}}" class="dm-text" style="color:$INK; font-weight:700;">{{status.tracking}}</a></p>{{/if}}
+    </td>
+  </tr></table>
+</td></tr>
+{{> order-meta}}
+{{> order-items aside=(t "order.prices_net")}}
+{{> order-totals}}
+{{> cta label=(T "order.view") href=order.url}}
+{{> help lead=(t "help.order") reply=true}}

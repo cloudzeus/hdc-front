@@ -1,0 +1,12 @@
+<!-- TWO COLUMNS -->
+<tr><td class="px dm-body" style="padding:36px 24px 0; background-color:#ffffff;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+    {{#each cols}}
+    <td class="stack{{#unless @first}} stack-gap{{/unless}}" width="268" valign="top" style="width:268px;{{#if @first}} padding-right:16px;{{/if}}">
+      <p class="dm-text" style="margin:0 0 8px; padding-bottom:6px; border-bottom:3px solid $INK; font-family:$FONT; font-size:14px; line-height:18px; font-weight:900; letter-spacing:0.04em; color:$INK;">{{upper title}}</p>
+      {{#if strong}}<p class="dm-text" style="margin:0 0 8px; font-family:$FONT; font-size:15px; line-height:22px; font-weight:700; color:$INK;">{{strong}}{{#if ok}} · <span class="dm-ok" style="color:$OK;">{{ok}}</span>{{/if}}{{#if wait}} · <span class="dm-wait" style="color:$WAIT;">{{wait}}</span>{{/if}}</p>{{/if}}
+      <p class="dm-muted" style="margin:0; font-family:$FONT; font-size:15px; line-height:22px; color:$G7;">{{#each lines}}{{#unless @first}}<br>{{/unless}}{{this}}{{/each}}</p>
+    </td>
+    {{/each}}
+  </tr></table>
+</td></tr>

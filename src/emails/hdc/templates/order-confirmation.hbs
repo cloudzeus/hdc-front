@@ -1,0 +1,22 @@
+{{> heading eyebrow=(T "confirm.eyebrow") title=(T "confirm.title") lead=(t leadKey)}}
+{{> order-meta}}
+{{#if order.supplier}}{{> note tone="wait" title=(T "supplier.title") text=(t "supplier.text")}}{{/if}}
+{{#if bank}}
+<!-- BANK TRANSFER -->
+<tr><td class="px dm-body" style="padding:32px 24px 0; background-color:#ffffff;">
+  {{> section-title title=(T "bank.title")}}
+</td></tr>
+{{> facts rows=bank.rows}}
+{{> note tone="wait" title=(T "bank.hold_title") text=bank.hold}}
+{{#if bank.card_url}}
+<tr><td class="px dm-body" style="padding:20px 24px 0; background-color:#ffffff;">
+  <p class="dm-muted" style="margin:0 0 12px; font-family:$FONT; font-size:15px; line-height:23px; color:$G7;">{{t "bank.card_note"}}</p>
+  {{> button label=(T "bank.card") href=bank.card_url width=240 dark=true}}
+</td></tr>
+{{/if}}
+{{/if}}
+{{> order-items aside=(t "order.prices_net")}}
+{{> order-totals}}
+{{> two-cols cols=order.cols}}
+{{> cta label=(T "order.view") href=order.url}}
+{{> help lead=(t "help.order") reply=true}}

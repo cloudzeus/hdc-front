@@ -1,0 +1,9 @@
+{{> heading eyebrow=(T verify.eyebrowKey) title=(T verify.titleKey) lead=verify.lead}}
+{{> cta label=(T verify.ctaKey) href=verify.url top=32 bottom=8}}
+<tr><td class="px dm-body" style="padding:16px 24px 0; background-color:#ffffff;">
+  <p class="dm-muted" style="margin:0 0 8px; font-family:$FONT; font-size:14px; line-height:21px; color:$G7;">{{t "verify.valid" hours=verify.hours}} {{t "verify.fallback"}}</p>
+  <p style="margin:0; font-family:$FONT; font-size:13px; line-height:19px; word-break:break-all;"><a href="{{verify.url}}" class="dm-text" style="color:$INK;">{{verify.url}}</a></p>
+</td></tr>
+{{> note tone="wait" title=(T "verify.ignore_title") text=(t verify.ignoreKey)}}
+<tr><td class="dm-body" style="height:24px; line-height:24px; font-size:0; background-color:#ffffff;">&nbsp;</td></tr>
+{{> help lead=(t "help.account") reply=true}}

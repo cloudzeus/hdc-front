@@ -1,0 +1,19 @@
+<!-- ORDER META -->
+<tr><td class="px dm-body" style="padding:24px 24px 0; background-color:#ffffff;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="dm-panel" bgcolor="$G1" style="background-color:$G1;">
+    <tr>
+      <td class="stack" width="250" valign="top" style="width:250px; padding:18px 20px;">
+        <p class="dm-muted" style="margin:0 0 4px; font-family:$FONT; font-size:12px; line-height:16px; font-weight:800; letter-spacing:0.06em; color:$G5;">{{T "order.number"}}</p>
+        <p class="dm-text" style="margin:0; font-family:$FONT; font-size:22px; line-height:26px; font-weight:900; letter-spacing:-0.01em; white-space:nowrap; color:$INK;">{{order.number}}</p>
+      </td>
+      <td class="stack" valign="top" style="padding:18px 20px;">
+        <p class="dm-muted" style="margin:0 0 4px; font-family:$FONT; font-size:12px; line-height:16px; font-weight:800; letter-spacing:0.06em; color:$G5;">{{T "order.date"}}</p>
+        <p class="dm-text" style="margin:0; font-family:$FONT; font-size:16px; line-height:26px; color:$INK;">{{order.date}}</p>
+      </td>
+      <td class="stack" valign="top" style="padding:18px 20px;">
+        <p class="dm-muted" style="margin:0 0 4px; font-family:$FONT; font-size:12px; line-height:16px; font-weight:800; letter-spacing:0.06em; color:$G5;">{{T "order.status"}}</p>
+        <p class="{{#if (eq order.state.tone "ok")}}dm-ok{{else}}dm-wait{{/if}}" style="margin:0; font-family:$FONT; font-size:16px; line-height:26px; font-weight:700; color:{{#if (eq order.state.tone "ok")}}$OK{{else}}$WAIT{{/if}};">&#9679;&nbsp;{{order.state.label}}</p>
+      </td>
+    </tr>
+  </table>
+</td></tr>

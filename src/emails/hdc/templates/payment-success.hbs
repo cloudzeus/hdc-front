@@ -1,0 +1,6 @@
+{{> heading eyebrow=(T "paid.eyebrow") title=(T "paid.title") lead=(t "paid.lead" number=order.number)}}
+{{> facts rows=payment.rows}}
+{{> order-items aside=(t "order.prices_net")}}
+{{> order-totals}}
+{{> cta label=(T "order.view") href=order.url}}
+{{> help lead=(t "help.order") reply=true}}

@@ -1,0 +1,12 @@
+{{> heading eyebrow=(T "review.eyebrow") title=(T "review.title") lead=(t "review.lead" number=order.number)}}
+<!-- ITEMS -->
+<tr><td class="px dm-body" style="padding:32px 24px 0; background-color:#ffffff;">
+  {{> section-title title=(T "review.items" count=order.items.length)}}
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+{{#each order.items}}{{> order-line}}{{/each}}
+  </table>
+</td></tr>
+{{> cta label=(T "review.cta") href=review.url}}
+{{> note tone="red" title=(T "review.problem_title") text=(t "review.problem")}}
+<tr><td class="dm-body" style="height:24px; line-height:24px; font-size:0; background-color:#ffffff;">&nbsp;</td></tr>
+{{> help reply=true}}

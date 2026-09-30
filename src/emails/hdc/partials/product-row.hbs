@@ -1,0 +1,26 @@
+    <tr>
+      {{#each row}}{{#unless @first}}<td class="ggap" width="16" style="width:16px; font-size:0; line-height:0;">&nbsp;</td>{{/unless}}
+      <td class="dm-img gcell gpad" width="268" valign="top" bgcolor="#ffffff" style="width:268px; background-color:#ffffff; border:1px solid $G3; border-bottom:0; padding:10px 10px 6px;">
+        {{#if (or tag pct)}}<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>{{#if tag}}<td style="background-color:$INK; padding:4px 8px; font-family:$FONT; font-size:11px; line-height:14px; font-weight:800; letter-spacing:0.04em; color:#ffffff;">{{tag}}</td>{{/if}}{{#if pct}}<td style="background-color:$RED; padding:4px 8px; font-family:$FONT; font-size:11px; line-height:14px; font-weight:800; color:#ffffff;">−{{pct}}%</td>{{/if}}</tr></table>{{else}}<div style="height:22px; line-height:22px; font-size:0;">&nbsp;</div>{{/if}}
+        {{#if image}}<a href="{{url}}" style="text-decoration:none;"><img class="card-img" src="{{img image 340}}" width="170" height="170" alt="{{name}}" style="display:block; margin:6px auto 0; width:170px; height:170px; border:0; outline:none; font-family:$FONT; font-size:12px; color:$G5;"></a>{{else}}<div style="height:176px; line-height:176px; font-size:0;">&nbsp;</div>{{/if}}
+      </td>{{/each}}{{#if (eq row.length 1)}}
+      <td class="ggap" width="16" style="width:16px; font-size:0; line-height:0;">&nbsp;</td><td class="gcell" width="268" style="width:268px;">&nbsp;</td>{{/if}}
+    </tr>
+    <tr>
+      {{#each row}}{{#unless @first}}<td class="ggap" width="16" style="width:16px; font-size:0; line-height:0;">&nbsp;</td>{{/unless}}
+      <td class="dm-panel gcell gpad" width="268" valign="top" bgcolor="$G1" style="width:268px; background-color:$G1; border-left:1px solid $G3; border-right:1px solid $G3; padding:12px 12px 10px;">
+        <p class="card-name dm-text" style="margin:0 0 4px; font-family:$FONT; font-size:14px; line-height:18px; font-weight:700; color:$INK;">{{name}}</p>
+        <p class="dm-muted" style="margin:0; font-family:$FONT; font-size:12px; line-height:17px; color:$G5;">{{code}}{{#if content}} · {{content}}{{/if}}</p>
+        {{#if price}}<p style="margin:8px 0 0; font-family:$FONT; line-height:24px;"><span class="card-price dm-text" style="font-size:22px; font-weight:900; letter-spacing:-0.02em; color:$INK;">{{price}}</span>{{#if was}}&nbsp;<span class="dm-muted" style="font-size:12px; color:$G5; text-decoration:line-through;">{{was}}</span>{{/if}}</p>{{/if}}
+        <p style="margin:4px 0 0; font-family:$FONT; font-size:12px; line-height:17px; font-weight:600;">{{> availability}}</p>
+      </td>{{/each}}{{#if (eq row.length 1)}}
+      <td class="ggap" width="16" style="width:16px; font-size:0; line-height:0;">&nbsp;</td><td class="gcell" width="268" style="width:268px;">&nbsp;</td>{{/if}}
+    </tr>
+    <tr>
+      {{#each row}}{{#unless @first}}<td class="ggap" width="16" style="width:16px; font-size:0; line-height:0;">&nbsp;</td>{{/unless}}
+      <td class="gcell" width="268" bgcolor="$INK" style="width:268px; background-color:$INK; border:1px solid $INK;" align="center">
+        <a href="{{url}}" style="display:block; padding:11px 8px; font-family:$FONT; font-size:12px; line-height:16px; font-weight:800; letter-spacing:0.06em; color:#ffffff; text-decoration:none;">{{T "card.view"}}&nbsp;&rarr;</a>
+      </td>{{/each}}{{#if (eq row.length 1)}}
+      <td class="ggap" width="16" style="width:16px; font-size:0; line-height:0;">&nbsp;</td><td class="gcell" width="268" style="width:268px;">&nbsp;</td>{{/if}}
+    </tr>
+    <tr><td colspan="3" style="height:16px; line-height:16px; font-size:16px;">&nbsp;</td></tr>

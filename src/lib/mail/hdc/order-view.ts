@@ -1,0 +1,238 @@
+import "server-only";
+import { prisma } from "@/lib/prisma";
+import { routing, type Locale } from "@/i18n/routing";
+import { formatMoney } from "@/lib/format";
+import { siteOrigin } from "@/lib/seo/urls";
+import { SHOP } from "@/config/shop";
+import { availabilityLabelKey, lineAvailability } from "@/lib/catalog/availability";
+import { displayName } from "@/lib/milwaukee/display";
+import { t } from "@/lib/mail/hdc/strings";
+import { localeUrl } from "@/lib/mail/hdc/render";
+
+/**
+ * An order, as every HDC order email shows it.
+ *
+ * One builder for the confirmation, the payment, shipping, status and internal
+ * emails, so the figures in them cannot disagree: two emails that say different
+ * totals for the same order are worse than one that says nothing.
+ *
+ * ── The lines are net, the totals read like an invoice ─────────────────────
+ *
+ *     subtotal − discount + shipping + VAT = total, and the lines sum to the subtotal.
+ *
+ * The line shows the price BEFORE an offer's discount and the discount is taken
+ * off once in the totals; the order's `savingsGross` is already inside the line
+ * prices and would count twice.
+ */
+
+export type OrderWithLines = NonNullable<Awaited<ReturnType<typeof loadOrder>>>;
+
+export function loadOrder(orderNumber: string) {
+  return prisma.order.findUnique({ where: { orderNumber }, include: { lines: true } });
+}
+
+/**
+ * The customer's language, frozen on the order at checkout.
+ *
+ * Kept inside `shippingQuote` (the order's frozen checkout snapshot) because a
+ * column would need a migration on the live database; `Order.locale` is the
+ * clean home for it once one is approved. Older orders have none: Greek.
+ */
+export function orderLocale(order: { shippingQuote: unknown }): Locale {
+  const value = (order.shippingQuote as { locale?: unknown } | null)?.locale;
+  return routing.locales.includes(value as Locale) ? (value as Locale) : "el";
+}
+
+/** «30.09.2026, 11:42», Athens time, 24-hour — the same in every language. */
+export function stamp(date: Date, withTime = true): string {
+  const parts = new Intl.DateTimeFormat("el-GR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    ...(withTime ? { hour: "2-digit", minute: "2-digit", hourCycle: "h23" as const } : {}),
+    timeZone: "Europe/Athens",
+  }).formatToParts(date);
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+  const day = `${get("day")}.${get("month")}.${get("year")}`;
+  return withTime ? `${day}, ${get("hour")}:${get("minute")}` : day;
+}
+
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
+export function shippingLabel(locale: Locale, id: string): string {
+  return id === "courier" || id === "express" || id === "pickup" ? t(locale, `method.${id}`) : id;
+}
+
+export function paymentLabel(locale: Locale, id: string): string {
+  return id === "card" || id === "iris" || id === "bank" ? t(locale, `pay.${id}`) : id;
+}
+
+/** The public page of the order: works for guests too, through the token. */
+export function orderUrl(locale: Locale, order: { orderNumber: string; guestToken: string }): string {
+  return localeUrl(
+    locale,
+    `/checkout/epibebaiosi/${encodeURIComponent(order.orderNumber)}?t=${encodeURIComponent(order.guestToken)}`,
+  );
+}
+
+export function adminOrderUrl(orderNumber: string): string {
+  return `${siteOrigin()}/admin/orders/${encodeURIComponent(orderNumber)}`;
+}
+
+function etaLine(locale: Locale, order: OrderWithLines): string {
+  if (order.shippingMethod === "pickup") return t(locale, "eta.pickup");
+  if (order.supplierOrder) return t(locale, "eta.supplier");
+  const days = Number((order.shippingQuote as { etaDays?: unknown } | null)?.etaDays);
+  if (!Number.isFinite(days) || days <= 0) return "";
+  return days === 1 ? t(locale, "eta.day") : t(locale, "eta.days", { n: days });
+}
+
+export type OrderItemView = {
+  name: string;
+  code: string;
+  qty: string;
+  unit: string;
+  total: string;
+  image: string;
+  url: string;
+  availability: { label: string; tone: "ok" | "wait" } | null;
+};
+
+/**
+ * What each line promises now: the product's stock, as the cart decided it.
+ * Read from the catalogue because the line does not store it; for an email
+ * sent at checkout it is the same answer the customer saw.
+ */
+async function lineFacts(order: OrderWithLines) {
+  const ids = order.lines.map((l) => l.productId).filter((id): id is string => !!id);
+  const products = ids.length
+    ? await prisma.product.findMany({
+        where: { id: { in: ids } },
+        select: { id: true, slug: true, inStock: true, supplierAvailable: true, qty: true },
+      })
+    : [];
+  return new Map(products.map((p) => [p.id, p]));
+}
+
+export async function buildOrderView(
+  order: OrderWithLines,
+  locale: Locale,
+  options: { prices?: boolean } = {},
+) {
+  const money = (n: unknown) => formatMoney(Number(n), locale);
+  const facts = await lineFacts(order);
+  const paid = order.paymentStatus === "PAID";
+
+  const priced = order.lines.map((line) => {
+    const d = Number(line.discountPercent) || 0;
+    const unitNet = Number(line.unitNet);
+    const unitBefore = d > 0 ? round2(unitNet / (1 - d / 100)) : unitNet;
+    return { line, unitBefore, lineBefore: round2(unitBefore * line.quantity) };
+  });
+
+  const items: OrderItemView[] = priced.map(({ line, unitBefore, lineBefore }) => {
+    const product = line.productId ? facts.get(line.productId) : undefined;
+    const availability = product
+      ? lineAvailability({
+          inStock: product.inStock,
+          supplierAvailable: product.supplierAvailable,
+          qty: Number(product.qty ?? 0),
+          quantity: line.quantity,
+        })
+      : null;
+    const key = availability ? availabilityLabelKey(availability, Number(product?.qty ?? 0)) : null;
+    return {
+      name: displayName(line.name, line.sku),
+      code: line.sku,
+      qty: String(line.quantity),
+      unit: options.prices === false ? "" : money(unitBefore),
+      total: options.prices === false ? "" : money(lineBefore),
+      image: line.imageUrl ?? "",
+      url: product ? localeUrl(locale, `/proion/${product.slug}`) : "",
+      availability: key
+        ? { label: t(locale, `avail.${key}`), tone: availability === "stock" ? "ok" : "wait" }
+        : null,
+    };
+  });
+
+  const sumLineNet = round2(priced.reduce((sum, p) => sum + Number(p.line.lineNet), 0));
+  const sumLineBefore = round2(priced.reduce((sum, p) => sum + p.lineBefore, 0));
+  const discountNet = round2(sumLineBefore - sumLineNet);
+  const discounted = discountNet > 0.004;
+
+  const feeNet = Number(order.paymentFeeNet);
+  const shippingNet = Number(order.shippingNet) + feeNet;
+  const method = shippingLabel(locale, order.shippingMethod);
+  const rates = [...new Set(order.lines.map((l) => Number(l.vatRate)))];
+
+  const totals = [
+    { label: t(locale, "order.subtotal"), value: money(discounted ? sumLineBefore : sumLineNet) },
+    ...(discounted ? [{ label: t(locale, "order.discount"), value: `−${money(discountNet)}` }] : []),
+    {
+      label: t(locale, "order.shipping", {
+        method: feeNet > 0 ? t(locale, "order.payment_fee", { method }) : method,
+      }),
+      value: shippingNet > 0 ? money(shippingNet) : t(locale, "order.free"),
+    },
+    {
+      // The rate only when there is one: a mixed basket has no single «24%».
+      label: rates.length === 1 ? t(locale, "order.vat", { rate: `${rates[0]}%` }) : t(locale, "order.vat_plain"),
+      value: money(order.vatAmount),
+    },
+  ];
+
+  const fullName = `${order.firstName} ${order.lastName}`.trim();
+  const shipAddress = order.shipLine1 + (order.shipLine2 ? `, ${order.shipLine2}` : "");
+  const shipCity = `${order.shipPostcode} ${order.shipCity}`;
+  const eta = etaLine(locale, order);
+  const pickup = order.shippingMethod === "pickup";
+
+  const billing = order.wantsInvoice
+    ? [
+        order.companyName ?? fullName,
+        order.billLine1 ?? shipAddress,
+        `${order.billPostcode ?? order.shipPostcode} ${order.billCity ?? order.shipCity}`,
+        ...(order.vatNumber
+          ? [t(locale, "order.vat_number", { vat: order.vatNumber, doy: order.taxOffice || "—" })]
+          : []),
+      ]
+    : [fullName, shipAddress, shipCity];
+
+  const cols = [
+    {
+      title: t(locale, pickup ? "order.pickup_title" : "order.shipping_title"),
+      strong: eta ? `${method} · ${eta}` : method,
+      lines: pickup
+        ? [SHOP.name, SHOP.contact.address]
+        : [fullName, shipAddress, shipCity, order.phone].filter(Boolean),
+    },
+    {
+      title: t(locale, "order.payment_title"),
+      strong: paymentLabel(locale, order.paymentMethod),
+      ok: paid ? t(locale, "state.paid") : undefined,
+      wait: paid ? undefined : t(locale, "state.pending"),
+      lines: [
+        t(locale, "order.document", {
+          type: t(locale, order.wantsInvoice ? "doc.invoice" : "doc.receipt"),
+        }),
+        ...billing.filter(Boolean),
+      ],
+    },
+  ];
+
+  return {
+    number: order.orderNumber,
+    date: stamp(order.createdAt),
+    url: orderUrl(locale, order),
+    paid,
+    supplier: order.supplierOrder,
+    state: paid
+      ? { label: t(locale, "state.paid"), tone: "ok" }
+      : { label: t(locale, "state.pending"), tone: "wait" },
+    items,
+    totals,
+    total: money(order.totalGross),
+    cols,
+  };
+}
+
