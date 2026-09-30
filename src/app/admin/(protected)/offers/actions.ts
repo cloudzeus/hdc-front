@@ -4,9 +4,10 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { assertCan } from "@/lib/rbac";
 import { deleteOffer, rewriteCopy, saveOffer } from "@/lib/offers/offers";
-import { searchBrandsForPicker, searchCategoriesForPicker, searchProductsForPicker } from "@/lib/media/picker";
+import { searchCategoriesForPicker, searchProductsForPicker } from "@/lib/media/picker";
 import { translateText } from "@/lib/ai/deepseek";
-import type { OfferDraft } from "@/lib/offers/offer-types";
+import { brandScopeProblem, type OfferDraft } from "@/lib/offers/offer-types";
+import { prisma } from "@/lib/prisma";
 import type { Locale } from "@/i18n/routing";
 
 /**
@@ -24,6 +25,17 @@ async function requireEditor(): Promise<string> {
 
 export async function actionSaveOffer(draft: OfferDraft) {
   const actor = await requireEditor();
+
+  // Εύρος μάρκας μόνο ως παλιά ρύθμιση: καμία νέα προσφορά μάρκας, και καμία
+  // υπάρχουσα δεν γίνεται προσφορά μάρκας ή αλλάζει μάρκα.
+  if (draft.scope === "brand") {
+    const existing = draft.id
+      ? await prisma.offer.findUnique({ where: { id: draft.id }, select: { scope: true, brandSlug: true } })
+      : null;
+    const problem = brandScopeProblem(draft, existing);
+    if (problem) return { ok: false as const, error: problem };
+  }
+
   const result = await saveOffer(draft, actor);
   if (result.ok) {
     revalidatePath("/", "layout");
@@ -70,11 +82,6 @@ export async function actionTranslateOffer(input: { text: string; to: "en" | "it
 export async function actionSearchProducts(query: string, locale: Locale) {
   await requireEditor();
   return searchProductsForPicker(query, locale, 24);
-}
-
-export async function actionSearchBrands(query: string, locale: Locale) {
-  await requireEditor();
-  return searchBrandsForPicker(query, locale);
 }
 
 export async function actionSearchCategories(query: string, locale: Locale) {

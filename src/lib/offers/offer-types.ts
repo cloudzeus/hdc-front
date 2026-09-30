@@ -152,3 +152,22 @@ export function validate(draft: OfferDraft): Partial<Record<"copy" | "scope" | "
 
   return problems;
 }
+
+/**
+ * Εύρος «μάρκα»: μόνο ως παλιά ρύθμιση.
+ *
+ * Το HDC πουλά μόνο Milwaukee, οπότε μια νέα προσφορά σε «όλη τη μάρκα» είναι
+ * προσφορά σε όλο τον κατάλογο με λάθος όνομα. Μια υπάρχουσα προσφορά με εύρος
+ * μάρκας κρατά το εύρος της (και συνεχίζει να ισχύει στο eshop) όσο δεν αλλάζει
+ * μάρκα· δεν γίνεται όμως καμία προσφορά μάρκας εκ νέου.
+ *
+ * `existing`: η προσφορά όπως είναι αποθηκευμένη, ή null για νέα.
+ */
+export function brandScopeProblem(
+  draft: Pick<OfferDraft, "scope" | "brandSlug">,
+  existing: { scope: string; brandSlug: string | null } | null,
+): string | null {
+  if (draft.scope !== "brand") return null;
+  if (existing?.scope === "brand" && existing.brandSlug === draft.brandSlug) return null;
+  return "Νέες προσφορές δεν παίρνουν εύρος μάρκας. Διαλέξτε προϊόντα ή κατηγορία.";
+}

@@ -18,7 +18,6 @@ import { toast } from "sonner";
 import {
   actionRewrite,
   actionSaveOffer,
-  actionSearchBrands,
   actionSearchCategories,
   actionSearchProducts,
   actionTranslateOffer,
@@ -35,7 +34,7 @@ import {
   type OfferWidgetKind,
 } from "@/lib/offers/offer-types";
 import { OfferWidget, WIDGET_HINT, WIDGET_LABEL } from "@/components/offers/OfferWidget";
-import type { PickerBrand, PickerCategory, PickerProduct } from "@/lib/media/picker";
+import type { PickerCategory, PickerProduct } from "@/lib/media/picker";
 import { MediaField } from "@/components/admin/MediaPicker";
 import { Segmented, NumberField } from "@/components/admin/banners/fields";
 import { Button } from "@/components/ui/button";
@@ -180,7 +179,13 @@ export function OfferWizard({ initial }: { initial: OfferDraft | null }) {
               onSlugTouched={() => setSlugTouched(true)}
             />
           )}
-          {step === "scope" && <ScopeStep draft={draft} set={set} />}
+          {step === "scope" && (
+            <ScopeStep
+              draft={draft}
+              set={set}
+              legacyBrand={initial?.scope === "brand" ? initial.brandSlug : null}
+            />
+          )}
           {step === "terms" && <TermsStep draft={draft} set={set} />}
           {step === "media" && <MediaStep draft={draft} set={set} />}
         </div>
@@ -402,19 +407,33 @@ function RewritableField({
 function ScopeStep({
   draft,
   set,
+  legacyBrand,
 }: {
   draft: OfferDraft;
   set: <K extends keyof OfferDraft>(key: K, value: OfferDraft[K]) => void;
+  /**
+   * Η μάρκα μιας υπάρχουσας προσφοράς με εύρος μάρκας, αλλιώς null.
+   *
+   * Νέες προσφορές δεν παίρνουν εύρος μάρκας (το HDC πουλά μόνο Milwaukee· ο
+   * server το απορρίπτει). Μια παλιά ανοίγει και δείχνει το εύρος της, μόνο
+   * για ανάγνωση, και συνεχίζει να ισχύει στο eshop.
+   */
+  legacyBrand: string | null;
 }) {
+  const scopes: OfferScope[] = legacyBrand ? ["products", "category", "brand"] : ["products", "category"];
   return (
     <div className="space-y-4">
       <Segmented
         label="Σε τι εφαρμόζεται"
         value={draft.scope}
-        onChange={(scope) => set("scope", scope as OfferScope)}
-        options={(["products", "brand", "category"] as const).map((v) => ({
+        onChange={(scope) => {
+          set("scope", scope as OfferScope);
+          // Πίσω στην παλιά ρύθμιση: με την ίδια μάρκα, όχι με ό,τι είχε μείνει.
+          if (scope === "brand" && legacyBrand) set("brandSlug", legacyBrand);
+        }}
+        options={scopes.map((v) => ({
           value: v,
-          label: SCOPE_LABEL[v],
+          label: v === "brand" ? "Μάρκα (παλιά ρύθμιση)" : SCOPE_LABEL[v],
         }))}
       />
 
@@ -424,8 +443,14 @@ function ScopeStep({
           onChange={(slugs) => set("productSlugs", slugs)}
         />
       )}
-      {draft.scope === "brand" && (
-        <BrandPicker value={draft.brandSlug} onChange={(slug) => set("brandSlug", slug)} />
+      {draft.scope === "brand" && legacyBrand && (
+        <div className="border border-k-line bg-k-surface-2 px-3 py-2.5 text-[length:var(--fs-12)] leading-[1.5] text-k-text-2">
+          <p className="font-medium text-k-ink">Εύρος μάρκας — παλιά ρύθμιση</p>
+          <p className="mt-0.5">
+            Μάρκα <span className="numeral text-k-ink">{legacyBrand}</span>. Συνεχίζει να ισχύει στο eshop·
+            δεν αλλάζει μάρκα, και νέες προσφορές δεν παίρνουν εύρος μάρκας.
+          </p>
+        </div>
       )}
       {draft.scope === "category" && (
         <CategoryPicker value={draft.categorySlug} onChange={(slug) => set("categorySlug", slug)} />
@@ -532,52 +557,6 @@ function ProductPicker({
         )}
       </div>
     </div>
-  );
-}
-
-function BrandPicker({ value, onChange }: { value: string; onChange: (slug: string) => void }) {
-  const [brands, setBrands] = useState<PickerBrand[]>([]);
-  const [busy, start] = useTransition();
-
-  useEffect(() => {
-    start(async () => setBrands(await actionSearchBrands("", "el")));
-  }, []);
-
-  if (busy && brands.length === 0) {
-    return (
-      <p className="flex items-center gap-2 py-6 text-[12px] text-k-text-3">
-        <Loader2 className="size-3.5 animate-spin" />
-        Φόρτωση…
-      </p>
-    );
-  }
-
-  return (
-    <ul className="grid max-h-72 grid-cols-2 gap-2 overflow-y-auto sm:grid-cols-4">
-      {brands.map((brand) => (
-        <li key={brand.slug}>
-          <button
-            type="button"
-            onClick={() => onChange(brand.slug)}
-            className={cn(
-              "w-full border p-2 text-center transition-colors",
-              value === brand.slug ? "border-k-ink bg-k-surface-2" : "border-k-line hover:border-k-ink",
-            )}
-          >
-            {brand.logo ? (
-              <span className="relative block h-8 w-full">
-                <NextImage src={brand.logo} alt={brand.name} fill sizes="120px" className="object-contain" unoptimized />
-              </span>
-            ) : (
-              <span className="block truncate py-2 text-[12px] text-k-ink">{brand.name}</span>
-            )}
-            <span className="numeral mt-1 block text-[10px] text-k-text-4">
-              {brand.productCount} κωδ.
-            </span>
-          </button>
-        </li>
-      ))}
-    </ul>
   );
 }
 
