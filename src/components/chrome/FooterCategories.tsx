@@ -12,6 +12,9 @@ import { upGreek } from "@/lib/greek";
  * site's second level did not exist in the HTML: the groups were reachable
  * only through the category pages. Server-rendered here, on every page, from
  * the same cached tree the menu uses.
+ *
+ * Folded into one closed `<details>` row so the footer keeps its layout: the
+ * links are in the HTML for crawlers, and a visitor opens them only if wanted.
  */
 export async function FooterCategories() {
   const requested = await getLocale();
@@ -20,9 +23,9 @@ export async function FooterCategories() {
   if (tree.length === 0) return null;
 
   return (
-    <nav className="hdc-foot-cats" aria-label={t("katigories")}>
-      <h2>{upGreek(t("katigories"))}</h2>
-      <div>
+    <details className="hdc-foot-cats">
+      <summary>{upGreek(t("katigories"))}</summary>
+      <nav aria-label={t("katigories")}>
         {tree.map((root) => (
           <div key={root.slug}>
             <Link href={`/katalogos/${root.slug}`} prefetch={false} className="hdc-foot-cat">
@@ -41,7 +44,7 @@ export async function FooterCategories() {
             )}
           </div>
         ))}
-      </div>
-    </nav>
+      </nav>
+    </details>
   );
 }

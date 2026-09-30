@@ -534,15 +534,40 @@
   .hdc-foot-legal a:hover {
     color: #fff;
   }
-  /* Every root category with its main groups: the site's second level in HTML. */
+  /* Every root category with its main groups, folded into one closed row. */
   .hdc-foot-cats {
-    padding: 28px 0;
     border-bottom: 1px solid #2a2a2a;
   }
-  .hdc-foot-cats > div {
+  .hdc-foot-cats > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 44px;
+    padding: 10px 0;
+    cursor: pointer;
+    list-style: none;
+    font-weight: 700;
+    font-size: var(--fs-13);
+    letter-spacing: 0.04em;
+    color: #fff;
+  }
+  .hdc-foot-cats > summary::-webkit-details-marker {
+    display: none;
+  }
+  .hdc-foot-cats > summary::after {
+    content: "+";
+    font-size: var(--fs-18);
+    line-height: 1;
+    color: #db011c;
+  }
+  .hdc-foot-cats[open] > summary::after {
+    content: "\2212";
+  }
+  .hdc-foot-cats > nav {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 22px 30px;
+    padding: 6px 0 26px;
   }
   .hdc-foot-cat {
     display: block;
@@ -556,7 +581,7 @@
     font-size: var(--fs-13);
   }
   @media (max-width: 1023px) {
-    .hdc-foot-cats > div {
+    .hdc-foot-cats > nav {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
