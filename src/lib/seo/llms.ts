@@ -1,5 +1,6 @@
 import { PRIMARY_PHONE, SHOP } from "@/config/shop";
 import { FREE_SHIPPING_THRESHOLD_NET } from "@/lib/cart/options";
+import { DEFAULT_VAT_RATE } from "@/lib/format";
 import { STOCK_HOLD_HOURS } from "@/lib/orders/hold";
 import { displayName } from "@/lib/milwaukee/display";
 import { parseModel } from "@/lib/milwaukee/model";
@@ -50,7 +51,7 @@ Email: ${C.email}
 Hours: ${HOURS}
 Operated by: ${SHOP.operator.name} (VAT EL${SHOP.operator.vat})
 Language: Greek.
-Currency: EUR. Displayed prices include Greek VAT (24%) and exclude shipping.
+Currency: EUR. Displayed prices include Greek VAT (${DEFAULT_VAT_RATE}%) and exclude shipping.
 
 ## What the store carries
 
@@ -154,6 +155,8 @@ export type LlmsPlatform = {
   models: LlmsModel[];
 };
 
+const SHORT_LABEL: Record<LlmsPlatform["platform"], string> = { M12: "M12", M18: "M18", MX: "MX FUEL" };
+
 const PLATFORM_LABEL: Record<LlmsPlatform["platform"], string> = {
   M12: "M12 (12 V)",
   M18: "M18 (18 V)",
@@ -166,10 +169,13 @@ const PLATFORM_LABEL: Record<LlmsPlatform["platform"], string> = {
  * only writes it down.
  */
 export function llmsFullTxt(origin: string, platforms: LlmsPlatform[]): string {
+  const present = platforms.filter((p) => p.models.length > 0).map((p) => SHORT_LABEL[p.platform]);
+  const listed =
+    present.length > 1 ? `${present.slice(0, -1).join(", ")} and ${present.at(-1)}` : (present[0] ?? "");
   const lines: string[] = [
     `# ${SHOP.name} — Milwaukee models and article numbers`,
     "",
-    `> Every Milwaukee M12, M18 and MX FUEL model listed by ${SHOP.name}`,
+    `> Every Milwaukee ${listed} model listed by ${SHOP.name}`,
     `> (${SHOP.contact.city}, Greece), with each version's Milwaukee article number`,
     "> and its product page. Store details: " + `${origin}/llms.txt`,
     "",
@@ -202,20 +208,23 @@ export type LlmsProductRow = {
 const PLATFORM_ORDER: LlmsPlatform["platform"][] = ["M18", "M12", "MX"];
 
 /**
- * Active products → platforms → models → versions. Only products the sync
- * recognised as a model (`modelRoot`) take part; a version's code is read off
+ * Active products → platforms → models → versions. Only products that are a
+ * model (`modelRoot`, or a tool code in the name) take part; a version's code is read off
  * the name, and the model is named by what the tool is — the bare version's
  * name without the model code, article number or brand.
  */
 export function groupModels(rows: LlmsProductRow[]): LlmsPlatform[] {
   const byRoot = new Map<string, { platform: LlmsPlatform["platform"]; rows: LlmsProductRow[] }>();
   for (const row of rows) {
-    if (!row.modelRoot) continue;
+    // The stored root, or the name's own until the sync has filled it (MX FUEL
+    // codes were only taught to `parseModel` on 30/9/2026).
+    const root = row.modelRoot ?? parseModel(row.name)?.root;
+    if (!root) continue;
     const platform = PLATFORM_ORDER.find((p) => p === row.platform);
     if (!platform) continue;
-    const entry = byRoot.get(row.modelRoot) ?? { platform, rows: [] };
+    const entry = byRoot.get(root) ?? { platform, rows: [] };
     entry.rows.push(row);
-    byRoot.set(row.modelRoot, entry);
+    byRoot.set(root, entry);
   }
 
   const models = [...byRoot.entries()].map(([root, { platform, rows: group }]) => {

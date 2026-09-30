@@ -55,14 +55,16 @@ const KNOWN_AH = new Set([2, 3, 4, 5, 6, 8, 12]);
 /**
  * Tool code: platform, space, a model starting with a letter, a dash, and a
  * suffix — 0 / 0X / 0C for the bare tool, digits (+ case letter) for a kit.
+ * MX FUEL is written «MXF» by the ERP («MXF DCD150-302C», «MXF PBE-0»).
  */
-const CODE = /\b(M12|M18)\s([A-Z][A-Z0-9]*)-(\d{1,3}[A-Z]?)\b/;
+const CODE = /\b(M12|M18|MXF)\s([A-Z][A-Z0-9]*)-(\d{1,3}[A-Z]?)\b/;
 
 export function parseModel(name: string): ParsedModel | null {
   const text = normalizeModelText(name);
   const match = CODE.exec(text);
   if (!match) return null;
-  const [, platform, model, suffix] = match as unknown as [string, "M12" | "M18", string, string];
+  const [, prefix, model, suffix] = match as unknown as [string, "M12" | "M18" | "MXF", string, string];
+  const platform: Platform = prefix === "MXF" ? "MX" : prefix;
 
   const digits = suffix.replace(/[A-Z]$/, "");
   const bare = digits === "0";
@@ -83,11 +85,12 @@ export function parseModel(name: string): ParsedModel | null {
 
   return {
     platform,
-    root: `${platform} ${model}`,
-    code: `${platform} ${model}-${suffix}`,
+    root: `${prefix} ${model}`,
+    code: `${prefix} ${model}-${suffix}`,
     content: bare ? "bare" : "kit",
     kit,
-    fuel: /^(ONE)?F/.test(model) || /\bFUEL\b/.test(text),
+    // Everything MX is MX FUEL.
+    fuel: platform === "MX" || /^(ONE)?F/.test(model) || /\bFUEL\b/.test(text),
     oneKey: model.startsWith("ONE"),
   };
 }

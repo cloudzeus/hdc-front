@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { DEALER_WORDING, groupModels, llmsFullTxt, llmsTxt } from "@/lib/seo/llms";
 import { brandFaq, categoryFaq } from "@/lib/seo/category-copy";
 import { SHOP } from "@/config/shop";
+import { DEFAULT_VAT_RATE } from "@/lib/format";
 
 /**
  * llms.txt is what a language model quotes when asked "where do I buy
@@ -41,6 +42,10 @@ describe("llmsTxt", () => {
     expect(body).toContain(SHOP.contact.email);
     expect(body).toContain(SHOP.contact.hours.weekdays.open);
     expect(body).toContain(SHOP.contact.hours.saturday.close);
+  });
+
+  it("states the VAT rate the prices are computed with", () => {
+    expect(body).toContain(`VAT (${DEFAULT_VAT_RATE}%)`);
   });
 
   it("explains the three availability states", () => {
@@ -85,6 +90,13 @@ describe("llmsFullTxt", () => {
     expect(body).toContain(`${ORIGIN}/proion/m18-fpd3-502x`);
   });
 
+  it("names only the platforms it actually lists", () => {
+    const header = body.split("\n").slice(0, 5).join("\n");
+    expect(header).toContain("M18");
+    expect(header).not.toContain("MX FUEL");
+    expect(header).not.toContain("M12");
+  });
+
   it("makes no dealer claim either", () => {
     expect(body).not.toMatch(DEALER_WORDING);
   });
@@ -119,11 +131,12 @@ describe("groupModels", () => {
     { name: "ΚΡΟΥΣΤΙΚΟ ΔΡΑΠΑΝΟ M18 FPD3-0X 4933479859 MILWAUKEE", code2: "4933479859", slug: "a", platform: "M18", modelRoot: "M18 FPD3", modelContent: "bare" },
     { name: "ΚΑΤΣΑΒΙΔΙ M12 FID2-0 4933479876", code2: "4933479876", slug: "c", platform: "M12", modelRoot: "M12 FID2", modelContent: "bare" },
     { name: "ΜΠΑΤΑΡΙΑ M18 B5", code2: "4932430483", slug: "d", platform: "M18", modelRoot: null, modelContent: null },
+    { name: "ΚΑΡΟΤΙΕΡΑ MXF DCD150-302C KIT 4933471835", code2: "4933471835", slug: "e", platform: "MX", modelRoot: "MXF DCD150", modelContent: "kit" },
   ];
   const grouped = groupModels(rows);
 
   it("groups versions by platform and model, bare first", () => {
-    expect(grouped.map((p) => p.platform)).toEqual(["M18", "M12"]);
+    expect(grouped.map((p) => p.platform)).toEqual(["M18", "M12", "MX"]);
     const fpd3 = grouped[0].models[0];
     expect(fpd3.root).toBe("M18 FPD3");
     expect(fpd3.versions.map((v) => v.code)).toEqual(["M18 FPD3-0X", "M18 FPD3-502X"]);
@@ -131,10 +144,18 @@ describe("groupModels", () => {
 
   it("names the model by what the tool is, without codes or brand", () => {
     expect(grouped[0].models[0].name).toBe("ΚΡΟΥΣΤΙΚΟ ΔΡΑΠΑΝΟ");
+    expect(grouped[2].models[0]).toMatchObject({ root: "MXF DCD150", versions: [{ code: "MXF DCD150-302C" }] });
+  });
+
+  it("reads the model from the name when the stored root is not filled yet", () => {
+    const [mx] = groupModels([
+      { name: "ΚΟΦΤΗΣ 350mm MXF COS350G2-802 4933480480", code2: "4933480480", slug: "f", platform: "MX", modelRoot: null, modelContent: null },
+    ]);
+    expect(mx).toMatchObject({ platform: "MX", models: [{ root: "MXF COS350G2" }] });
   });
 
   it("leaves out products that are not a model", () => {
     expect(grouped.flatMap((p) => p.models).map((m) => m.root)).not.toContain(null);
-    expect(grouped.flatMap((p) => p.models)).toHaveLength(2);
+    expect(grouped.flatMap((p) => p.models)).toHaveLength(3);
   });
 });

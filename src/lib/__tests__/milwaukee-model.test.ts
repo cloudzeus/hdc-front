@@ -87,4 +87,23 @@ describe("parseModel", () => {
     ].map((n) => parseModel(n)?.root);
     expect(new Set(roots)).toEqual(new Set(["M12 FPD2"]));
   });
+
+  it("reads MX FUEL codes, as the ERP writes them (MXF …)", () => {
+    const kit = parseModel("ΚΑΡΟΤΙΕΡΑ MXF DCD150-302C KIT 4933471835");
+    expect(kit).toMatchObject({
+      platform: "MX",
+      root: "MXF DCD150",
+      code: "MXF DCD150-302C",
+      content: "kit",
+      fuel: true,
+    });
+    const bare = parseModel("ΣΑΚΙΔΙΟ ΠΛΑΤΗΣ  ΜΠΑΤΑΡΙΩΝ ΓΙΑ ΕΡΓΑΛΕΙΑ MXF PBE-0 4933498067");
+    expect(bare).toMatchObject({ platform: "MX", root: "MXF PBE", content: "bare" });
+    expect(parseModel("ΚΟΦΤΗΣ 350mm MXF COS350G2-802 4933480480")?.root).toBe("MXF COS350G2");
+    expect(parseModel("PACKOUT ΠΥΡΓΟΣ ΦΩΤΙΣΜΟΥ MXF TLIC-601 4933498072 MILWAUKEE")?.code).toBe("MXF TLIC-601");
+  });
+
+  it("does not read a «10TMX» set count as an MX model", () => {
+    expect(parseModel("ΑΝΤ/ΚΟ  ΕΣΩΤ. ΜΑΞΙΛΑΡΙ ΓΙΑ TO BOLT 200 10TMX 4932480660")).toBeNull();
+  });
 });
