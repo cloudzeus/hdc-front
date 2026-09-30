@@ -1,0 +1,151 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-xylourgous#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-xylourgous",
+      "url": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-xylourgous",
+      "headline": "Εργαλεία Milwaukee για ξυλουργούς: δισκοπρίονα, καρφωτικά, σέγες",
+      "description": "Ποια εργαλεία Milwaukee χρειάζεται ένας ξυλουργός: δισκοπρίονο M18 FCSG66, βυθιζόμενο FPS55, φαλτσοπρίονο, καρφωτικό FN18GS, σέγα FJS, δράπανα.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "εργαλεία για ξυλουργούς, εργαλεία ξυλουργού Milwaukee, δισκοπρίονο μπαταρίας, καρφωτικό μπαταρίας, φαλτσοπρίονο μπαταρίας, βυθιζόμενο δισκοπρίονο, σέγα μπαταρίας",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FCSG66"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FPS55"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "M18 FMS305"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FN18GS"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FJS"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FPD3"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FID3"
+        },
+        {
+          "@type": "Thing",
+          "name": "PACKOUT"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-66-mm-circular-saw-for-wood-and-plastics-guide-rail-compatible/m18-fcsg66/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-55-mm-plunge-saw/m18-fps55/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-one-key-305-mm-mitre-saw/m18-fms305/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-18-gs-finish-nailer/m18-fn18gs/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-top-handle-jigsaw/m18-fjs/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-body-grip-jigsaw/m18-fbjs/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-percussion-drill/m18-fpd3/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-1-4-hex-impact-driver/m18-fid3/"
+      ],
+      "wordCount": 865
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-xylourgous#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-xylourgous#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Ποιο δισκοπρίονο μπαταρίας Milwaukee για ξυλεία;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το M18 FCSG66 κόβει κατά τη Milwaukee σε βάθος 66 mm με δίσκο 190 mm, παίρνει κλίση έως 56° και συνεργάζεται με τη ράγα οδηγό της Milwaukee. Με μία μπαταρία 12,0 Ah κόβει 750 κομμάτια 90 x 45 mm."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι κερδίζω με το βυθιζόμενο δισκοπρίονο M18 FPS55;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Καθαρές, ίσιες κοπές σε πάνελ, πόρτες και πάγκους πάνω σε ράγα. Κατά τη Milwaukee έχει ρυθμιζόμενες στροφές 2.500–5.600 rpm και κόβει 45 m κόντρα πλακέ 18 mm με μία μπαταρία 5,5 Ah."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πόσα καρφιά βάζει το M18 FN18GS με μία μπαταρία;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σύμφωνα με τη Milwaukee, έως 1.200 καρφιά με μπαταρία REDLITHIUM 2,0 Ah. Παίρνει ίσια καρφιά 18 gauge και ρίχνει χωρίς χρόνο αναμονής ανάμεσα στα καρφιά."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Κόβει ένα φαλτσοπρίονο μπαταρίας όσο ένα ρεύματος;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Για το M18 FMS305 η Milwaukee δηλώνει ότι κόβει με τον ίδιο ρυθμό που κόβει ένα αντίστοιχο φαλτσοπρίονο ρεύματος 305 mm, και έως 500 κομμάτια σοβατεπί πεύκου 78 mm με μία μπαταρία FORGE 12,0 Ah."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ποια σέγα για καμπύλες κοπές;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Η σέγα άνω λαβής M18 FJS έχει κατά τη Milwaukee παλινδρόμηση 5 θέσεων, κλίση βάσης 0–45° χωρίς κλειδί και φυσητήρα που κρατά καθαρή τη γραμμή κοπής. Υπάρχει και έκδοση λαβής σώματος (FBJS)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Χρειάζομαι M18 ή M12 για ξυλουργική;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Για πριόνια, καρφωτικά και μεγάλες διατρήσεις M18. Για συναρμολόγηση επίπλων και ρυθμίσεις μεντεσέδων ένα ελαφρύ M12 είναι πιο βολικό όλη μέρα."
+          }
+        }
+      ]
+    }
+  ]
+}

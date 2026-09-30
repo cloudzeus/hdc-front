@@ -1,0 +1,158 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/mesa-atomikis-prostasias-milwaukee-odigos#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/mesa-atomikis-prostasias-milwaukee-odigos",
+      "url": "{{SITE_URL}}/blog/mesa-atomikis-prostasias-milwaukee-odigos",
+      "headline": "Μέσα ατομικής προστασίας Milwaukee: κράνος, γάντια, γυαλιά, γιλέκο, υποδήματα",
+      "description": "Οδηγός ΜΑΠ Milwaukee: κράνη BOLT (EN 397, EN 12492), γάντια EN 388, γυαλιά EN 166, γιλέκα EN ISO 20471, υποδήματα FLEXTRED EN ISO 20345. Πώς διαλέγετε.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "μέσα ατομικής προστασίας, ΜΑΠ εργοταξίου, κράνος εργοταξίου Milwaukee, γάντια κατά της κοπής, γυαλιά ασφαλείας EN 166, γιλέκο υψηλής ορατότητας, παπούτσια ασφαλείας S3S",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "BOLT 200"
+        },
+        {
+          "@type": "Thing",
+          "name": "EN 397"
+        },
+        {
+          "@type": "Thing",
+          "name": "EN 12492"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "EN 50365"
+        },
+        {
+          "@type": "Thing",
+          "name": "EN 388"
+        },
+        {
+          "@type": "Thing",
+          "name": "EN 166"
+        },
+        {
+          "@type": "Thing",
+          "name": "EN ISO 20471"
+        },
+        {
+          "@type": "Thing",
+          "name": "EN ISO 20345"
+        },
+        {
+          "@type": "Thing",
+          "name": "FLEXTRED"
+        },
+        {
+          "@type": "Thing",
+          "name": "SMARTSWIPE"
+        },
+        {
+          "@type": "Thing",
+          "name": "AUTOSTOP"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/bolt-200/bolt-200/",
+        "https://www.milwaukeetool.eu/en-eu/cut-c-gloves/cut-c-gloves/",
+        "https://www.milwaukeetool.eu/en-eu/performance-safety-glasses/performance-safety-glasses/",
+        "https://www.milwaukeetool.eu/en-eu/high-visibility-vest/high-visibility-vest/",
+        "https://www.milwaukeetool.eu/en-eu/flextred-s3s-safety-boots-black-1m110133-esd-sc-fo-sr/fxt-s3s-1m110133/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-125-mm-safety-grinder-with-variable-speed-and-one-key/m18-fsagsvo125x/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-percussion-drill/m18-fpd3/"
+      ],
+      "wordCount": 989
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/mesa-atomikis-prostasias-milwaukee-odigos#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/mesa-atomikis-prostasias-milwaukee-odigos#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Ποιο κράνος εργοταξίου Milwaukee να πάρω;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το BOLT 200 πιστοποιείται κατά τη Milwaukee κατά EN 397 και EN 12492, με δοκιμή στους -40 °C και σε πλευρική παραμόρφωση. Το αεριζόμενο είναι πιο δροσερό· το μη αεριζόμενο έχει επιπλέον ηλεκτρική μόνωση 440 V a.c. και πιστοποίηση EN 50365 για ηλεκτρολογικές εργασίες."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει ο κόκκινος και ο γκρι ιμάντας στα κράνη BOLT;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Κατά τη Milwaukee, ο κόκκινος ιμάντας πηγουνιού του αεριζόμενου BOLT 200 είναι πιστοποιημένος κατά EN 12492 και ο γκρι του μη αεριζόμενου κατά EN 397."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει 4343C σε ένα γάντι;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι η βαθμολογία κατά EN 388:2016: τα τέσσερα πρώτα νούμερα αφορούν τριβή, κοπή με δοκιμή κυκλικής λεπίδας, σκίσιμο και διάτρηση, και το γράμμα την αντοχή στην κοπή κατά ISO, από A έως F. Τα γάντια Cut C της Milwaukee έχουν 4343C."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει EN 166 στα γυαλιά ασφαλείας;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι το ευρωπαϊκό πρότυπο για την προστασία ματιών. Τα Performance Safety Glasses της Milwaukee πιστοποιούνται κατά EN 166 και EN 170/EN 172 και έχουν αντιθαμβωτική και αντιχαρακτική επίστρωση."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει S3S ESD SR στα παπούτσια ασφαλείας;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι σημάνσεις κατά EN ISO 20345:2022. Το ESD δείχνει προστασία από ηλεκτροστατική εκφόρτιση, το FO αντοχή σε καύσιμα και λάδια και το SR αντιολισθητική σόλα. Τα FLEXTRED S3S της Milwaukee έχουν τις σημάνσεις αυτές και μη μεταλλικά ένθετα κατά της διάτρησης."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ποια κλάση γιλέκου υψηλής ορατότητας χρειάζομαι;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Εξαρτάται από τον χώρο εργασίας και τις απαιτήσεις του έργου. Το γιλέκο υψηλής ορατότητας της Milwaukee είναι πιστοποιημένο κλάσης 2 κατά EN ISO 20471 και έχει 10 τσέπες και άνοιγμα για ιμάντα ζώνης ασφαλείας."
+          }
+        }
+      ]
+    }
+  ]
+}

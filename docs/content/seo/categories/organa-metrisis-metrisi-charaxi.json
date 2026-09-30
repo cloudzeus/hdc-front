@@ -1,0 +1,53 @@
+{
+  "slug": "organa-metrisis-metrisi-charaxi",
+  "route": "/katalogos/organa-metrisis-metrisi-charaxi",
+  "erpType": "CATEGORY",
+  "parent": null,
+  "name": "ΟΡΓΑΝΑ ΜΕΤΡΗΣΗΣ - ΜΕΤΡΗΣΗ/ΧΑΡΑΞΗ",
+  "status": "draft",
+  "date": "2026-09-30",
+  "el": {
+    "h1": "Όργανα μέτρησης και χάραξης Milwaukee",
+    "seoTitle": "Όργανα μέτρησης Milwaukee: laser, μέτρα, αλφάδια",
+    "metaDescription": "Όργανα μέτρησης Milwaukee: laser σταυρού, 3 επιπέδων και περιστροφικά, μέτρα, αλφάδια, μετρητές αποστάσεων, θερμικές κάμερες. Πώς διαλέγετε.",
+    "intro": "Τα όργανα μέτρησης και χάραξης Milwaukee περιλαμβάνουν μέτρα και μετροταινίες, αλφάδια και μοιρογνωμόνια, laser σταυρού, laser 3 επιπέδων 360° και περιστροφικά laser με δέκτες, μετρητές αποστάσεων, ανιχνευτές, ενδοσκόπια και θερμόμετρα laser. Για χάραξη σε εσωτερικούς χώρους διαλέξτε laser σταυρού ή 3 επιπέδων· για εξωτερικούς χώρους και μεγάλες αποστάσεις περιστροφικό με δέκτη. Σύμφωνα με τη Milwaukee, η πράσινη δέσμη φαίνεται έως 4 φορές καλύτερα από την κόκκινη. Τα M12 και M18 laser παίρνουν τις ίδιες μπαταρίες με τα εργαλεία σας.",
+    "keywords": [
+      "όργανα μέτρησης Milwaukee",
+      "laser Milwaukee",
+      "αλφάδι laser",
+      "μέτρο Milwaukee",
+      "αλφάδι Milwaukee",
+      "αλφαδι λειζερ"
+    ],
+    "faq": [
+      {
+        "q": "Laser σταυρού ή laser 3 επιπέδων;",
+        "a": "Το laser σταυρού αρκεί για έναν τοίχο, πλακάκια και ντουλάπια. Το laser 3 επιπέδων 360° όπως το M12 3PL ντύνει όλο το δωμάτιο με γραμμές και βολεύει σε γυψοσανίδες και ψευδοροφές."
+      },
+      {
+        "q": "Πόσο ακριβή είναι τα laser Milwaukee;",
+        "a": "Η Milwaukee δίνει 0,3 mm/m για τα M12 CLL4P και M12 3PL και ±1,6 mm στα 30 m για το περιστροφικό M18 RLOHVG300."
+      },
+      {
+        "q": "Χρειάζομαι δέκτη laser;",
+        "a": "Σε εξωτερικό χώρο με ήλιο και σε μεγάλες αποστάσεις ναι, γιατί η γραμμή δεν φαίνεται με γυμνό μάτι. Με δέκτη τα M12 CLL4P και M12 3PL φτάνουν έως 100 m κατά τη Milwaukee."
+      },
+      {
+        "q": "Πράσινο ή κόκκινο laser;",
+        "a": "Σύμφωνα με τη Milwaukee, η πράσινη δέσμη έχει έως 4 φορές καλύτερη ορατότητα από την κόκκινη, κάτι που φαίνεται σε φωτεινούς χώρους και σε μεγαλύτερες αποστάσεις."
+      }
+    ],
+    "relatedCategories": [
+      "grammika-peristrofika-laser-dektes-laser",
+      "charaxi",
+      "diastasi",
+      "organa-metrisis-power-tools",
+      "alfadia-moirognomonia"
+    ]
+  },
+  "sources": [
+    "https://www.milwaukeetool.eu/en-eu/m12-cross-line-laser-with-4-points/m12-cll4p/",
+    "https://www.milwaukeetool.eu/en-eu/m12-green-360-176;-3-plane-laser/m12-3pl/",
+    "https://www.milwaukeetool.eu/en-eu/m18-300-m-green-horizontal-vertical-rotary-laser-with-one-key/m18-rlohvg300/"
+  ]
+}

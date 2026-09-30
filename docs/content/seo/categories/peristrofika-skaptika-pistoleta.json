@@ -1,0 +1,54 @@
+{
+  "slug": "peristrofika-skaptika-pistoleta",
+  "route": "/katalogos/peristrofika-skaptika-pistoleta",
+  "erpType": "GROUP",
+  "parent": "ergaleia-batarias",
+  "name": "ΠΕΡΙΣΤΡΟΦΙΚΑ -  ΣΚΑΠΤΙΚΑ ΠΙΣΤΟΛΕΤΑ",
+  "status": "draft",
+  "date": "2026-09-30",
+  "el": {
+    "h1": "Περιστροφικά και κατεδαφιστικά πιστολέτα μπαταρίας Milwaukee",
+    "seoTitle": "Πιστολέτα SDS-Plus και SDS-Max μπαταρίας Milwaukee",
+    "metaDescription": "Περιστροφικά πιστολέτα Milwaukee SDS-Plus και SDS-Max M12, M18 και κατεδαφιστικά MX FUEL. Ενέργεια κρούσης, διάμετροι, AUTOSTOP, σκόνη.",
+    "intro": "Τα περιστροφικά πιστολέτα τρυπούν και σκάβουν σε μπετό με τη δύναμη ενός εμβόλου, πολύ πιο γρήγορα από ένα κρουστικό δράπανο. Στη Milwaukee θα βρείτε πιστολέτα SDS-Plus σε M12 και M18 για βύσματα, αγκύρια και διελεύσεις, πιστολέτα SDS-Max M18 FUEL για μεγάλες διαμέτρους και καλέμισμα, και κατεδαφιστικά MX FUEL για σοβαρή καθαίρεση. Το M18 ONEFHPX, για παράδειγμα, δίνει κατά τη Milwaukee 5,0 J και τρυπά έως 32 mm, με ιδανικό εύρος 8–24 mm. Διαλέξτε με βάση τη διάμετρο που ανοίγετε πιο συχνά και αν χρειάζεστε σκάψιμο. Εκδόσεις με ενσωματωμένη αναρρόφηση κρατούν τη σκόνη μακριά.",
+    "keywords": [
+      "πιστολέτο μπαταρίας Milwaukee",
+      "πιστολετο sds plus",
+      "περιστροφικό πιστολέτο",
+      "σκαπτικό πιστολέτο",
+      "κατεδαφιστικό Milwaukee",
+      "M18 ONEFHPX"
+    ],
+    "faq": [
+      {
+        "q": "SDS-Plus ή SDS-Max;",
+        "a": "Το SDS-Plus είναι για ελαφρύτερα πιστολέτα και τρύπες έως περίπου 32 mm. Το SDS-Max είναι για βαρύτερα πιστολέτα, μεγάλες διαμέτρους και καλέμισμα. Τα τρυπάνια δεν είναι εναλλάξιμα."
+      },
+      {
+        "q": "Τι σημαίνουν οι 3 λειτουργίες σε ένα πιστολέτο;",
+        "a": "Τρύπημα χωρίς κρούση, τρύπημα με κρούση και μόνο κρούση για καλέμισμα. Τα πιστολέτα 2 λειτουργιών δεν σκάβουν."
+      },
+      {
+        "q": "Τι είναι το AUTOSTOP στα πιστολέτα Milwaukee;",
+        "a": "Προστασία που σβήνει το εργαλείο όταν το τρυπάνι μαγκώσει και το σώμα στρίψει απότομα. Στο M18 FHM η Milwaukee δίνει ενεργοποίηση μετά από 45° απότομης κίνησης."
+      },
+      {
+        "q": "Χρειάζομαι πιστολέτο με αναρρόφηση σκόνης;",
+        "a": "Αν τρυπάτε σε κατοικημένους χώρους ή πολλές τρύπες πάνω από το κεφάλι, ναι. Η Milwaukee έχει πιστολέτα M18 με ενσωματωμένο ή αφαιρούμενο εξαγωγέα σκόνης."
+      }
+    ],
+    "relatedCategories": [
+      "ypodochi-sds-plus",
+      "ypodochi-sds-max",
+      "peristrofika-skaptika-pistoleta-2",
+      "trypima",
+      "kalemisma-2",
+      "bataries-2"
+    ]
+  },
+  "sources": [
+    "https://www.milwaukeetool.eu/en-eu/m18-fuel-high-performance-4-mode-32-mm-sds-plus-hammer-with-one-key-and-fixtec-chuck/m18-onefhpx/",
+    "https://www.milwaukeetool.eu/en-eu/m18-fuel-one-key-8-kg-sds-max-drilling-and-breaking-hammer/m18-fhm/",
+    "https://www.milwaukeetool.eu/en-eu/mx-fuel-25-kg-class-28-mm-hex-demolition-hammer/mxf-dh2528h/"
+  ]
+}

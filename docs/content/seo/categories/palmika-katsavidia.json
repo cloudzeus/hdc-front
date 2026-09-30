@@ -1,0 +1,53 @@
+{
+  "slug": "palmika-katsavidia",
+  "route": "/katalogos/palmika-katsavidia",
+  "erpType": "SUBGROUP",
+  "parent": "drapana-katsavidieres-boulonokleida-kastanies",
+  "name": "ΠΑΛΜΙΚΑ ΚΑΤΣΑΒΙΔΙΑ",
+  "status": "draft",
+  "date": "2026-09-30",
+  "el": {
+    "h1": "Παλμικά κατσαβίδια μπαταρίας Milwaukee",
+    "seoTitle": "Παλμικά κατσαβίδια Milwaukee M18 FUEL και M12",
+    "metaDescription": "Παλμικά κατσαβίδια μπαταρίας 1/4\" Milwaukee: M18 FID3, M12 FID2, υδραυλικό SURGE, ONE-KEY και γωνιακά. Ροπή, λειτουργίες, μύτες.",
+    "intro": "Το παλμικό κατσαβίδι βιδώνει με κρούσεις στη φορά περιστροφής και βγάζει μεγάλη ροπή σε μικρό σώμα, με εξάγωνη υποδοχή 1/4\". Στη Milwaukee το M18 FUEL M18 FID3 δίνει 226 Nm σε σώμα μόλις 113 mm, με τέσσερις λειτουργίες ταχύτητας. Το M12 FID2 δίνει 170 Nm για ελαφρύτερη δουλειά. Το υδραυλικό M18 FQID SURGE βιδώνει με περίπου 50% λιγότερο θόρυβο κατά τη Milwaukee, ιδανικό για εσωτερικούς χώρους. Υπάρχουν επίσης εκδόσεις ONE-KEY (M18 ONEID3), brushless (BLIDR) και γωνιακά. Βάλτε μύτες για κρουστική χρήση, όπως οι SHOCKWAVE.",
+    "keywords": [
+      "παλμικό κατσαβίδι Milwaukee",
+      "παλμικο κατσαβιδι μπαταριας",
+      "M18 FID3",
+      "M12 FID2",
+      "υδραυλικό παλμικό SURGE",
+      "impact driver Milwaukee"
+    ],
+    "faq": [
+      {
+        "q": "M18 FID3 ή M12 FID2;",
+        "a": "Το M18 FID3 δίνει κατά τη Milwaukee 226 Nm και είναι μόλις 113 mm. Το M12 FID2 δίνει 170 Nm με σώμα 127 mm. Για βίδες ξυλείας και μπουλόνια έως M14 το M12 αρκεί· για μεγαλύτερα μπουλόνια πάρτε M18."
+      },
+      {
+        "q": "Τι είναι το υδραυλικό παλμικό SURGE;",
+        "a": "Παλμικό με υδραυλικό μηχανισμό κρούσης. Κατά τη Milwaukee, το M18 FQID βιδώνει σε ξύλο όσο τα συμβατικά brushless παλμικά, με περίπου 50% λιγότερο θόρυβο."
+      },
+      {
+        "q": "Τι κάνουν οι 4 λειτουργίες στο M18 FID3;",
+        "a": "Η 1 είναι για ακριβή δουλειά, η 2 προστατεύει βίδες και υλικό, η 3 δίνει μέγιστη απόδοση και η 4 προσαρμόζει αυτόματα ταχύτητα και κρούσεις ανάλογα με την αντίσταση."
+      },
+      {
+        "q": "Ποιες μύτες να βάλω στο παλμικό;",
+        "a": "Μύτες για κρουστική χρήση, όπως οι Milwaukee SHOCKWAVE, με ζώνη που απορροφά τις αιχμές. Οι απλές μύτες σπάνε ή φθείρονται γρήγορα στο παλμικό."
+      }
+    ],
+    "relatedCategories": [
+      "kroustika-drapana-2",
+      "mytes-vidomatos-magnitikoi-antaptores",
+      "drapana-katsavidieres-boulonokleida-kastanies",
+      "set-combo-ergaleion-18v",
+      "bataries-2"
+    ]
+  },
+  "sources": [
+    "https://www.milwaukeetool.eu/en-eu/m18-fuel-1-4-hex-impact-driver/m18-fid3/",
+    "https://www.milwaukeetool.eu/en-eu/m12-fuel-sub-compact-1-4-impact-driver/m12-fid2/",
+    "https://www.milwaukeetool.eu/en-eu/m18-fuel-surge-1-4-hex-hydraulic-impact-driver/m18-fqid/"
+  ]
+}

@@ -1,0 +1,154 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-ydraylikous#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-ydraylikous",
+      "url": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-ydraylikous",
+      "headline": "Εργαλεία Milwaukee για υδραυλικούς και θερμοϋδραυλικούς",
+      "description": "Ποια εργαλεία Milwaukee χρειάζεται ένας υδραυλικός: πρέσα σωλήνων FORCE LOGIC, βιδολόγος M18 FPT2, κόφτες σωλήνων, καθαριστές αποχέτευσης, M12.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "εργαλεία για υδραυλικούς, εργαλεία υδραυλικού Milwaukee, πρέσα σωλήνων μπαταρίας, βιδολόγος μπαταρίας, κόφτης χαλκοσωλήνα, καθαριστής αποχέτευσης μπαταρίας, εργαλεια θερμοϋδραυλικου",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "FORCE LOGIC"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "M18 ONEBLHPT"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FPT2"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 PCSS"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FQID"
+        },
+        {
+          "@type": "Thing",
+          "name": "SURGE"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        },
+        {
+          "@type": "Thing",
+          "name": "PACKOUT"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/systems/m12/",
+        "https://www.milwaukeetool.eu/en-eu/m18-force-logic-brushless-press-tool-with-one-key/m18-oneblhpt/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-pipe-threader-2-with-one-key/m18-fpt2/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-surge-1-4-hex-hydraulic-impact-driver/m18-fqid/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-percussion-drill/m18-fpd3/",
+        "https://www.milwaukeetool.eu/en-eu/cut-c-gloves/cut-c-gloves/",
+        "https://www.milwaukeetool.eu/en-eu/packout-boxes/packout-boxes/"
+      ],
+      "wordCount": 919
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-ydraylikous#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-ydraylikous#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Ποια πρέσα σωλήνων μπαταρίας έχει η Milwaukee;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Τη σειρά FORCE LOGIC. Η M18 ONEBLHPT πρεσάρει κατά τη Milwaukee μεταλλικούς σωλήνες έως 108 mm και πολυστρωματικούς έως 110 mm, με υποδοχή που δέχεται τα κοινά μαγουλά της αγοράς. Υπάρχει και compact πρέσα M12 και η μεγάλη M18 BLHPTXL."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πώς ξέρω ότι το πρεσάρισμα έγινε σωστά;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Στις πρέσες FORCE LOGIC η λειτουργία Auto-Cycle ολοκληρώνει κάθε κύκλο και η ένδειξη FORCE LOGIC επιβεβαιώνει οπτικά τη σωστή σύνδεση. Στη M18 ONEBLHPT το ONE-KEY καταγράφει επιπλέον κάθε πρεσάρισμα για αναφορές."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Μέχρι ποια διάμετρο σπειρώνει ο βιδολόγος M18 FPT2;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σύμφωνα με τη Milwaukee, από 1/8\" έως 2\", με δύο ταχύτητες: 0–29 rpm για 1¼\"–2\" και 0–41 rpm για 1/8\"–1\"."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πόσα σπειρώματα βγάζει ο M18 FPT2 με μία μπαταρία;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Κατά τη Milwaukee, πάνω από 25 σπειρώματα 2\" και πάνω από 60 σπειρώματα 1/2\" με μία μπαταρία M18 12,0 Ah."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ταιριάζουν κουκουνάρες άλλων μαρκών στον M18 FPT2;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Η Milwaukee δίνει άμεση συμβατότητα με τις δικές της κουκουνάρες FPT2H και με Ridgid 12-R, και αντάπτορες για Ridgid 11-R, REMS Quick Change και Rothenberger SUPER CUT."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Υπάρχει αθόρυβο παλμικό για δουλειά σε σπίτια;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το υδραυλικό παλμικό M18 FQID SURGE βιδώνει κατά τη Milwaukee με περίπου 50% λιγότερο θόρυβο από τα συμβατικά brushless παλμικά, χρήσιμο σε κατοικημένους χώρους."
+          }
+        }
+      ]
+    }
+  ]
+}

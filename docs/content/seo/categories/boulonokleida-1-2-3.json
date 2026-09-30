@@ -1,0 +1,53 @@
+{
+  "slug": "boulonokleida-1-2-3",
+  "route": "/katalogos/boulonokleida-1-2-3",
+  "erpType": "SUBGROUP",
+  "parent": "drapana-katsavidieres-boulonokleida-kastanies",
+  "name": "ΜΠΟΥΛΟΝΟΚΛΕΙΔΑ 1/2\"",
+  "status": "draft",
+  "date": "2026-09-30",
+  "el": {
+    "h1": "Μπουλονόκλειδα 1/2\" μπαταρίας Milwaukee",
+    "seoTitle": "Μπουλονόκλειδα 1/2\" μπαταρίας Milwaukee M18 και M12",
+    "metaDescription": "Μπουλονόκλειδα 1/2\" Milwaukee: M18 FHIW2F12, ONEFHIWF12, μέσης ροπής FMTIW2F12 και M12 FCIWF12G3. Ροπή σύσφιξης, ξεβιδώματος, μέγεθος.",
+    "intro": "Τα μπουλονόκλειδα 1/2\" μπαταρίας είναι για μπουλόνια τροχών, μεταλλικές κατασκευές και συντηρήσεις. Στη Milwaukee θα τα βρείτε σε τρεις κατηγορίες: υψηλής ροπής M18 FUEL, όπως το M18 FHIW2F12 με 1491 Nm σύσφιξης και 2034 Nm για ξεβίδωμα, μέσης ροπής (M18 FMTIW2F12) για τη γενική δουλειά του συνεργείου, και compact M12 FUEL, όπως το M12 FCIWF12G3 με 542 Nm σε 122 mm. Υπάρχουν και εκδόσεις ONE-KEY (M18 ONEFHIWF12) με ρύθμιση ροπής από το κινητό. Διαλέξτε με βάση το μεγαλύτερο μπουλόνι που ξεβιδώνετε συχνά και τον χώρο που έχετε.",
+    "keywords": [
+      "μπουλονόκλειδο Milwaukee",
+      "μπουλονοκλειδο μπαταριας",
+      "μπουλονόκλειδο 1/2",
+      "M18 FHIW2F12",
+      "M18 ONEFHIWF12",
+      "αερόκλειδο μπαταρίας"
+    ],
+    "faq": [
+      {
+        "q": "Ποια η διαφορά M18 FHIW2F12 και M18 ONEFHIWF12;",
+        "a": "Κατά τη Milwaukee, το FHIW2F12 δίνει 1491 Nm σύσφιξης και 2034 Nm ξεβιδώματος σε 193 mm. Το ONEFHIWF12 δίνει 1356 και 1898 Nm σε 213 mm, αλλά έχει ONE-KEY για ρυθμίσεις ροπής και ταχύτητας και απομακρυσμένο κλείδωμα."
+      },
+      {
+        "q": "Τι σημαίνει F12 στον κωδικό;",
+        "a": "Καρέ 1/2\" με δακτύλιο συγκράτησης (friction ring) για γρήγορη αλλαγή καρυδακιού. Τα μοντέλα με P έχουν πείρο συγκράτησης."
+      },
+      {
+        "q": "Χρειάζομαι υψηλής ή μέσης ροπής μπουλονόκλειδο;",
+        "a": "Για μπουλόνια φορτηγών, σκουριασμένα μπουλόνια και μεταλλικές κατασκευές, υψηλής ροπής. Για τροχούς αυτοκινήτων και γενική δουλειά συνεργείου, ένα μέσης ροπής ή ένα compact είναι ελαφρύτερο και αρκεί."
+      },
+      {
+        "q": "Τι κάνει η λειτουργία 4 στο ξεβίδωμα;",
+        "a": "Στα M18 FHIW2F12 και ONEFHIWF12 δίνει τη μέγιστη ροπή ξεβιδώματος και μόλις λυθεί το παξιμάδι κατεβαίνει στις 750 rpm, για να μην πεταχτεί."
+      }
+    ],
+    "relatedCategories": [
+      "boulonokleida-3-8",
+      "boulonokleida-1",
+      "seira-me-kare-1-2",
+      "kastanies-6",
+      "drapana-katsavidieres-boulonokleida-kastanies"
+    ]
+  },
+  "sources": [
+    "https://www.milwaukeetool.eu/en-eu/m18-fuel-1-2-high-torque-impact-wrench-with-friction-ring/m18-fhiw2f12/",
+    "https://www.milwaukeetool.eu/en-eu/m18-fuel-one-key-1-2-high-torque-impact-wrench-with-friction-ring/m18-onefhiwf12/",
+    "https://www.milwaukeetool.eu/en-eu/m12-fuel-1-2-compact-impact-wrench-with-friction-ring/m12-fciwf12g3/"
+  ]
+}

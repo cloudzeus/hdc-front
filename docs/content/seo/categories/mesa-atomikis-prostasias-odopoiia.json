@@ -1,0 +1,60 @@
+{
+  "slug": "mesa-atomikis-prostasias-odopoiia",
+  "route": "/katalogos/mesa-atomikis-prostasias-odopoiia",
+  "erpType": "CATEGORY",
+  "parent": null,
+  "name": "ΜΕΣΑ ΑΤΟΜΙΚΗΣ ΠΡΟΣΤΑΣΙΑΣ - ΟΔΟΠΟΙΙΑ",
+  "status": "draft",
+  "date": "2026-09-30",
+  "el": {
+    "h1": "Μέσα ατομικής προστασίας Milwaukee",
+    "seoTitle": "Μέσα ατομικής προστασίας Milwaukee: κράνη, γάντια, γυαλιά",
+    "metaDescription": "ΜΑΠ Milwaukee: κράνη BOLT, γάντια κατά της κοπής, γυαλιά ασφαλείας, γιλέκα υψηλής ορατότητας, παπούτσια ασφαλείας. Τι σημαίνουν τα πρότυπα EN.",
+    "intro": "Τα μέσα ατομικής προστασίας (ΜΑΠ) Milwaukee καλύπτουν όλο το σώμα: κράνη BOLT, γυαλιά και μάσκες, ωτοασπίδες, γάντια εργασίας και κατά της κοπής, γιλέκα υψηλής ορατότητας και υποδήματα ασφαλείας FLEXTRED. Διαλέξτε με βάση τον κίνδυνο και το πρότυπο: EN 397 και EN 12492 στα κράνη, EN 388 στα γάντια, EN 166 στα γυαλιά, EN ISO 20471 στα γιλέκα, EN ISO 20345 στα παπούτσια. Το σωστό μέγεθος μετράει όσο και η πιστοποίηση: ένα γάντι που γλιστράει ή ένα κράνος που χορεύει δεν προστατεύει.",
+    "keywords": [
+      "μέσα ατομικής προστασίας Milwaukee",
+      "ΜΑΠ Milwaukee",
+      "κράνος Milwaukee BOLT",
+      "γάντια Milwaukee",
+      "γυαλιά ασφαλείας Milwaukee",
+      "παπούτσια ασφαλείας Milwaukee"
+    ],
+    "faq": [
+      {
+        "q": "Σε ποια πρότυπα είναι πιστοποιημένο το κράνος Milwaukee BOLT 200;",
+        "a": "Σύμφωνα με τη Milwaukee, στο EN 397 και στο EN 12492, με δοκιμή σε ακραία θερμοκρασία -40 °C. Η μη αεριζόμενη έκδοση πιστοποιείται και κατά EN 50365 για ηλεκτρική μόνωση χαμηλής τάσης."
+      },
+      {
+        "q": "Τι σημαίνει το Cut Level στα γάντια Milwaukee;",
+        "a": "Είναι η αντοχή στην κοπή κατά EN 388:2016, από A (χαμηλότερη) έως F (υψηλότερη). Τα γάντια Cut C, για παράδειγμα, έχουν κωδικό 4343C και η Milwaukee τα προτείνει για απογύμνωση καλωδίων και σπείρωμα σωλήνων."
+      },
+      {
+        "q": "Τι σημαίνει EN ISO 20471 Class 2 σε ένα γιλέκο;",
+        "a": "Ότι το γιλέκο είναι πιστοποιημένο ρουχισμό υψηλής ορατότητας κλάσης 2. Το γιλέκο υψηλής ορατότητας της Milwaukee είναι πιστοποιημένο έτσι και έχει 10 τσέπες και θήκη για κάρτα."
+      },
+      {
+        "q": "Τι σημαίνει S3S ESD SR στα παπούτσια FLEXTRED;",
+        "a": "Είναι σημάνσεις κατά EN ISO 20345:2022. Το ESD δείχνει προστασία από ηλεκτροστατική εκφόρτιση, το SR αντιολισθητική σόλα και το FO αντοχή σε καύσιμα και λάδια. Τα FLEXTRED S3S έχουν μη μεταλλικά ένθετα κατά της διάτρησης."
+      },
+      {
+        "q": "Ποια γυαλιά ασφαλείας Milwaukee να πάρω;",
+        "a": "Για γενική χρήση γυαλιά πιστοποιημένα κατά EN 166 με αντιχαρακτική και αντιθαμβωτική επίστρωση. Για τροχό και κοπές με πολλή σκόνη, μάσκα-γυαλιά που κλείνει γύρω από τα μάτια."
+      }
+    ],
+    "relatedCategories": [
+      "gantia",
+      "prostasia-kefalis-prosopou",
+      "prostasia-kato-akron",
+      "prostasia-somatos",
+      "gyalia-prostasias",
+      "krani-prostasias"
+    ]
+  },
+  "sources": [
+    "https://www.milwaukeetool.eu/en-eu/bolt-200/bolt-200/",
+    "https://www.milwaukeetool.eu/en-eu/cut-c-gloves/cut-c-gloves/",
+    "https://www.milwaukeetool.eu/en-eu/performance-safety-glasses/performance-safety-glasses/",
+    "https://www.milwaukeetool.eu/en-eu/high-visibility-vest/high-visibility-vest/",
+    "https://www.milwaukeetool.eu/en-eu/flextred-s3s-safety-boots-black-1m110133-esd-sc-fo-sr/fxt-s3s-1m110133/"
+  ]
+}

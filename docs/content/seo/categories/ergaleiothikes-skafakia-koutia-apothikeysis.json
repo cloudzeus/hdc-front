@@ -1,0 +1,53 @@
+{
+  "slug": "ergaleiothikes-skafakia-koutia-apothikeysis",
+  "route": "/katalogos/ergaleiothikes-skafakia-koutia-apothikeysis",
+  "erpType": "GROUP",
+  "parent": "metafora-apothikeysi-thesi-ergasias",
+  "name": "ΕΡΓΑΛΕΙΟΘΗΚΕΣ-ΣΚΑΦΑΚΙΑ-ΚΟΥΤΙΑ ΑΠΟΘΗΚΕΥΣΗΣ",
+  "status": "draft",
+  "date": "2026-09-30",
+  "el": {
+    "h1": "Εργαλειοθήκες, ταμπακιέρες και κουτιά αποθήκευσης Milwaukee",
+    "seoTitle": "Εργαλειοθήκες Milwaukee PACKOUT και ταμπακιέρες",
+    "metaDescription": "Εργαλειοθήκες Milwaukee PACKOUT, ταμπακιέρες, συρταριέρες, σακίδια και τσάντες. Φορτία, στεγάνωση IP65 και πώς στήνετε τη στοίβα σας.",
+    "intro": "Εδώ θα βρείτε εργαλειοθήκες, ταμπακιέρες, συρταριέρες, σακίδια, τσάντες και ζώνες εργαλείων Milwaukee, με κύριο κορμό το αρθρωτό σύστημα PACKOUT. Στο PACKOUT τα κουτιά κουμπώνουν μεταξύ τους και έχουν στεγάνωση IP65 με μεταλλικές γωνίες. Κατά τη Milwaukee, η standard εργαλειοθήκη σηκώνει 34 kg, η large 45 kg και κάθε συρτάρι συρταριέρας 11 kg. Διαλέξτε με βάση το τι κουβαλάτε: μεγάλη εργαλειοθήκη για ηλεκτρικά εργαλεία, συρταριέρα για όσα πιάνετε συνέχεια, ταμπακιέρα για βίδες και μικροϋλικά, τσάντα ή σακίδιο για τα εργαλεία χειρός της ημέρας.",
+    "keywords": [
+      "εργαλειοθήκη Milwaukee",
+      "εργαλειοθηκη packout",
+      "ταμπακιέρα PACKOUT",
+      "συρταριέρα PACKOUT",
+      "σακίδιο εργαλείων Milwaukee",
+      "τσάντα εργαλείων Milwaukee"
+    ],
+    "faq": [
+      {
+        "q": "Ποια εργαλειοθήκη PACKOUT να πάρω πρώτη;",
+        "a": "Αν ξεκινάτε από το μηδέν, το τρόλεϊ ή το σετ τρόλεϊ με large και standard δίνει τη βάση της στοίβας. Αν κουβαλάτε λίγα, μια large εργαλειοθήκη και μια ταμπακιέρα είναι αρκετές."
+      },
+      {
+        "q": "Κουμπώνουν οι μικρές ταμπακιέρες πάνω στις μεγάλες εργαλειοθήκες;",
+        "a": "Ναι. Η Milwaukee σχεδίασε το PACKOUT ως σύστημα πολλαπλών αποτυπωμάτων, οπότε κουτιά διαφορετικού μεγέθους κλειδώνουν μεταξύ τους."
+      },
+      {
+        "q": "Πόσο βάρος σηκώνει μια εργαλειοθήκη PACKOUT;",
+        "a": "Κατά τη Milwaukee, η standard 34 kg και η large 45 kg. Κάθε συρτάρι συρταριέρας σηκώνει 11 kg."
+      },
+      {
+        "q": "Χωράει ONE-KEY TICK στις εργαλειοθήκες PACKOUT;",
+        "a": "Ναι. Το τρόλεϊ και οι εργαλειοθήκες έχουν θέση για τον ιχνηλάτη ONE-KEY TICK, ώστε να καταγράφεται και το ίδιο το κουτί στο ONE-KEY."
+      }
+    ],
+    "relatedCategories": [
+      "metafora-apothikeysi-thesi-ergasias",
+      "plastikes-ergaleiothikes",
+      "yfasmatines-ergaleiothikes-tsantakia-thikes",
+      "ergaleioforoi-ntoulapes-pagkoi",
+      "karotsia-metaforas-platformes-rabes"
+    ]
+  },
+  "sources": [
+    "https://www.milwaukeetool.eu/range/packout/",
+    "https://www.milwaukeetool.eu/en-eu/packout-boxes/packout-boxes/",
+    "https://www.milwaukeetool.eu/en-eu/packout-drawer-tool-boxes/packout-drawer-tool-boxes/"
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "slug": "kroustika-drapana-2",
+  "route": "/katalogos/kroustika-drapana-2",
+  "erpType": "SUBGROUP",
+  "parent": "drapana-katsavidieres-boulonokleida-kastanies",
+  "name": "ΚΡΟΥΣΤΙΚΑ ΔΡΑΠΑΝΑ",
+  "status": "draft",
+  "date": "2026-09-30",
+  "el": {
+    "h1": "Κρουστικά δραπανοκατσάβιδα μπαταρίας Milwaukee",
+    "seoTitle": "Κρουστικά δραπανοκατσάβιδα Milwaukee M18 και M12",
+    "metaDescription": "Κρουστικά δραπανοκατσάβιδα μπαταρίας Milwaukee M18 FUEL, M18 brushless και M12 FUEL. Ροπή, μέγεθος, ONE-KEY και πώς διαλέγετε το σωστό.",
+    "intro": "Το κρουστικό δραπανοκατσάβιδο μπαταρίας τρυπά ξύλο, μέταλλο και τοιχοποιία και βιδώνει με ρυθμιζόμενο συμπλέκτη. Στη Milwaukee θα το βρείτε σε τρία επίπεδα: M18 FUEL για βαριά καθημερινή χρήση (το M18 FPD3 δίνει 158 Nm σε σώμα 175 mm), M18 brushless (BLPD2, BLPDRC) για ενδιάμεση χρήση και M12 FUEL (M12 FPD2, 45 Nm) για ελαφριά δουλειά σε στενά σημεία. Υπάρχουν και εκδόσεις ONE-KEY (M18 ONEPD3) και δραπανοκατσάβιδα M12 με αποσπώμενες κεφαλές. Διαλέξτε με βάση τις διαμέτρους που ανοίγετε και την πλατφόρμα μπαταρίας που έχετε.",
+    "keywords": [
+      "κρουστικό δραπανοκατσάβιδο Milwaukee",
+      "κρουστικο δραπανοκατσαβιδο",
+      "δράπανο μπαταρίας Milwaukee",
+      "M18 FPD3",
+      "M12 FPD2",
+      "δραπανο milwaukee"
+    ],
+    "faq": [
+      {
+        "q": "M18 FPD3 ή M12 FPD2;",
+        "a": "Το M18 FPD3 έχει κατά τη Milwaukee 158 Nm και τρυπά έως 89 mm σε ξύλο. Το M12 FPD2 έχει 45 Nm και τρυπά έως 35 mm σε ξύλο, αλλά είναι ελαφρύτερο σε όλη την ημέρα. Για ποτηροτρύπανα και μεγάλες διαμέτρους πάρτε M18."
+      },
+      {
+        "q": "Τι είναι το AUTOSTOP στο M18 FPD3;",
+        "a": "Μια λειτουργία που σβήνει το εργαλείο όταν το τρυπάνι μαγκώσει και το σώμα στρίψει απότομα, μετά από 45° κίνηση κατά τη Milwaukee, για να προστατέψει τον καρπό."
+      },
+      {
+        "q": "Τρυπάει μπετό το κρουστικό δραπανοκατσάβιδο;",
+        "a": "Μικρές τρύπες σε τούβλο και τοιχοποιία ναι, έως 16 mm στο M18 FPD3 κατά τη Milwaukee. Για οπλισμένο σκυρόδεμα και συχνή διάτρηση χρειάζεστε πιστολέτο SDS-Plus."
+      },
+      {
+        "q": "Τι σημαίνει ONE στο M18 ONEPD3;",
+        "a": "Ότι το εργαλείο έχει ONE-KEY: συνδέεται με την εφαρμογή της Milwaukee για απογραφή, προσαρμογή ρυθμίσεων και απομακρυσμένο κλείδωμα."
+      }
+    ],
+    "relatedCategories": [
+      "palmika-katsavidia",
+      "drapana-katsavidieres-boulonokleida-kastanies",
+      "set-combo-ergaleion-18v",
+      "trypania-metallou",
+      "potirotrypana",
+      "bataries-2"
+    ]
+  },
+  "sources": [
+    "https://www.milwaukeetool.eu/en-eu/m18-fuel-percussion-drill/m18-fpd3/",
+    "https://www.milwaukeetool.eu/en-eu/m12-fuel-sub-compact-percussion-drill/m12-fpd2/",
+    "https://www.milwaukeetool.eu/en-eu/m18-compact-percussion-drill/m18-bpd/"
+  ]
+}

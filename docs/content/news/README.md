@@ -1,9 +1,41 @@
 # HDC news articles — drafts
 
-Ten guide-style news articles for the Milwaukee Heavy Duty Centre blog, written for the
-Greek market and translated into English and Italian. **None of them is published.** The
+Twenty guide-style news articles for the Milwaukee Heavy Duty Centre blog, written for the
+Greek market. Articles 01–10 are also translated into English and Italian; 11–20 are Greek
+only. **None of them is published.** The
 shop is not on its real domain yet, so they sit here as drafts and will be imported into
 the blog at go-live.
+
+## Round 2 (articles 11–20): Greek only
+
+On 2026-09-30 the owner decided that SEO/GEO/AEO content targets the Greek market only.
+Articles 11–20 therefore exist **only in Greek**: each folder has `el.md` and a
+`schema.json` whose `@graph` holds Organization + BlogPosting (el) + FAQPage (el). There
+are no `en.md`/`it.md` files and `alternates` lists only `el`. Round 1 (01–10) keeps its
+three languages.
+
+| # | folder | topic |
+|---|---|---|
+| 11 | `11-ergaleia-milwaukee-gia-ilektrologous` | trade guide: electricians |
+| 12 | `12-ergaleia-milwaukee-gia-ydraylikous` | trade guide: plumbers / heating |
+| 13 | `13-ergaleia-milwaukee-gia-synergeia-aytokiniton` | trade guide: car workshops |
+| 14 | `14-ergaleia-milwaukee-gia-xylourgous` | trade guide: carpenters |
+| 15 | `15-ergaleia-milwaukee-gia-oikodomi-skyrodema` | trade guide: construction / concrete |
+| 16 | `16-m18-fhiw2f12-i-m18-onefhiwf12-sygkrisi` | comparison: M18 FHIW2F12 vs M18 ONEFHIWF12 |
+| 17 | `17-lexiko-texnologion-milwaukee` | glossary of Milwaukee terms |
+| 18 | `18-frontida-apothikeysi-bataries-milwaukee` | battery care, charging, storage, recycling |
+| 19 | `19-mesa-atomikis-prostasias-milwaukee-odigos` | PPE guide and EN standards |
+| 20 | `20-kodikos-milwaukee-pos-diavazetai` | how to read a model code and article number |
+
+Round-2 rules on top of the ones below (owner, 2026-09-30): no quantities, stock, prices
+or delivery promises anywhere; the store section is NAP only (name, address, phone,
+hours). Anything that is the store's own reading rather than a Milwaukee fact (e.g. the
+kit-suffix table in 20, the "which one to choose" advice in 16) is labelled as such in the
+text.
+
+Comparisons FPD2 vs FPD3 and FID2 vs FID3 were **not** written: the M18 FPD2 and M18 FID2
+pages are no longer on milwaukeetool.eu en-eu/it-it (they redirect to FPD3 or return 404),
+so their figures could not be sourced.
 
 ## Where the blog content lives
 
@@ -28,7 +60,8 @@ docs/content/news/
     schema.json   JSON-LD @graph: Organization + BlogPosting ×3 (el/en/it) + FAQPage ×3
 ```
 
-`<nn>` is the reading order (01–10). The folder name uses the Greek slug.
+`<nn>` is the reading order (01–20). The folder name uses the Greek slug. Folders 11–20
+have `el.md` + `schema.json` only (see "Round 2" above).
 
 ## Front matter (YAML), per language file
 
@@ -70,8 +103,9 @@ section about the store in Piraeus.
 
 ## Editorial rules these drafts follow
 
-- Facts only from the official Milwaukee Tool Europe site (milwaukeetool.eu), listed in
-  `sources`. Figures are Milwaukee's own (often "up to", often from Milwaukee's internal
+- Facts only from the official Milwaukee Tool Europe site (milwaukeetool.eu en-eu/it-it pages,
+  plus, in article 18, Milwaukee's own battery Safety Data Sheet hosted on
+  static.milwaukeetool.eu), listed in `sources`. Figures are Milwaukee's own (often "up to", often from Milwaukee's internal
   tests) and are attributed as such. Anything that could not be verified was left out.
 - Original prose. No Milwaukee marketing copy is reproduced or closely paraphrased.
 - Store facts only from `src/config/shop.ts`: name, address, phone, hours, store pickup or
@@ -86,3 +120,5 @@ section about the store in Piraeus.
 2. Re-check figures against the `sources` pages (Milwaukee updates specs and ranges).
 3. Replace `{{SITE_URL}}` and the dates in `schema.json`; set `status` in HDCtool.
 4. Add a main image per post (HDCtool `PostImage`); none is included here.
+5. Round 1 store sections still say orders are shipped across Greece. Under the owner's
+   round-2 rule (no delivery promises) consider trimming them to NAP only before import.

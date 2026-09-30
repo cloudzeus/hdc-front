@@ -1,0 +1,165 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-oikodomi-skyrodema#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-oikodomi-skyrodema",
+      "url": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-oikodomi-skyrodema",
+      "headline": "Εργαλεία Milwaukee για οικοδομή και σκυρόδεμα: από το τρύπημα ως τη σκυροδέτηση",
+      "description": "Εργαλεία Milwaukee για οικοδομή: πιστολέτα SDS-Plus και SDS-Max, τρυπάνια MX4, κατεδαφιστικά, κόφτες, δονητές σκυροδέματος, δονητικές πλάκες MX FUEL.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "εργαλεία οικοδομής, εργαλεία για σκυρόδεμα, δονητής σκυροδέματος μπαταρίας, πιστολέτο SDS Max μπαταρίας, κατεδαφιστικό μπαταρίας, κομπακτέρ μπαταρίας, εργαλεια οικοδομης milwaukee",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "MX FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 ONEFHPX"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "M18 FHM"
+        },
+        {
+          "@type": "Thing",
+          "name": "MX4"
+        },
+        {
+          "@type": "Thing",
+          "name": "MXF DH2528H"
+        },
+        {
+          "@type": "Thing",
+          "name": "MXF COS350G2"
+        },
+        {
+          "@type": "Thing",
+          "name": "MXF CVBC"
+        },
+        {
+          "@type": "Thing",
+          "name": "MXF PC50"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 RLOHVG300"
+        },
+        {
+          "@type": "Thing",
+          "name": "AUTOSTOP"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-high-performance-4-mode-32-mm-sds-plus-hammer-with-one-key-and-fixtec-chuck/m18-onefhpx/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-one-key-8-kg-sds-max-drilling-and-breaking-hammer/m18-fhm/",
+        "https://www.milwaukeetool.eu/en-eu/sds-plus-mx4-drill-bits-4-cut/",
+        "https://www.milwaukeetool.eu/en-eu/sds-max-mx4-drill-bits-4-cut/",
+        "https://www.milwaukeetool.eu/en-eu/mx-fuel-25-kg-class-28-mm-hex-demolition-hammer/mxf-dh2528h/",
+        "https://www.milwaukeetool.eu/en-eu/mx-fuel-350-mm-cut-off-saw/mxf-cos350g2/",
+        "https://www.milwaukeetool.eu/en-eu/mx-fuel-briefcase-concrete-vibrator/mxf-cvbc/",
+        "https://www.milwaukeetool.eu/en-eu/mx-fuel-plate-compactor/mxf-pc50/",
+        "https://www.milwaukeetool.eu/en-eu/m18-300-m-green-horizontal-vertical-rotary-laser-with-one-key/m18-rlohvg300/",
+        "https://www.milwaukeetool.eu/systems/mx-fuel/"
+      ],
+      "wordCount": 965
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-oikodomi-skyrodema#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-oikodomi-skyrodema#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "SDS-Plus ή SDS-Max για οικοδομή;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "SDS-Plus για βύσματα, αγκύρια και διελεύσεις έως περίπου 32 mm· τα τρυπάνια MX4 SDS-Plus πάνε από 3,5 έως 32 mm. SDS-Max για μεγάλες διαμέτρους και καλέμισμα· τα MX4 SDS-Max πάνε από 12 έως 52 mm."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι μπορεί να σπάσει το κατεδαφιστικό MXF DH2528H;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σύμφωνα με τη Milwaukee, με μία μπαταρία MXF XC608 σπάει έως 2,5 τόνους σκυρόδεμα ή ανοίγει χαντάκι έως 18 m (βάθος 20 cm, πλάτος 30 cm), με ενέργεια κρούσης 64 J."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πόσο μπετό δονεί ο δονητής MXF CVBC με μία μπαταρία;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Κατά τη Milwaukee, έως 40 m³ με μία μπαταρία MXF XC406, με πάνω από 11.200 δονήσεις το λεπτό. Δέχεται κεφαλές έως Ø63 mm και εύκαμπτους άξονες έως 6,4 m."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Υπάρχει δονητική πλάκα μπαταρίας;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ναι, η MXF PC50. Η Milwaukee την παρουσιάζει ως την πρώτη αναστρεφόμενη δονητική πλάκα της κατηγορίας βάρους της, με 26 m/min και συμπίεση έως 325 m² σε 35 λεπτά με μία MXF HD812."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Μπορώ να κόψω μπετό σε εσωτερικό χώρο με μπαταρία;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Τα μηχανήματα MX FUEL δεν βγάζουν καυσαέρια, οπότε κατά τη Milwaukee μπορούν να δουλέψουν σε κλειστούς χώρους, σκάμματα και τούνελ. Η σκόνη της κοπής όμως μένει: χρειάζεστε αναρρόφηση ή νερό και προστασία αναπνοής."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι το AUTOSTOP στα πιστολέτα;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Προστασία που σβήνει το εργαλείο αν το τρυπάνι μαγκώσει και το σώμα στρίψει απότομα. Στο M18 FHM η Milwaukee δίνει ενεργοποίηση μετά από 45° απότομης κίνησης."
+          }
+        }
+      ]
+    }
+  ]
+}

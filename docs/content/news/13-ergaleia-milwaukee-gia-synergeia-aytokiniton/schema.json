@@ -1,0 +1,153 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-synergeia-aytokiniton#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-synergeia-aytokiniton",
+      "url": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-synergeia-aytokiniton",
+      "headline": "Εργαλεία Milwaukee για συνεργεία αυτοκινήτων και μηχανικούς",
+      "description": "Εργαλεία Milwaukee για μηχανικούς αυτοκινήτων: καστάνιες M12, μπουλονόκλειδα 1/2\" M12 και M18, φακός καπό M12 UHL, καρυδάκια κρούσης, εργαλειοφόροι.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "εργαλεία συνεργείου αυτοκινήτων, εργαλεία μηχανικού Milwaukee, καστάνια μπαταρίας, μπουλονόκλειδο μπαταρίας για τροχούς, φακός καπό, καρυδάκια κρούσης, αερόκλειδο μπαταρίας",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FIR38G2"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "M12 FCIWF12G3"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FHIW2F12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 ONEFHIWF12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 UHL"
+        },
+        {
+          "@type": "Thing",
+          "name": "SHOCKWAVE"
+        },
+        {
+          "@type": "Thing",
+          "name": "DRIVE CONTROL"
+        },
+        {
+          "@type": "Thing",
+          "name": "PACKOUT"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-3-8-ratchet/m12-fir38g2/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-1-2-compact-impact-wrench-with-friction-ring/m12-fciwf12g3/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-1-2-high-torque-impact-wrench-with-friction-ring/m18-fhiw2f12/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-one-key-1-2-high-torque-impact-wrench-with-friction-ring/m18-onefhiwf12/",
+        "https://www.milwaukeetool.eu/en-eu/m12-led-underhood-light/m12-uhl/",
+        "https://www.milwaukeetool.eu/systems/m12/"
+      ],
+      "wordCount": 960
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-synergeia-aytokiniton#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-synergeia-aytokiniton#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Ποια καστάνια μπαταρίας Milwaukee για συνεργείο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Η M12 FIR38G2 είναι μια καλή αφετηρία: κατά τη Milwaukee δίνει 95 Nm και 400 rpm, με κεφαλή χαμηλού προφίλ 19 mm για στενά σημεία στο καπό. Υπάρχουν και εκδόσεις 1/4\" και 1/2\", μακρύλαιμες και υψηλής ταχύτητας."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Φτάνει ένα μπουλονόκλειδο M12 για τροχούς αυτοκινήτων;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Για τους περισσότερους τροχούς επιβατικών συνήθως ναι. Το M12 FCIWF12G3 δίνει κατά τη Milwaukee 542 Nm σύσφιξης και 745 Nm για ξεβίδωμα, με μήκος 122 mm και βάρος 1 kg χωρίς μπαταρία. Για φορτηγά και σκουριασμένα μπουλόνια πάτε σε M18 υψηλής ροπής."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πόση ροπή έχει το M18 FHIW2F12;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σύμφωνα με τη Milwaukee, 1491 Nm σύσφιξης και 2034 Nm ξεβιδώματος, σε σώμα 193 mm. Στη λειτουργία 4 δίνει τη μέγιστη ροπή και μόλις λυθεί το παξιμάδι πέφτει στις 750 rpm."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Χρειάζομαι καρυδάκια κρούσης για μπουλονόκλειδο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ναι. Τα απλά καρυδάκια χρωμίου δεν είναι φτιαγμένα για κρουστικά εργαλεία και μπορεί να ραγίσουν. Χρησιμοποιείτε καρυδάκια impact, όπως τα SHOCKWAVE της Milwaukee."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πόσο κρατά ο φακός καπό M12 UHL;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Κατά τη Milwaukee, με μπαταρία M12 4,0 Ah περίπου 4 ώρες στα 1350 lumen και 8 ώρες στα 600 lumen. Τα άγκιστρα ανοίγουν από 119 έως 196 cm και έχουν προστασία FINISHGUARD για τη βαφή."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Μπορώ να ρυθμίσω τη ροπή του μπουλονόκλειδου από το κινητό;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Στα μοντέλα ONE-KEY, όπως το M18 ONEFHIWF12, ναι: η εφαρμογή επιτρέπει ρύθμιση ταχύτητας και ροπής σε κλίμακα 1–10. Το ρυθμισμένο εργαλείο δεν αντικαθιστά το δυναμόκλειδο για την τελική σύσφιξη τροχών."
+          }
+        }
+      ]
+    }
+  ]
+}

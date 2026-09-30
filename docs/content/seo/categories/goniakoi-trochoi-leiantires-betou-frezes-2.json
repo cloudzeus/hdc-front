@@ -1,0 +1,52 @@
+{
+  "slug": "goniakoi-trochoi-leiantires-betou-frezes-2",
+  "route": "/katalogos/goniakoi-trochoi-leiantires-betou-frezes-2",
+  "erpType": "GROUP",
+  "parent": "ergaleia-batarias",
+  "name": "ΓΩΝΙΑΚΟΙ ΤΡΟΧΟΙ - ΛΕΙΑΝΤΗΡΕΣ ΜΠΕΤΟΥ ΦΡΕΖΕΣ",
+  "status": "draft",
+  "date": "2026-09-30",
+  "el": {
+    "h1": "Γωνιακοί τροχοί μπαταρίας Milwaukee",
+    "seoTitle": "Γωνιακοί τροχοί μπαταρίας Milwaukee 125 και 230 mm",
+    "metaDescription": "Γωνιακοί τροχοί μπαταρίας Milwaukee M18 FUEL 125 και 230 mm, τροχοί ασφαλείας, ευθυλειαντήρες και M12. Φρένο RAPIDSTOP, AUTOSTOP, FIXTEC.",
+    "intro": "Ο γωνιακός τροχός μπαταρίας κόβει μέταλλο, πέτρα και πλακάκι και λειαίνει συγκολλήσεις, χωρίς καλώδιο. Στη Milwaukee θα βρείτε τροχούς M18 FUEL 125 mm, τροχούς 230 mm για βαριά κοπή, ευθυλειαντήρες και μικρούς τροχούς M12 για στενά σημεία. Κοιτάξτε τα χαρακτηριστικά ασφαλείας: σύμφωνα με τη Milwaukee, ο M18 FSAG125XB σταματά τον δίσκο σε λιγότερο από 2 δευτερόλεπτα με το φρένο RAPIDSTOP, ενώ ο τροχός ασφαλείας M18 FSAGSVO125X σε λιγότερο από 1 δευτερόλεπτο και έχει AUTOSTOP στο μάγκωμα. Για βαρύ τροχό θέλετε μπαταρία HIGH OUTPUT ή FORGE.",
+    "keywords": [
+      "γωνιακός τροχός μπαταρίας Milwaukee",
+      "τροχος μπαταριας",
+      "τροχός M18",
+      "τροχός 125 μπαταρίας",
+      "τροχός 230 μπαταρίας",
+      "κόφτης μπαταρίας"
+    ],
+    "faq": [
+      {
+        "q": "Τροχός 125 ή 230 mm;",
+        "a": "Ο 125 mm είναι ο τροχός για όλες τις δουλειές, ελαφρύς και ευέλικτος. Ο 230 mm κόβει βαθύτερα, για μεγάλες διατομές και πέτρα, αλλά είναι βαρύτερος και θέλει μεγάλη μπαταρία."
+      },
+      {
+        "q": "Τι είναι το RAPIDSTOP;",
+        "a": "Το φρένο του δίσκου. Όταν αφήνετε τον διακόπτη, σταματά τον δίσκο σε λίγα δευτερόλεπτα αντί να γυρίζει ελεύθερα: κάτω από 2 s στον M18 FSAG125XB και κάτω από 1 s στον M18 FSAGSVO125X κατά τη Milwaukee."
+      },
+      {
+        "q": "Τι είναι το FIXTEC στους τροχούς Milwaukee;",
+        "a": "Σύστημα για αλλαγή δίσκου χωρίς κλειδί. Υπάρχει, για παράδειγμα, στους M18 FSAG125XB και M18 FSAGSVO125X και διευκολύνει να βάζετε κάθε φορά τον σωστό δίσκο για το υλικό."
+      },
+      {
+        "q": "Ποια μπαταρία για γωνιακό τροχό M18;",
+        "a": "Ο τροχός τραβάει πολύ ρεύμα, οπότε μια HIGH OUTPUT ή FORGE αξιοποιεί καλύτερα τον κινητήρα. Κατά τη Milwaukee η HIGH OUTPUT δίνει έως 50% περισσότερη ισχύ από την απλή REDLITHIUM."
+      }
+    ],
+    "relatedCategories": [
+      "goniakoi-trochoi-f125-2",
+      "goniakoi-trochoi-f230-2",
+      "metallikoi-diskoi-goniakon-trochon",
+      "prostasia-kefalis-prosopou",
+      "bataries-2"
+    ]
+  },
+  "sources": [
+    "https://www.milwaukeetool.eu/en-eu/m18-fuel-125-160;mm-braking-angle-grinder-with-slide-switch/m18-fsag125xb/",
+    "https://www.milwaukeetool.eu/en-eu/m18-fuel-125-mm-safety-grinder-with-variable-speed-and-one-key/m18-fsagsvo125x/"
+  ]
+}

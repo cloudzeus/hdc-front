@@ -1,0 +1,54 @@
+{
+  "slug": "grammika-peristrofika-laser-dektes-laser",
+  "route": "/katalogos/grammika-peristrofika-laser-dektes-laser",
+  "erpType": "SUBGROUP",
+  "parent": "organa-metrisis-power-tools",
+  "name": "ΓΡΑΜΜΙΚΑ - ΠΕΡΙΣΤΡΟΦΙΚΑ LASER - ΔΕΚΤΕΣ LASER",
+  "status": "draft",
+  "date": "2026-09-30",
+  "el": {
+    "h1": "Laser Milwaukee: γραμμικά, περιστροφικά και δέκτες",
+    "seoTitle": "Laser Milwaukee: σταυρού, 3 επιπέδων, περιστροφικά",
+    "metaDescription": "Laser Milwaukee με πράσινη δέσμη: σταυρού, 3 επιπέδων 360° και περιστροφικά M12 και M18, δέκτες, τρίποδα και κοντάρια. Πώς διαλέγετε.",
+    "intro": "Τα laser Milwaukee αντικαθιστούν το ράμμα και το λάστιχο στη χάραξη. Θα βρείτε laser σταυρού (π.χ. M12 CLL4P) για πλακάκια, ντουλάπια και έναν τοίχο, laser 3 επιπέδων 360° (M12 3PL) για γυψοσανίδες και ψευδοροφές, και περιστροφικά M18 (π.χ. M18 RLOHVG300) για εξωτερικούς χώρους και μεγάλες αποστάσεις, μαζί με δέκτες, τρίποδα και τηλεσκοπικά κοντάρια. Σύμφωνα με τη Milwaukee, η πράσινη δέσμη φαίνεται έως 4 φορές καλύτερα από την κόκκινη και τα M12 CLL4P και 3PL έχουν ακρίβεια 0,3 mm/m. Διαλέξτε με βάση τον χώρο, την απόσταση και την μπαταρία που έχετε.",
+    "keywords": [
+      "laser Milwaukee",
+      "αλφάδι laser Milwaukee",
+      "περιστροφικό laser",
+      "laser σταυρού",
+      "laser 3 επιπέδων",
+      "αλφαδι λειζερ"
+    ],
+    "faq": [
+      {
+        "q": "Ποιο laser Milwaukee για πλακάκια;",
+        "a": "Ένα laser σταυρού, όπως το M12 CLL4P, αρκεί για πλακάκια, κουζίνες και ντουλάπια. Αν στρώνετε όλο το δωμάτιο ή κάνετε ψευδοροφή, ένα laser 3 επιπέδων όπως το M12 3PL γλιτώνει μετακινήσεις."
+      },
+      {
+        "q": "Πόσο μακριά φτάνει ένα laser Milwaukee;",
+        "a": "Κατά τη Milwaukee, τα M12 CLL4P και M12 3PL φαίνονται έως 38 m και φτάνουν έως 100 m με δέκτη. Το περιστροφικό M18 RLOHVG300 δουλεύει έως 300 m με τον δέκτη RD300G."
+      },
+      {
+        "q": "Τι κάνει ο δέκτης laser;",
+        "a": "Πιάνει τη δέσμη όταν δεν τη βλέπετε με το μάτι, σε ήλιο ή σε μεγάλη απόσταση. Με περιστροφικό laser σε εξωτερικό χώρο είναι απαραίτητος."
+      },
+      {
+        "q": "Αντέχουν τα laser Milwaukee στο εργοτάξιο;",
+        "a": "Τα M12 CLL4P και M12 3PL είναι IP54 και αντέχουν πτώση από 1 m κατά τη Milwaukee. Το M18 RLOHVG300 είναι IP66 και αντέχει πτώση από 1,5 m."
+      }
+    ],
+    "relatedCategories": [
+      "organa-metrisis-metrisi-charaxi",
+      "organa-metrisis-power-tools",
+      "charaxi",
+      "alfadia-moirognomonia",
+      "bataries-2"
+    ]
+  },
+  "sources": [
+    "https://www.milwaukeetool.eu/en-eu/m12-cross-line-laser-with-4-points/m12-cll4p/",
+    "https://www.milwaukeetool.eu/en-eu/m12-green-360-176;-3-plane-laser/m12-3pl/",
+    "https://www.milwaukeetool.eu/en-eu/m18-300-m-green-horizontal-vertical-rotary-laser-with-one-key/m18-rlohvg300/",
+    "https://www.milwaukeetool.eu/range/rotary-lasers/"
+  ]
+}

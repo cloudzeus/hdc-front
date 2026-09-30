@@ -1,0 +1,58 @@
+{
+  "slug": "bataries-2",
+  "route": "/katalogos/bataries-2",
+  "erpType": "GROUP",
+  "parent": "exartimata-ilektrikon-ergaleion-kai-batarias",
+  "name": "ΜΠΑΤΑΡΙΕΣ",
+  "status": "draft",
+  "date": "2026-09-30",
+  "el": {
+    "h1": "Μπαταρίες Milwaukee M18 και M12",
+    "seoTitle": "Μπαταρίες Milwaukee M18, M12, HIGH OUTPUT και FORGE",
+    "metaDescription": "Μπαταρίες Milwaukee M18 και M12: REDLITHIUM, HIGH OUTPUT και FORGE, από 2,0 έως 12,0 Ah, και σετ με φορτιστή. Ποια μπαταρία για ποιο εργαλείο.",
+    "intro": "Οι μπαταρίες Milwaukee χωρίζονται ανά πλατφόρμα και ανά κατηγορία. Οι M18 ταιριάζουν σε όλα τα εργαλεία M18 και οι M12 στα τρέχοντα M12· δεν ανταλλάσσονται μεταξύ τους. Στο M18 υπάρχουν τρεις κατηγορίες: REDLITHIUM (π.χ. M18 B5), HIGH OUTPUT με έως 50% περισσότερη ισχύ και έως 50% πιο δροσερή λειτουργία κατά τη Milwaukee (π.χ. M18 HB5.5), και FORGE, η κορυφαία, με ψύξη COOL-CYCLE (M18 FB6, FB8, FB12). Τα Ah δείχνουν διάρκεια, η κατηγορία απόδοση υπό φορτίο. Για βίδωμα αρκεί μικρή μπαταρία· για τροχούς και πιστολέτα HIGH OUTPUT ή FORGE.",
+    "keywords": [
+      "μπαταρίες Milwaukee",
+      "μπαταρια milwaukee m18",
+      "μπαταρία M18 5Ah",
+      "M18 FORGE",
+      "M18 HIGH OUTPUT",
+      "μπαταρία M12"
+    ],
+    "faq": [
+      {
+        "q": "Ποια η διαφορά REDLITHIUM, HIGH OUTPUT και FORGE;",
+        "a": "Είναι τρία επίπεδα απόδοσης. Η HIGH OUTPUT δίνει κατά τη Milwaukee έως 50% περισσότερη ισχύ και δουλεύει έως 50% πιο δροσερή από την απλή REDLITHIUM. Η FORGE είναι η κορυφαία, με ψύξη COOL-CYCLE και τη γρηγορότερη φόρτιση."
+      },
+      {
+        "q": "Ταιριάζει η μπαταρία M18 FORGE σε παλιό εργαλείο M18;",
+        "a": "Ναι. Σύμφωνα με τη Milwaukee, όλες οι μπαταρίες M18 ταιριάζουν σε όλα τα εργαλεία M18."
+      },
+      {
+        "q": "Πόσο γρήγορα φορτίζει μια M18 FB12;",
+        "a": "Κατά τη Milwaukee, στον Super Charger M18 DBSC φτάνει το 80% σε 35 λεπτά και γεμίζει σε 45 λεπτά."
+      },
+      {
+        "q": "Δουλεύουν οι μπαταρίες Milwaukee στο κρύο;",
+        "a": "Σύμφωνα με τη Milwaukee, οι μπαταρίες REDLITHIUM M18 δουλεύουν έως τους -20 °C, ενώ οι συμβατικές σταματούν γύρω στους -6 °C."
+      },
+      {
+        "q": "Τι είναι τα σετ NRG;",
+        "a": "Σετ μπαταριών με φορτιστή, για όσους έχουν ήδη σκέτα εργαλεία. Στον κατάλογο θα δείτε σετ NRG, HNRG και FORGE NRG· η σύνθεση κάθε σετ (μπαταρίες και φορτιστής) γράφεται στη σελίδα του."
+      }
+    ],
+    "relatedCategories": [
+      "fortistes",
+      "ergaleia-batarias",
+      "set-combo-ergaleion-18v",
+      "set-combo-ergaleion-12v"
+    ]
+  },
+  "sources": [
+    "https://www.milwaukeetool.eu/systems/m18/",
+    "https://www.milwaukeetool.eu/systems/m18/redlithium-ion/",
+    "https://www.milwaukeetool.eu/en-eu/m18-high-output-50-ah-battery/m18-hb5/",
+    "https://www.milwaukeetool.eu/en-eu/m18-forge-120-ah-battery/m18-fb12/",
+    "https://www.milwaukeetool.eu/systems/m12/high-output/"
+  ]
+}

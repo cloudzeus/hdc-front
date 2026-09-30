@@ -1,0 +1,165 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-ilektrologous#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-ilektrologous",
+      "url": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-ilektrologous",
+      "headline": "Εργαλεία Milwaukee για ηλεκτρολόγους: τι χρειάζεται η βαλίτσα σας",
+      "description": "Ποια εργαλεία Milwaukee χρειάζεται ένας ηλεκτρολόγος: M12 για πίνακες, M18 για διελεύσεις, κόφτες και πρέσες καλωδίων, εργαλεία VDE, laser, ΜΑΠ.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "εργαλεία για ηλεκτρολόγους, εργαλεία ηλεκτρολόγου Milwaukee, κόφτης καλωδίων μπαταρίας, πρέσα ακροδεκτών μπαταρίας, εργαλεία VDE, δραπανοκατσάβιδο ηλεκτρολόγου, εργαλεια ηλεκτρολογου",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "FORCE LOGIC"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "M18 ONEHCC"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 ONEHCCT60"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FPD2"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FID2"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 ONEFHPX"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 CLL4P"
+        },
+        {
+          "@type": "Thing",
+          "name": "BOLT 200"
+        },
+        {
+          "@type": "Thing",
+          "name": "VDE"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/systems/m12/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-sub-compact-percussion-drill/m12-fpd2/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-sub-compact-1-4-impact-driver/m12-fid2/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-percussion-drill/m18-fpd3/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-high-performance-4-mode-32-mm-sds-plus-hammer-with-one-key-and-fixtec-chuck/m18-onefhpx/",
+        "https://www.milwaukeetool.eu/en-eu/m18-force-logic-hydraulic-35-160;mm-cable-cutter/m18-onehcc/",
+        "https://www.milwaukeetool.eu/en-eu/m18-force-logic-hydraulic-60-160;kn-cable-crimper/m18-onehcct60/",
+        "https://www.milwaukeetool.eu/en-eu/m12-cross-line-laser-with-4-points/m12-cll4p/",
+        "https://www.milwaukeetool.eu/en-eu/bolt-200/bolt-200/",
+        "https://www.milwaukeetool.eu/en-eu/cut-c-gloves/cut-c-gloves/"
+      ],
+      "wordCount": 1019
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-ilektrologous#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/ergaleia-milwaukee-gia-ilektrologous#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "M12 ή M18 για ηλεκτρολόγο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Για τη δουλειά της ημέρας σε κουτιά, σχάρες και πίνακες, το M12 είναι ελαφρύτερο και χωρά παντού. Για διελεύσεις σε ξύλο με ποτηροτρύπανο και για το πιστολέτο SDS-Plus στο μπετό χρειάζεστε M18. Ένας φορτιστής M12-18 φορτίζει και τα δύο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πόσο γρήγορα κόβει ο κόφτης καλωδίων M18 ONEHCC;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σύμφωνα με τη Milwaukee, κόβει καλώδια έως 35 mm σε λιγότερο από 3 δευτερόλεπτα, με δύναμη 53 kN. Η κεφαλή περιστρέφεται 350° και τα μαγουλά αλλάζουν σε λιγότερο από 15 δευτερόλεπτα."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ποια μαγουλά χρειάζομαι στον κόφτη ONEHCC;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ανάλογα με το καλώδιο: η Milwaukee έχει μαγουλά για Cu/Al, ACSR, οπλισμένα καλώδια SWA και πολύκλωνα FSW. Ο κωδικός του σετ γράφει ποια μαγουλά περιέχει."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Χρειάζομαι εργαλεία χειρός VDE;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Αν δουλεύετε σε πίνακες και εγκαταστάσεις, ναι. Τα εργαλεία VDE είναι μονωμένα και πιστοποιημένα για εργασίες κοντά σε ηλεκτρικά μέρη. Είναι επιπλέον προστασία, όχι υποκατάστατο της απομόνωσης του κυκλώματος."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ποιο κράνος Milwaukee για ηλεκτρολόγο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το μη αεριζόμενο BOLT 200. Κατά τη Milwaukee, πιστοποιείται κατά EN 397 με την προαιρετική απαίτηση ηλεκτρικής μόνωσης 440 V a.c. και κατά EN 50365 για εργασίες σε εγκαταστάσεις χαμηλής τάσης. Το αεριζόμενο δεν έχει αυτή την πιστοποίηση."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ποια γάντια για απογύμνωση καλωδίων;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Γάντια κατά της κοπής. Η Milwaukee προτείνει τα γάντια Cut C (EN 388:2016, 4343C) για απογύμνωση καλωδίων, και έχουν επένδυση SMARTSWIPE για οθόνη αφής."
+          }
+        }
+      ]
+    }
+  ]
+}

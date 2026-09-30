@@ -1,0 +1,144 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/m18-fhiw2f12-i-m18-onefhiwf12-sygkrisi#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/m18-fhiw2f12-i-m18-onefhiwf12-sygkrisi",
+      "url": "{{SITE_URL}}/blog/m18-fhiw2f12-i-m18-onefhiwf12-sygkrisi",
+      "headline": "M18 FHIW2F12 ή M18 ONEFHIWF12; Σύγκριση μπουλονόκλειδων 1/2\" υψηλής ροπής",
+      "description": "M18 FHIW2F12 ή M18 ONEFHIWF12: ροπή σύσφιξης και ξεβιδώματος, μήκος, λειτουργίες, ONE-KEY. Ποιο μπουλονόκλειδο 1/2\" Milwaukee ταιριάζει σε εσάς.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "M18 FHIW2F12, M18 ONEFHIWF12, FHIW2F12 ή ONEFHIWF12, μπουλονόκλειδο 1/2 υψηλής ροπής, μπουλονόκλειδο μπαταρίας Milwaukee, 4933492783, 4933459727",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FHIW2F12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 ONEFHIWF12"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "M18 ONEFHIWF12E"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        },
+        {
+          "@type": "Thing",
+          "name": "DRIVE CONTROL"
+        },
+        {
+          "@type": "Thing",
+          "name": "POWERSTATE"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLINK PLUS"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-1-2-high-torque-impact-wrench-with-friction-ring/m18-fhiw2f12/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-one-key-1-2-high-torque-impact-wrench-with-friction-ring/m18-onefhiwf12/",
+        "https://it.milwaukeetool.eu/it-it/avvitatore-ad-impulsi-alta-coppia-1-2-m18-fuel-con-anello-di-frizione/m18-fhiw2f12/",
+        "https://it.milwaukeetool.eu/it-it/avvitatore-ad-impulsi-one-key-fuel-ad-alta-coppia-attacco-1-2-f/m18-onefhiwf12/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-one-key-1-2-high-torque-impact-wrench-with-friction-ring-and-extended-anvil/m18-onefhiwf12e/"
+      ],
+      "wordCount": 803
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/m18-fhiw2f12-i-m18-onefhiwf12-sygkrisi#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/m18-fhiw2f12-i-m18-onefhiwf12-sygkrisi#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Ποιο είναι πιο δυνατό, το M18 FHIW2F12 ή το M18 ONEFHIWF12;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σύμφωνα με τη Milwaukee, το M18 FHIW2F12: 1491 Nm σύσφιξης και 2034 Nm ξεβιδώματος, απέναντι σε 1356 Nm και 1898 Nm του M18 ONEFHIWF12."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ποιο είναι πιο κοντό;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το M18 FHIW2F12, με 193 mm. Το M18 ONEFHIWF12 έχει μήκος 213 mm, κατά τη Milwaukee."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι κερδίζω με το ONE-KEY στο ONEFHIWF12;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ρύθμιση ταχύτητας και ροπής από την εφαρμογή σε κλίμακα 1–10, για επαναλαμβανόμενη σύσφιξη, καθώς και εντοπισμό, ψηφιακή απογραφή και απομακρυσμένο κλείδωμα αν το εργαλείο χαθεί."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Έχουν και τα δύο λειτουργία ξεβιδώματος;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ναι. Και τα δύο έχουν 4 λειτουργίες DRIVE CONTROL. Στη λειτουργία 4 δίνουν τη μέγιστη ροπή για να λύσει το παξιμάδι και μετά πέφτουν στις 750 rpm για έλεγχο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ταιριάζουν οι ίδιες μπαταρίες και στα δύο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ναι. Και τα δύο είναι M18 FUEL και δουλεύουν με όλες τις μπαταρίες M18. Τα κιτ -502X έχουν δύο μπαταρίες M18 B5 των 5,0 Ah, φορτιστή M12-18 FC και βαλίτσα HD Box."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι το M18 ONEFHIWF12E;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Η έκδοση του ONEFHIWF12 με επιμηκυμένο άξονα (extended anvil) και δακτύλιο συγκράτησης, για μπουλόνια σε βαθιά σημεία. Ελέγξτε τα στοιχεία της στη σελίδα του προϊόντος."
+          }
+        }
+      ]
+    }
+  ]
+}

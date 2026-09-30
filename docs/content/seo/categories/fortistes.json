@@ -1,0 +1,51 @@
+{
+  "slug": "fortistes",
+  "route": "/katalogos/fortistes",
+  "erpType": "GROUP",
+  "parent": "exartimata-ilektrikon-ergaleion-kai-batarias",
+  "name": "ΦΟΡΤΙΣΤΕΣ",
+  "status": "draft",
+  "date": "2026-09-30",
+  "el": {
+    "h1": "Φορτιστές Milwaukee M12 και M18",
+    "seoTitle": "Φορτιστές Milwaukee M12, M18, Super Charger και PACKOUT",
+    "metaDescription": "Φορτιστές Milwaukee: M12-18 C και FC για δύο πλατφόρμες, Super Charger M18 DBSC, πολυφορτιστές, φορτιστής PACKOUT 6 θέσεων και αυτοκινήτου.",
+    "intro": "Οι φορτιστές Milwaukee φορτίζουν τις μπαταρίες της πλατφόρμας τους: ο C12 C μόνο M12, ενώ οι M12-18 C και M12-18 FC φορτίζουν και M12 και M18, οπότε ένας φορτιστής αρκεί για δύο συστήματα. Ο Super Charger M18 DBSC είναι ο ταχυφορτιστής διπλής θύρας· κατά τη Milwaukee φορτίζει μια M18 FB6 σε 25 λεπτά. Υπάρχουν επίσης πολυφορτιστές για συνεργεία, ο φορτιστής PACKOUT 6 θέσεων που μπαίνει στη στοίβα, και φορτιστής αυτοκινήτου 12 V. Διαλέξτε με βάση πόσες μπαταρίες φορτίζετε μαζί και πόσο γρήγορα τις χρειάζεστε ξανά.",
+    "keywords": [
+      "φορτιστής Milwaukee",
+      "φορτιστης m18",
+      "M12-18 FC",
+      "Super Charger M18 DBSC",
+      "φορτιστής μπαταρίας Milwaukee"
+    ],
+    "faq": [
+      {
+        "q": "Ποιος φορτιστής φορτίζει και M12 και M18;",
+        "a": "Οι φορτιστές διπλής πλατφόρμας M12-18 C και M12-18 FC. Ο C12 C φορτίζει μόνο μπαταρίες M12."
+      },
+      {
+        "q": "Πόσο γρήγορος είναι ο Super Charger M18 DBSC;",
+        "a": "Κατά τη Milwaukee, φορτίζει μια M18 FB6 σε 25 λεπτά, τις FB8 και FB12 σε 45 λεπτά και την HB5.5 σε 35 λεπτά."
+      },
+      {
+        "q": "Γιατί ο ίδιος φορτιστής αργεί περισσότερο σε μεγάλη μπαταρία;",
+        "a": "Επειδή η χωρητικότητα είναι μεγαλύτερη. Κατά τη Milwaukee, η M18 HB5 θέλει 39 λεπτά στον DBSC, 59 στον M12-18 FC και 100 στον M12-18 C."
+      },
+      {
+        "q": "Μπορώ να φορτίσω μπαταρία Milwaukee με φορτιστή άλλης μάρκας;",
+        "a": "Όχι. Φορτίζετε μόνο με φορτιστή Milwaukee της πλατφόρμας σας ή διπλής πλατφόρμας M12-18. Η Milwaukee προειδοποιεί για κίνδυνο φωτιάς όταν ένας φορτιστής χρησιμοποιείται με μπαταρίες για τις οποίες δεν προορίζεται."
+      }
+    ],
+    "relatedCategories": [
+      "bataries-2",
+      "ergaleia-batarias",
+      "set-combo-ergaleion-18v",
+      "set-combo-ergaleion-12v"
+    ]
+  },
+  "sources": [
+    "https://www.milwaukeetool.eu/systems/m18/",
+    "https://www.milwaukeetool.eu/systems/m12/",
+    "https://static.milwaukeetool.eu/NetC.MilwaukeeTools/media/Product-Downloads/542661_doc_fr-fr.pdf"
+  ]
+}

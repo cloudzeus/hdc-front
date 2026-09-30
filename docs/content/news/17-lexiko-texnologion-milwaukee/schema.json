@@ -1,0 +1,205 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/lexiko-texnologion-milwaukee#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/lexiko-texnologion-milwaukee",
+      "url": "{{SITE_URL}}/blog/lexiko-texnologion-milwaukee",
+      "headline": "Λεξικό Milwaukee: τι σημαίνουν FUEL, POWERSTATE, REDLINK PLUS, ONE-KEY και οι υπόλοιποι όροι",
+      "description": "Τι σημαίνουν οι όροι της Milwaukee: FUEL, POWERSTATE, REDLITHIUM, REDLINK PLUS, FORGE, ONE-KEY, TICK, PACKOUT, SHOCKWAVE, AUTOSTOP και άλλοι.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "τι σημαίνει FUEL Milwaukee, POWERSTATE, REDLINK PLUS, REDLITHIUM, Milwaukee FORGE, ONE-KEY, SHOCKWAVE, όροι Milwaukee",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "POWERSTATE"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLITHIUM"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "REDLINK PLUS"
+        },
+        {
+          "@type": "Thing",
+          "name": "HIGH OUTPUT"
+        },
+        {
+          "@type": "Thing",
+          "name": "FORGE"
+        },
+        {
+          "@type": "Thing",
+          "name": "COOL-CYCLE"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        },
+        {
+          "@type": "Thing",
+          "name": "TICK"
+        },
+        {
+          "@type": "Thing",
+          "name": "PACKOUT"
+        },
+        {
+          "@type": "Thing",
+          "name": "SHOCKWAVE"
+        },
+        {
+          "@type": "Thing",
+          "name": "AUTOSTOP"
+        },
+        {
+          "@type": "Thing",
+          "name": "RAPIDSTOP"
+        },
+        {
+          "@type": "Thing",
+          "name": "FIXTEC"
+        },
+        {
+          "@type": "Thing",
+          "name": "DRIVE CONTROL"
+        },
+        {
+          "@type": "Thing",
+          "name": "SURGE"
+        },
+        {
+          "@type": "Thing",
+          "name": "FORCE LOGIC"
+        },
+        {
+          "@type": "Thing",
+          "name": "SAWZALL"
+        },
+        {
+          "@type": "Thing",
+          "name": "MX FUEL"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/systems/m18/",
+        "https://www.milwaukeetool.eu/systems/m18/redlithium-ion/",
+        "https://www.milwaukeetool.eu/systems/m12/",
+        "https://www.milwaukeetool.eu/systems/mx-fuel/",
+        "https://www.milwaukeetool.eu/systems/mx-fuel/forge/",
+        "https://www.milwaukeetool.eu/en-eu/m18-high-output-50-ah-battery/m18-hb5/",
+        "https://www.milwaukeetool.eu/en-eu/m18-forge-120-ah-battery/m18-fb12/",
+        "https://www.milwaukeetool.eu/systems/one-key/",
+        "https://www.milwaukeetool.eu/en-eu/one-key-bluetooth-tracking-tag/btt/",
+        "https://www.milwaukeetool.eu/range/packout/",
+        "https://www.milwaukeetool.eu/en-eu/shockwave-impact-duty-screwdriving-bits-hex/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-percussion-drill/m18-fpd3/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-125-160;mm-braking-angle-grinder-with-slide-switch/m18-fsag125xb/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-1-4-hex-impact-driver/m18-fid3/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-surge-1-4-hex-hydraulic-impact-driver/m18-fqid/",
+        "https://www.milwaukeetool.eu/en-eu/m18-force-logic-brushless-press-tool-with-one-key/m18-oneblhpt/",
+        "https://www.milwaukeetool.eu/header/about-us/milwaukee-story/history/",
+        "https://www.milwaukeetool.eu/en-eu/sds-plus-mx4-drill-bits-4-cut/",
+        "https://www.milwaukeetool.eu/en-eu/accessories/sawing-and-cutting/",
+        "https://www.milwaukeetool.eu/en-eu/m12-led-underhood-light/m12-uhl/",
+        "https://www.milwaukeetool.eu/en-eu/bolt-200/bolt-200/",
+        "https://www.milwaukeetool.eu/en-eu/cut-c-gloves/cut-c-gloves/"
+      ],
+      "wordCount": 1144
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/lexiko-texnologion-milwaukee#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/lexiko-texnologion-milwaukee#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει FUEL στα εργαλεία Milwaukee;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "FUEL είναι η κορυφαία σειρά των M12 και M18. Ένα εργαλείο είναι FUEL όταν συνδυάζει τον brushless κινητήρα POWERSTATE, την μπαταρία REDLITHIUM και τα ηλεκτρονικά REDLINK PLUS της Milwaukee."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Είναι το POWERSTATE απλώς brushless κινητήρας;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι ο brushless κινητήρας που σχεδιάζει και κατασκευάζει η ίδια η Milwaukee για τα εργαλεία της. Χωρίς καρβουνάκια, δεν θέλει αλλαγή ψηκτρών και βγάζει λιγότερη θερμότητα."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι κάνει το REDLINK PLUS;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι τα ηλεκτρονικά που βάζουν εργαλείο και μπαταρία να επικοινωνούν. Προστατεύουν από υπερφόρτωση και, αν η μπαταρία υπερθερμανθεί, τη σβήνουν μέχρι να κρυώσει."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ποια η διαφορά HIGH OUTPUT και FORGE;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι δύο κατηγορίες μπαταριών πάνω από την απλή REDLITHIUM. Η HIGH OUTPUT δίνει κατά τη Milwaukee έως 50% περισσότερη ισχύ και δουλεύει έως 50% πιο δροσερή. Η FORGE είναι η κορυφαία, με ενεργή ψύξη COOL-CYCLE και τη γρηγορότερη φόρτιση."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι το ONE-KEY και τι το TICK;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το ONE-KEY είναι η δωρεάν πλατφόρμα της Milwaukee στο cloud για απογραφή, εντοπισμό και ρυθμίσεις εργαλείων. Το TICK είναι ιχνηλάτης που στερεώνεται σε εξοπλισμό χωρίς ενσωματωμένο ONE-KEY· οι εργαλειοθήκες PACKOUT έχουν θέση γι' αυτόν."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ποια η διαφορά AUTOSTOP και RAPIDSTOP;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το RAPIDSTOP είναι φρένο: σταματά τον δίσκο γρήγορα όταν αφήνετε τον διακόπτη. Το AUTOSTOP επεμβαίνει μόνο του: σβήνει το εργαλείο όταν αυτό μαγκώσει και στρίψει απότομα, στο M18 FPD3 μετά από 45°."
+          }
+        }
+      ]
+    }
+  ]
+}

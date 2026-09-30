@@ -1,0 +1,160 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/kodikos-milwaukee-pos-diavazetai#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/kodikos-milwaukee-pos-diavazetai",
+      "url": "{{SITE_URL}}/blog/kodikos-milwaukee-pos-diavazetai",
+      "headline": "Πώς διαβάζεται ένας κωδικός Milwaukee: M18 FPD3-502X και 4933479860",
+      "description": "Τι σημαίνει κάθε κομμάτι στο M18 FPD3-502X: πλατφόρμα, FUEL, είδος εργαλείου, γενιά, μπαταρίες, βαλίτσα. Και τι είναι ο 10ψήφιος κωδικός 4933479860.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "keywords": "κωδικός Milwaukee, τι σημαίνει 502X Milwaukee, τι σημαίνει 0X Milwaukee, κωδικός προϊόντος Milwaukee 4933, M18 FPD3-502X, article number Milwaukee, κωδικοι milwaukee",
+      "about": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "MX FUEL"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Thing",
+          "name": "FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        },
+        {
+          "@type": "Thing",
+          "name": "HD Box"
+        },
+        {
+          "@type": "Thing",
+          "name": "PACKOUT"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FPD3"
+        },
+        {
+          "@type": "Thing",
+          "name": "4933479860"
+        },
+        {
+          "@type": "Thing",
+          "name": "EAN"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-percussion-drill/m18-fpd3/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-1-4-hex-impact-driver/m18-fid3/",
+        "https://www.milwaukeetool.eu/en-eu/m18-brushless-percussion-drill/m18-blpd2/",
+        "https://www.milwaukeetool.eu/en-eu/m18-compact-percussion-drill/m18-bpd/",
+        "https://www.milwaukeetool.eu/en-eu/m18-force-logic-hydraulic-35-160;mm-cable-cutter/m18-onehcc/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-one-key-8-kg-sds-max-drilling-and-breaking-hammer/m18-fhm/",
+        "https://www.milwaukeetool.eu/en-eu/m18-force-logic-brushless-press-tool-with-one-key/m18-oneblhpt/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-3-8-ratchet/m12-fir38g2/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-1-2-compact-impact-wrench-with-friction-ring/m12-fciwf12g3/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-55-mm-plunge-saw/m18-fps55/",
+        "https://www.milwaukeetool.eu/en-eu/mx-fuel-plate-compactor/mxf-pc50/",
+        "https://www.milwaukeetool.eu/en-eu/mx-fuel-briefcase-concrete-vibrator/mxf-cvbc/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-1-2-high-torque-impact-wrench-with-friction-ring/m18-fhiw2f12/"
+      ],
+      "wordCount": 1201
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/kodikos-milwaukee-pos-diavazetai#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/kodikos-milwaukee-pos-diavazetai#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει το 502X στον κωδικό ενός εργαλείου Milwaukee;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι η σύνθεση του κιτ. Στα κιτ -502X που εξετάσαμε η Milwaukee δίνει δύο μπαταρίες 5,0 Ah, φορτιστή και βαλίτσα HD Box: το 5 δείχνει τα Ah, το 02 τις δύο μπαταρίες και το X τη βαλίτσα. Είναι δική μας ανάγνωση από τις επίσημες συνθέσεις, οπότε ελέγχετε πάντα το περιεχόμενο του κιτ."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει -0 ή -0X;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ότι το εργαλείο πωλείται χωρίς μπαταρία και φορτιστή. Στο -0X έρχεται συνήθως σε βαλίτσα HD Box, ενώ το -0 είναι σκέτο εργαλείο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει το F στο M18 FPD3;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Στις ονομασίες της Milwaukee το F αντιστοιχεί στη σειρά FUEL: το M18 FPD3 είναι το «M18 FUEL Percussion Drill». Αντίστοιχα, το M18 BLPD2 είναι brushless χωρίς FUEL και το M18 BPD το compact κρουστικό."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει ONE μπροστά από τον κωδικό;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ότι το εργαλείο έχει ONE-KEY, δηλαδή συνδέεται με την εφαρμογή της Milwaukee για απογραφή, ρυθμίσεις και απομακρυσμένο κλείδωμα, όπως το M18 ONEPD3 ή το M18 ONEFHIWF12."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι ο 10ψήφιος κωδικός, π.χ. 4933479860;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι ο κωδικός είδους (article number) της Milwaukee για τη συγκεκριμένη έκδοση και αγορά. Το M18 FPD3-502X έχει 4933479860 για την ηπειρωτική Ευρώπη (220–240 V) και 4933479861 για τη Μεγάλη Βρετανία."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Είναι ο κωδικός Milwaukee το ίδιο με το EAN;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Όχι. Ο κωδικός είδους της Milwaukee είναι ο 10ψήφιος αριθμός (π.χ. 4933479860). Το EAN είναι ο γραμμωτός κώδικας στη συσκευασία. Στη σελίδα κάθε προϊόντος μας θα δείτε και τα δύο."
+          }
+        }
+      ]
+    }
+  ]
+}
