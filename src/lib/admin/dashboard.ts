@@ -1,5 +1,6 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
+import { SUPPLIER_OPEN_WHERE } from "@/lib/admin/orders";
 
 /**
  * What the admin home page needs, in one round-trip.
@@ -63,8 +64,6 @@ export const AVAILABILITY_WHERE = {
 export type DashboardData = {
   attention: AttentionItem[];
   orders: { last7: number; last30: number; revenue7: number; revenue30: number; total: number };
-  /** Πληρωμένες παραγγελίες από προμηθευτή που δεν έχουν σταλεί ακόμα. */
-  supplierOrders: number;
   recent: RecentOrder[];
   catalogue: { products: number; active: number };
   /** Ενεργά προϊόντα ανά διαθεσιμότητα· stock + supplier + order = ενεργά. */
@@ -103,7 +102,7 @@ export async function getDashboard(): Promise<DashboardData> {
       where: { paymentStatus: "PAID", erpPushedAt: null },
     }),
     // Πληρωμένες, από προμηθευτή, που δεν έχουν φύγει: περιμένουν τον Παπαθεοδοσίου.
-    prisma.order.count({ where: { supplierOrder: true, paymentStatus: "PAID", shippedAt: null } }),
+    prisma.order.count({ where: SUPPLIER_OPEN_WHERE }),
     prisma.contactMessage.count({ where: { status: "new" } }),
     prisma.syncState.count({ where: { lastStatus: { in: ["FAILED", "PARTIAL"] } } }),
     prisma.order.count({ where: { createdAt: { gte: from7 } } }),
@@ -179,7 +178,7 @@ export async function getDashboard(): Promise<DashboardData> {
       count: supplierOrders,
       label: supplierOrders === 1 ? "Παραγγελία από προμηθευτή" : "Παραγγελίες από προμηθευτή",
       detail: "Πληρωμένες, δεν έχουν σταλεί· φεύγουν σε 3–5 εργάσιμες.",
-      href: "/admin/orders?filter=supplier",
+      href: "/admin/orders?filter=supplier-open",
       tone: "warn",
     });
   }
@@ -213,7 +212,6 @@ export async function getDashboard(): Promise<DashboardData> {
       revenue7: Number(sums7._sum.totalGross ?? 0),
       revenue30: Number(sums30._sum.totalGross ?? 0),
     },
-    supplierOrders,
     recent: recentRows.map((o) => ({
       orderNumber: o.orderNumber,
       createdAt: o.createdAt,

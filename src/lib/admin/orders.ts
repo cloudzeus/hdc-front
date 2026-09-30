@@ -15,18 +15,33 @@ import type { RecentOrder } from "@/lib/admin/dashboard";
  * chances to feel slow.
  */
 
-export type OrderFilter = "all" | "erp-pending" | "supplier" | "unpaid" | "to-ship" | "shipped";
+export type OrderFilter =
+  | "all"
+  | "erp-pending"
+  | "supplier"
+  | "supplier-open"
+  | "unpaid"
+  | "to-ship"
+  | "shipped";
 
 export const FILTERS: ReadonlyArray<{ id: OrderFilter; label: string }> = [
   { id: "all", label: "Όλες" },
   { id: "erp-pending", label: "Εκτός ERP" },
   { id: "supplier", label: "Από προμηθευτή" },
+  { id: "supplier-open", label: "Από προμηθευτή · ανοιχτές" },
   { id: "unpaid", label: "Απλήρωτες" },
   { id: "to-ship", label: "Προς αποστολή" },
   { id: "shipped", label: "Απεσταλμένες" },
 ] as const;
 
 const PAGE_SIZE = 25;
+
+/**
+ * Παραγγελίες από προμηθευτή που περιμένουν: πληρωμένες, δεν έχουν φύγει. Ο
+ * ίδιος όρος για το φίλτρο και για την κάρτα της επισκόπησης, ώστε ο αριθμός
+ * της κάρτας να είναι ο αριθμός της λίστας που ανοίγει.
+ */
+export const SUPPLIER_OPEN_WHERE = { supplierOrder: true, paymentStatus: "PAID", shippedAt: null } as const;
 
 export function whereFor(filter: OrderFilter, query: string) {
   const base: Record<string, unknown> = {};
@@ -41,6 +56,9 @@ export function whereFor(filter: OrderFilter, query: string) {
       // Παραγγελίες που πάνε ολόκληρες στον Παπαθεοδοσίου (Order.supplierOrder,
       // παγωμένο στην τοποθέτηση): 3–5 εργάσιμες, PURDOC στο βήμα 3.
       Object.assign(base, { supplierOrder: true });
+      break;
+    case "supplier-open":
+      Object.assign(base, SUPPLIER_OPEN_WHERE);
       break;
     case "unpaid":
       Object.assign(base, { paymentStatus: { in: ["PENDING", "FAILED"] } });
@@ -91,7 +109,7 @@ export async function getOrders({
   const where = whereFor(filter, query);
   const skip = (Math.max(1, page) - 1) * PAGE_SIZE;
 
-  const [rows, total, erpPending, supplier, unpaid, toShip, shipped, all] = await Promise.all([
+  const [rows, total, erpPending, supplier, supplierOpen, unpaid, toShip, shipped, all] = await Promise.all([
     prisma.order.findMany({
       where,
       orderBy: { createdAt: "desc" },
@@ -130,6 +148,7 @@ export async function getOrders({
     // Counts ignore the search box: they describe the queue, not the search.
     prisma.order.count({ where: whereFor("erp-pending", "") }),
     prisma.order.count({ where: whereFor("supplier", "") }),
+    prisma.order.count({ where: whereFor("supplier-open", "") }),
     prisma.order.count({ where: whereFor("unpaid", "") }),
     prisma.order.count({ where: whereFor("to-ship", "") }),
     prisma.order.count({ where: whereFor("shipped", "") }),
@@ -175,6 +194,7 @@ export async function getOrders({
       all,
       "erp-pending": erpPending,
       supplier,
+      "supplier-open": supplierOpen,
       unpaid,
       "to-ship": toShip,
       shipped,
