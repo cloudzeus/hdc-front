@@ -3,6 +3,7 @@ import {
   mergeQueue,
   modelScore,
   planTopics,
+  eligibleTopic,
   topicOrder,
   type PlannerInput,
   type PlannerModel,
@@ -171,13 +172,19 @@ describe("mergeQueue", () => {
 });
 
 describe("topicOrder", () => {
-  it("takes pinned first, then fewer failures, then the higher score", () => {
+  it("takes pinned first, then the higher score, then fewer failures", () => {
     const rows = [
       { key: "a", pinned: false, attempts: 0, score: 90 },
       { key: "b", pinned: true, attempts: 2, score: 10 },
       { key: "c", pinned: false, attempts: 1, score: 99 },
-      { key: "d", pinned: false, attempts: 0, score: 95 },
+      { key: "d", pinned: false, attempts: 0, score: 99 },
     ];
-    expect([...rows].sort(topicOrder).map((r) => r.key)).toEqual(["b", "d", "a", "c"]);
+    expect([...rows].sort(topicOrder).map((r) => r.key)).toEqual(["b", "d", "c", "a"]);
+  });
+
+  it("lets the writer take only pinned topics or those at the threshold", () => {
+    expect(eligibleTopic({ pinned: false, score: 39.9 })).toBe(false);
+    expect(eligibleTopic({ pinned: false, score: 40 })).toBe(true);
+    expect(eligibleTopic({ pinned: true, score: 5 })).toBe(true);
   });
 });

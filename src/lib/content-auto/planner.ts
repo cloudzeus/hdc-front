@@ -238,8 +238,11 @@ export function mergeQueue(stored: StoredTopic[], planned: PlannedTopic[]): Queu
   return changes;
 }
 
-/** The order the writer takes topics in: pinned, fewer failures, higher score. */
+/** The order the writer takes topics in: pinned, higher score, fewer failures. */
 export function topicOrder<T extends { pinned: boolean; attempts: number; score: number; key: string }>(a: T, b: T): number {
-  return Number(b.pinned) - Number(a.pinned) || a.attempts - b.attempts || b.score - a.score || a.key.localeCompare(b.key);
+  return Number(b.pinned) - Number(a.pinned) || b.score - a.score || a.attempts - b.attempts || a.key.localeCompare(b.key);
 }
+
+/** May the writer take this topic by itself? Pinned, or scored at the threshold or above. */
+export const eligibleTopic = (t: { pinned: boolean; score: number }) => t.pinned || t.score >= SCORE_THRESHOLD;
 

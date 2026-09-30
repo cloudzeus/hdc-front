@@ -3,55 +3,66 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@/generated/prisma/client";
 import type { ContentRunOutcome } from "@/generated/prisma/enums";
-import { chatJson } from "@/lib/ai/deepseek";
+import { DeepSeekError, chatJson } from "@/lib/ai/deepseek";
 import { brokenLinks } from "@/lib/seo/admin-data";
 import { allowedImage } from "@/lib/seo/markdown";
 import { faqFromJson, stringsFromJson } from "@/lib/seo/seo-merge";
 import { siteOrigin } from "@/lib/seo/urls";
 import { getSetting } from "@/lib/settings/settings";
 import { contentAdminUrl, sendContentRunEmail } from "@/lib/mail/content-auto-email";
-import { loadFactPack, packNumbers, type FactPack, type PackProduct } from "@/lib/content-auto/fact-pack";
+import { athensTime } from "@/lib/content-auto/cadence";
+import { STORE_FACTS, loadFactPack, packNumbers, type FactPack, type PackProduct } from "@/lib/content-auto/fact-pack";
 import {
   GATE_LABELS,
   failedGates,
+  imageGate,
   linkTargets,
-  runGates,
+  namesFrom,
+  textGates,
   visibleText,
   type Catalogue,
   type Existing,
   type GateResult,
 } from "@/lib/content-auto/gates";
 import { insertInlineImages, pickHeroPhoto, uploadHero, type InlineCandidate } from "@/lib/content-auto/images";
-import { topicOrder, type TopicPayload } from "@/lib/content-auto/planner";
+import { eligibleTopic, topicOrder, type TopicPayload } from "@/lib/content-auto/planner";
 import { articleSlug, modelMentions } from "@/lib/content-auto/text";
 import { verifyArticle, writeArticle, type Chat, type StyleExample } from "@/lib/content-auto/writer";
 
 /**
  * One run of the automatic writer (spec §2):
  *
- *   topic → fact pack → writer → inline photos → verifier → gates → hero →
- *   save (PUBLISHED when every gate passes and the mode allows it, else
- *   DRAFT) → topic state → run record → revalidate → audit → email
+ *   topic → fact pack → writer → inline photos → verifier → gates → hero
+ *   (only for a unique text, at its final slug) → one transaction: article
+ *   (PUBLISHED when every gate passes, the mode allows it, the caps allow it
+ *   and — for the cron — the switch is still on; else DRAFT), topic, run →
+ *   revalidate → audit → email
  *
  * `startRun` claims the single writer slot and records the run; `executeRun`
  * does the work and never throws — every failure ends in the run record, the
- * audit log and the email. The admin polls the run row (Cloudflare cuts a
- * request at 100″, a run takes longer).
+ * audit log and (at most once a day for a passing outage) the email. The
+ * admin polls the run row (Cloudflare cuts a request at 100″).
  */
 
 export type RunTrigger = "cron" | "manual-draft" | "manual-publish";
 
 export const AUTO_ACTOR = "auto:content";
-/** A run older than this with no end was cut off (restart, deploy). */
-export const STALE_MS = 15 * 60_000;
+/** A run older than this with no end was cut off (restart, deploy). Above the deadline, with room. */
+export const STALE_MS = 30 * 60_000;
+/** A run that is not done in 20 minutes is abandoned: FAILED, nothing saved or published. */
+export const RUN_DEADLINE_MS = 20 * 60_000;
 /** Three failed runs on one topic and it is skipped (spec §7). */
 export const MAX_ATTEMPTS = 3;
+/** Hard caps on automatic publications, whatever started the run (spec §7). */
+export const PUBLISH_CAPS = { perDay: 1, perWeek: 3 } as const;
 /** Any constant; the writer slot's Postgres advisory lock. */
 const LOCK_KEY = 88_120_930;
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const BASE = { ARTICLE: "/blog", GUIDE: "/odigoi" } as const;
 /** The guides whose voice the writer copies, best first. */
 const STYLE_SLUGS = ["pos-dialego-drapano", "drapanokatsavido-mpatarias-pos-dialego", "boulonokleido-pos-dialego"];
+const TRANSIENT_PREFIX = "Προσωρινό σφάλμα: ";
+const DAY = 86_400_000;
 
 // ── Starting ────────────────────────────────────────────────────────────────
 
@@ -63,12 +74,13 @@ async function closeStaleRuns(now = new Date()) {
   });
 }
 
-async function nextTopicId(): Promise<string | null> {
+/** The next topic: pinned, or scored at the threshold; pinned first, then score, then fewer failures. */
+export async function nextTopicId(): Promise<string | null> {
   const topics = await prisma.contentTopic.findMany({
     where: { status: { in: ["PENDING", "FAILED"] } },
     select: { id: true, key: true, pinned: true, attempts: true, score: true },
   });
-  return topics.sort(topicOrder)[0]?.id ?? null;
+  return topics.filter(eligibleTopic).sort(topicOrder)[0]?.id ?? null;
 }
 
 export type StartOptions = {
@@ -90,7 +102,7 @@ export type StartResult = { ok: true; runId: string } | { ok: false; error: stri
 export async function startRun(options: StartOptions): Promise<StartResult> {
   await closeStaleRuns();
   const topicId = options.topicId ?? (await nextTopicId());
-  if (!topicId) return { ok: false, error: "Δεν υπάρχει θέμα στην ουρά." };
+  if (!topicId) return { ok: false, error: "Δεν υπάρχει θέμα στην ουρά (βαθμολογία ≥ κατώφλι ή «Πρώτο»)." };
   return prisma.$transaction(async (tx) => {
     const [lock] = await tx.$queryRaw<Array<{ locked: boolean }>>`SELECT pg_try_advisory_xact_lock(${LOCK_KEY}) AS locked`;
     if (!lock?.locked) return { ok: false as const, error: "Τρέχει ήδη μια εκτέλεση." };
@@ -104,6 +116,24 @@ export async function startRun(options: StartOptions): Promise<StartResult> {
     });
     return { ok: true as const, runId: run.id };
   });
+}
+
+/**
+ * Automatic articles published in the last 7 days and today (Athens), counted
+ * on the articles themselves — a withdrawn one still counts: it went out.
+ */
+export async function publishedCounts(now = new Date()): Promise<{ week: number; today: number; dates: Date[] }> {
+  const rows = await prisma.contentArticle.findMany({
+    where: { source: "AUTO", publishedAt: { gte: new Date(now.getTime() - 8 * DAY) } },
+    select: { publishedAt: true },
+  });
+  const dates = rows.map((r) => r.publishedAt!).filter(Boolean);
+  const today = athensTime(now).date;
+  return {
+    dates,
+    week: dates.filter((d) => now.getTime() - d.getTime() < 7 * DAY).length,
+    today: dates.filter((d) => athensTime(d).date === today).length,
+  };
 }
 
 // ── The work ────────────────────────────────────────────────────────────────
@@ -171,14 +201,39 @@ function internalPaths(draftText: string): string[] {
   ];
 }
 
-function revalidateContent() {
-  // Outside a request (the cron) Next may refuse; the pages read the database on every request anyway.
-  for (const path of ["/admin/seo", "/blog", "/odigoi", "/sitemap.xml", "/llms.txt", "/llms-full.txt"]) {
+/**
+ * The routes live under /[locale]; they read the database on every request
+ * (searchParams, force-dynamic sitemap and llms), so this only clears what a
+ * router or data cache may still hold. Outside a request (the cron) Next may
+ * refuse, which is harmless.
+ */
+function revalidateContent(published: boolean) {
+  const targets: Array<[string, "page" | "layout" | undefined]> = [["/admin/seo", undefined]];
+  if (published) targets.push(["/[locale]/blog", "layout"], ["/[locale]/odigoi", "layout"]);
+  for (const [path, type] of targets) {
     try {
-      revalidatePath(path);
+      if (type) revalidatePath(path, type);
+      else revalidatePath(path);
     } catch {
       /* not in a request scope */
     }
+  }
+}
+
+/** DeepSeek down, the network, a timeout, a missing key: not the topic's fault. */
+export function isTransient(error: unknown): boolean {
+  if (error instanceof DeepSeekError) return true;
+  const e = error as { name?: string; message?: string; cause?: { code?: string } };
+  if (e?.name === "TimeoutError" || e?.name === "AbortError") return true;
+  const message = String(e?.message ?? "");
+  if (/fetch failed|ECONN|ETIMEDOUT|ENOTFOUND|EAI_AGAIN|socket hang up|network/i.test(message)) return true;
+  if (/DEEPSEEK_API_KEY|DeepSeek \d{3}/.test(message)) return true;
+  return typeof e?.cause?.code === "string" && /^E[A-Z]+$/.test(e.cause.code);
+}
+
+class DeadlineError extends Error {
+  constructor() {
+    super(`Η εκτέλεση ξεπέρασε τα ${RUN_DEADLINE_MS / 60_000} λεπτά και εγκαταλείφθηκε· δεν αποθηκεύτηκε τίποτα.`);
   }
 }
 
@@ -187,6 +242,7 @@ async function audit(action: string, entity: string, entityId: string, userId: s
     .create({ data: { userId, action, entity, entityId: entityId.slice(0, 64), diff: diff as Prisma.InputJsonValue } })
     .catch((error) => console.error("[content-auto] audit", error instanceof Error ? error.message : error));
 }
+
 
 export type RunSummary = {
   runId: string;
@@ -201,226 +257,332 @@ export type RunSummary = {
   error: string | null;
 };
 
-export type ExecuteOptions = { chat?: Chat; actorUserId?: string | null };
+export type ExecuteOptions = {
+  chat?: Chat;
+  actorUserId?: string | null;
+  /** For the tests; the real runs have 20 minutes. */
+  deadlineMs?: number;
+};
 
 const deepseek: Chat = (input) => chatJson(input);
 
-/** Do the run recorded as `runId`. Never throws. */
+type Run = NonNullable<Awaited<ReturnType<typeof loadRun>>>;
+type State = { abandoned: boolean; tokens: number; detail: Record<string, unknown>; t0: number };
+
+const loadRun = (id: string) => prisma.contentJobRun.findUnique({ where: { id }, include: { topic: true } });
+
+/** Do the run recorded as `runId`. Never throws; gives up at the deadline. */
 export async function executeRun(runId: string, options: ExecuteOptions = {}): Promise<RunSummary> {
-  const t0 = Date.now();
+  const state: State = { abandoned: false, tokens: 0, detail: {}, t0: Date.now() };
+  const run = await loadRun(runId);
+  if (!run) return { runId, outcome: "FAILED", topic: null, title: null, slug: null, articleId: null, failedGates: [], tokens: 0, seconds: 0, error: "Η εκτέλεση δεν βρέθηκε." };
+
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const deadline = new Promise<"deadline">((resolve) => {
+    timer = setTimeout(() => resolve("deadline"), options.deadlineMs ?? RUN_DEADLINE_MS);
+  });
+  const work = doRun(run, options, state).then(
+    (summary) => ({ summary }),
+    (error: unknown) => ({ error }),
+  );
+  const result = await Promise.race([work, deadline]);
+  clearTimeout(timer);
+  if (result === "deadline") {
+    state.abandoned = true;
+    return finishFailure(run, new DeadlineError(), state, options);
+  }
+  if ("error" in result) return finishFailure(run, result.error, state, options);
+  return result.summary;
+}
+
+async function doRun(run: Run, options: ExecuteOptions, state: State): Promise<RunSummary> {
   const chat = options.chat ?? deepseek;
   const actorUserId = options.actorUserId ?? null;
-  let tokens = 0;
-  const detail: Record<string, unknown> = {};
-  const run = await prisma.contentJobRun.findUnique({ where: { id: runId }, include: { topic: true } });
-  if (!run) return { runId, outcome: "FAILED", topic: null, title: null, slug: null, articleId: null, failedGates: [], tokens: 0, seconds: 0, error: "Η εκτέλεση δεν βρέθηκε." };
+  const detail = state.detail;
+  const check = () => {
+    if (state.abandoned) throw new DeadlineError();
+  };
   const topic = run.topic;
+  if (!topic) throw new Error("Το θέμα δεν υπάρχει πια.");
+  const payload = topic.payload as unknown as TopicPayload;
   const allowPublish = run.trigger === "cron" || run.trigger === "manual-publish";
   const notifyTo = await getSetting("content.auto.notifyEmail").catch(() => null);
 
-  try {
-    if (!topic) throw new Error("Το θέμα δεν υπάρχει πια.");
-    const payload = topic.payload as unknown as TopicPayload;
-
-    // A draft of an earlier run is rewritten only while nobody has touched it.
-    const previous = topic.articleId
-      ? await prisma.contentArticle.findUnique({
-          where: { id: topic.articleId },
-          select: { id: true, slug: true, status: true, source: true, updatedBy: true },
-        })
-      : null;
-    if (previous && !(previous.source === "AUTO" && previous.status === "DRAFT" && previous.updatedBy === AUTO_ACTOR)) {
-      await prisma.contentTopic.update({ where: { id: topic.id }, data: { status: "DONE", pinned: false } });
-      const reason = "Το άρθρο αυτού του θέματος δημοσιεύτηκε ή το επεξεργάστηκε άνθρωπος· δεν ξαναγράφεται.";
-      await prisma.contentJobRun.update({ where: { id: runId }, data: { finishedAt: new Date(), outcome: "SKIPPED", error: reason, articleId: previous.id } });
-      return { runId, outcome: "SKIPPED", topic: topic.title, title: null, slug: previous.slug, articleId: previous.id, failedGates: [], tokens: 0, seconds: (Date.now() - t0) / 1000, error: reason };
-    }
-    const own = previous;
-
-    // 1. The facts.
-    const pack = await loadFactPack({ kind: topic.kind, title: topic.title, payload });
-    detail.pack = {
-      products: pack.products.map((p) => p.code),
-      withOfficial: pack.products.filter((p) => p.official.length).map((p) => p.code),
-      links: pack.links.length,
-      representative: pack.representative,
-      notes: pack.notes,
-    };
-    if (pack.products.length === 0) throw new Error("Κανένα ενεργό προϊόν για το θέμα.");
-
-    // 2. The text.
-    const written = await writeArticle(pack, await loadStyleExample(), chat);
-    tokens += written.tokens;
-    detail.writer = { tokens: written.tokens, promptTokens: written.promptTokens, completionTokens: written.completionTokens, attempts: written.attempts };
-
-    // 3. Photos: the hero's source, then the inline ones into the body.
-    const byCode = new Map(pack.products.map((p) => [p.code, p]));
-    // The writer's choice first, then the representative, then the rest; a packshot on white wins.
-    const order = [written.heroProductCode, pack.representative, ...pack.products.map((p) => p.code)];
-    const candidates = [...new Set(order.filter((c): c is string => !!c))]
-      .map((code) => byCode.get(code))
-      .filter((p): p is PackProduct => !!p?.image && allowedImage(p.image))
-      .map((p) => ({ code: p.code, url: p.image! }));
-    const hero = await pickHeroPhoto(candidates);
-    const heroProduct = hero ? byCode.get(hero.code) : undefined;
-    const heroSource = hero?.url ?? null;
-    const heroAlt = heroProduct
-      ? (heroProduct.code === written.heroProductCode && written.heroImageAlt ? written.heroImageAlt : altFor(heroProduct, written.imageAlts))
-      : null;
-    const inline = insertInlineImages(written.draft.body, inlineCandidates(pack, heroProduct?.code ?? null, written.imageAlts));
-    const draft = { ...written.draft, body: inline.body };
-    detail.images = { hero: heroProduct?.code ?? null, inline: inline.placed };
-
-    // 4. The verifier.
-    let unsupported: Awaited<ReturnType<typeof verifyArticle>>["unsupported"] | null = null;
-    try {
-      const verified = await verifyArticle(pack, draft, chat, heroAlt);
-      tokens += verified.tokens;
-      unsupported = verified.unsupported;
-      detail.verifier = { tokens: verified.tokens, promptTokens: verified.promptTokens, completionTokens: verified.completionTokens };
-    } catch (error) {
-      tokens += (error as { tokens?: number }).tokens ?? 0;
-      detail.verifierError = error instanceof Error ? error.message : String(error);
-    }
-
-    // 5. The gates.
-    const slug = own?.slug ?? articleSlug(draft.title);
-    const [catalogue, existing, broken] = await Promise.all([
-      loadCatalogue(),
-      loadExisting(own?.id ?? null),
-      brokenLinks(internalPaths(visibleText(draft))),
-    ]);
-    const results: GateResult[] = runGates({
-      draft,
-      slug,
-      supported: packNumbers(pack),
-      catalogue,
-      broken,
-      existing,
-      unsupported,
-      heroSource,
+  // A draft of an earlier run is rewritten only while nobody has touched it.
+  const previous = topic.articleId
+    ? await prisma.contentArticle.findUnique({
+        where: { id: topic.articleId },
+        select: { id: true, slug: true, status: true, source: true, updatedBy: true },
+      })
+    : null;
+  if (previous && !(previous.source === "AUTO" && previous.status === "DRAFT" && previous.updatedBy === AUTO_ACTOR)) {
+    await prisma.contentTopic.update({ where: { id: topic.id }, data: { status: "DONE", pinned: false } });
+    const reason = "Το άρθρο αυτού του θέματος δημοσιεύτηκε ή το επεξεργάστηκε άνθρωπος· δεν ξαναγράφεται.";
+    await prisma.contentJobRun.updateMany({
+      where: { id: run.id, finishedAt: null },
+      data: { finishedAt: new Date(), outcome: "SKIPPED", error: reason, articleId: previous.id },
     });
+    return { runId: run.id, outcome: "SKIPPED", topic: topic.title, title: null, slug: previous.slug, articleId: previous.id, failedGates: [], tokens: 0, seconds: (Date.now() - state.t0) / 1000, error: reason };
+  }
+  const own = previous;
 
-    // 6. The hero, to our CDN — for a draft too, so the editor has it.
-    let heroImageUrl: string | null = null;
-    if (hero && SLUG.test(slug)) {
-      try {
-        heroImageUrl = await uploadHero(slug, hero.photo);
-      } catch (error) {
-        const image = results.find((r) => r.id === "image")!;
-        image.ok = false;
-        image.problems.push(`Η φωτογραφία δεν ανέβηκε: ${error instanceof Error ? error.message : String(error)}`);
-      }
+  // 1. The facts.
+  const pack = await loadFactPack({ kind: topic.kind, title: topic.title, payload });
+  detail.pack = {
+    products: pack.products.map((p) => p.code),
+    withOfficial: pack.products.filter((p) => p.official.length).map((p) => p.code),
+    links: pack.links.length,
+    representative: pack.representative,
+    notes: pack.notes,
+  };
+  if (pack.products.length === 0) throw new Error("Κανένα ενεργό προϊόν για το θέμα.");
+  check();
+
+  // 2. The text.
+  const written = await writeArticle(pack, await loadStyleExample(), chat);
+  state.tokens += written.tokens;
+  detail.writer = { tokens: written.tokens, promptTokens: written.promptTokens, completionTokens: written.completionTokens, attempts: written.attempts };
+  check();
+
+  // 3. Photos: the hero's source, then the inline ones into the body.
+  const byCode = new Map(pack.products.map((p) => [p.code, p]));
+  // The writer's choice first, then the representative, then the rest; a packshot on white wins.
+  const order = [written.heroProductCode, pack.representative, ...pack.products.map((p) => p.code)];
+  const candidates = [...new Set(order.filter((c): c is string => !!c))]
+    .map((code) => byCode.get(code))
+    .filter((p): p is PackProduct => !!p?.image && allowedImage(p.image))
+    .map((p) => ({ code: p.code, url: p.image! }));
+  const hero = await pickHeroPhoto(candidates);
+  const heroProduct = hero ? byCode.get(hero.code) : undefined;
+  const heroAlt = heroProduct
+    ? (heroProduct.code === written.heroProductCode && written.heroImageAlt ? written.heroImageAlt : altFor(heroProduct, written.imageAlts))
+    : null;
+  const inlineOffer = inlineCandidates(pack, heroProduct?.code ?? null, written.imageAlts);
+  const inline = insertInlineImages(written.draft.body, inlineOffer);
+  const placed = inlineOffer.filter((c) => inline.placed.includes(c.code));
+  const draft = { ...written.draft, body: inline.body };
+  const alts = [heroAlt, ...placed.map((c) => c.alt)].filter((a): a is string => !!a);
+  detail.images = { hero: heroProduct?.code ?? null, inline: inline.placed };
+  check();
+
+  // 4. The verifier: everything the article carries, the alts included.
+  let unsupported: Awaited<ReturnType<typeof verifyArticle>>["unsupported"] | null = null;
+  try {
+    const verified = await verifyArticle(pack, draft, chat, alts);
+    state.tokens += verified.tokens;
+    unsupported = verified.unsupported;
+    detail.verifier = { tokens: verified.tokens, promptTokens: verified.promptTokens, completionTokens: verified.completionTokens };
+  } catch (error) {
+    state.tokens += (error as { tokens?: number }).tokens ?? 0;
+    if (isTransient(error)) throw error;
+    detail.verifierError = error instanceof Error ? error.message : String(error);
+  }
+  check();
+
+  // 5. The text gates.
+  const slug = own?.slug ?? articleSlug(draft.title);
+  const [catalogue, existing, broken] = await Promise.all([
+    loadCatalogue(),
+    loadExisting(own?.id ?? null),
+    brokenLinks(internalPaths(visibleText(draft))),
+  ]);
+  const names = namesFrom([
+    ...pack.products.flatMap((p) => [p.name, p.model ?? "", p.code, p.platform ?? ""]),
+    ...STORE_FACTS,
+    ...catalogue.roots,
+    ...catalogue.fullCodes,
+  ]);
+  const gates = textGates({
+    draft,
+    alts,
+    slug,
+    supported: packNumbers(pack),
+    catalogue,
+    links: { allowed: new Set(pack.links.map((l) => l.href)), placedImages: placed.map((c) => c.url), broken },
+    names,
+    existing,
+    unsupported,
+  });
+  const unique = gates.find((g) => g.id === "unique")!.ok;
+
+  // 6. The final slug, THEN the hero at that slug — and only for a unique text,
+  // so a colliding title can never overwrite another article's hero.
+  const clash = own ? null : await prisma.contentArticle.findUnique({ where: { slug }, select: { id: true } });
+  const saveSlug = clash ? `${slug.slice(0, 140)}-auto-${run.id.slice(-6)}` : slug;
+  let heroImageUrl: string | null = null;
+  let imageProblem: string | null = null;
+  if (!hero) imageProblem = "Καμία φωτογραφία προϊόντος (no image)";
+  else if (!unique) imageProblem = "Η φωτογραφία δεν ανέβηκε: το κείμενο δεν είναι μοναδικό";
+  else if (!SLUG.test(saveSlug)) imageProblem = `Η φωτογραφία δεν ανέβηκε: μη έγκυρο slug «${saveSlug}»`;
+  else {
+    check();
+    try {
+      heroImageUrl = await uploadHero(saveSlug, hero.photo);
+    } catch (error) {
+      imageProblem = `Η φωτογραφία δεν ανέβηκε: ${error instanceof Error ? error.message : String(error)}`;
     }
-    const failed = failedGates(results);
-    const publish = failed.length === 0 && allowPublish;
-    detail.gates = results;
-    detail.unsupported = unsupported;
+  }
+  const results: GateResult[] = [...gates, imageGate(heroImageUrl, imageProblem)];
+  const failed = failedGates(results);
+  detail.gates = results;
+  detail.unsupported = unsupported;
 
-    // 7. Save. A taken slug (the uniqueness gate failed) gets a suffix: the draft still saves.
-    const clash = own ? null : await prisma.contentArticle.findUnique({ where: { slug }, select: { id: true } });
-    const saveSlug = clash ? `${slug.slice(0, 140)}-auto-${runId.slice(-6)}` : slug;
-    const now = new Date();
-    const data = {
-      kind: pack.articleKind,
-      slug: saveSlug,
-      title: draft.title.slice(0, 300),
-      seoTitle: draft.seoTitle.slice(0, 200) || null,
-      metaDescription: draft.metaDescription.slice(0, 400) || null,
-      answer: draft.answer || null,
-      body: draft.body,
-      faq: draft.faq,
-      keywords: draft.keywords,
-      entities: draft.entities,
-      sources: pack.sources,
-      heroImageUrl,
-      heroImageAlt: heroImageUrl && heroAlt ? heroAlt.slice(0, 300) : null,
-      updatedBy: AUTO_ACTOR,
-      source: "AUTO" as const,
-      status: publish ? ("PUBLISHED" as const) : ("DRAFT" as const),
-      publishedAt: publish ? now : null,
-    };
-    const article = own
-      ? await prisma.contentArticle.update({ where: { id: own.id }, data, select: { id: true, slug: true, kind: true } })
-      : await prisma.contentArticle.create({ data, select: { id: true, slug: true, kind: true } });
+  // 7. May it go out? Every gate, the mode, the hard caps, and for the cron the switch — read again now.
+  let publish = failed.length === 0 && allowPublish;
+  if (publish) {
+    const counts = await publishedCounts();
+    if (counts.today >= PUBLISH_CAPS.perDay || counts.week >= PUBLISH_CAPS.perWeek) {
+      publish = false;
+      detail.held = `Όριο δημοσιεύσεων: ${counts.today} σήμερα, ${counts.week} σε 7 ημέρες (έως ${PUBLISH_CAPS.perDay} / ${PUBLISH_CAPS.perWeek}).`;
+    }
+  }
+  if (publish && run.trigger === "cron" && (await getSetting("content.auto.enabled")) !== "on") {
+    publish = false;
+    detail.held = "Τα αυτόματα άρθρα απενεργοποιήθηκαν κατά την εκτέλεση.";
+  }
+  check();
 
-    // 8. The topic: done when published (or a clean draft was asked for); else one more attempt.
-    const done = publish || (failed.length === 0 && !allowPublish);
-    const attempts = topic.attempts + (done ? 0 : 1);
-    await prisma.contentTopic.update({
+  // 8. Article, topic and run in ONE transaction: the run row is claimed only
+  // while it is still open, so an abandoned run can never publish.
+  const now = new Date();
+  const data = {
+    kind: pack.articleKind,
+    slug: saveSlug,
+    title: draft.title.slice(0, 300),
+    seoTitle: draft.seoTitle.slice(0, 200) || null,
+    metaDescription: draft.metaDescription.slice(0, 400) || null,
+    answer: draft.answer || null,
+    body: draft.body,
+    faq: draft.faq,
+    keywords: draft.keywords,
+    entities: draft.entities,
+    sources: pack.sources,
+    heroImageUrl,
+    heroImageAlt: heroImageUrl && heroAlt ? heroAlt.slice(0, 300) : null,
+    updatedBy: AUTO_ACTOR,
+    source: "AUTO" as const,
+    status: publish ? ("PUBLISHED" as const) : ("DRAFT" as const),
+    publishedAt: publish ? now : null,
+  };
+  const done = failed.length === 0;
+  const attempts = topic.attempts + (done ? 0 : 1);
+  const outcome: ContentRunOutcome = publish ? "PUBLISHED" : "DRAFT";
+  const article = await prisma.$transaction(async (tx) => {
+    const saved = own
+      ? await tx.contentArticle.update({ where: { id: own.id }, data, select: { id: true, slug: true, kind: true } })
+      : await tx.contentArticle.create({ data, select: { id: true, slug: true, kind: true } });
+    await tx.contentTopic.update({
       where: { id: topic.id },
       // «Πρώτο» means «next»: once tried, the topic takes its place in the queue again.
-      data: { articleId: article.id, status: done ? "DONE" : attempts >= MAX_ATTEMPTS ? "SKIPPED" : "FAILED", attempts, pinned: false },
+      data: { articleId: saved.id, status: done ? "DONE" : attempts >= MAX_ATTEMPTS ? "SKIPPED" : "FAILED", attempts, pinned: false },
     });
+    const closed = await tx.contentJobRun.updateMany({
+      where: { id: run.id, finishedAt: null },
+      data: { finishedAt: new Date(), outcome, failedGates: failed, detail: detail as Prisma.InputJsonValue, tokens: state.tokens, articleId: saved.id },
+    });
+    if (closed.count !== 1 || state.abandoned) throw new DeadlineError();
+    return saved;
+  });
+  const seconds = (Date.now() - state.t0) / 1000;
 
-    const outcome: ContentRunOutcome = publish ? "PUBLISHED" : "DRAFT";
-    const seconds = (Date.now() - t0) / 1000;
-    await prisma.contentJobRun.update({
-      where: { id: runId },
-      data: { finishedAt: new Date(), outcome, failedGates: failed, detail: detail as Prisma.InputJsonValue, tokens, articleId: article.id },
-    });
-    if (publish) revalidateContent();
-    else {
-      try {
-        revalidatePath("/admin/seo");
-      } catch {
-        /* not in a request scope */
-      }
-    }
-    await audit(publish ? "seo.auto.publish" : "seo.auto.draft", "ContentArticle", article.id, actorUserId, {
-      slug: article.slug,
-      topic: topic.key,
-      trigger: run.trigger,
-      failedGates: failed,
-      tokens,
-    });
+  // 9. After the commit nothing may fail the run: each step on its own.
+  revalidateContent(publish);
+  await audit(publish ? "seo.auto.publish" : "seo.auto.draft", "ContentArticle", article.id, actorUserId, {
+    slug: article.slug,
+    topic: topic.key,
+    trigger: run.trigger,
+    failedGates: failed,
+    held: detail.held ?? null,
+    tokens: state.tokens,
+  });
+  await sendContentRunEmail(notifyTo, {
+    outcome,
+    topic: topic.title,
+    title: draft.title,
+    pageUrl: `${siteOrigin()}${BASE[article.kind]}/${article.slug}${publish ? "" : "?preview=1"}`,
+    adminUrl: `${siteOrigin()}/admin/seo?tab=articles&edit=${article.id}`,
+    problems: [
+      ...results.filter((r) => !r.ok).map((r) => ({ title: GATE_LABELS[r.id].toUpperCase(), text: r.problems.slice(0, 4).join(" · ") })),
+      ...(detail.held ? [{ title: "ΔΕΝ ΔΗΜΟΣΙΕΥΤΗΚΕ", text: String(detail.held) }] : []),
+    ],
+    tokens: state.tokens,
+    seconds,
+    trigger: run.trigger,
+  }).catch(() => null);
 
-    const pageUrl = `${siteOrigin()}${BASE[article.kind]}/${article.slug}${publish ? "" : "?preview=1"}`;
-    await sendContentRunEmail(notifyTo, {
-      outcome,
-      topic: topic.title,
-      title: draft.title,
-      pageUrl,
-      adminUrl: `${siteOrigin()}/admin/seo?tab=articles&edit=${article.id}`,
-      problems: results
-        .filter((r) => !r.ok)
-        .map((r) => ({ title: GATE_LABELS[r.id].toUpperCase(), text: r.problems.slice(0, 4).join(" · ") })),
-      tokens,
+  return { runId: run.id, outcome, topic: topic.title, title: draft.title, slug: article.slug, articleId: article.id, failedGates: failed, tokens: state.tokens, seconds, error: null };
+}
+
+/**
+ * The end of a run that did not save: FAILED (the topic's attempt counts), or
+ * SKIPPED for an outage — DeepSeek, the network, a missing key — which is not
+ * the topic's fault and emails at most once a day. A run the deadline cut is
+ * FAILED without costing the topic an attempt.
+ */
+async function finishFailure(run: Run, error: unknown, state: State, options: ExecuteOptions): Promise<RunSummary> {
+  const topic = run.topic;
+  const deadline = error instanceof DeadlineError;
+  const transient = !deadline && isTransient(error);
+  const message = `${transient ? TRANSIENT_PREFIX : ""}${error instanceof Error ? error.message : String(error)}`;
+  state.tokens += (error as { tokens?: number }).tokens ?? 0;
+  const seconds = (Date.now() - state.t0) / 1000;
+  const outcome: ContentRunOutcome = transient ? "SKIPPED" : "FAILED";
+
+  const closed = await prisma.contentJobRun
+    .updateMany({
+      where: { id: run.id, finishedAt: null },
+      data: { finishedAt: new Date(), outcome, error: message.slice(0, 2000), tokens: state.tokens, detail: state.detail as Prisma.InputJsonValue },
+    })
+    .catch(() => ({ count: 0 }));
+  if (closed.count !== 1) {
+    // The work committed first (or another closed it): report what the row says.
+    const row = await prisma.contentJobRun.findUnique({ where: { id: run.id }, include: { article: { select: { slug: true, title: true } } } }).catch(() => null);
+    return {
+      runId: run.id,
+      outcome: row?.outcome ?? outcome,
+      topic: topic?.title ?? null,
+      title: row?.article?.title ?? null,
+      slug: row?.article?.slug ?? null,
+      articleId: row?.articleId ?? null,
+      failedGates: Array.isArray(row?.failedGates) ? (row!.failedGates as string[]) : [],
+      tokens: row?.tokens ?? state.tokens,
       seconds,
-      trigger: run.trigger,
-    });
+      error: row?.error ?? null,
+    };
+  }
 
-    return { runId, outcome, topic: topic.title, title: draft.title, slug: article.slug, articleId: article.id, failedGates: failed, tokens, seconds, error: null };
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    tokens += (error as { tokens?: number }).tokens ?? 0;
-    const seconds = (Date.now() - t0) / 1000;
-    if (topic) {
-      const attempts = topic.attempts + 1;
-      await prisma.contentTopic
-        .update({ where: { id: topic.id }, data: { attempts, status: attempts >= MAX_ATTEMPTS ? "SKIPPED" : "FAILED", pinned: false } })
-        .catch(() => {});
-    }
-    await prisma.contentJobRun
-      .update({
-        where: { id: runId },
-        data: { finishedAt: new Date(), outcome: "FAILED", error: message.slice(0, 2000), tokens, detail: detail as Prisma.InputJsonValue },
-      })
+  if (topic && !transient && !deadline) {
+    const attempts = topic.attempts + 1;
+    await prisma.contentTopic
+      .update({ where: { id: topic.id }, data: { attempts, status: attempts >= MAX_ATTEMPTS ? "SKIPPED" : "FAILED", pinned: false } })
       .catch(() => {});
-    await audit("seo.auto.fail", "ContentTopic", topic?.id ?? runId, actorUserId, { topic: topic?.key ?? null, trigger: run.trigger, error: message.slice(0, 300) });
+  }
+  await audit(transient ? "seo.auto.skip" : "seo.auto.fail", "ContentTopic", topic?.id ?? run.id, options.actorUserId ?? null, {
+    topic: topic?.key ?? null,
+    trigger: run.trigger,
+    error: message.slice(0, 300),
+  });
+
+  const alreadyTold = transient
+    ? (await prisma.contentJobRun
+        .count({ where: { id: { not: run.id }, outcome: "SKIPPED", error: { startsWith: TRANSIENT_PREFIX }, finishedAt: { gte: new Date(Date.now() - DAY) } } })
+        .catch(() => 0)) > 0
+    : false;
+  if (!alreadyTold) {
+    const notifyTo = await getSetting("content.auto.notifyEmail").catch(() => null);
     await sendContentRunEmail(notifyTo, {
       outcome: "FAILED",
       topic: topic?.title ?? "—",
       title: null,
       pageUrl: null,
       adminUrl: contentAdminUrl(),
-      problems: [{ title: "ΣΦΑΛΜΑ", text: message.slice(0, 500) }],
-      tokens,
+      problems: [{ title: transient ? "ΠΡΟΣΩΡΙΝΟ ΣΦΑΛΜΑ" : "ΣΦΑΛΜΑ", text: message.slice(0, 500) }],
+      tokens: state.tokens,
       seconds,
       trigger: run.trigger,
-    });
-    return { runId, outcome: "FAILED", topic: topic?.title ?? null, title: null, slug: null, articleId: null, failedGates: [], tokens, seconds, error: message };
+    }).catch(() => null);
   }
+  return { runId: run.id, outcome, topic: topic?.title ?? null, title: null, slug: null, articleId: null, failedGates: [], tokens: state.tokens, seconds, error: message };
 }
 
 /** Start and wait: the cron's way. */

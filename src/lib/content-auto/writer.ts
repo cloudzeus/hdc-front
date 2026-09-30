@@ -59,7 +59,8 @@ const RULES = [
   "8. Για το κατάστημα γράφεις μόνο ό,τι λέει το «κατάστημα» του πακέτου: Πειραιάς, παραλαβή, αποστολή σε όλη την Ελλάδα. Χωρίς ωράρια, χρόνους παράδοσης ή ποσά.",
   "9. Οι πρακτικές συμβουλές επιλογής (ποιο για ποια δουλειά) είναι σωστό να υπάρχουν, αλλά χωρίς νέους αριθμούς ή χαρακτηριστικά.",
   "10. Πληθυντικός ευγενείας («διαλέξτε», «δείτε»), όπως στο παράδειγμα ύφους — ποτέ ενικός.",
-  "11. Αν δύο στοιχεία του πακέτου αντιφάσκουν (π.χ. σκέτο εργαλείο που στα τεχνικά γράφει μπαταρίες), δεν γράφεις κανένα από τα δύο.",
+  "11. Αν δύο στοιχεία του πακέτου αντιφάσκουν (π.χ. σκέτο εργαλείο που στα τεχνικά γράφει μπαταρίες), δεν γράφεις κανένα από τα δύο. Ένα σκέτο εργαλείο (-0, -0X, -0C) ΠΟΤΕ δεν έχει μπαταρίες, Ah ή φορτιστή· γράψε «χωρίς μπαταρίες και φορτιστή».",
+  "12. Ο αυτόματος έλεγχος απορρίπτει, όπου κι αν εμφανιστούν (και σε λέξεις-κλειδιά και alt): «τιμή/τιμές» (ούτε «τιμή ροπής» — γράψε «ροπή»), «ευρώ», «κοστίζει», «απόθεμα», «τεμάχιο/τεμάχια» (γράψε «υλικό»), «κομμάτια», «διαθεσιμότητα», «ετοιμοπαράδοτο», «χονδρική», «αντιπρόσωπος», «εξουσιοδοτημένος», διευθύνσεις site, emoji. Αριθμοί χωρίς μονάδα από 10 και πάνω, ή με «ετών/χρόνια/μήνες», μόνο αν είναι στο πακέτο.",
 ].join("\n");
 
 /*
@@ -124,17 +125,35 @@ export function writerPrompt(pack: FactPack, style: StyleExample | null): { syst
   return { system, user };
 }
 
-export function verifierPrompt(pack: FactPack, draft: Draft, heroAlt: string | null = null): { system: string; user: string } {
+export function verifierPrompt(pack: FactPack, draft: Draft, alts: string[] = []): { system: string; user: string } {
   const system = [
     "Είσαι αυστηρός ελεγκτής γεγονότων για ένα ελληνικό κατάστημα εργαλείων Milwaukee.",
     "Σου δίνεται ΠΑΚΕΤΟ ΣΤΟΙΧΕΙΩΝ και ΚΕΙΜΕΝΟ. Βρες κάθε ισχυρισμό του κειμένου για προϊόντα που ΔΕΝ στηρίζεται στο πακέτο:",
     "αριθμοί και μονάδες, χαρακτηριστικά, λειτουργίες, τεχνολογίες, περιεχόμενο κιτ, συμβατότητα, σύγκριση ανάμεσα σε εκδόσεις, στοιχεία για το κατάστημα.",
+    "Έλεγξε ΟΛΑ τα μέρη: τίτλο, τίτλο Google, περιγραφή Google, απάντηση, κείμενο, ερωτήσεις, λέξεις-κλειδιά, οντότητες και τις περιγραφές (alt) των φωτογραφιών.",
+    "Ένα σκέτο εργαλείο (-0, -0X, -0C) δεν έχει μπαταρίες ούτε φορτιστή: κάθε τέτοιος ισχυρισμός γι' αυτό δεν στηρίζεται.",
     "ΔΕΝ είναι ισχυρισμοί προς έλεγχο: γενικές συμβουλές χρήσης και επιλογής, ορισμοί εννοιών (π.χ. τι σημαίνει Nm), προτροπές, διατυπώσεις χωρίς συγκεκριμένο στοιχείο.",
     'Απάντησε ΜΟΝΟ με JSON: {"unsupported":[{"claim":"ο ισχυρισμός όπως γράφεται","reason":"γιατί δεν στηρίζεται"}]} — ή {"unsupported":[]} αν όλα στηρίζονται.',
   ].join("\n");
   const user = [
     `ΠΑΚΕΤΟ ΣΤΟΙΧΕΙΩΝ (JSON):\n${JSON.stringify(promptPack(pack))}`,
-    `ΚΕΙΜΕΝΟ:\n# ${draft.title}\n\n${heroAlt ? `![${heroAlt}](κεντρική φωτογραφία)\n\n` : ""}${draft.answer}\n\n${draft.body}\n\n## Συχνές ερωτήσεις\n\n${draft.faq.map((p) => `### ${p.q}\n${p.a}`).join("\n\n")}`,
+    [
+      "ΚΕΙΜΕΝΟ:",
+      `Τίτλος: ${draft.title}`,
+      `Τίτλος Google: ${draft.seoTitle}`,
+      `Περιγραφή Google: ${draft.metaDescription}`,
+      `Λέξεις-κλειδιά: ${draft.keywords.join(" · ")}`,
+      `Οντότητες: ${draft.entities.join(" · ")}`,
+      ...alts.map((a) => `Περιγραφή φωτογραφίας: ${a}`),
+      "",
+      draft.answer,
+      "",
+      draft.body,
+      "",
+      "## Συχνές ερωτήσεις",
+      "",
+      draft.faq.map((p) => `### ${p.q}\n${p.a}`).join("\n\n"),
+    ].join("\n"),
   ].join("\n\n---\n\n");
   return { system, user };
 }
@@ -238,9 +257,9 @@ export async function verifyArticle(
   pack: FactPack,
   draft: Draft,
   chat: Chat,
-  heroAlt: string | null = null,
+  alts: string[] = [],
 ): Promise<{ unsupported: Unsupported[]; tokens: number; promptTokens: number; completionTokens: number }> {
-  const { system, user } = verifierPrompt(pack, draft, heroAlt);
+  const { system, user } = verifierPrompt(pack, draft, alts);
   const { value, tokens, promptTokens, completionTokens } = await withRetry(chat, { system, user, maxTokens: 3000, temperature: 0 }, parseVerifierReply);
   return { unsupported: value, tokens, promptTokens, completionTokens };
 }

@@ -7,6 +7,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const session = vi.hoisted(() => ({ current: null as null | { user: Record<string, unknown> } }));
 vi.mock("@/auth", () => ({ auth: vi.fn(async () => session.current) }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
+vi.mock("next/server", () => ({ after: (fn: () => unknown) => void fn() }));
 
 const db = vi.hoisted(() => ({
   audit: vi.fn(async () => ({})),

@@ -12,7 +12,9 @@ import { publishedForLlms } from "@/lib/blog/articles";
  * database). The catalogue read is kept for a day in the shared catalogue
  * cache (tagged `catalogue`), so a crawler hammering the file costs one query
  * a day. Nothing revalidates that tag when the catalogue syncs, so a model
- * added today appears here within 24 hours, not at once.
+ * added today appears here within 24 hours, not at once. The response itself
+ * is cached for an hour only: the articles in it (read fresh) change as soon
+ * as one is published or withdrawn.
  */
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -33,7 +35,7 @@ export async function GET() {
   return new Response(llmsFullTxt(siteOrigin(), groupModels(rows), articles), {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
-      "Cache-Control": "public, max-age=86400, s-maxage=86400",
+      "Cache-Control": "public, max-age=3600, s-maxage=3600",
     },
   });
 }

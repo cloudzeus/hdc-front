@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { assertCan } from "@/lib/rbac";
@@ -110,9 +111,11 @@ export async function startAutoRunAction(mode: "draft" | "publish", topicId?: st
   });
   if (!started.ok) return started;
   await audit(user, "seo.auto.run.start", "ContentJobRun", started.runId, { mode, topicId: topicId ?? null });
-  // Not awaited: the run outlives this request, and records its own end.
-  void executeRun(started.runId, { actorUserId: user.id }).catch((error) =>
-    console.error("[content-auto] run", started.runId, error instanceof Error ? error.message : error),
+  // After the response: the run outlives this request and records its own end (executeRun never throws).
+  after(() =>
+    executeRun(started.runId, { actorUserId: user.id }).catch((error) =>
+      console.error("[content-auto] run", started.runId, error instanceof Error ? error.message : error),
+    ),
   );
   return { ok: true, runId: started.runId };
 }

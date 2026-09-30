@@ -5,6 +5,7 @@ import { cadence, weeklyTarget } from "@/lib/content-auto/cadence";
 import { GATE_LABELS, type GateId } from "@/lib/content-auto/gates";
 import { SCORE_THRESHOLD } from "@/lib/content-auto/planner";
 import { backlogCount } from "@/lib/content-auto/queue";
+import { publishedCounts } from "@/lib/content-auto/runner";
 
 /**
  * What the «Αυτόματα άρθρα» tab of /admin/seo shows: the settings, where the
@@ -78,7 +79,7 @@ export async function autoOverview(now = new Date()): Promise<AutoOverview> {
     backlogCount(),
     prisma.contentTopic.findMany({
       where: { status: { in: ["PENDING", "FAILED"] } },
-      orderBy: [{ pinned: "desc" }, { attempts: "asc" }, { score: "desc" }, { key: "asc" }],
+      orderBy: [{ pinned: "desc" }, { score: "desc" }, { attempts: "asc" }, { key: "asc" }],
       take: 60,
     }),
     prisma.contentTopic.count({ where: { status: { in: ["PENDING", "FAILED"] } } }),
@@ -91,10 +92,7 @@ export async function autoOverview(now = new Date()): Promise<AutoOverview> {
         article: { select: { id: true, title: true, slug: true, kind: true, status: true } },
       },
     }),
-    prisma.contentJobRun.findMany({
-      where: { outcome: "PUBLISHED", finishedAt: { gte: new Date(now.getTime() - 8 * DAY) } },
-      select: { finishedAt: true },
-    }),
+    publishedCounts(now),
   ]);
 
   const settings: AutoSettings = {
@@ -102,7 +100,7 @@ export async function autoOverview(now = new Date()): Promise<AutoOverview> {
     notifyEmail: notifyEmail ?? "",
     maxPerWeek: Math.min(3, Math.max(1, Math.floor(maxPerWeek ?? 3))),
   };
-  const dates = published.map((r) => r.finishedAt!).filter(Boolean);
+  const dates = published.dates;
   const decision = cadence({ now, enabled: settings.enabled, backlog, maxPerWeek: settings.maxPerWeek, published: dates, attemptsToday: 0 });
 
   return {

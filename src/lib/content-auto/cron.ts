@@ -4,7 +4,7 @@ import { claimSlot, ensureSlot, finishSlot } from "@/lib/cron/claim";
 import { getSetting, getSettingNumber } from "@/lib/settings/settings";
 import { athensTime, cadence } from "@/lib/content-auto/cadence";
 import { backlogCount, refreshTopicQueue } from "@/lib/content-auto/queue";
-import { runNow } from "@/lib/content-auto/runner";
+import { publishedCounts, runNow } from "@/lib/content-auto/runner";
 
 /**
  * The hourly `content` job (src/lib/cron/schedule.ts), one replica at a time:
@@ -39,10 +39,8 @@ export async function contentTick(now = new Date()): Promise<string> {
   const [backlog, maxPerWeek, published, cronRuns] = await Promise.all([
     backlogCount(),
     getSettingNumber("content.auto.maxPerWeek"),
-    prisma.contentJobRun.findMany({
-      where: { outcome: "PUBLISHED", finishedAt: { gte: new Date(now.getTime() - 8 * DAY) } },
-      select: { finishedAt: true },
-    }),
+    // Counted on the articles (source AUTO), not on run rows: a withdrawn one still went out.
+    publishedCounts(now),
     prisma.contentJobRun.findMany({
       where: { trigger: "cron", startedAt: { gte: new Date(now.getTime() - DAY) } },
       select: { startedAt: true },
@@ -54,7 +52,7 @@ export async function contentTick(now = new Date()): Promise<string> {
     enabled,
     backlog,
     maxPerWeek,
-    published: published.map((r) => r.finishedAt!).filter(Boolean),
+    published: published.dates,
     attemptsToday: cronRuns.filter((r) => athensTime(r.startedAt).date === today).length,
   });
   if (!decision.write) {

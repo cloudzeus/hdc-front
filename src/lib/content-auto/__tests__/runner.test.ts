@@ -12,21 +12,38 @@ const db = vi.hoisted(() => ({
   runUpdates: [] as Array<Record<string, unknown>>,
   audits: [] as Array<Record<string, unknown>>,
   previous: null as null | Record<string, unknown>,
+  /** Slugs that exist already. */
+  slugs: new Set<string>(),
+  /** publishedAt of automatic articles already out. */
+  published: [] as Date[],
+  /** The run row is still open. */
+  open: true,
+  enabled: "on",
 }));
 
-vi.mock("@/lib/prisma", () => ({
-  prisma: {
+vi.mock("@/lib/prisma", () => {
+  const client = {
     contentJobRun: {
       findUnique: vi.fn(async () => db.run),
-      update: vi.fn(async ({ data }: { data: Record<string, unknown> }) => (db.runUpdates.push(data), {})),
+      updateMany: vi.fn(async ({ data }: { data: Record<string, unknown> }) => {
+        if (!db.open) return { count: 0 };
+        db.open = false;
+        db.runUpdates.push(data);
+        return { count: 1 };
+      }),
+      count: vi.fn(async () => 0),
     },
     contentArticle: {
-      findMany: vi.fn(async ({ select }: { select: Record<string, unknown> }) =>
-        "keywords" in select
-          ? [{ id: "a1", slug: "pos-dialego-drapano", title: "Πώς διαλέγω δράπανο", keywords: ["δράπανο"] }]
-          : [{ slug: "pos-dialego-drapano", title: "Πώς διαλέγω δράπανο", answer: "Απάντηση.", body: "## Ενότητα\n\nΚείμενο.", faq: [] }],
+      findMany: vi.fn(async ({ select, where }: { select: Record<string, unknown>; where?: Record<string, unknown> }) =>
+        where && "source" in where
+          ? db.published.map((publishedAt) => ({ publishedAt }))
+          : "keywords" in select
+            ? [{ id: "a1", slug: "pos-dialego-drapano", title: "Πώς διαλέγω δράπανο", keywords: ["δράπανο"] }, ...[...db.slugs].map((slug) => ({ id: `x-${slug}`, slug, title: "Άλλο θέμα εντελώς", keywords: ["κάτι"] }))]
+            : [{ slug: "pos-dialego-drapano", title: "Πώς διαλέγω δράπανο", answer: "Απάντηση.", body: "## Ενότητα\n\nΚείμενο.", faq: [] }],
       ),
-      findUnique: vi.fn(async ({ where }: { where: { id?: string } }) => (where.id ? db.previous : null)),
+      findUnique: vi.fn(async ({ where }: { where: { id?: string; slug?: string } }) =>
+        where.id ? db.previous : where.slug && db.slugs.has(where.slug) ? { id: `x-${where.slug}` } : null,
+      ),
       create: vi.fn(async ({ data }: { data: Record<string, unknown> }) => {
         db.articleWrites.push({ op: "create", data });
         return { id: "new-article", slug: data.slug, kind: data.kind };
@@ -44,15 +61,32 @@ vi.mock("@/lib/prisma", () => ({
       ]),
     },
     adminAuditLog: { create: vi.fn(async ({ data }: { data: Record<string, unknown> }) => (db.audits.push(data), {})) },
-  },
-}));
+    // One transaction: if the callback throws, nothing it wrote stays.
+    $transaction: vi.fn(async (fn: (tx: unknown) => Promise<unknown>) => {
+      const before = { articles: db.articleWrites.length, topics: db.topicUpdates.length };
+      try {
+        return await fn(client);
+      } catch (error) {
+        db.articleWrites.length = before.articles;
+        db.topicUpdates.length = before.topics;
+        throw error;
+      }
+    }),
+  };
+  return { prisma: client };
+});
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
-vi.mock("@/lib/settings/settings", () => ({ getSetting: vi.fn(async () => "") }));
+vi.mock("@/lib/settings/settings", () => ({
+  getSetting: vi.fn(async (key: string) => (key === "content.auto.enabled" ? db.enabled : "")),
+}));
 vi.mock("@/lib/seo/admin-data", () => ({ brokenLinks: vi.fn(async () => []) }));
 vi.mock("@/lib/mail/content-auto-email", () => ({ sendContentRunEmail: vi.fn(async () => null), contentAdminUrl: () => "/admin/seo?tab=auto" }));
+const images = vi.hoisted(() => ({
+  uploadHero: vi.fn(async (slug: string) => `https://cdn.test/eshop/content/${slug}/hero.webp`),
+}));
 vi.mock("@/lib/content-auto/images", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/lib/content-auto/images")>()),
-  uploadHero: vi.fn(async (slug: string) => `https://cdn.test/eshop/content/${slug}/hero.webp`),
+  uploadHero: images.uploadHero,
   // No network: the first candidate is taken, as if it were a packshot.
   pickHeroPhoto: vi.fn(async (candidates: Array<{ code: string; url: string }>) =>
     candidates[0] ? { ...candidates[0], photo: Buffer.from("x") } : null,
@@ -174,6 +208,11 @@ beforeEach(() => {
   db.runUpdates = [];
   db.audits = [];
   db.previous = null;
+  db.slugs = new Set();
+  db.published = [];
+  db.open = true;
+  db.enabled = "on";
+  images.uploadHero.mockClear();
 });
 
 describe("executeRun", () => {
@@ -217,6 +256,44 @@ describe("executeRun", () => {
     expect(db.topicUpdates[0]).toMatchObject({ status: "FAILED", attempts: 1 });
   });
 
+  it("C1: a colliding title never touches the existing slug's hero, and uploads nothing", async () => {
+    setRun("cron");
+    db.slugs.add("milwaukee-m18-fpd3-poia-ekdosi-na-dialexete");
+    const out = await executeRun("run1", { chat: chatWith(article()) });
+    expect(out.failedGates).toEqual(expect.arrayContaining(["unique", "image"]));
+    expect(images.uploadHero).not.toHaveBeenCalled();
+    const saved = db.articleWrites[0].data;
+    expect(saved.slug).toBe("milwaukee-m18-fpd3-poia-ekdosi-na-dialexete-auto-run1");
+    expect(saved).toMatchObject({ status: "DRAFT", heroImageUrl: null });
+  });
+
+  it("uploads the hero to the final slug when the text is unique", async () => {
+    setRun("manual-draft");
+    await executeRun("run1", { chat: chatWith(article()) });
+    expect(images.uploadHero).toHaveBeenCalledTimes(1);
+    expect(images.uploadHero.mock.calls[0][0]).toBe(db.articleWrites[0].data.slug);
+  });
+
+  it("holds a passing text as a draft at the hard caps, for manual-publish too", async () => {
+    for (const published of [[new Date()], [1, 2, 3].map((d) => new Date(Date.now() - d * 86_400_000))]) {
+      db.articleWrites = [];
+      db.open = true;
+      db.published = published;
+      setRun("manual-publish");
+      const out = await executeRun("run1", { chat: chatWith(article()) });
+      expect(out.outcome).toBe("DRAFT");
+      expect(out.failedGates).toEqual([]);
+      expect(db.articleWrites[0].data).toMatchObject({ status: "DRAFT" });
+    }
+  });
+
+  it("checks the switch again before a cron publication", async () => {
+    setRun("cron");
+    db.enabled = "off";
+    const out = await executeRun("run1", { chat: chatWith(article()) });
+    expect(out.outcome).toBe("DRAFT");
+  });
+
   it("rewrites its own untouched draft in place", async () => {
     setRun("cron", { articleId: "old-article", attempts: 1 });
     db.previous = { id: "old-article", slug: "old-slug", status: "DRAFT", source: "AUTO", updatedBy: "auto:content" };
@@ -231,6 +308,7 @@ describe("executeRun", () => {
     ]) {
       db.articleWrites = [];
       db.topicUpdates = [];
+      db.open = true;
       setRun("cron", { articleId: "old-article" });
       db.previous = previous;
       const chat = chatWith(article());
@@ -251,5 +329,50 @@ describe("executeRun", () => {
     expect(db.topicUpdates[0]).toMatchObject({ status: "SKIPPED", attempts: 3 });
     expect(db.runUpdates[0]).toMatchObject({ outcome: "FAILED", tokens: 40 });
     expect(db.audits[0]).toMatchObject({ action: "seo.auto.fail" });
+  });
+
+  it("an outage (DeepSeek, network) is SKIPPED and costs the topic no attempt", async () => {
+    setRun("cron", { attempts: 2 });
+    const { DeepSeekError } = await import("@/lib/ai/deepseek");
+    const chat = vi.fn<Chat>(async () => {
+      throw new DeepSeekError("DeepSeek 503: busy");
+    });
+    const out = await executeRun("run1", { chat });
+    expect(out.outcome).toBe("SKIPPED");
+    expect(out.error).toMatch(/^Προσωρινό σφάλμα/);
+    expect(db.topicUpdates).toEqual([]);
+    expect(db.runUpdates[0]).toMatchObject({ outcome: "SKIPPED" });
+  });
+
+  it("the deadline abandons the run: FAILED, nothing saved, no attempt", async () => {
+    setRun("manual-publish");
+    let release: () => void = () => {};
+    const chat = vi.fn<Chat>(
+      ({ temperature }) =>
+        new Promise((resolve) => {
+          release = () => resolve({ text: JSON.stringify(temperature === 0 ? { unsupported: [] } : article()), usage: { promptTokens: 1, completionTokens: 1 } });
+        }),
+    );
+    const out = await executeRun("run1", { chat, deadlineMs: 20 });
+    expect(out.outcome).toBe("FAILED");
+    expect(out.error).toMatch(/λεπτά/);
+    // The writer answers late: the abandoned work must not save or publish anything.
+    release();
+    await new Promise((r) => setTimeout(r, 30));
+    release();
+    await new Promise((r) => setTimeout(r, 30));
+    expect(db.articleWrites).toEqual([]);
+    expect(images.uploadHero).not.toHaveBeenCalled();
+    expect(db.topicUpdates).toEqual([]);
+  });
+
+  it("a failure after the commit never marks a published article FAILED", async () => {
+    setRun("manual-publish");
+    const { sendContentRunEmail } = await import("@/lib/mail/content-auto-email");
+    vi.mocked(sendContentRunEmail).mockRejectedValueOnce(new Error("mail down"));
+    const out = await executeRun("run1", { chat: chatWith(article()) });
+    expect(out.outcome).toBe("PUBLISHED");
+    expect(db.runUpdates).toHaveLength(1);
+    expect(db.runUpdates[0]).toMatchObject({ outcome: "PUBLISHED" });
   });
 });
