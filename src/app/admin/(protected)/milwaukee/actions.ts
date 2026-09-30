@@ -5,16 +5,13 @@ import { prisma } from "@/lib/prisma";
 import { CAPABILITY_META, can, type Capability } from "@/lib/rbac";
 import * as hdc from "@/lib/hdctool/milwaukee-admin";
 import type { MilwaukeeFail, MilwaukeeResult } from "@/lib/hdctool/milwaukee-admin";
+import { startJob, type JobKind, type JobView } from "@/lib/hdctool/milwaukee-admin-jobs";
 import {
   MAX_BULK,
   type CategoryChoice,
   type ErpPreviewOk,
-  type ErpRegisterOk,
   type ItemContent,
   type ItemPatch,
-  type OfficialSearchResult,
-  type OfficialView,
-  type XmlMissing,
 } from "@/lib/hdctool/milwaukee-admin-contract";
 
 /**
@@ -26,6 +23,12 @@ import {
  * - ο actor: το email του συνδεδεμένου χρήστη πάει στο `X-HDC-Actor`·
  * - μια πρώτη επικύρωση σχήματος (την πλήρη την κάνει το HDCtool)·
  * - η καταγραφή στο `AdminAuditLog` του hdc-front.
+ *
+ * Οι μακριές κλήσεις (καταχώριση, ενεργοποίηση, ανάλυση, μετάφραση, αναζήτηση
+ * στο επίσημο site) δεν περιμένονται: το Cloudflare κόβει κάθε αίτημα του
+ * browser στα ~100″. Ξεκινούν ως εργασίες (`milwaukee-admin-jobs.ts`), το
+ * action επιστρέφει `{ jobId }` αμέσως και ο browser ρωτά την κατάστασή τους.
+ * Η καταγραφή στο audit γίνεται όταν τελειώσει η εργασία, με ή χωρίς επιτυχία.
  *
  * Καμία δεν πετάει: επιστρέφουν `{ ok, ... }` με ελληνικό μήνυμα.
  */
@@ -60,6 +63,41 @@ async function audit(actor: Actor, action: string, entityId: string | null, diff
 }
 
 const bad = (error: string): MilwaukeeFail => ({ ok: false, status: 400, error });
+
+/** Απάντηση ενός action που ξεκίνησε εργασία. */
+export type JobStarted = MilwaukeeResult<{ jobId: string; reused: boolean }>;
+
+/**
+ * Ξεκινά την κλήση στο παρασκήνιο και επιστρέφει αμέσως. `summary`: τι από το
+ * αποτέλεσμα μπαίνει στο audit (ποτέ ολόκληρες απαντήσεις).
+ */
+function background(
+  actor: Actor,
+  kind: JobKind,
+  itemId: string | null,
+  run: () => Promise<MilwaukeeResult<object>>,
+  auditAction: string,
+  base: Record<string, unknown>,
+  summary: (result: Record<string, unknown>) => Record<string, unknown> = () => ({}),
+): JobStarted {
+  const started = startJob({
+    kind,
+    itemId,
+    actor: actor.email,
+    run,
+    onFinish: (job: JobView) => {
+      const result = (job.result ?? {}) as Record<string, unknown>;
+      return audit(actor, auditAction, itemId, {
+        ...base,
+        jobId: job.id,
+        ok: job.status === "done",
+        ...(job.status === "done" ? summary(result) : { error: job.error, ...("mtrl" in result ? { mtrl: result.mtrl } : {}) }),
+      });
+    },
+  });
+  if (!started.ok) return { ok: false, status: 409, error: started.error };
+  return { ok: true, jobId: started.job.id, reused: started.reused };
+}
 
 const isId = (v: unknown): v is string => typeof v === "string" && /^[\w-]{1,64}$/.test(v);
 
@@ -125,34 +163,45 @@ export async function milwaukeeUpdateContent(id: string, content: unknown): Prom
   return result;
 }
 
-export async function milwaukeeTranslate(id: string): Promise<MilwaukeeResult<{ nameEn: string; nameIt: string }>> {
+/** Μετάφραση του ελληνικού ονόματος σε en/it (AI, έως ~2′): εργασία στο παρασκήνιο. */
+export async function milwaukeeTranslate(id: string): Promise<JobStarted> {
   const actor = await actorFor("milwaukee.edit");
   if (!actor.ok) return actor;
   if (!isId(id)) return bad("Μη έγκυρο προϊόν");
-  const result = await hdc.translateItem(actor.email, id);
-  if (result.ok) await audit(actor, "milwaukee.item.translate", id, { nameEn: result.nameEn, nameIt: result.nameIt });
-  return result;
+  return background(actor, "translate", id, () => hdc.translateItem(actor.email, id), "milwaukee.item.translate", {}, (r) => ({
+    nameEn: r.nameEn,
+    nameIt: r.nameIt,
+  }));
 }
 
-export async function milwaukeeAnalyze(id: string): Promise<MilwaukeeResult<{ dropped: string[]; written: boolean }>> {
+/** «Ανάλυση με AI» (έως ~2′): εργασία στο παρασκήνιο. */
+export async function milwaukeeAnalyze(id: string): Promise<JobStarted> {
   const actor = await actorFor("milwaukee.edit");
   if (!actor.ok) return actor;
   if (!isId(id)) return bad("Μη έγκυρο προϊόν");
-  const result = await hdc.analyzeItem(actor.email, id);
-  if (result.ok) await audit(actor, "milwaukee.item.analyze", id, { written: result.written, dropped: result.dropped.length });
-  return result;
+  return background(actor, "analyze", id, () => hdc.analyzeItem(actor.email, id), "milwaukee.item.analyze", {}, (r) => ({
+    written: r.written,
+    dropped: Array.isArray(r.dropped) ? r.dropped.length : 0,
+  }));
 }
 
-/** «Αναζήτηση στο επίσημο site»: κατεβάζει έως 3 σελίδες και γράφει στο ευρετήριο, άρα αλλαγή. */
-export async function milwaukeeSearchOfficial(
-  id: string,
-): Promise<MilwaukeeResult<{ search: OfficialSearchResult; official: OfficialView | null }>> {
+/**
+ * «Αναζήτηση στο επίσημο site»: κατεβάζει έως 3 σελίδες (έως ~2′) και γράφει
+ * στο ευρετήριο, άρα αλλαγή· εργασία στο παρασκήνιο.
+ */
+export async function milwaukeeSearchOfficial(id: string): Promise<JobStarted> {
   const actor = await actorFor("milwaukee.edit");
   if (!actor.ok) return actor;
   if (!isId(id)) return bad("Μη έγκυρο προϊόν");
-  const result = await hdc.searchItemOfficial(actor.email, id);
-  if (result.ok) await audit(actor, "milwaukee.official.search", id, { found: result.search.found });
-  return result;
+  return background(
+    actor,
+    "official-search",
+    id,
+    () => hdc.searchItemOfficial(actor.email, id),
+    "milwaukee.official.search",
+    {},
+    (r) => ({ found: (r.search as { found?: unknown } | undefined)?.found === true }),
+  );
 }
 
 /** «Ενημέρωση ευρετηρίου»: ξεκινά τη σάρωση του επίσημου site στο παρασκήνιο. */
@@ -190,22 +239,24 @@ export async function milwaukeeBulkAcceptSuggested(ids: unknown): Promise<Milwau
   return result;
 }
 
-export async function milwaukeeBulkActivate(
-  ids: unknown,
-): Promise<MilwaukeeResult<{ activated: number; skipped: Array<{ id: string; missing: XmlMissing[] }> }>> {
+/** Ενεργοποίηση (έως 5′, μία τη φορά σε όλο το HDCtool): εργασία στο παρασκήνιο. */
+export async function milwaukeeBulkActivate(ids: unknown): Promise<JobStarted> {
   const actor = await actorFor("milwaukee.edit");
   if (!actor.ok) return actor;
   const list = idList(ids);
   if (!list) return bad(`Διαλέξτε 1 έως ${MAX_BULK} προϊόντα`);
-  const result = await hdc.bulkActivate(actor.email, list);
-  if (result.ok) {
-    await audit(actor, "milwaukee.bulk.activate", null, {
-      ids: list,
-      activated: result.activated,
-      skipped: result.skipped.map((s) => s.id),
-    });
-  }
-  return result;
+  return background(
+    actor,
+    "bulk-activate",
+    null,
+    () => hdc.bulkActivate(actor.email, list),
+    "milwaukee.bulk.activate",
+    { ids: list },
+    (r) => ({
+      activated: r.activated,
+      skipped: Array.isArray(r.skipped) ? r.skipped.map((x: { id?: unknown }) => x.id) : [],
+    }),
+  );
 }
 
 export async function milwaukeeBulkArchive(ids: unknown): Promise<MilwaukeeResult<{ archived: number }>> {
@@ -259,8 +310,10 @@ export async function milwaukeeErpPreview(id: string): Promise<MilwaukeeResult<E
 /**
  * «Καταχώριση στο SoftOne»: μόνο από προεπισκόπηση — το `fingerprint` της
  * είναι υποχρεωτικό και το HDCtool αρνείται αν κάτι άλλαξε στο μεταξύ.
+ * Κρατά έως 5′, άρα εργασία στο παρασκήνιο. Καταγράφεται πάντα, και η
+ * αποτυχία: μια άρνηση μετά τη δημιουργία (`mtrl`) θέλει έλεγχο στο SoftOne.
  */
-export async function milwaukeeRegisterInErp(id: string, input: unknown): Promise<MilwaukeeResult<ErpRegisterOk>> {
+export async function milwaukeeRegisterInErp(id: string, input: unknown): Promise<JobStarted> {
   const actor = await actorFor("milwaukee.erp");
   if (!actor.ok) return actor;
   if (!isId(id)) return bad("Μη έγκυρο προϊόν");
@@ -274,14 +327,10 @@ export async function milwaukeeRegisterInErp(id: string, input: unknown): Promis
     ...(typeof code === "string" && code ? { code } : {}),
     ...(acceptWithdrawal === true ? { acceptWithdrawal: true } : {}),
   };
-  const result = await hdc.registerInErp(actor.email, id, body);
-  // Καταγράφεται και η αποτυχία: μια άρνηση μετά τη δημιουργία (`mtrl`) θέλει έλεγχο στο SoftOne.
-  await audit(actor, "milwaukee.erp.register", id, {
-    ...body,
-    ok: result.ok,
-    ...(result.ok
-      ? { mode: result.mode, mtrl: result.mtrl, code: result.code, alerts: result.alerts }
-      : { error: result.error, mtrl: result.mtrl ?? null }),
-  });
-  return result;
+  return background(actor, "erp-register", id, () => hdc.registerInErp(actor.email, id, body), "milwaukee.erp.register", body, (r) => ({
+    mode: r.mode,
+    mtrl: r.mtrl,
+    code: r.code,
+    alerts: r.alerts,
+  }));
 }

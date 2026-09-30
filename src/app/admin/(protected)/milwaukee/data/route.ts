@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { can } from "@/lib/rbac";
 import * as hdc from "@/lib/hdctool/milwaukee-admin";
+import { getJob } from "@/lib/hdctool/milwaukee-admin-jobs";
 
 export const dynamic = "force-dynamic";
 
@@ -11,8 +12,12 @@ export const dynamic = "force-dynamic";
  * Route και όχι server actions: ο client στέλνει τα actions ένα-ένα, οπότε
  * μια ανάλυση AI δύο λεπτών θα πάγωνε κάθε άνοιγμα προϊόντος πίσω της.
  *
+ * `?r=job&id=<jobId>`: η κατάσταση μιας εργασίας στο παρασκήνιο (καταχώριση,
+ * ενεργοποίηση, ανάλυση…). Τη βλέπει μόνο όποιος την ξεκίνησε, ή ένας
+ * Διαχειριστής· για τους άλλους «Δεν βρέθηκε», όπως και για μια που έληξε.
+ *
  * Θέλει `milwaukee.view`. Απαντά πάντα με το `{ ok, ... }` του client (200),
- * εκτός από 401/403/400 για τον ίδιο τον χρήστη ή το αίτημα.
+ * εκτός από 401/403/400/404 για τον ίδιο τον χρήστη ή το αίτημα.
  */
 const READS = {
   overview: (actor: string) => hdc.getOverview(actor),
@@ -39,7 +44,14 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const r = url.searchParams.get("r") ?? "";
   const id = url.searchParams.get("id") ?? "";
-  if (!(r in READS)) return reply({ ok: false, status: 400, error: "Άγνωστη ανάγνωση" }, 400);
+  if (r === "job") {
+    const job = /^[\w-]{1,64}$/.test(id) ? getJob(id) : null;
+    if (!job || (job.actor !== session.user.email && session.user.role !== "ADMIN")) {
+      return reply({ ok: false, status: 404, error: "Η εργασία δεν βρέθηκε (ίσως έληξε)" }, 404);
+    }
+    return reply({ ok: true, job });
+  }
+  if (!Object.hasOwn(READS, r)) return reply({ ok: false, status: 400, error: "Άγνωστη ανάγνωση" }, 400);
   if (NEEDS_ID.has(r) && !/^[\w-]{1,64}$/.test(id)) {
     return reply({ ok: false, status: 400, error: "Μη έγκυρο προϊόν" }, 400);
   }

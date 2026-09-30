@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Archive, BadgeCheck, FolderTree, Loader2, Power, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,14 +15,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { MISSING_LABEL, type SoftOneCategories, type XmlMissing } from "@/lib/hdctool/milwaukee-admin-contract";
+import {
+  MISSING_LABEL,
+  type BulkActivateOk,
+  type SoftOneCategories,
+  type XmlMissing,
+} from "@/lib/hdctool/milwaukee-admin-contract";
 import {
   milwaukeeBulkAcceptSuggested,
   milwaukeeBulkActivate,
   milwaukeeBulkArchive,
   milwaukeeBulkCategory,
 } from "../actions";
-import { attempt, num, type Result } from "./format";
+import { attempt, isAborted, num, runJob, type Result } from "./format";
 import { CategoryPicker, EMPTY_CHOICE, type PartialChoice } from "./CategoryPicker";
 
 /**
@@ -47,10 +52,13 @@ export function BulkBar({
   const [choice, setChoice] = useState<PartialChoice>(EMPTY_CHOICE);
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
+  const polling = useRef<AbortController | null>(null);
+  useEffect(() => () => polling.current?.abort(), []);
 
   const run = <T extends object>(label: string, fn: () => Promise<Result<T>>, success: (r: T) => void) =>
     start(async () => {
       const r = await attempt(fn);
+      if (isAborted(r)) return;
       if (!r.ok) {
         toast.error(`${label}: ${r.error}`);
         return;
@@ -81,8 +89,18 @@ export function BulkBar({
       toast.success(`Προτεινόμενη τιμή σε ${num(r.updated)}`),
     );
 
+  /** Έως 5′ στο HDCtool: εργασία στο παρασκήνιο, με ρώτημα κάθε 2,5″. */
+  const startActivation = () => {
+    const controller = new AbortController();
+    polling.current = controller;
+    return runJob<BulkActivateOk>(() => milwaukeeBulkActivate(ids), {
+      signal: controller.signal,
+      onReused: () => toast.info("Τρέχει ήδη μια ενεργοποίηση δική σας· περιμένουμε το αποτέλεσμά της."),
+    });
+  };
+
   const activate = () =>
-    run("Ενεργοποίηση", () => milwaukeeBulkActivate(ids), (r) => {
+    run("Ενεργοποίηση", startActivation, (r) => {
       toast.success(`Ενεργοποιήθηκαν ${num(r.activated)}`);
       if (r.skipped.length > 0) {
         const reasons = new Set<XmlMissing>(r.skipped.flatMap((s) => s.missing));

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { CheckCircle2, Database, Loader2, TriangleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import {
   type ErpRegisterOk,
 } from "@/lib/hdctool/milwaukee-admin-contract";
 import { milwaukeeErpPreview, milwaukeeRegisterInErp } from "../actions";
-import { attempt, type Result } from "./format";
+import { attempt, isAborted, runJob, type Result } from "./format";
 import { Notice, Tag } from "./kit";
 
 type Preview = Result<ErpPreviewOk>;
@@ -48,22 +48,48 @@ export function ErpRegisterDialog({
   const [consent, setConsent] = useState(false);
   const reason = disabledReason ?? (blockers.length > 0 ? blockers.join(" · ") : null);
 
+  // Κάθε άνοιγμα είναι νέα «συνεδρία»: απαντήσεις από προηγούμενο άνοιγμα αγνοούνται.
+  const session = useRef(0);
+  const polling = useRef<AbortController | null>(null);
+  useEffect(() => () => polling.current?.abort(), []);
+
+  const close = () => {
+    session.current++;
+    setOpen(false);
+  };
+
   const start = async () => {
+    const token = ++session.current;
     setOpen(true);
     setConsent(false);
     setStage({ step: "loading" });
-    setStage({ step: "preview", preview: await attempt<ErpPreviewOk>(() => milwaukeeErpPreview(itemId)) });
+    const preview = await attempt<ErpPreviewOk>(() => milwaukeeErpPreview(itemId));
+    if (token === session.current) setStage({ step: "preview", preview });
   };
 
+  /**
+   * Η καταχώριση κρατά έως 5′: το action την ξεκινά στο παρασκήνιο και εδώ
+   * ρωτάμε την κατάσταση ώσπου να τελειώσει.
+   */
   const send = async (preview: Preview) => {
     if (!preview.ok) return;
+    const token = session.current;
     setStage({ step: "sending", preview });
-    const result = await attempt<ErpRegisterOk>(() =>
-      milwaukeeRegisterInErp(itemId, {
-        fingerprint: preview.fingerprint,
-        ...(preview.mode === "create" ? { code: preview.code } : { acceptWithdrawal: consent }),
-      }),
+    polling.current?.abort();
+    const controller = new AbortController();
+    polling.current = controller;
+    const result = await runJob<ErpRegisterOk>(
+      () =>
+        milwaukeeRegisterInErp(itemId, {
+          fingerprint: preview.fingerprint,
+          ...(preview.mode === "create" ? { code: preview.code } : { acceptWithdrawal: consent }),
+        }),
+      {
+        signal: controller.signal,
+        onReused: () => toast.info("Η καταχώριση αυτού του προϊόντος τρέχει ήδη· περιμένουμε το αποτέλεσμά της."),
+      },
     );
+    if (isAborted(result) || token !== session.current) return;
     setStage({ step: "done", result });
     if (result.ok) {
       toast.success(
@@ -84,7 +110,14 @@ export function ErpRegisterDialog({
         <Database className="size-4" aria-hidden />
         Καταχώριση στο SoftOne
       </Button>
-      <Dialog open={open} onOpenChange={(o) => stage.step !== "sending" && setOpen(o)}>
+      <Dialog
+        open={open}
+        onOpenChange={(o) => {
+          if (stage.step === "sending") return;
+          if (o) setOpen(true);
+          else close();
+        }}
+      >
         <DialogContent size="wide" className="max-h-[90vh] overflow-y-auto rounded-none border-k-line">
           <DialogHeader>
             <DialogTitle>Καταχώριση στο SoftOne</DialogTitle>
@@ -117,7 +150,7 @@ export function ErpRegisterDialog({
 
           {stage.step === "sending" && (
             <p className="flex items-center gap-2 text-[length:var(--fs-12-5)] text-k-text-3">
-              <Loader2 className="size-4 animate-spin" aria-hidden /> Αποστολή, ανάγνωση και ενημέρωση του eshop… (έως 5 λεπτά)
+              <Loader2 className="size-4 animate-spin" aria-hidden /> Η καταχώριση τρέχει στο HDCtool: αποστολή, ανάγνωση και ενημέρωση του eshop (έως 5 λεπτά). Το αποτέλεσμα θα φανεί εδώ.
             </p>
           )}
 
@@ -125,12 +158,12 @@ export function ErpRegisterDialog({
 
           <DialogFooter>
             {stage.step === "done" ? (
-              <Button type="button" onClick={() => setOpen(false)}>
+              <Button type="button" onClick={close}>
                 Κλείσιμο
               </Button>
             ) : (
               <>
-                <Button type="button" variant="outline" disabled={stage.step === "sending"} onClick={() => setOpen(false)}>
+                <Button type="button" variant="outline" disabled={stage.step === "sending"} onClick={close}>
                   Άκυρο
                 </Button>
                 <Button

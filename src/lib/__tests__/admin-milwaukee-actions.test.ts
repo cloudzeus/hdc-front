@@ -35,16 +35,20 @@ const hdc = vi.hoisted(() => ({
 vi.mock("@/lib/hdctool/milwaukee-admin", () => hdc);
 
 import { applyRoleCapabilities } from "@/lib/rbac";
+import { clearJobs } from "@/lib/hdctool/milwaukee-admin-jobs";
 import * as actions from "@/app/admin/(protected)/milwaukee/actions";
 import { GET } from "@/app/admin/(protected)/milwaukee/data/route";
 
-function signIn(role: "ADMIN" | "EDITOR" | "OPS") {
-  session.current = { user: { id: "u1", email: "ops@hdc.test", role } };
+function signIn(role: "ADMIN" | "EDITOR" | "OPS", email = "ops@hdc.test") {
+  session.current = { user: { id: "u1", email, role } };
 }
+
+const flush = () => new Promise((r) => setTimeout(r, 0));
 
 beforeEach(() => {
   for (const fn of Object.values(hdc)) fn.mockReset();
   auditCreate.mockClear();
+  clearJobs();
   // EDITOR: μόνο προβολή · OPS: προβολή και αλλαγές, χωρίς SoftOne.
   applyRoleCapabilities({ EDITOR: ["content", "milwaukee.view"], OPS: ["orders", "milwaukee.edit"] });
   signIn("ADMIN");
@@ -132,29 +136,66 @@ describe("καταχώριση στο SoftOne", () => {
     expect(hdc.registerInErp).not.toHaveBeenCalled();
   });
 
-  it("στέλνει το αποτύπωμα και τον κωδικό της προεπισκόπησης και καταγράφεται", async () => {
-    hdc.registerInErp.mockResolvedValue({
-      ok: true,
-      mode: "created",
-      mtrl: 55,
-      code: "4933478911",
-      eshopListed: false,
-      alerts: [],
-      warnings: [],
-    });
-    await actions.milwaukeeRegisterInErp("a", { fingerprint: "fp", code: "4933478911", acceptWithdrawal: "yes" });
+  it("επιστρέφει αμέσως jobId· η καταχώριση συνεχίζει και καταγράφεται όταν τελειώσει", async () => {
+    let finish!: (v: unknown) => void;
+    hdc.registerInErp.mockReturnValue(new Promise((resolve) => (finish = resolve)));
+    const r = await actions.milwaukeeRegisterInErp("a", { fingerprint: "fp", code: "4933478911", acceptWithdrawal: "yes" });
+    expect(r).toMatchObject({ ok: true, reused: false, jobId: expect.any(String) });
     expect(hdc.registerInErp).toHaveBeenCalledWith("ops@hdc.test", "a", { fingerprint: "fp", code: "4933478911" });
+    expect(auditCreate).not.toHaveBeenCalled();
+
+    // Δεύτερο κλικ όσο τρέχει: η ίδια εργασία, όχι δεύτερη καταχώριση.
+    const again = await actions.milwaukeeRegisterInErp("a", { fingerprint: "fp", code: "4933478911" });
+    expect(again).toMatchObject({ ok: true, reused: true, jobId: r.ok ? r.jobId : "" });
+    expect(hdc.registerInErp).toHaveBeenCalledTimes(1);
+
+    finish({ ok: true, mode: "created", mtrl: 55, code: "4933478911", eshopListed: false, alerts: [], warnings: [] });
+    await flush();
     expect(auditCreate).toHaveBeenCalledWith({
-      data: expect.objectContaining({ action: "milwaukee.erp.register", entityId: "a" }),
+      data: expect.objectContaining({
+        action: "milwaukee.erp.register",
+        entityId: "a",
+        diff: expect.objectContaining({ ok: true, mtrl: 55, fingerprint: "fp" }),
+      }),
     });
   });
 
-  it("η ρητή αποδοχή απόσυρσης περνά μόνο ως true", async () => {
+  it("η ρητή αποδοχή απόσυρσης περνά μόνο ως true· καταγράφεται και η άρνηση", async () => {
     hdc.registerInErp.mockResolvedValue({ ok: false, status: 400, error: "Άλλαξαν τα στοιχεία" });
     await actions.milwaukeeRegisterInErp("a", { fingerprint: "fp", acceptWithdrawal: true });
     expect(hdc.registerInErp).toHaveBeenCalledWith("ops@hdc.test", "a", { fingerprint: "fp", acceptWithdrawal: true });
-    // Καταγράφεται και η άρνηση.
+    await flush();
     expect(auditCreate).toHaveBeenCalledTimes(1);
+    expect(auditCreate).toHaveBeenCalledWith({
+      data: expect.objectContaining({ diff: expect.objectContaining({ ok: false, error: "Άλλαξαν τα στοιχεία" }) }),
+    });
+  });
+});
+
+describe("μακριές ενέργειες ως εργασίες", () => {
+  it("ανάλυση, μετάφραση, αναζήτηση και ενεργοποίηση επιστρέφουν αμέσως", async () => {
+    const never = () => new Promise(() => {});
+    hdc.analyzeItem.mockImplementation(never);
+    hdc.translateItem.mockImplementation(never);
+    hdc.searchItemOfficial.mockImplementation(never);
+    hdc.bulkActivate.mockImplementation(never);
+    for (const r of [
+      await actions.milwaukeeAnalyze("a"),
+      await actions.milwaukeeTranslate("a"),
+      await actions.milwaukeeSearchOfficial("a"),
+      await actions.milwaukeeBulkActivate(["a", "b"]),
+    ]) {
+      expect(r).toMatchObject({ ok: true, reused: false, jobId: expect.any(String) });
+    }
+    expect(hdc.bulkActivate).toHaveBeenCalledWith("ops@hdc.test", ["a", "b"]);
+  });
+
+  it("η ίδια ενέργεια από άλλον χρήστη όσο τρέχει: 409", async () => {
+    hdc.analyzeItem.mockImplementation(() => new Promise(() => {}));
+    await actions.milwaukeeAnalyze("a");
+    signIn("ADMIN", "other@hdc.test");
+    expect(await actions.milwaukeeAnalyze("a")).toMatchObject({ ok: false, status: 409 });
+    expect(hdc.analyzeItem).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -178,8 +219,28 @@ describe("αναγνώσεις (GET /admin/milwaukee/data)", () => {
     expect(hdc.getItem).toHaveBeenCalledWith("ops@hdc.test", "a");
   });
 
+  it("εργασία: τη βλέπει όποιος την ξεκίνησε ή ένας Διαχειριστής", async () => {
+    hdc.translateItem.mockResolvedValue({ ok: true, nameEn: "Drill", nameIt: "Trapano" });
+    signIn("OPS");
+    const started = await actions.milwaukeeTranslate("a");
+    if (!started.ok) throw new Error(started.error);
+    await flush();
+    const mine = await get(`r=job&id=${started.jobId}`);
+    expect(await mine.json()).toMatchObject({
+      ok: true,
+      job: { status: "done", result: { ok: true, nameEn: "Drill", nameIt: "Trapano" } },
+    });
+
+    signIn("OPS", "someone@hdc.test");
+    expect((await get(`r=job&id=${started.jobId}`)).status).toBe(404);
+    signIn("ADMIN", "boss@hdc.test");
+    expect((await get(`r=job&id=${started.jobId}`)).status).toBe(200);
+    expect((await get("r=job&id=missing")).status).toBe(404);
+  });
+
   it("άγνωστη ανάγνωση ή id: 400", async () => {
     expect((await get("r=erp-register&id=a")).status).toBe(400);
+    expect((await get("r=toString")).status).toBe(400);
     expect((await get("r=item&id=../x")).status).toBe(400);
   });
 });

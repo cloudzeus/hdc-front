@@ -17,7 +17,7 @@ export const errorText = (e: unknown) => (e instanceof Error ? e.message : Strin
 export type Fail = { ok: false; error: string; status?: number; blockers?: string[]; mtrl?: number };
 export type Result<T extends object = object> = ({ ok: true } & T) | Fail;
 
-export type ReadKind = "overview" | "items" | "categories" | "item" | "peers" | "analysis" | "official";
+export type ReadKind = "overview" | "items" | "categories" | "item" | "peers" | "analysis" | "official" | "job";
 
 /** Ανάγνωση μέσω `GET /admin/milwaukee/data`: ποτέ δεν πετάει. */
 export async function read<T extends object>(r: ReadKind, id?: string): Promise<Result<T>> {
@@ -38,5 +38,77 @@ export async function attempt<T extends object>(fn: () => Promise<Result<T>>): P
     return await fn();
   } catch (e) {
     return { ok: false, error: errorText(e) };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Εργασίες στο παρασκήνιο
+// ---------------------------------------------------------------------------
+
+/** Η απάντηση ενός action που ξεκίνησε εργασία (`JobStarted` στο actions.ts). */
+export type JobStart = Result<{ jobId: string; reused: boolean }>;
+
+type JobState = { status: "running" | "done" | "failed"; result: Result<object> | null; error: string | null };
+
+/** Κωδικός της ακύρωσης από τον browser (κλείσιμο διαλόγου/πάνελ): χωρίς μήνυμα στον χρήστη. */
+export const ABORTED_STATUS = -1;
+export const isAborted = (r: { ok: boolean; status?: number }) => !r.ok && r.status === ABORTED_STATUS;
+
+function sleep(ms: number, signal?: AbortSignal) {
+  return new Promise<void>((resolve) => {
+    const timer = setTimeout(resolve, ms);
+    signal?.addEventListener(
+      "abort",
+      () => {
+        clearTimeout(timer);
+        resolve();
+      },
+      { once: true },
+    );
+  });
+}
+
+/**
+ * Ξεκινά μια μακριά ενέργεια (το action επιστρέφει αμέσως `jobId`) και ρωτά
+ * την κατάστασή της κάθε 2,5″ ώσπου να τελειώσει. Το Cloudflare κόβει κάθε
+ * αίτημα στα ~100″, οπότε κανένα αίτημα δεν περιμένει το HDCtool.
+ *
+ * Η ακύρωση (`signal`) σταματά μόνο το ρώτημα· η εργασία συνεχίζει στον server.
+ */
+export async function runJob<T extends object>(
+  start: () => Promise<JobStart>,
+  { signal, onReused, intervalMs = 2500, maxWaitMs = 8 * 60_000 }: {
+    signal?: AbortSignal;
+    onReused?: () => void;
+    intervalMs?: number;
+    maxWaitMs?: number;
+  } = {},
+): Promise<Result<T>> {
+  const aborted: Fail = { ok: false, status: ABORTED_STATUS, error: "Ακυρώθηκε" };
+  const started = await attempt(start);
+  if (!started.ok) return started;
+  if (started.reused) onReused?.();
+  const deadline = Date.now() + maxWaitMs;
+  let misses = 0;
+  let wait = Math.min(1000, intervalMs);
+  for (;;) {
+    await sleep(wait, signal);
+    wait = intervalMs;
+    if (signal?.aborted) return aborted;
+    const r = await read<{ job: JobState }>("job", started.jobId);
+    if (signal?.aborted) return aborted;
+    if (r.ok) {
+      misses = 0;
+      if (r.job.status !== "running") {
+        return (r.job.result ?? { ok: false, error: r.job.error ?? "Η εργασία απέτυχε" }) as Result<T>;
+      }
+    } else if (r.status === 404) {
+      return r;
+    } else if (++misses >= 5) {
+      return { ok: false, error: `Η κατάσταση της εργασίας δεν διαβάζεται: ${r.error}` };
+    }
+    if (Date.now() > deadline) {
+      return { ok: false, error: "Η εργασία συνεχίζει στο HDCtool· ανανεώστε σε λίγο για το αποτέλεσμα" };
+    }
   }
 }

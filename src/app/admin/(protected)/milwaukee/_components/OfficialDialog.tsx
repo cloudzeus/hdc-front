@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Globe, Loader2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import type { OfficialSearchResult, OfficialView } from "@/lib/hdctool/milwaukee-admin-contract";
+import type { OfficialSearchOk, OfficialSearchResult, OfficialView } from "@/lib/hdctool/milwaukee-admin-contract";
 import { milwaukeeSearchOfficial } from "../actions";
-import { attempt, read } from "./format";
+import { isAborted, read, runJob } from "./format";
 import { LoadError } from "./kit";
 import { OfficialIndex, OfficialProduct, OfficialSearch } from "./OfficialView";
 
@@ -19,24 +19,48 @@ export function OfficialDialog({ itemId, canEdit }: { itemId: string; canEdit: b
   const [searching, setSearching] = useState(false);
   const [search, setSearch] = useState<OfficialSearchResult | null>(null);
 
-  /** Φόρτωση όταν ανοίγει ο διάλογος και με το «Ξανά»· απαντήσεις μετά το κλείσιμο αγνοούνται. */
+  // Κάθε άνοιγμα/κλείσιμο αλλάζει τη «συνεδρία»: παλιές απαντήσεις αγνοούνται
+  // και η αναζήτηση σταματά να ρωτά (συνεχίζει στον server).
+  const session = useRef(0);
+  const polling = useRef<AbortController | null>(null);
+  useEffect(() => () => polling.current?.abort(), []);
+
+  /** Φόρτωση όταν ανοίγει ο διάλογος και με το «Ξανά». */
   const load = async () => {
+    const token = session.current;
     setData(null);
     setError(null);
-    setSearch(null);
     const r = await read<{ official: OfficialView }>("official", itemId);
+    if (token !== session.current) return;
     if (r.ok) setData(r.official);
     else setError(r.error);
   };
 
   const show = () => {
+    session.current++;
+    setSearch(null);
+    setSearching(false);
     setOpen(true);
     void load();
   };
 
+  const onOpenChange = (o: boolean) => {
+    if (!o) {
+      session.current++;
+      polling.current?.abort();
+    }
+    setOpen(o);
+  };
+
+  /** Έως 3 σελίδες του επίσημου site (έως ~2′): εργασία στο παρασκήνιο. */
   const runSearch = async () => {
+    const token = session.current;
     setSearching(true);
-    const r = await attempt(() => milwaukeeSearchOfficial(itemId));
+    polling.current?.abort();
+    const controller = new AbortController();
+    polling.current = controller;
+    const r = await runJob<OfficialSearchOk>(() => milwaukeeSearchOfficial(itemId), { signal: controller.signal });
+    if (isAborted(r) || token !== session.current) return;
     setSearching(false);
     if (!r.ok) {
       toast.error(r.error);
@@ -54,7 +78,7 @@ export function OfficialDialog({ itemId, canEdit }: { itemId: string; canEdit: b
         <Globe className="size-4" aria-hidden />
         Επίσημα δεδομένα Milwaukee
       </Button>
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent size="wide" className="max-h-[90vh] overflow-y-auto rounded-none border-k-line">
           <DialogHeader>
             <DialogTitle>Επίσημα δεδομένα Milwaukee</DialogTitle>

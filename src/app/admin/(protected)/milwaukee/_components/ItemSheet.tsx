@@ -21,7 +21,10 @@ import { Shimmer } from "@/components/skeleton/Skeleton";
 import {
   MISSING_LABEL,
   STATUS_LABEL,
+  type AnalyzeOk,
+  type BulkActivateOk,
   type ItemPatch,
+  type TranslateOk,
   type PeersSuggestion,
   type SoftOneCategories,
   type XmlItemDetail,
@@ -34,7 +37,7 @@ import {
   milwaukeeUpdateContent,
   milwaukeeUpdateItem,
 } from "../actions";
-import { attempt, money, read, when } from "./format";
+import { attempt, isAborted, money, read, runJob, when } from "./format";
 import { LoadError, SectionTitle, Tag } from "./kit";
 import { CategoryPicker, type PartialChoice } from "./CategoryPicker";
 import { PricingEditor, parseDecimal, type PricingState } from "./PricingEditor";
@@ -102,6 +105,15 @@ export function ItemSheet({
   const [loadError, setLoadError] = useState<string | null>(null);
   // Το item που δείχνει τώρα το πάνελ: απαντήσεις για προηγούμενο item αγνοούνται.
   const current = useRef<string | null>(null);
+  // Οι μακριές ενέργειες ρωτούν την κατάστασή τους· το κλείσιμο του πάνελ
+  // σταματά το ρώτημα (η εργασία συνεχίζει στον server).
+  const polling = useRef<AbortController | null>(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    polling.current = controller;
+    return () => controller.abort();
+  }, []);
+  const signal = () => polling.current?.signal;
 
   const apply = useCallback((item: XmlItemDetail) => {
     const init = initial(item);
@@ -181,6 +193,11 @@ export function ItemSheet({
       toast.error("Δώστε ποσοστό για την τιμή «Ποσοστό»");
       return false;
     }
+    const manual = parseDecimal(pricing.manualPriceW);
+    if (pricing.mode === "MANUAL" && (manual == null || !(manual > 0))) {
+      toast.error("Δώστε θετική PRICEW για τη χειροκίνητη τιμή");
+      return false;
+    }
     const patch: ItemPatch = {
       nameEl: names.nameEl,
       nameEn: names.nameEn,
@@ -229,23 +246,29 @@ export function ItemSheet({
 
   const save = () => void withPending(saveNow);
 
+  /** Μετάφραση με AI (έως ~2′): εργασία στο παρασκήνιο· το HDCtool γράφει τα ονόματα. */
   const translate = () =>
     void withPending(async () => {
       if (!detail) return;
-      const r = await attempt(() => milwaukeeTranslate(detail.id));
+      const r = await runJob<TranslateOk>(() => milwaukeeTranslate(detail.id), { signal: signal() });
+      if (isAborted(r)) return;
       if (!r.ok) {
         toast.error(`Η μετάφραση απέτυχε: ${r.error}`);
         return;
       }
+      // Και στο `detail`: τα ονόματα γράφτηκαν ήδη, άρα δεν είναι «αλλαγή που δεν αποθηκεύτηκε».
+      setDetail((d) => (d ? { ...d, nameEn: r.nameEn, nameIt: r.nameIt } : d));
       setNames((n) => ({ ...n, nameEn: r.nameEn, nameIt: r.nameIt }));
       toast.success("Μεταφράστηκε· αποθηκεύτηκε στο HDCtool");
       onChanged();
     });
 
+  /** «Ανάλυση με AI» (έως ~2′): εργασία στο παρασκήνιο. */
   const analyzeNow = async () => {
     if (!detail) return;
     setAnalyzing(true);
-    const r = await attempt(() => milwaukeeAnalyze(detail.id));
+    const r = await runJob<AnalyzeOk>(() => milwaukeeAnalyze(detail.id), { signal: signal() });
+    if (isAborted(r)) return;
     setAnalyzing(false);
     if (!r.ok) {
       toast.error(`Η ανάλυση απέτυχε: ${r.error}`);
@@ -271,7 +294,8 @@ export function ItemSheet({
         return;
       }
       if (activate) {
-        const r = await attempt(() => milwaukeeBulkActivate([detail.id]));
+        const r = await runJob<BulkActivateOk>(() => milwaukeeBulkActivate([detail.id]), { signal: signal() });
+        if (isAborted(r)) return;
         if (!r.ok) {
           toast.error(`Η ενεργοποίηση απέτυχε: ${r.error}`);
           return;
@@ -467,7 +491,15 @@ export function ItemSheet({
               <ErpRegisterDialog
                 itemId={detail.id}
                 blockers={detail.erpBlockers}
-                disabledReason={pending ? "Σε εξέλιξη" : dirty ? "Αποθηκεύστε πρώτα τις αλλαγές" : null}
+                disabledReason={
+                  pending
+                    ? "Σε εξέλιξη"
+                    : analyzing
+                      ? "Τρέχει ανάλυση· περιμένετε να τελειώσει"
+                      : dirty
+                        ? "Αποθηκεύστε πρώτα τις αλλαγές"
+                        : null
+                }
                 onDone={() => {
                   void load(detail.id, { quiet: true });
                   onChanged();
