@@ -5,6 +5,11 @@ import { authConfig } from "@/auth.config";
 import { routing } from "@/i18n/routing";
 import { indexingAllowed, NOINDEX_HEADER } from "@/lib/seo/indexing";
 import { isAliasHost } from "@/lib/seo/canonical-host";
+import {
+  createMagentoResolver,
+  isMagentoCandidate,
+  type MagentoTable,
+} from "@/lib/seo/magento-redirects";
 
 // Edge-safe: authConfig carries no providers and no database access.
 const { auth } = NextAuth(authConfig);
@@ -56,8 +61,30 @@ function canonicalHostRedirect(request: NextRequest): NextResponse | null {
  * /admin is NOT localised (staff UI is Greek only) and is gated on a valid JWT.
  * Everything else goes through next-intl locale negotiation.
  */
-export default auth((request) => {
-  const response = route(request);
+/**
+ * Οι παλιές διευθύνσεις του milwaukeetoolshdc.gr (Magento) → 301 στις νέες.
+ *
+ * Ο πίνακας (src/config/magento-redirects.json, από το
+ * scripts/seo/magento-redirects.ts) φορτώνεται την πρώτη φορά που έρχεται
+ * διεύθυνση με σχήμα Magento, και οι Maps του χτίζονται μία φορά. Μια κανονική
+ * σελίδα του καταστήματος δεν περνά καν από εδώ: το `isMagentoCandidate`
+ * απορρίπτει κάθε δική μας διαδρομή πριν αγγίξει τον πίνακα.
+ */
+let magentoResolver: Promise<ReturnType<typeof createMagentoResolver>> | null = null;
+
+async function magentoRedirect(request: NextRequest): Promise<NextResponse | null> {
+  const { pathname, search } = request.nextUrl;
+  if (!isMagentoCandidate(pathname)) return null;
+  magentoResolver ??= import("@/config/magento-redirects.json").then((table) =>
+    createMagentoResolver(table.default as unknown as MagentoTable),
+  );
+  const hit = (await magentoResolver)(pathname, search);
+  if (!hit) return null;
+  return NextResponse.redirect(new URL(hit.to, request.nextUrl), 301);
+}
+
+export default auth(async (request) => {
+  const response = await route(request);
   /*
    * Not on the final domain yet: every page says so in a header as well as in
    * robots.txt and the <meta> tag. The header is the one crawlers honour even
@@ -68,11 +95,14 @@ export default auth((request) => {
   return response;
 });
 
-function route(request: NextRequest & { auth: { user?: unknown } | null }): NextResponse {
+async function route(request: NextRequest & { auth: { user?: unknown } | null }): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
 
   const canonical = canonicalHostRedirect(request);
   if (canonical) return canonical;
+
+  const magento = await magentoRedirect(request);
+  if (magento) return magento;
 
   if (pathname.startsWith("/admin")) {
     const isLoginPage = pathname === "/admin/login";
@@ -95,6 +125,10 @@ function route(request: NextRequest & { auth: { user?: unknown } | null }): Next
 }
 
 export const config = {
-  // Skip Next internals, the auth endpoints and anything with a file extension.
-  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
+  matcher: [
+    // Skip Next internals, the auth endpoints and anything with a file extension.
+    "/((?!api|_next|_vercel|.*\\..*).*)",
+    // …except the old Magento `*.html` pages, which get a 301 (see magentoRedirect).
+    "/((?!api|_next|_vercel).*\\.html)",
+  ],
 };
