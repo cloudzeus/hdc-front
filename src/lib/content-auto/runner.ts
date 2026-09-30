@@ -222,6 +222,21 @@ export async function executeRun(runId: string, options: ExecuteOptions = {}): P
     if (!topic) throw new Error("Το θέμα δεν υπάρχει πια.");
     const payload = topic.payload as unknown as TopicPayload;
 
+    // A draft of an earlier run is rewritten only while nobody has touched it.
+    const previous = topic.articleId
+      ? await prisma.contentArticle.findUnique({
+          where: { id: topic.articleId },
+          select: { id: true, slug: true, status: true, source: true, updatedBy: true },
+        })
+      : null;
+    if (previous && !(previous.source === "AUTO" && previous.status === "DRAFT" && previous.updatedBy === AUTO_ACTOR)) {
+      await prisma.contentTopic.update({ where: { id: topic.id }, data: { status: "DONE", pinned: false } });
+      const reason = "Το άρθρο αυτού του θέματος δημοσιεύτηκε ή το επεξεργάστηκε άνθρωπος· δεν ξαναγράφεται.";
+      await prisma.contentJobRun.update({ where: { id: runId }, data: { finishedAt: new Date(), outcome: "SKIPPED", error: reason, articleId: previous.id } });
+      return { runId, outcome: "SKIPPED", topic: topic.title, title: null, slug: previous.slug, articleId: previous.id, failedGates: [], tokens: 0, seconds: (Date.now() - t0) / 1000, error: reason };
+    }
+    const own = previous;
+
     // 1. The facts.
     const pack = await loadFactPack({ kind: topic.kind, title: topic.title, payload });
     detail.pack = {
@@ -236,7 +251,7 @@ export async function executeRun(runId: string, options: ExecuteOptions = {}): P
     // 2. The text.
     const written = await writeArticle(pack, await loadStyleExample(), chat);
     tokens += written.tokens;
-    detail.writer = { tokens: written.tokens, attempts: written.attempts };
+    detail.writer = { tokens: written.tokens, promptTokens: written.promptTokens, completionTokens: written.completionTokens, attempts: written.attempts };
 
     // 3. Photos: the hero's source, then the inline ones into the body.
     const byCode = new Map(pack.products.map((p) => [p.code, p]));
@@ -254,16 +269,13 @@ export async function executeRun(runId: string, options: ExecuteOptions = {}): P
       const verified = await verifyArticle(pack, draft, chat);
       tokens += verified.tokens;
       unsupported = verified.unsupported;
+      detail.verifier = { tokens: verified.tokens, promptTokens: verified.promptTokens, completionTokens: verified.completionTokens };
     } catch (error) {
       tokens += (error as { tokens?: number }).tokens ?? 0;
       detail.verifierError = error instanceof Error ? error.message : String(error);
     }
 
     // 5. The gates.
-    const previous = topic.articleId
-      ? await prisma.contentArticle.findUnique({ where: { id: topic.articleId }, select: { id: true, slug: true, status: true, source: true } })
-      : null;
-    const own = previous && previous.source === "AUTO" && previous.status === "DRAFT" ? previous : null;
     const slug = own?.slug ?? articleSlug(draft.title);
     const [catalogue, existing, broken] = await Promise.all([
       loadCatalogue(),
@@ -329,7 +341,8 @@ export async function executeRun(runId: string, options: ExecuteOptions = {}): P
     const attempts = topic.attempts + (done ? 0 : 1);
     await prisma.contentTopic.update({
       where: { id: topic.id },
-      data: { articleId: article.id, status: done ? "DONE" : attempts >= MAX_ATTEMPTS ? "SKIPPED" : "FAILED", attempts },
+      // «Πρώτο» means «next»: once tried, the topic takes its place in the queue again.
+      data: { articleId: article.id, status: done ? "DONE" : attempts >= MAX_ATTEMPTS ? "SKIPPED" : "FAILED", attempts, pinned: false },
     });
 
     const outcome: ContentRunOutcome = publish ? "PUBLISHED" : "DRAFT";
@@ -377,7 +390,7 @@ export async function executeRun(runId: string, options: ExecuteOptions = {}): P
     if (topic) {
       const attempts = topic.attempts + 1;
       await prisma.contentTopic
-        .update({ where: { id: topic.id }, data: { attempts, status: attempts >= MAX_ATTEMPTS ? "SKIPPED" : "FAILED" } })
+        .update({ where: { id: topic.id }, data: { attempts, status: attempts >= MAX_ATTEMPTS ? "SKIPPED" : "FAILED", pinned: false } })
         .catch(() => {});
     }
     await prisma.contentJobRun

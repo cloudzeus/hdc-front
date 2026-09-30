@@ -180,16 +180,20 @@ async function withRetry<T>(
   chat: Chat,
   input: Parameters<Chat>[0],
   parse: (reply: string) => T,
-): Promise<{ value: T; tokens: number; attempts: number }> {
+): Promise<{ value: T; tokens: number; promptTokens: number; completionTokens: number; attempts: number }> {
   let tokens = 0;
+  let promptTokens = 0;
+  let completionTokens = 0;
   let lastError: unknown = null;
   for (let attempt = 1; attempt <= 2; attempt++) {
     const reply = await chat(
       attempt === 1 ? input : { ...input, user: `${input.user}\n\nΠΡΟΣΟΧΗ: η προηγούμενη απάντηση δεν ήταν έγκυρο JSON με όλα τα πεδία. Επίστρεψε ΜΟΝΟ το αντικείμενο JSON.` },
     );
     tokens += tokensOf(reply);
+    promptTokens += reply.usage.promptTokens;
+    completionTokens += reply.usage.completionTokens;
     try {
-      return { value: parse(reply.text), tokens, attempts: attempt };
+      return { value: parse(reply.text), tokens, promptTokens, completionTokens, attempts: attempt };
     } catch (error) {
       lastError = error;
     }
@@ -202,14 +206,18 @@ export async function writeArticle(
   pack: FactPack,
   style: StyleExample | null,
   chat: Chat,
-): Promise<WriterOutput & { tokens: number; attempts: number }> {
+): Promise<WriterOutput & { tokens: number; promptTokens: number; completionTokens: number; attempts: number }> {
   const { system, user } = writerPrompt(pack, style);
-  const { value, tokens, attempts } = await withRetry(chat, { system, user, maxTokens: 8000, temperature: 0.5 }, parseWriterReply);
-  return { ...value, tokens, attempts };
+  const { value, ...usage } = await withRetry(chat, { system, user, maxTokens: 8000, temperature: 0.5 }, parseWriterReply);
+  return { ...value, ...usage };
 }
 
-export async function verifyArticle(pack: FactPack, draft: Draft, chat: Chat): Promise<{ unsupported: Unsupported[]; tokens: number }> {
+export async function verifyArticle(
+  pack: FactPack,
+  draft: Draft,
+  chat: Chat,
+): Promise<{ unsupported: Unsupported[]; tokens: number; promptTokens: number; completionTokens: number }> {
   const { system, user } = verifierPrompt(pack, draft);
-  const { value, tokens } = await withRetry(chat, { system, user, maxTokens: 3000, temperature: 0 }, parseVerifierReply);
-  return { unsupported: value, tokens };
+  const { value, tokens, promptTokens, completionTokens } = await withRetry(chat, { system, user, maxTokens: 3000, temperature: 0 }, parseVerifierReply);
+  return { unsupported: value, tokens, promptTokens, completionTokens };
 }

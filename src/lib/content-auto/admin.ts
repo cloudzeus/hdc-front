@@ -46,6 +46,8 @@ export type AutoOverview = {
   settings: AutoSettings;
   status: { backlog: number; threshold: number; target: number; publishedThisWeek: number; next: string };
   topics: TopicRow[];
+  /** Every waiting topic; `topics` holds the first 60. */
+  topicCount: number;
   skipped: TopicRow[];
   runs: RunRow[];
   running: string | null;
@@ -69,7 +71,7 @@ const topicRow = (t: {
 }): TopicRow => ({ ...t, score: Math.round(t.score * 10) / 10 });
 
 export async function autoOverview(now = new Date()): Promise<AutoOverview> {
-  const [enabled, notifyEmail, maxPerWeek, backlog, waiting, skipped, runs, published] = await Promise.all([
+  const [enabled, notifyEmail, maxPerWeek, backlog, waiting, topicCount, skipped, runs, published] = await Promise.all([
     getSetting("content.auto.enabled"),
     getSetting("content.auto.notifyEmail"),
     getSettingNumber("content.auto.maxPerWeek"),
@@ -79,6 +81,7 @@ export async function autoOverview(now = new Date()): Promise<AutoOverview> {
       orderBy: [{ pinned: "desc" }, { attempts: "asc" }, { score: "desc" }, { key: "asc" }],
       take: 60,
     }),
+    prisma.contentTopic.count({ where: { status: { in: ["PENDING", "FAILED"] } } }),
     prisma.contentTopic.findMany({ where: { status: "SKIPPED" }, orderBy: { updatedAt: "desc" }, take: 20 }),
     prisma.contentJobRun.findMany({
       orderBy: { startedAt: "desc" },
@@ -112,6 +115,7 @@ export async function autoOverview(now = new Date()): Promise<AutoOverview> {
       next: decision.write ? "στην επόμενη ωριαία εκτέλεση" : decision.reason,
     },
     topics: waiting.map(topicRow),
+    topicCount,
     skipped: skipped.map(topicRow),
     runs: runs.map((r) => ({
       id: r.id,

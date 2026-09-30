@@ -267,7 +267,11 @@ export function AutoPanel({ data, canEdit }: { data: AutoOverview; canEdit: bool
       <section className="grid gap-3 border border-k-line bg-white p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-[length:var(--fs-13)] font-semibold text-k-ink">
-            Ουρά θεμάτων <span className="numeral font-normal text-k-text-3">({data.topics.length})</span>
+            Ουρά θεμάτων{" "}
+            <span className="numeral font-normal text-k-text-3">
+              ({data.topicCount}
+              {data.topicCount > data.topics.length ? `, τα πρώτα ${data.topics.length}` : ""})
+            </span>
           </h2>
           {canEdit && (
             <Button type="button" variant="outline" size="sm" disabled={pending} onClick={refresh}>

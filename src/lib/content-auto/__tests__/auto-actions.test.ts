@@ -21,7 +21,7 @@ vi.mock("@/lib/prisma", () => ({
     $transaction: vi.fn(async (ops: unknown[]) => Promise.all(ops)),
   },
 }));
-const settings = vi.hoisted(() => ({ setSetting: vi.fn(async () => ({ ok: true })) }));
+const settings = vi.hoisted(() => ({ setSetting: vi.fn<(key: string, value: string, actor: string) => Promise<{ ok: boolean }>>(async () => ({ ok: true })) }));
 vi.mock("@/lib/settings/settings", () => settings);
 const runner = vi.hoisted(() => ({
   startRun: vi.fn(async () => ({ ok: true, runId: "run1" })),

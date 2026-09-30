@@ -11,6 +11,7 @@ const db = vi.hoisted(() => ({
   articleWrites: [] as Array<{ op: string; data: Record<string, unknown> }>,
   runUpdates: [] as Array<Record<string, unknown>>,
   audits: [] as Array<Record<string, unknown>>,
+  previous: null as null | Record<string, unknown>,
 }));
 
 vi.mock("@/lib/prisma", () => ({
@@ -25,7 +26,7 @@ vi.mock("@/lib/prisma", () => ({
           ? [{ id: "a1", slug: "pos-dialego-drapano", title: "Πώς διαλέγω δράπανο", keywords: ["δράπανο"] }]
           : [{ slug: "pos-dialego-drapano", title: "Πώς διαλέγω δράπανο", answer: "Απάντηση.", body: "## Ενότητα\n\nΚείμενο.", faq: [] }],
       ),
-      findUnique: vi.fn(async () => null),
+      findUnique: vi.fn(async ({ where }: { where: { id?: string } }) => (where.id ? db.previous : null)),
       create: vi.fn(async ({ data }: { data: Record<string, unknown> }) => {
         db.articleWrites.push({ op: "create", data });
         return { id: "new-article", slug: data.slug, kind: data.kind };
@@ -168,6 +169,7 @@ beforeEach(() => {
   db.articleWrites = [];
   db.runUpdates = [];
   db.audits = [];
+  db.previous = null;
 });
 
 describe("executeRun", () => {
@@ -189,7 +191,7 @@ describe("executeRun", () => {
     // The kit's catalogue photo after the paragraph that names it; not the hero's.
     expect(String(saved.body)).toContain("](https://cdn.test/fpd3-502x.webp)");
     expect(String(saved.body)).not.toContain("fpd3-0x.webp");
-    expect(db.topicUpdates[0]).toMatchObject({ status: "DONE", attempts: 0, articleId: "new-article" });
+    expect(db.topicUpdates[0]).toMatchObject({ status: "DONE", attempts: 0, articleId: "new-article", pinned: false });
     expect(db.runUpdates[0]).toMatchObject({ outcome: "PUBLISHED", tokens: 3000, failedGates: [] });
     expect(db.audits[0]).toMatchObject({ action: "seo.auto.publish", userId: null });
   });
@@ -209,6 +211,31 @@ describe("executeRun", () => {
     expect(out.failedGates).toEqual(expect.arrayContaining(["numbers", "forbidden", "lengths", "verifier"]));
     expect(db.articleWrites[0].data).toMatchObject({ status: "DRAFT" });
     expect(db.topicUpdates[0]).toMatchObject({ status: "FAILED", attempts: 1 });
+  });
+
+  it("rewrites its own untouched draft in place", async () => {
+    setRun("cron", { articleId: "old-article", attempts: 1 });
+    db.previous = { id: "old-article", slug: "old-slug", status: "DRAFT", source: "AUTO", updatedBy: "auto:content" };
+    await executeRun("run1", { chat: chatWith(article()) });
+    expect(db.articleWrites[0]).toMatchObject({ op: "update", data: { slug: "old-slug" } });
+  });
+
+  it("never rewrites a draft a person edited, or a published article", async () => {
+    for (const previous of [
+      { id: "old-article", slug: "s", status: "DRAFT", source: "AUTO", updatedBy: "editor@hdc.test" },
+      { id: "old-article", slug: "s", status: "PUBLISHED", source: "AUTO", updatedBy: "auto:content" },
+    ]) {
+      db.articleWrites = [];
+      db.topicUpdates = [];
+      setRun("cron", { articleId: "old-article" });
+      db.previous = previous;
+      const chat = chatWith(article());
+      const out = await executeRun("run1", { chat });
+      expect(out.outcome).toBe("SKIPPED");
+      expect(chat).not.toHaveBeenCalled();
+      expect(db.articleWrites).toEqual([]);
+      expect(db.topicUpdates[0]).toMatchObject({ status: "DONE" });
+    }
   });
 
   it("skips the topic at the third failure", async () => {
