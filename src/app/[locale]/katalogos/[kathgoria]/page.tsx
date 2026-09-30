@@ -2,9 +2,10 @@ import { getTranslations } from "next-intl/server";
 import { pageMeta } from "@/lib/seo/urls";
 import { categoryBreadcrumb, categoryItemList } from "@/lib/seo/product-schema";
 import type { Metadata } from "next";
-import { cache } from "react";
+import { cache, Suspense } from "react";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
+import { HdcPlpSkeleton } from "@/components/skeleton/HdcPlpSkeleton";
 import { setRequestLocale } from "next-intl/server";
 import { SiteChrome } from "@/components/chrome/SiteChrome";
 import { SiteFooter } from "@/components/chrome/SiteFooter";
@@ -93,7 +94,26 @@ export async function generateMetadata({
   };
 }
 
-export default async function CategoryPage({
+export default async function CategoryPage({ params, searchParams }: PageProps) {
+  const { locale, kathgoria } = await params;
+  setRequestLocale(locale);
+
+  /*
+   * Existence first, before any Suspense boundary, so an unknown slug answers
+   * a real 404 status rather than a streamed 200 marked noindex (a soft 404).
+   * That is why this route has no loading.tsx above it (the catalogue index
+   * keeps its own in `katalogos/(index)`) and shows its skeleton from here.
+   */
+  if (!(await getCategory(kathgoria))) notFound();
+
+  return (
+    <Suspense fallback={<HdcPlpSkeleton />}>
+      <CategoryBody params={params} searchParams={searchParams} />
+    </Suspense>
+  );
+}
+
+async function CategoryBody({
   params,
   searchParams,
 }: PageProps) {

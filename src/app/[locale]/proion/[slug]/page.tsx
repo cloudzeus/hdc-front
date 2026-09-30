@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
+import ProductSkeleton from "./skeleton";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SiteChrome } from "@/components/chrome/SiteChrome";
 import { SiteFooter } from "@/components/chrome/SiteFooter";
@@ -121,6 +123,26 @@ const DEFAULT_BAND_AH: Record<string, number> = { M18: 5, M12: 4 };
  * spec table — it says 135 Nm for the FPD3, Milwaukee says 158.
  */
 export default async function ProductPage({ params }: PageProps) {
+  const { locale, slug } = await params;
+  setRequestLocale(locale);
+
+  /*
+   * Existence first, before any Suspense boundary, so an unknown slug answers
+   * a real 404 status. Once a loading state streams, the status is committed
+   * as 200 and Next can only mark the page noindex (a soft 404) — which is why
+   * this route has no loading.tsx above it and shows its skeleton from here.
+   * `getProductBySlug` is cached, so the body's call is the same lookup.
+   */
+  if (!(await getProductBySlug(slug, locale))) notFound();
+
+  return (
+    <Suspense fallback={<ProductSkeleton />}>
+      <ProductBody params={params} />
+    </Suspense>
+  );
+}
+
+async function ProductBody({ params }: PageProps) {
   const t = await getTranslations("pdp.Hdc");
   const { locale, slug } = await params;
   setRequestLocale(locale);
