@@ -113,7 +113,7 @@ export async function subscribeNewsletter(input: {
     subject: "Επιβεβαιώστε την εγγραφή σας στο newsletter",
     html,
     text:
-      "Επιβεβαιώστε την εγγραφή σας στο newsletter του Kolleris:\n" +
+      "Επιβεβαιώστε την εγγραφή σας στο newsletter του Milwaukee Heavy Duty Centre:\n" +
       `${siteOrigin()}/newsletter/epibebaiosi/${token}\n\n` +
       `Ο σύνδεσμος ισχύει για ${TOKEN_HOURS} ώρες. Αν δεν ζητήσατε εγγραφή, αγνοήστε το μήνυμα.`,
   });
