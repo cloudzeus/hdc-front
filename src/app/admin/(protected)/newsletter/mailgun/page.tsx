@@ -95,7 +95,7 @@ function MailgunReport({
     <>
       <Panel
         title={`Domain αποστολής: ${stats.domain}`}
-        description="Το web.kolleris.com δεν είναι domain του Mailgun — το κατάστημα στέλνει μέσω kolleris.com. Δεν υπάρχει δεύτερο σύνολο αριθμών που λείπει."
+        description="Στατιστικά αποστολών από το domain αποστολής του καταστήματος."
       >
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Kpi

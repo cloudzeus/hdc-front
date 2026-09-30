@@ -27,20 +27,6 @@ export async function searchProductsAction(filters: ProductFilters): Promise<Pic
   return searchCampaignProducts(filters);
 }
 
-/** Οι μάρκες που έχουν έστω ένα ενεργό προϊόν με εικόνα — τίποτα άλλο δεν έχει νόημα στο φίλτρο. */
-export async function campaignBrandsAction(): Promise<Array<{ mtrmark: number; name: string }>> {
-  await guard();
-  const rows = await prisma.brand.findMany({
-    where: { mtrmark: { not: null }, productCount: { gt: 0 } },
-    select: { mtrmark: true, nameEl: true },
-    orderBy: { productCount: "desc" },
-    take: 40,
-  });
-  return rows
-    .filter((r): r is { mtrmark: number; nameEl: string } => r.mtrmark != null)
-    .map((r) => ({ mtrmark: r.mtrmark, name: r.nameEl }));
-}
-
 /**
  * Η προεπισκόπηση περνά από τον ΙΔΙΟ δρόμο με την αποστολή.
  *

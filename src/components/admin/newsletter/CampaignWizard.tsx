@@ -46,9 +46,12 @@ const STEPS: StepDef[] = [
 export function CampaignWizard({
   templates,
   confirmedCount,
+  siteOrigin,
 }: {
   templates: TemplateMeta[];
   confirmedCount: number;
+  /** Η διεύθυνση του site, από τον server (`siteOrigin()`), για τα παραδείγματα συνδέσμων. */
+  siteOrigin: string;
 }) {
   const router = useRouter();
   const [step, setStep] = useState(0);
@@ -228,7 +231,7 @@ export function CampaignWizard({
                   έχουν τεύχος, κύριο θέμα και άρθρα. Δείχνοντάς τους τα πεδία
                   έκπτωσης θα ζητούσαμε ποσοστό για email που δεν πουλά τίποτα.
                 */
-                <NewsEditor value={news} onChange={setNews} />
+                <NewsEditor value={news} onChange={setNews} siteOrigin={siteOrigin} />
               )}
 
               {template.takesProducts && (
@@ -277,7 +280,7 @@ export function CampaignWizard({
                     <input
                       value={campaign.url}
                       onChange={(e) => setCampaign({ ...campaign, url: e.target.value })}
-                      placeholder="https://web.kolleris.com/prosfores"
+                      placeholder={`${siteOrigin}/prosfores`}
                       className={INPUT}
                     />
                   </Field>
@@ -340,8 +343,6 @@ export function CampaignWizard({
                         ["section_title", "Τίτλος ενότητας"],
                         ["section_link", "Σύνδεσμος ενότητας"],
                         ["all_button", "Κουμπί «όλες»"],
-                        ["b2b_eyebrow", "Επικεφαλίδα B2B"],
-                        ["b2b_button", "Κουμπί B2B"],
                       ] as const
                     ).map(([key, label]) => (
                       <Field key={key} label={label}>

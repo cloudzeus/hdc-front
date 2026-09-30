@@ -51,11 +51,13 @@ function ArticleCard({
   index,
   onChange,
   onRemove,
+  siteOrigin,
 }: {
   article: NewsArticle;
   index: number;
   onChange: (next: NewsArticle) => void;
   onRemove: () => void;
+  siteOrigin: string;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: article.id,
@@ -136,7 +138,7 @@ function ArticleCard({
           <input
             value={article.url}
             onChange={(e) => onChange({ ...article, url: e.target.value })}
-            placeholder="https://web.kolleris.com/…"
+            placeholder={`${siteOrigin}/…`}
             className={INPUT}
           />
         </label>
@@ -146,7 +148,7 @@ function ArticleCard({
           <input
             value={article.image}
             onChange={(e) => onChange({ ...article, image: e.target.value })}
-            placeholder="https://kolleris.b-cdn.net/…"
+            placeholder={`${siteOrigin}/…/eikona.jpg`}
             className={INPUT}
           />
         </label>
@@ -158,9 +160,12 @@ function ArticleCard({
 export function NewsEditor({
   value,
   onChange,
+  siteOrigin,
 }: {
   value: NewsContent;
   onChange: (next: NewsContent) => void;
+  /** Για τα παραδείγματα συνδέσμων, από τον server component. */
+  siteOrigin: string;
 }) {
   const [picking, setPicking] = useState(false);
   const sensors = useSensors(
@@ -322,6 +327,7 @@ export function NewsEditor({
                     key={a.id}
                     article={a}
                     index={i}
+                    siteOrigin={siteOrigin}
                     onChange={(next) =>
                       onChange({
                         ...value,

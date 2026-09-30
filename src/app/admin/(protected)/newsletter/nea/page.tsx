@@ -4,6 +4,7 @@ import { PageShell } from "@/components/admin/PageShell";
 import { CampaignWizard } from "@/components/admin/newsletter/CampaignWizard";
 import { campaignTemplates } from "@/lib/newsletter/campaign";
 import { prisma } from "@/lib/prisma";
+import { siteOrigin } from "@/lib/seo/urls";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,11 @@ export default async function NewCampaignPage() {
       title="Νέα καμπάνια"
       description="Τέσσερα βήματα. Η προεπισκόπηση δεξιά είναι ακριβώς αυτό που θα σταλεί."
     >
-      <CampaignWizard templates={campaignTemplates()} confirmedCount={confirmedCount} />
+      <CampaignWizard
+        templates={campaignTemplates()}
+        confirmedCount={confirmedCount}
+        siteOrigin={siteOrigin()}
+      />
     </PageShell>
   );
 }

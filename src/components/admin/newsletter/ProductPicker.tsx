@@ -19,7 +19,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Plus, Search, X } from "lucide-react";
-import { campaignBrandsAction, searchProductsAction } from "@/lib/newsletter/campaign-actions";
+import { searchProductsAction } from "@/lib/newsletter/campaign-actions";
 import type { PickedProduct } from "@/lib/newsletter/copy";
 import { cn } from "@/lib/utils";
 
@@ -127,10 +127,8 @@ export function ProductPicker({
   onChange: (next: PickedProduct[]) => void;
 }) {
   const [query, setQuery] = useState("");
-  const [mtrmark, setMtrmark] = useState<number | null>(null);
   const [onSaleOnly, setOnSaleOnly] = useState(false);
   const [inStockOnly, setInStockOnly] = useState(true);
-  const [brands, setBrands] = useState<Array<{ mtrmark: number; name: string }>>([]);
   const [results, setResults] = useState<PickedProduct[]>([]);
   const [pending, startTransition] = useTransition();
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -144,20 +142,16 @@ export function ProductPicker({
   const selectedIds = useMemo(() => new Set(selected.map((p) => p.id)), [selected]);
 
   useEffect(() => {
-    campaignBrandsAction().then(setBrands).catch(() => setBrands([]));
-  }, []);
-
-  useEffect(() => {
     if (debounce.current) clearTimeout(debounce.current);
     debounce.current = setTimeout(() => {
       startTransition(async () =>
-        setResults(await searchProductsAction({ query, mtrmark, onSaleOnly, inStockOnly })),
+        setResults(await searchProductsAction({ query, onSaleOnly, inStockOnly })),
       );
     }, 250);
     return () => {
       if (debounce.current) clearTimeout(debounce.current);
     };
-  }, [query, mtrmark, onSaleOnly, inStockOnly]);
+  }, [query, onSaleOnly, inStockOnly]);
 
   const add = (p: PickedProduct) => {
     if (selectedIds.has(p.id)) return;
@@ -201,26 +195,10 @@ export function ProductPicker({
           />
         </div>
         {/*
-          Τα φίλτρα κάτω από το πεδίο και όχι σε συρτάρι: με 9.434 προϊόντα, η
-          αναζήτηση με κείμενο μόνη της δεν φτάνει. Το πραγματικό ερώτημα όταν
-          χτίζεις newsletter προσφορών είναι «τι KNIPEX έχει έκπτωση και είναι
-          σε απόθεμα», και αυτό είναι τρία φίλτρα, όχι μια φράση.
+          Τα φίλτρα κάτω από το πεδίο και όχι σε συρτάρι. Χωρίς φίλτρο μάρκας:
+          το κατάστημα πουλά μόνο Milwaukee.
         */}
         <div className="mt-2 flex flex-wrap items-center gap-2">
-          <select
-            value={mtrmark ?? ""}
-            onChange={(e) => setMtrmark(e.target.value ? Number(e.target.value) : null)}
-            aria-label="Φίλτρο μάρκας"
-            className="h-8 border border-neutral-300 bg-white px-2 text-[12px] outline-none focus:border-neutral-900"
-          >
-            <option value="">Όλες οι μάρκες</option>
-            {brands.map((b) => (
-              <option key={b.mtrmark} value={b.mtrmark}>
-                {b.name}
-              </option>
-            ))}
-          </select>
-
           <label className="flex cursor-pointer items-center gap-1.5 border border-neutral-300 bg-white px-2.5 py-1.5 text-[12px]">
             <input
               type="checkbox"
@@ -312,7 +290,7 @@ export function ProductPicker({
           })}
           {!pending && results.length === 0 && (
             <li className="border border-dashed border-neutral-200 p-6 text-center text-[12px] text-neutral-500">
-              Κανένα προϊόν. Δοκιμάστε κωδικό ή μάρκα.
+              Κανένα προϊόν. Δοκιμάστε όνομα ή κωδικό.
             </li>
           )}
         </ul>
