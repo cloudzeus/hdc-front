@@ -48,6 +48,7 @@ const GROUPS: Array<{ title: string; sections: Section[] }> = [
     sections: [
       { href: "/admin/newsletter", label: "Newsletter", icon: "newsletter", capability: "engagement" },
       { href: "/admin/newsletter/mailgun", label: "MailGun", icon: "mailgun", capability: "engagement" },
+      { href: "/admin/email-templates", label: "Πρότυπα email", icon: "emailTemplates", capability: "engagement" },
       { href: "/admin/engagement", label: "Μηνύματα", icon: "engagement", capability: "engagement" },
     ],
   },

@@ -31,6 +31,7 @@ import {
   Users,
   UsersRound,
   X,
+  MailCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -71,6 +72,7 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   engagement: Mail,
   newsletter: Send,
   mailgun: Gauge,
+  emailTemplates: MailCheck,
   sync: RefreshCw,
   settings: Settings,
   users: Users,
