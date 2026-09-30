@@ -111,6 +111,13 @@ describe("numbers, as the review asked (I1)", () => {
   it("reads number words before a unit", () => {
     expect(numberMentions("δεκαοκτώ V")[0]).toMatchObject({ unit: "v", readings: [[18]] });
   });
+  it("reads Milwaukee's official labels and units: «[mm]», «⌀ cm»", () => {
+    const official = supportedNumbers([], [
+      { label: "Cutting height [mm]", value: "25 - 100" },
+      { label: "Front wheel", value: "18.8", unit: "⌀ cm" },
+    ]);
+    expect(unsupportedNumbers("ύψος κοπής 25–100 mm, τροχός 18,8 cm", official)).toEqual([]);
+  });
   it("a pack range «0-33.000 bpm» does not support «33 bpm»", () => {
     expect(unsupportedNumbers("33.000 bpm", supported)).toEqual([]);
     expect(unsupportedNumbers("33 bpm", supported)).toEqual(["33 bpm"]);

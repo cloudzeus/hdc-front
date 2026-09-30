@@ -124,7 +124,8 @@ const NUMBER_WORDS: Record<string, number> = {
 const TIME_WORDS = /^\s?(ετ[ώη]ν|έτη|χρόν\p{L}*|μήν\p{L}*|ημέρ\p{L}*|ώρ\p{L}*|λεπτ\p{L}*|years?|months?)(?!\p{L})/iu;
 
 function unitOf(raw: string): string | null {
-  const clean = raw.trim();
+  // «⌀ cm» (a diameter) is centimetres.
+  const clean = raw.trim().replace(/^[⌀ØøⲐ]\s*/, "");
   for (const [id, pattern] of UNIT_PATTERNS) {
     if (new RegExp(`^(?:${pattern})$`, "iu").test(clean)) return id;
   }
@@ -194,7 +195,11 @@ export function numberMentions(raw: string, strict = false): NumberMention[] {
 /** «Μέγιστη ροπή (Nm)» → "nm"; the last parenthesis that is a unit. */
 export function labelUnit(label: string): string | null {
   // One level of nesting: «Στάθμη θορύβου (dB(A))».
-  const parts = [...label.matchAll(/\(((?:[^()]|\([^()]*\))+)\)/g)].map((m) => m[1].trim()).reverse();
+  const parts = [
+    ...[...label.matchAll(/\(((?:[^()]|\([^()]*\))+)\)/g)].map((m) => m[1].trim()),
+    // Milwaukee's own labels: «Cutting height [mm]».
+    ...[...label.matchAll(/\[([^\]]+)\]/g)].map((m) => m[1].trim()),
+  ].reverse();
   for (const part of parts) {
     const unit = unitOf(part);
     if (unit) return unit;
