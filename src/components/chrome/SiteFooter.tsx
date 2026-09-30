@@ -1,12 +1,13 @@
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import { PRIMARY_PHONE, SHOP } from "@/config/shop";
+import { PRIMARY_PHONE, SHOP, SOCIAL_LINKS } from "@/config/shop";
 import { Link } from "@/i18n/navigation";
 import type { CategoryTile } from "@/lib/catalog/queries";
 import { upGreek } from "@/lib/greek";
 import { hoursMessageArgs } from "@/lib/contact/hours";
 import { resolveHdcNav } from "@/lib/hdc-nav";
 import { HUBS } from "@/lib/seo/hubs";
+import { FooterCategories } from "@/components/chrome/FooterCategories";
 
 /*
  * `prefetch={false}` on every link here: the footer is on every page, nobody
@@ -100,6 +101,16 @@ export function SiteFooter({ categories }: { categories: CategoryTile[] }) {
               <br />
               {t("orario", hoursMessageArgs(contact.hours))}
             </address>
+            {/* The HDC's own profiles (SHOP.social); brand names, not translated. */}
+            <ul className="hdc-foot-social">
+              {SOCIAL_LINKS.map((social) => (
+                <li key={social.id}>
+                  <a href={social.href} target="_blank" rel="noopener noreferrer">
+                    {social.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
             <ul className="hdc-foot-pay" aria-label={t("pliromes")}>
               {PAYMENTS.map((payment) => (
                 <li key={payment}>{payment}</li>
@@ -123,6 +134,8 @@ export function SiteFooter({ categories }: { categories: CategoryTile[] }) {
             </nav>
           ))}
         </div>
+
+        <FooterCategories />
 
         <div className="hdc-foot-legal">
           <div>

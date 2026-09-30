@@ -248,3 +248,15 @@ export function productFeedTitle(input: ProductSeoInput): string {
   const code = modelCode(input.erpName);
   return tidy(["Milwaukee", code, localKind(input), input.code2].filter(Boolean).join(" ")).slice(0, 150);
 }
+
+/**
+ * The words for a product picture: «Milwaukee M18 FPD3-502X Κρουστικό
+ * δραπανοκατσάβιδο – 4933479860»; the gallery and the card add «– εικόνα N».
+ * What an image search matches, and what a screen reader says instead of
+ * «image».
+ */
+export function productImageAlt(input: ProductSeoInput): string {
+  const code = modelCode(input.erpName);
+  const head = tidy(["Milwaukee", code, localKind(input)].filter(Boolean).join(" "));
+  return input.code2 ? `${head} – ${input.code2}` : head;
+}

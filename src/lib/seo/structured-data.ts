@@ -43,11 +43,11 @@ export const SHOP = {
    */
   founded: "1978",
   /*
-   * `sameAs` — the shop's own social profiles. Empty until the HDC has its
-   * own: the Kolleris accounts are another business, and saying they are the
-   * same entity would merge the two in a knowledge panel.
+   * `sameAs` — the HDC's own social profiles (SHOP.social), never the Kolleris
+   * accounts: those are another business, and saying they are the same entity
+   * would merge the two in a knowledge panel.
    */
-  sameAs: [] as string[],
+  sameAs: Object.values(CONFIG.social) as string[],
 } as const;
 
 /**
@@ -59,8 +59,29 @@ export const SHOP = {
  * own search box, and tells an agent the URL shape for a query rather than
  * leaving it to guess.
  */
+/**
+ * The shop's other profiles, for `sameAs`: the Google Business Profile
+ * (NEXT_PUBLIC_GBP_URL, when the owner gives it) and any others listed in
+ * SHOP_SAME_AS (comma-separated). Only https URLs; nothing by default — the
+ * Kolleris profiles are another business.
+ */
+export function storeSameAs(env: Record<string, string | undefined> = process.env): string[] {
+  const raw = [env.NEXT_PUBLIC_GBP_URL, ...(env.SHOP_SAME_AS ?? "").split(",")];
+  const urls = raw
+    .map((u) => u?.trim().replace(/[\s,;]+$/, ""))
+    .filter((u): u is string => !!u && /^https:\/\/[^\s]+$/.test(u));
+  return [...new Set(urls)];
+}
+
+/** A map of the store: its Business Profile when set, else a Google Maps search of the coordinates. */
+export function storeMapUrl(env: Record<string, string | undefined> = process.env): string {
+  const gbp = storeSameAs({ NEXT_PUBLIC_GBP_URL: env.NEXT_PUBLIC_GBP_URL })[0];
+  return gbp ?? `https://www.google.com/maps/search/?api=1&query=${SHOP.lat},${SHOP.lon}`;
+}
+
 export function siteJsonLd(locale: Locale) {
   const origin = siteOrigin();
+  const sameAs = [...SHOP.sameAs, ...storeSameAs()];
 
   return {
     "@context": "https://schema.org",
@@ -73,7 +94,12 @@ export function siteJsonLd(locale: Locale) {
         url: absoluteUrl("/", locale),
         telephone: SHOP.phone,
         email: SHOP.email,
-        ...(SHOP.sameAs.length ? { sameAs: SHOP.sameAs } : {}),
+        logo: `${origin}/brand/hdc-lockup-440.png`,
+        image: `${origin}/brand/hdc-lockup-440.png`,
+        hasMap: storeMapUrl(),
+        // Collect in Piraeus, or delivered anywhere in Greece.
+        areaServed: { "@type": "Country", name: "Greece", identifier: "GR" },
+        ...(sameAs.length ? { sameAs } : {}),
         priceRange: "€€",
         currenciesAccepted: "EUR",
         address: {

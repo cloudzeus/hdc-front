@@ -12,6 +12,9 @@ import { formatPrice } from "@/lib/format";
 import { displayName, platformTag } from "@/lib/milwaukee/display";
 import { parseModel } from "@/lib/milwaukee/model";
 import { discountedNet, offerBadgeFor } from "@/lib/offers/badges";
+import { getGreekLexicon } from "@/lib/catalog/greek-lexicon";
+import { productImageAlt } from "@/lib/seo/product-seo";
+import type { Locale } from "@/i18n/routing";
 
 /**
  * The HDC product card — a SERVER component (mockups: home.html `.card`,
@@ -81,6 +84,18 @@ export async function HdcProductCard({
     family?.availability ??
     availabilityOf({ inStock: product.inStock, supplierAvailable: product.supplierAvailable });
 
+  /* «Milwaukee {model} {kind} – {code} – εικόνα 1»: what an image search matches. */
+  const imageAlt = t("eikona_alt", {
+    alt: productImageAlt({
+      locale: locale as Locale,
+      name: product.name,
+      erpName: product.name,
+      code2: product.sku,
+      greekTexts: [],
+      lexicon: await getGreekLexicon(),
+    }),
+  });
+
   return (
     <article className={`hdc-card${isNew ? " hdc-card--flat" : ""}`}>
       <div className="hdc-card-img">
@@ -110,7 +125,7 @@ export async function HdcProductCard({
           {product.image ? (
             <Image
               src={product.image}
-              alt=""
+              alt={imageAlt}
               width={400}
               height={400}
               sizes="(max-width: 767px) 45vw, 260px"

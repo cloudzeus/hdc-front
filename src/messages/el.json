@@ -75,7 +75,8 @@
       "megethi": "{count, plural, one {# μέγεθος} other {# μεγέθη}}",
       "epilogi_megethous": "ΕΠΙΛΟΓΗ ΜΕΓΕΘΟΥΣ",
       "diathesimo_3_5": "Διαθέσιμο · 3–5 εργάσιμες",
-      "teleftaio": "Τελευταίο τεμάχιο"
+      "teleftaio": "Τελευταίο τεμάχιο",
+      "eikona_alt": "{alt} – εικόνα 1"
     }
   },
   "plp": {
@@ -330,7 +331,8 @@
       "megethi_3_5": "ΔΙΑΘΕΣΙΜΟ · 3–5 ΕΡΓΑΣΙΜΕΣ",
       "kodikoi": "Κωδικοί",
       "oles_oi_ekdoseis": "Όλες οι εκδόσεις του {model}",
-      "nav_erotiseis": "Ερωτήσεις"
+      "nav_erotiseis": "Ερωτήσεις",
+      "eikona_alt": "{alt} – εικόνα {n}"
     }
   },
   "orders": {
@@ -639,7 +641,8 @@
       "aporrito": "Απόρρητο",
       "cookies": "Cookies",
       "nomika": "Νομικά",
-      "schetika": "Σχετικά με εμάς"
+      "schetika": "Σχετικά με εμάς",
+      "katigories": "Κατηγορίες"
     },
     "SiteHeader": {
       "kyria_ploigisi": "Κύρια πλοήγηση",

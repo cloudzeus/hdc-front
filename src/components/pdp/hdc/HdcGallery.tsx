@@ -25,10 +25,12 @@ export function HdcGallery({
   tags,
 }: {
   images: Array<{ id: string; url: string }>;
+  /** «Milwaukee M18 FPD3-502X Κρουστικό δραπανοκατσάβιδο – 4933479860»; each picture adds «– εικόνα N». */
   alt: string;
   tags: GalleryTag[];
 }) {
   const t = useTranslations("pdp.Hdc");
+  const altOf = (index: number) => t("eikona_alt", { alt, n: index + 1 });
   const [active, setActive] = useState(0);
   const [viewer, setViewer] = useState(false);
   const track = useRef<HTMLDivElement | null>(null);
@@ -84,7 +86,7 @@ export function HdcGallery({
                 aria-current={index === active}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- CDN WebP; the optimiser is off */}
-                <img src={image.url} alt="" loading="lazy" />
+                <img src={image.url} alt={altOf(index)} loading="lazy" />
               </button>
             ))}
             {more > 0 && (
@@ -132,7 +134,7 @@ export function HdcGallery({
             aria-label={t("megethynsi")}
           >
             {/* eslint-disable-next-line @next/next/no-img-element -- CDN WebP; the optimiser is off */}
-            <img src={images[active].url} alt={alt} fetchPriority="high" />
+            <img src={images[active].url} alt={altOf(active)} fetchPriority="high" />
           </button>
           <button
             type="button"
@@ -167,7 +169,7 @@ export function HdcGallery({
                 aria-label={t("fotografia", { n: index + 1 })}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- CDN WebP; the optimiser is off */}
-                <img src={image.url} alt={index === 0 ? alt : ""} loading={index === 0 ? "eager" : "lazy"} />
+                <img src={image.url} alt={altOf(index)} loading={index === 0 ? "eager" : "lazy"} />
               </button>
             ))}
           </div>
@@ -206,6 +208,7 @@ function Viewer({
   onClose: () => void;
 }) {
   const t = useTranslations("pdp.Hdc");
+  const altOf = (index: number) => t("eikona_alt", { alt, n: index + 1 });
   const close = useRef<HTMLButtonElement | null>(null);
   const strip = useRef<HTMLDivElement | null>(null);
 
@@ -259,7 +262,7 @@ function Viewer({
           </button>
         )}
         {/* eslint-disable-next-line @next/next/no-img-element -- CDN WebP; the optimiser is off */}
-        <img src={images[active].url} alt={alt} />
+        <img src={images[active].url} alt={altOf(active)} />
         {images.length > 1 && (
           <button
             type="button"
@@ -284,7 +287,7 @@ function Viewer({
               aria-current={index === active}
             >
               {/* eslint-disable-next-line @next/next/no-img-element -- CDN WebP; the optimiser is off */}
-              <img src={image.url} alt="" loading="lazy" />
+              <img src={image.url} alt={altOf(index)} loading="lazy" />
             </button>
           ))}
         </div>

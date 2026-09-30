@@ -534,6 +534,32 @@
   .hdc-foot-legal a:hover {
     color: #fff;
   }
+  /* Every root category with its main groups: the site's second level in HTML. */
+  .hdc-foot-cats {
+    padding: 28px 0;
+    border-bottom: 1px solid #2a2a2a;
+  }
+  .hdc-foot-cats > div {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 22px 30px;
+  }
+  .hdc-foot-cat {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+    font-size: var(--fs-13);
+    color: #fff;
+  }
+  .hdc-foot-cats li {
+    margin-bottom: 5px;
+    font-size: var(--fs-13);
+  }
+  @media (max-width: 1023px) {
+    .hdc-foot-cats > div {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
   .hdc-foot-contact {
     font-style: normal;
     font-size: var(--fs-14);
@@ -542,6 +568,24 @@
   .hdc-foot-contact strong {
     color: #fff;
     font-weight: 700;
+  }
+  .hdc-foot-social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .hdc-foot .hdc-foot-social li {
+    margin: 0;
+    font-weight: 700;
+    font-size: var(--fs-13);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .hdc-foot-social a {
+    color: #fff;
   }
   .hdc-foot-pay {
     display: flex;

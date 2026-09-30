@@ -75,7 +75,8 @@
       "megethi": "{count, plural, one {# size} other {# sizes}}",
       "epilogi_megethous": "CHOOSE SIZE",
       "diathesimo_3_5": "Available · 3–5 working days",
-      "teleftaio": "Last one in stock"
+      "teleftaio": "Last one in stock",
+      "eikona_alt": "{alt} – image 1"
     }
   },
   "plp": {
@@ -330,7 +331,8 @@
       "megethi_3_5": "AVAILABLE · 3–5 WORKING DAYS",
       "kodikoi": "Codes",
       "oles_oi_ekdoseis": "All versions of the {model}",
-      "nav_erotiseis": "Questions"
+      "nav_erotiseis": "Questions",
+      "eikona_alt": "{alt} – image {n}"
     }
   },
   "orders": {
@@ -639,7 +641,8 @@
       "aporrito": "Privacy",
       "cookies": "Cookies",
       "nomika": "Legal",
-      "schetika": "About us"
+      "schetika": "About us",
+      "katigories": "Categories"
     },
     "SiteHeader": {
       "kyria_ploigisi": "Main navigation",

@@ -65,7 +65,14 @@ import { absoluteUrl, pageMeta, siteOrigin } from "@/lib/seo/urls";
 import { clampDescription, sizeFamilyLd, sizedText, sizeTitleEl } from "@/lib/seo/size-variant";
 import { SHOP } from "@/config/shop";
 import { jsonLdHtml } from "@/lib/seo/json-ld";
-import { productDescription, productH1, productTitle, type Lexicon, type ProductSeoInput } from "@/lib/seo/product-seo";
+import {
+  productDescription,
+  productH1,
+  productImageAlt,
+  productTitle,
+  type Lexicon,
+  type ProductSeoInput,
+} from "@/lib/seo/product-seo";
 import { getGreekLexicon } from "@/lib/catalog/greek-lexicon";
 import { seoFor } from "@/lib/seo/seo-for";
 
@@ -293,6 +300,8 @@ async function ProductBody({ params }: PageProps) {
           })
         ).h1;
   const title = upGreek(h1);
+  /* «Milwaukee {model} {kind} – {code}»; each picture adds «– εικόνα N». */
+  const imageAlt = productImageAlt(productSeoInput(product, locale, await getGreekLexicon()));
   /* «Μέγεθος 43 · κωδικός …» for one size of a family — in the H1 and the
      JSON-LD as in the <title>. */
   const sizeCode = (size: string, code: string) => t("megethos_kodikos", { size, code });
@@ -568,7 +577,7 @@ async function ProductBody({ params }: PageProps) {
 
         {/* ═══ Gallery + buy box ═══ */}
         <div className="hdc-wrap hdc-pdp-top">
-          <HdcGallery images={product.images} alt={displayName(product.name, product.code2)} tags={galleryTags} />
+          <HdcGallery images={product.images} alt={imageAlt} tags={galleryTags} />
 
           <div className="hdc-pdp-buy">
             {platformText && <span className="hdc-slant hdc-pdp-tag hdc-pdp-tag--ink hdc-pdp-buytag">{platformText}</span>}
@@ -790,7 +799,7 @@ async function ProductBody({ params }: PageProps) {
                 {photo && (
                   <figure className="hdc-pdp-ph">
                     {/* eslint-disable-next-line @next/next/no-img-element -- CDN WebP; the optimiser is off */}
-                    <img src={photo} alt={displayName(product.name, product.code2)} loading="lazy" />
+                    <img src={photo} alt={t("eikona_alt", { alt: imageAlt, n: 2 })} loading="lazy" />
                     {product.modelRoot && <figcaption>{product.modelRoot}</figcaption>}
                   </figure>
                 )}

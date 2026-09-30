@@ -75,7 +75,8 @@
       "megethi": "{count, plural, one {# taglia} other {# taglie}}",
       "epilogi_megethous": "SCEGLI LA TAGLIA",
       "diathesimo_3_5": "Disponibile · 3–5 giorni lavorativi",
-      "teleftaio": "Ultimo pezzo"
+      "teleftaio": "Ultimo pezzo",
+      "eikona_alt": "{alt} – immagine 1"
     }
   },
   "plp": {
@@ -330,7 +331,8 @@
       "megethi_3_5": "DISPONIBILE · 3–5 GIORNI LAVORATIVI",
       "kodikoi": "Codici",
       "oles_oi_ekdoseis": "Tutte le versioni di {model}",
-      "nav_erotiseis": "Domande"
+      "nav_erotiseis": "Domande",
+      "eikona_alt": "{alt} – immagine {n}"
     }
   },
   "orders": {
@@ -639,7 +641,8 @@
       "aporrito": "Privacy",
       "cookies": "Cookie",
       "nomika": "Legale",
-      "schetika": "Chi siamo"
+      "schetika": "Chi siamo",
+      "katigories": "Categorie"
     },
     "SiteHeader": {
       "kyria_ploigisi": "Navigazione principale",
