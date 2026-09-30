@@ -137,6 +137,11 @@ describe("codes and models", () => {
     ]);
   });
 
+  it("never joins two lines or keywords into a model («m18» + «Milwaukee …»)", () => {
+    expect(modelMentions("φυσητήρας m18\n\nmilwaukee φυσητήρας\n\nm18 fblg3")).toEqual([{ root: "M18 FBLG3", full: null }]);
+    expect(modelMentions("Milwaukee M18 Milwaukee, M18 M18 FUEL")).toEqual([]);
+  });
+
   it("finds article numbers and EANs, not other numbers", () => {
     expect(codeMentions("Κωδικός 4933479859, 158 Nm, EAN 4058546294489, 2100 rpm")).toEqual(["4933479859", "4058546294489"]);
   });

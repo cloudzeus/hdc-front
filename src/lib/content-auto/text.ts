@@ -291,7 +291,10 @@ export function unsupportedNumbers(text: string, supported: Set<string>): string
 // ── Codes and models ────────────────────────────────────────────────────────
 
 /** Platform words that follow «M18» without being a model: «M18 FUEL», «M12 REDLITHIUM». */
-const NOT_A_MODEL = new Set(["FUEL", "REDLITHIUM", "HIGH", "FORGE", "ONE", "ONE-KEY", "PACKOUT", "SYSTEM", "BRUSHLESS", "PLATFORM", "BATTERY", "BATTERIES", "TM"]);
+const NOT_A_MODEL = new Set([
+  "FUEL", "REDLITHIUM", "HIGH", "FORGE", "ONE", "ONE-KEY", "PACKOUT", "SYSTEM", "BRUSHLESS", "PLATFORM", "BATTERY", "BATTERIES", "TM",
+  "MILWAUKEE", "REDLINK", "POWERSTATE", "M12", "M18", "MX", "MXF",
+]);
 
 const MODEL_MENTION = /\b(M12|M18|MXF)\s([A-Z][A-Z0-9]*)(?:-([A-Z0-9]{1,4}))?(?![A-Z0-9])/g;
 
@@ -299,12 +302,16 @@ export type ModelMention = { root: string; full: string | null };
 
 /** «M18 FPD3», «M18 FPD3-502X» in any text — Greek lookalike letters and «M18FPD3» included. */
 export function modelMentions(text: string): ModelMention[] {
-  const upper = normalizeModelText(text.toUpperCase().replace(/[™®]/g, ""));
   const out: ModelMention[] = [];
-  for (const m of upper.matchAll(MODEL_MENTION)) {
-    if (NOT_A_MODEL.has(m[2])) continue;
-    const root = `${m[1]} ${m[2]}`;
-    out.push({ root, full: m[3] ? `${root}-${m[3]}` : null });
+  // Line by line: `normalizeModelText` joins whitespace, and a keyword ending
+  // in «m18» must not become «M18 MILWAUKEE» with the next one.
+  for (const line of text.split(/\n+/)) {
+    const upper = normalizeModelText(line.toUpperCase().replace(/[™®]/g, ""));
+    for (const m of upper.matchAll(MODEL_MENTION)) {
+      if (NOT_A_MODEL.has(m[2])) continue;
+      const root = `${m[1]} ${m[2]}`;
+      out.push({ root, full: m[3] ? `${root}-${m[3]}` : null });
+    }
   }
   return out;
 }
