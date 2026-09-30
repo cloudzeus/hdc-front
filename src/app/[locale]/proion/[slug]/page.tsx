@@ -64,8 +64,9 @@ import {
   returnPolicy,
   shippingDetails,
 } from "@/lib/seo/product-schema";
-import { absoluteUrl, pageMeta } from "@/lib/seo/urls";
-import { sizeFamilyLd, sizedText } from "@/lib/seo/size-variant";
+import { absoluteUrl, pageMeta, siteOrigin } from "@/lib/seo/urls";
+import { clampDescription, sizeFamilyLd, sizedText, sizeTitleEl } from "@/lib/seo/size-variant";
+import { SHOP } from "@/config/shop";
 import { jsonLdHtml } from "@/lib/seo/json-ld";
 
 type PageProps = {
@@ -84,20 +85,37 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   /* A size of a family (boots, gloves, clothing) names its size and code in the
      title and the description — see src/lib/seo/size-variant.ts. */
   const sizes = await variantsOf(product);
-  const sizeCode = (size: string, code: string) => t("megethos_kodikos", { size, code });
-  const title = sizedText(baseTitle, sizes, sizeCode);
-  const currentSize = sizedText(null, sizes, sizeCode) ? sizes.find((s) => s.current) : undefined;
+  const currentSize = sizes.length > 1 ? sizes.find((s) => s.current) : undefined;
   const code = product.code2 || product.sku;
-  const description = currentSize
-    ? product.shortDescription
+
+  let title: string | { absolute: string } = baseTitle;
+  let shareTitle = baseTitle;
+  let description = product.shortDescription ?? t("meta_description", { name: baseTitle, code });
+  if (currentSize && locale === "el") {
+    /* Greek, the market that matters: «{name} Νο 43 · 4932498126», cut to
+       fit ~60 characters with size and code intact; description ≤ 155 and
+       led by size and code rather than the whole title again. */
+    const el = sizeTitleEl({ name: baseTitle, size: currentSize.label, code: currentSize.code, siteName: SHOP.name });
+    title = el.absolute ? { absolute: el.title } : el.title;
+    shareTitle = el.title;
+    const lead = t("megethos_kodikos", { size: currentSize.label, code: currentSize.code });
+    description = clampDescription(
+      product.shortDescription
+        ? `${lead}. ${product.shortDescription}`
+        : t("meta_description_megethos", { name: baseTitle, size: currentSize.label, code: currentSize.code }),
+    );
+  } else if (currentSize) {
+    const sizeCode = (size: string, c: string) => t("megethos_kodikos", { size, code: c });
+    title = shareTitle = sizedText(baseTitle, sizes, sizeCode);
+    description = product.shortDescription
       ? `${title}. ${product.shortDescription}`
-      : t("meta_description_megethos", { name: baseTitle, size: currentSize.label, code: currentSize.code || code })
-    : (product.shortDescription ?? t("meta_description", { name: baseTitle, code }));
+      : t("meta_description_megethos", { name: baseTitle, size: currentSize.label, code: currentSize.code });
+  }
   return {
     ...pageMeta({
       path: `/proion/${slug}`,
       locale,
-      title,
+      title: shareTitle,
       description,
       image: product.images[0]?.url,
     }),
@@ -239,6 +257,7 @@ async function ProductBody({ params }: PageProps) {
     sizes,
     url: (s) => absoluteUrl(`/proion/${s}`, locale),
     sizeCode,
+    origin: siteOrigin(),
     locale,
   });
   const tag = platformTag(product.erpName);
@@ -485,7 +504,7 @@ async function ProductBody({ params }: PageProps) {
             {platformText && <span className="hdc-slant hdc-pdp-tag hdc-pdp-tag--ink hdc-pdp-buytag">{platformText}</span>}
             <h1 className="hdc-disp hdc-pdp-h1">
               {title}
-              {sizePart && <span className="hdc-pdp-h1-size">{sizePart}</span>}
+              {sizePart && <> <span className="hdc-pdp-h1-size">{sizePart}</span></>}
             </h1>
 
             <div className="hdc-pdp-codes">

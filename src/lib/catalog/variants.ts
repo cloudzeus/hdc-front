@@ -18,6 +18,8 @@ export type VariantOption = {
   label: string;
   /** Ο κωδικός κατασκευαστή αυτού του μεγέθους. */
   code: string;
+  /** Μόνο ο κωδικός κατασκευαστή (κενό όταν το `code` είναι ο κωδικός ERP). */
+  code2?: string;
   inStock: boolean;
   /** Όχι δικό μας απόθεμα, αλλά το έχει ο προμηθευτής: «3–5 εργάσιμες». */
   supplierAvailable: boolean;
@@ -56,6 +58,7 @@ export const variantsOf = cache(
         slug: row.slug,
         label,
         code: row.code2 || row.code,
+        code2: row.code2,
         inStock,
         supplierAvailable: !inStock && row.supplierAvailable,
         family: row.sizes[0]?.family ?? null,
