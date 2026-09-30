@@ -24,6 +24,12 @@ export const CAPABILITIES = [
   "engagement", // newsletter, alerts, contact inbox, reviews
   "settings", // site config, shipping, payment, redirects
   "sync", // HDCtool delta status, reconcile
+  // Milwaukee tools served by HDCtool (/admin/milwaukee). Split three ways
+  // because the last one writes to SoftOne: reading, changing the XML-only
+  // products, and registering them in the ERP are different levels of trust.
+  "milwaukee.view", // overview, availability, XML-only products, official data
+  "milwaukee.edit", // names, categories, prices, content, activation, spec labels
+  "milwaukee.erp", // «Καταχώριση στο SoftOne»
   "users", // admin user management
 ] as const;
 
@@ -57,6 +63,18 @@ export const CAPABILITY_META: Record<Capability, { label: string; description: s
   engagement: { label: "Επικοινωνία", description: "Newsletter, Mailgun, μηνύματα πελατών" },
   settings: { label: "Ρυθμίσεις", description: "Ρυθμίσεις καταστήματος, κλειδιά πληρωμών και courier" },
   sync: { label: "Συγχρονισμός", description: "Κατάσταση συγχρονισμού με το HDCtool" },
+  "milwaukee.view": {
+    label: "Milwaukee · προβολή",
+    description: "Πρόοδος, διαθεσιμότητα, προϊόντα μόνο-XML και επίσημα στοιχεία από το HDCtool",
+  },
+  "milwaukee.edit": {
+    label: "Milwaukee · αλλαγές",
+    description: "Ονόματα, κατηγορίες, τιμές, περιεχόμενο, ενεργοποίηση, ετικέτες τεχνικών, ευρετήριο",
+  },
+  "milwaukee.erp": {
+    label: "Milwaukee · SoftOne",
+    description: "Καταχώριση προϊόντων μόνο-XML στο SoftOne — γράφει στο ERP",
+  },
   users: { label: "Χρήστες & ρόλοι", description: "Μόνο για διαχειριστές" },
 };
 
@@ -79,12 +97,27 @@ export function isCapability(value: string): value is Capability {
 }
 
 /**
+ * Capabilities that are useless without another one: the Milwaukee actions
+ * live on a page that `milwaukee.view` opens, so granting them alone would
+ * give a role buttons it can never reach.
+ */
+export const CAPABILITY_IMPLIES: Partial<Record<Capability, Capability>> = {
+  "milwaukee.edit": "milwaukee.view",
+  "milwaukee.erp": "milwaukee.view",
+};
+
+/**
  * Cleans a stored or submitted list: known capabilities only, no admin-only
- * ones, canonical order. ADMIN always gets everything regardless of input.
+ * ones, implied ones added, canonical order. ADMIN always gets everything
+ * regardless of input.
  */
 export function normaliseCapabilities(role: AdminRole, list: readonly string[]): Capability[] {
   if (role === "ADMIN") return [...CAPABILITIES];
   const wanted = new Set(list);
+  for (const c of list) {
+    const implied = isCapability(c) ? CAPABILITY_IMPLIES[c] : undefined;
+    if (implied) wanted.add(implied);
+  }
   return CAPABILITIES.filter((c) => wanted.has(c) && !ADMIN_ONLY_CAPABILITIES.includes(c));
 }
 

@@ -9,6 +9,7 @@ import type { RoleMatrixRow } from "@/lib/admin/roles";
 import {
   ADMIN_ONLY_CAPABILITIES,
   CAPABILITIES,
+  CAPABILITY_IMPLIES,
   CAPABILITY_META,
   DEFAULT_ROLE_CAPABILITIES,
   ROLE_META,
@@ -52,6 +53,12 @@ export function RoleMatrix({ rows }: { rows: RoleMatrixRow[] }) {
       const next = new Set(d[role]);
       if (on) next.add(capability);
       else next.delete(capability);
+      // Ίδιος κανόνας με το normaliseCapabilities: «αλλαγές»/«SoftOne» του
+      // Milwaukee χωρίς «προβολή» δεν ανοίγουν ποτέ τη σελίδα τους.
+      for (const [dependent, required] of Object.entries(CAPABILITY_IMPLIES) as Array<[Capability, Capability]>) {
+        if (on && capability === dependent) next.add(required);
+        if (!on && capability === required) next.delete(dependent);
+      }
       return { ...d, [role]: next };
     });
   }
