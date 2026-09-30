@@ -14,7 +14,6 @@ import type { Locale } from "@/i18n/routing";
 import { getMiniCart } from "@/lib/cart/cart";
 import {
   getCatalogueStats,
-  getCategoryChildren,
   getFeaturedProducts,
   getHomeCategorySources,
   getHomeNewArrivals,
@@ -92,10 +91,6 @@ export default async function HomePage({
   ]);
 
   const categoryCards = resolveHomeCategories(categorySources);
-  const batterySlug = categoryCards
-    .find((c) => c.key === "battery")
-    ?.href.match(/^\/katalogos\/([^/?]+)$/)?.[1];
-  const batteryGroups = batterySlug ? await getCategoryChildren(batterySlug) : [];
 
   /* The price the cart would charge, VAT included — campaigns applied. */
   const charged = async (product: ProductCardData | undefined) => {
@@ -127,7 +122,7 @@ export default async function HomePage({
         href: heroProduct ? `/proion/${heroProduct.slug}` : "/anazitisi?q=FPD3",
         label: t("deite_to"),
       },
-      secondary: { href: drillsHref(batteryGroups), label: t("ola_ta_drapana") },
+      secondary: { href: drillsHref(), label: t("ola_ta_drapana") },
     },
   ];
 
@@ -156,7 +151,7 @@ export default async function HomePage({
         <HomeCategories cards={categoryCards} />
         <Zone id="home.belowCategories" locale={locale} />
         <BestSellers products={bestSellers} />
-        <PackoutBand href="/anazitisi?q=PACKOUT" />
+        <PackoutBand href="/packout" />
         <Zone id="home.band" locale={locale} />
         <NewArrivalsBand products={newArrivals.products} />
         <StoreBand />

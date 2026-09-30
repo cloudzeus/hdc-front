@@ -6,6 +6,7 @@ import type { CategoryTile } from "@/lib/catalog/queries";
 import { upGreek } from "@/lib/greek";
 import { hoursMessageArgs } from "@/lib/contact/hours";
 import { resolveHdcNav } from "@/lib/hdc-nav";
+import { HUBS } from "@/lib/seo/hubs";
 
 /*
  * `prefetch={false}` on every link here: the footer is on every page, nobody
@@ -16,17 +17,16 @@ import { resolveHdcNav } from "@/lib/hdc-nav";
 const PAYMENTS = ["VISA", "MASTERCARD", "IRIS"] as const;
 
 /**
- * The platforms column. There are no platform pages yet (the platform filter
- * arrives with the new catalogue, Plan 3 Task 3), so each opens a search for
- * the platform's name — a real, non-empty page today.
+ * The platforms column: the platform hubs (/milwaukee-m12, …), then the two
+ * technologies, which have no page of their own and open a search.
  */
 const PLATFORMS = [
-  { label: "M12", q: "M12" },
-  { label: "M18", q: "M18" },
-  /* The ERP writes the platform as "MXF": a search for "MX FUEL" finds nothing. */
-  { label: "MX FUEL", q: "MXF" },
-  { label: "ONE-KEY™", q: "ONE-KEY" },
-  { label: "REDLITHIUM™", q: "REDLITHIUM" },
+  { label: "M12", href: HUBS.m12.path },
+  { label: "M18", href: HUBS.m18.path },
+  { label: "MX FUEL", href: HUBS["mx-fuel"].path },
+  { label: "PACKOUT", href: HUBS.packout.path },
+  { label: "ONE-KEY™", href: `/anazitisi?q=${encodeURIComponent("ONE-KEY")}` },
+  { label: "REDLITHIUM™", href: `/anazitisi?q=${encodeURIComponent("REDLITHIUM")}` },
 ] as const;
 
 /**
@@ -72,10 +72,7 @@ export function SiteFooter({ categories }: { categories: CategoryTile[] }) {
     },
     {
       title: t("platformes"),
-      links: PLATFORMS.map((p) => ({
-        href: `/anazitisi?q=${encodeURIComponent(p.q)}`,
-        label: p.label,
-      })),
+      links: PLATFORMS.map((p) => ({ href: p.href, label: p.label })),
     },
   ];
 

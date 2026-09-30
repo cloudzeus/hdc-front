@@ -99,6 +99,24 @@ async function manualRedirect(request: NextRequest): Promise<NextResponse | null
 }
 
 /**
+ * Σελίδες του νέου καταστήματος που μετακόμισαν οριστικά: 301, με το πρόθεμα
+ * γλώσσας και τις παραμέτρους του αιτήματος. Η σελίδα της μάρκας Milwaukee
+ * είναι πια η κεντρική σελίδα `/milwaukee` (σχέδιο 8, Task 8).
+ */
+const MOVED: Record<string, string> = {
+  "/brands/milwaukee": "/milwaukee",
+};
+
+function movedRedirect(request: NextRequest): NextResponse | null {
+  const match = /^(\/(?:en|it))?(\/.*?)\/*$/.exec(request.nextUrl.pathname);
+  const to = match ? MOVED[match[2].toLowerCase()] : undefined;
+  if (!match || !to) return null;
+  const url = onCanonicalHost(new URL(`${match[1] ?? ""}${to}`, request.nextUrl), request);
+  url.search = request.nextUrl.search;
+  return NextResponse.redirect(url, 301);
+}
+
+/**
  * Οι παλιές διευθύνσεις του milwaukeetoolshdc.gr (Magento) → οι νέες.
  *
  * Ο πίνακας (src/config/magento-redirects.json, από το
@@ -163,6 +181,9 @@ async function route(request: NextRequest & { auth: { user?: unknown } | null })
 
   const magento = await magentoRedirect(request);
   if (magento) return magento;
+
+  const moved = movedRedirect(request);
+  if (moved) return moved;
 
   const canonical = canonicalHostRedirect(request);
   if (canonical) return canonical;

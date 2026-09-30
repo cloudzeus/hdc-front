@@ -113,3 +113,13 @@ describe("proxy: manual redirects", () => {
     expect(res.headers.get("location")).toBe("https://milwaukeetoolshdc.gr/blog");
   });
 });
+
+describe("proxy: pages that moved", () => {
+  it("sends the Milwaukee brand page to the Milwaukee hub for good, keeping language and parameters", async () => {
+    const res = await get("/brands/milwaukee?utm_source=x");
+    expect(res.status).toBe(301);
+    expect(res.headers.get("location")).toBe("https://milwaukeetoolshdc.gr/milwaukee?utm_source=x");
+    const en = await get("/en/brands/milwaukee/");
+    expect(en.headers.get("location")).toBe("https://milwaukeetoolshdc.gr/en/milwaukee");
+  });
+});

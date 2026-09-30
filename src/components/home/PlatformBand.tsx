@@ -1,19 +1,19 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { HUBS } from "@/lib/seo/hubs";
 
 /**
  * "ΔΙΑΛΕΞΤΕ ΠΛΑΤΦΟΡΜΑ" (mockup `.plat`): the red band with the three battery
  * platforms — how a Milwaukee customer thinks ("I have M18 batteries").
  *
- * There is no platform filter in the catalogue yet (it arrives with the new
- * catalogue, Plan 3 Task 3), so each tile opens a search for the platform's
- * name, the same as the footer's platform links.
+ * Each tile opens the platform's hub (/milwaukee-m12, /milwaukee-m18,
+ * /mx-fuel): categories, models, batteries and the platform explained — the
+ * pages the platform searches should land on, linked from the home page.
  */
 const PLATFORMS = [
-  { key: "m12", mark: "M", rest: "12", q: "M12", label: "M12" },
-  { key: "m18", mark: "M", rest: "18", q: "M18", label: "M18" },
-  /* The ERP writes the platform as "MXF": a search for "MX FUEL" finds nothing. */
-  { key: "mx", mark: "MX", rest: "FUEL", q: "MXF", label: "MX FUEL" },
+  { key: "m12", mark: "M", rest: "12", href: HUBS.m12.path, label: "M12" },
+  { key: "m18", mark: "M", rest: "18", href: HUBS.m18.path, label: "M18" },
+  { key: "mx", mark: "MX", rest: "FUEL", href: HUBS["mx-fuel"].path, label: "MX FUEL" },
 ] as const;
 
 export async function PlatformBand() {
@@ -28,7 +28,7 @@ export async function PlatformBand() {
           {PLATFORMS.map((p) => (
             <Link
               key={p.key}
-              href={`/anazitisi?q=${encodeURIComponent(p.q)}`}
+              href={p.href}
               prefetch={false}
               className="hdc-plat-tile"
             >

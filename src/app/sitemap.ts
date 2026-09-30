@@ -1,6 +1,9 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 import { absoluteUrl, sitemapAlternates } from "@/lib/seo/urls";
+import { getAllModels } from "@/lib/catalog/models";
+import { modelPath } from "@/lib/milwaukee/model-slug";
+import { articlePath } from "@/lib/blog/post-page";
 
 /**
  * The sitemap.
@@ -29,7 +32,12 @@ const STATIC_PATHS: Array<{ path: string; priority: number; changeFrequency: Met
   { path: "/katalogos", priority: 0.9, changeFrequency: "daily" },
   { path: "/prosfores", priority: 0.8, changeFrequency: "daily" },
   { path: "/nees-afixeis", priority: 0.8, changeFrequency: "daily" },
-  { path: "/brands", priority: 0.7, changeFrequency: "weekly" },
+  { path: "/milwaukee", priority: 0.9, changeFrequency: "weekly" },
+  { path: "/milwaukee-m18", priority: 0.9, changeFrequency: "weekly" },
+  { path: "/milwaukee-m12", priority: 0.9, changeFrequency: "weekly" },
+  { path: "/mx-fuel", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/packout", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/odigoi", priority: 0.6, changeFrequency: "weekly" },
   { path: "/etaireia", priority: 0.5, changeFrequency: "monthly" },
   { path: "/epikoinonia", priority: 0.6, changeFrequency: "monthly" },
   { path: "/syxnes-erotiseis", priority: 0.5, changeFrequency: "monthly" },
@@ -50,7 +58,7 @@ export const dynamic = "force-dynamic";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
-  const [products, categories, brands] = await Promise.all([
+  const [products, categories, models, articles] = await Promise.all([
     prisma.product.findMany({
       where: { isActive: true },
       select: { slug: true, updatedAt: true },
@@ -63,17 +71,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       where: { productCount: { gt: 0 } },
       select: { slug: true, updatedAt: true },
     }),
-    prisma.brand.findMany({
-      where: { productCount: { gt: 0 } },
-      select: { slug: true, updatedAt: true },
+    // Model pages with at least two versions: one version is its own product page.
+    getAllModels().then((all) => all.filter((m) => m.versions >= 2)),
+    prisma.contentArticle.findMany({
+      where: { status: "PUBLISHED", publishedAt: { not: null } },
+      select: { kind: true, slug: true, updatedAt: true },
     }),
   ]);
 
   /*
-   * No blog posts. They are not a table here — the pages read them from
-   * HDCtool, whose endpoints do not exist yet (`src/lib/blog/contract.ts`).
-   * Listing `/blog` itself is right; inventing entries under it is not, and a
-   * sitemap full of 404s is worse than a short one.
+   * No brand pages: the store is Milwaukee only, and /brands/milwaukee is a
+   * 301 to the /milwaukee hub. Articles and guides only once published.
    */
 
   const entry = (
@@ -92,7 +100,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...STATIC_PATHS.map((s) => entry(s.path, now, s.priority, s.changeFrequency)),
     ...categories.map((c: { slug: string; updatedAt: Date }) => entry(`/katalogos/${c.slug}`, c.updatedAt, 0.7, "weekly" as const)),
-    ...brands.map((b: { slug: string; updatedAt: Date }) => entry(`/brands/${b.slug}`, b.updatedAt, 0.6, "weekly" as const)),
+    ...models.map((m) => entry(modelPath(m.root), new Date(m.lastUpdated), 0.7, "weekly" as const)),
+    ...articles.map((a) => entry(articlePath(a), a.updatedAt, 0.5, "monthly" as const)),
     ...products.map((p: { slug: string; updatedAt: Date }) => entry(`/proion/${p.slug}`, p.updatedAt, 0.6, "weekly" as const)),
   ];
 }

@@ -127,11 +127,10 @@ export function directionsUrl(contact: { street: string; postcode: string; city:
 }
 
 /**
- * "ALL M18 DRILLS": the drills group of the battery-tools category, narrowed
- * to M18 with the catalogue's own `q` filter; a search for M18 when the group
- * is not synced.
+ * "ALL M18 DRILLS": the M18 hub (/milwaukee-m18), whose first category is the
+ * drills group narrowed to M18 — a landing page for the platform rather than
+ * a search.
  */
-export function drillsHref(batteryGroups: Named[]): string {
-  const drills = batteryGroups.find((g) => has(g.name, "δραπαν", "drill"));
-  return drills ? `/katalogos/${drills.slug}?q=M18` : "/anazitisi?q=M18";
+export function drillsHref(): string {
+  return "/milwaukee-m18";
 }

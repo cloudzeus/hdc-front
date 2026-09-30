@@ -4,6 +4,7 @@ import { DEFAULT_VAT_RATE } from "@/lib/format";
 import { STOCK_HOLD_HOURS } from "@/lib/orders/hold";
 import { displayName } from "@/lib/milwaukee/display";
 import { parseModel } from "@/lib/milwaukee/model";
+import { modelPath } from "@/lib/milwaukee/model-slug";
 
 /**
  * llms.txt and llms-full.txt — what this site is, for something that reads
@@ -61,7 +62,6 @@ const HOURS_EL =
 
 export function llmsTxt(origin: string, options: { summaryEl?: string | null } = {}): string {
   const url = (path: string) => `${origin}${path}`;
-  const search = (q: string) => url(`/anazitisi?q=${encodeURIComponent(q)}`);
   const summary = greekSummary(options.summaryEl)
     .split(/(?<=[.;!;])\s+/)
     .map((line) => `> ${line}`)
@@ -78,7 +78,9 @@ ${summary}
 Ωράριο: ${HOURS_EL}
 Τιμές σε ευρώ, με ΦΠΑ ${DEFAULT_VAT_RATE}%.
 
+- [Εργαλεία Milwaukee](${url("/milwaukee")}): οι πλατφόρμες [M18](${url("/milwaukee-m18")}), [M12](${url("/milwaukee-m12")}), [MX FUEL](${url("/mx-fuel")}) και [PACKOUT](${url("/packout")}).
 - [Κατάλογος](${url("/katalogos")}): όλες οι κατηγορίες.
+- Κάθε μοντέλο έχει σελίδα με όλες τις εκδόσεις και τους κωδικούς του: ${url("/montelo/m18-fpd3")} για το M18 FPD3.
 - [Αναζήτηση](${url("/anazitisi")}?q={κωδικός}): με κωδικό Milwaukee (π.χ. 4933479859), μοντέλο (π.χ. M18 FPD3) ή EAN.
 - [Οδηγοί αγοράς](${url("/odigoi")}) και [Blog](${url("/blog")}).
 - [Όλα τα μοντέλα και οι κωδικοί](${url("/llms-full.txt")}).
@@ -101,10 +103,10 @@ Currency: EUR. Displayed prices include Greek VAT (${DEFAULT_VAT_RATE}%) and exc
 ## What the store carries
 
 - M18: the 18 V cordless platform — drills, impact drivers, grinders, saws,
-  batteries and chargers. [Browse M18](${search("M18")})
-- M12: the compact 12 V platform. [Browse M12](${search("M12")})
-- MX FUEL: cordless equipment for heavy construction. [Browse MX FUEL](${search("MXF")})
-- PACKOUT: the modular storage and transport system. [Browse PACKOUT](${search("PACKOUT")})
+  batteries and chargers. [M18](${url("/milwaukee-m18")})
+- M12: the compact 12 V platform. [M12](${url("/milwaukee-m12")})
+- MX FUEL: cordless equipment for heavy construction. [MX FUEL](${url("/mx-fuel")})
+- PACKOUT: the modular storage and transport system. [PACKOUT](${url("/packout")})
 - Accessories (bits, blades, discs, chucks) and hand tools.
 
 A cordless tool is sold "bare" (tool only, suffix -0, -0X or -0C) or as a kit
@@ -230,7 +232,7 @@ export function llmsFullTxt(origin: string, platforms: LlmsPlatform[]): string {
     if (!models.length) continue;
     lines.push(`## ${PLATFORM_LABEL[platform]} — ${models.length} models`, "");
     for (const model of models) {
-      lines.push(`### ${model.root} — ${model.name}`, "");
+      lines.push(`### ${model.root} — ${model.name}`, "", `All versions: ${origin}${modelPath(model.root)}`, "");
       for (const v of model.versions) {
         lines.push(`- ${v.code} · ${v.code2} · ${origin}/proion/${v.slug}`);
       }

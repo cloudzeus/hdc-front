@@ -15,6 +15,9 @@ const DETAIL_ROUTES = [
   "[locale]/katalogos/[kathgoria]",
   "[locale]/blog/[slug]",
   "[locale]/odigoi/[slug]",
+  "[locale]/montelo/[model]",
+  "[locale]/brands/[slug]",
+  "[locale]/prosfores/[slug]",
 ];
 
 describe("detail routes answer a real 404", () => {

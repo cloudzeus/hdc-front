@@ -70,15 +70,7 @@ describe("directionsUrl", () => {
 });
 
 describe("drillsHref", () => {
-  it("opens the drills group narrowed to M18", () => {
-    expect(
-      drillsHref([
-        { slug: "loipa", name: "ΛΟΙΠΑ ΜΗΧΑΝΗΜΑΤΑ ΜΠΑΤΑΡΙΑΣ" },
-        { slug: "drapana", name: "ΔΡΑΠΑΝΑ ΚΑΤΣΑΒΙΔΙΕΡΕΣ ΜΠΟΥΛΟΝΟΚΛΕΙΔΑ ΚΑΣΤΑΝΙΕΣ" },
-      ]),
-    ).toBe("/katalogos/drapana?q=M18");
-  });
-  it("searches for M18 when there is no drills group", () => {
-    expect(drillsHref([])).toBe("/anazitisi?q=M18");
+  it("lands on the M18 hub, not on a search", () => {
+    expect(drillsHref()).toBe("/milwaukee-m18");
   });
 });

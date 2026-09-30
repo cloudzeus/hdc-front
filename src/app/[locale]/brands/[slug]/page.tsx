@@ -6,6 +6,8 @@ import { faqJsonLd } from "@/lib/seo/product-faq";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
+import BrandSkeleton from "./skeleton";
 import { setRequestLocale } from "next-intl/server";
 import { SiteChrome } from "@/components/chrome/SiteChrome";
 import { SiteFooter } from "@/components/chrome/SiteFooter";
@@ -67,7 +69,26 @@ export async function generateMetadata({
   };
 }
 
-export default async function BrandPage({ params, searchParams }: PageProps) {
+export default async function BrandPage(props: PageProps) {
+  const { locale, slug } = await props.params;
+  setRequestLocale(locale);
+
+  /*
+   * Existence first, before any Suspense boundary, so an unknown brand answers
+   * a real 404 status rather than a streamed 200 marked noindex (a soft 404).
+   * That is why this route lives outside `(site)` and its loading.tsx, and
+   * shows its skeleton from here. `getBrandBySlug` is cached per request.
+   */
+  if (!(await getBrandBySlug(slug, locale))) notFound();
+
+  return (
+    <Suspense fallback={<BrandSkeleton />}>
+      <BrandBody {...props} />
+    </Suspense>
+  );
+}
+
+async function BrandBody({ params, searchParams }: PageProps) {
   const t = await getTranslations("brands.page");
   const { locale, slug } = await params;
   setRequestLocale(locale);

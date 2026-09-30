@@ -1,6 +1,8 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { cache, Suspense } from "react";
+import Loading from "../../(site)/loading";
 import { pageMeta } from "@/lib/seo/urls";
 import { SiteChrome } from "@/components/chrome/SiteChrome";
 import { SiteFooter } from "@/components/chrome/SiteFooter";
@@ -58,7 +60,8 @@ type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-const getOffer = async (slug: string) =>
+/* `cache()`: metadata, the existence check and the body ask for the same row. */
+const getOffer = cache(async (slug: string) =>
   prisma.offer.findUnique({
     where: { slug },
     select: {
@@ -77,7 +80,8 @@ const getOffer = async (slug: string) =>
       isActive: true,
       endsAt: true,
     },
-  });
+  }),
+);
 
 export async function generateMetadata({
   params,
@@ -96,10 +100,27 @@ export async function generateMetadata({
   };
 }
 
-export default async function OfferProductsPage({
-  params,
-  searchParams,
-}: PageProps) {
+export default async function OfferProductsPage(props: PageProps) {
+  const { locale, slug } = await props.params;
+  setRequestLocale(locale);
+
+  /*
+   * Existence first, before any Suspense boundary, so an unknown or ended
+   * campaign answers a real 404 status rather than a streamed 200 marked
+   * noindex (a soft 404). That is why this route lives outside `(site)` and
+   * its loading.tsx, and shows the generic skeleton from here.
+   */
+  const offer = await getOffer(slug);
+  if (!offer || !offer.isActive) notFound();
+
+  return (
+    <Suspense fallback={<Loading />}>
+      <OfferBody {...props} />
+    </Suspense>
+  );
+}
+
+async function OfferBody({ params, searchParams }: PageProps) {
   const t = await getTranslations("katalogos.page");
   const { locale, slug } = await params;
   setRequestLocale(locale);
