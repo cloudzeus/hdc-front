@@ -13,7 +13,7 @@
  * Client-safe: definitions only, no values, no I/O.
  */
 
-export type SettingGroup = "erp" | "payment" | "courier" | "shop";
+export type SettingGroup = "erp" | "payment" | "courier" | "shop" | "seo";
 
 export type SettingDef = {
   key: string;
@@ -23,7 +23,8 @@ export type SettingDef = {
   help?: string;
   /** Secrets are encrypted, never sent to the browser, and shown as ••••1234. */
   secret?: boolean;
-  kind: "text" | "number" | "select";
+  /** `textarea`: several sentences; a form without a textarea may show a text field. */
+  kind: "text" | "textarea" | "number" | "select";
   options?: ReadonlyArray<{ value: string; label: string }>;
   envVar: string;
   placeholder?: string;
@@ -47,6 +48,11 @@ export const SETTING_GROUPS: ReadonlyArray<{ id: SettingGroup; title: string; bl
     blurb: "ACS. Οι τιμές έρχονται ζωντανά από τον τιμοκατάλογό σας μέσω του HDCtool.",
   },
   { id: "shop", title: "Κατάστημα", blurb: "Όρια και κατώφλια του ταμείου." },
+  {
+    id: "seo",
+    title: "SEO & AI",
+    blurb: "Ό,τι διαβάζουν οι μηχανές αναζήτησης και τα μοντέλα AI για το κατάστημα. Μόνο ελληνικά.",
+  },
 ] as const;
 
 export const SETTINGS: ReadonlyArray<SettingDef> = [
@@ -178,6 +184,18 @@ export const SETTINGS: ReadonlyArray<SettingDef> = [
     help: "Σε ευρώ, χωρίς ΦΠΑ.",
     kind: "number",
     envVar: "FREE_SHIPPING_THRESHOLD_NET",
+  },
+
+  // ── SEO & AI ──
+  {
+    key: "llms.summary.el",
+    group: "seo",
+    label: "Σύνοψη για AI (llms.txt)",
+    help:
+      "Λίγες προτάσεις στα ελληνικά: ποιοι είστε, τι πουλάτε, πού. Μπαίνει πρώτη στο /llms.txt. " +
+      "Κενό = η αυτόματη σύνοψη. Χωρίς «αντιπρόσωπος» ή «επίσημος διανομέας».",
+    kind: "textarea",
+    envVar: "LLMS_SUMMARY_EL",
   },
 ] as const;
 

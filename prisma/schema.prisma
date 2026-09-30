@@ -1828,3 +1828,123 @@ model Favourite {
   @@index([customerId, createdAt])
   @@map("favourites")
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SEO & content (plan 8, Part Δ) — Greek only
+// ─────────────────────────────────────────────────────────────────────────────
+
+enum ContentKind {
+  /// A news/blog article, served at /blog/<slug>.
+  ARTICLE
+  /// A buying guide, served at /odigoi/<slug>.
+  GUIDE
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+}
+
+/// An article or buying guide, written in Greek (SEO targets the Greek market
+/// only — owner decision, 30/9/2026). The storefront reads only PUBLISHED
+/// rows; the drafts in docs/content/** are imported as DRAFT
+/// (scripts/content/import-content.ts).
+model ContentArticle {
+  id     String        @id @default(cuid())
+  kind   ContentKind
+  slug   String        @unique @db.VarChar(160)
+  status ContentStatus @default(DRAFT)
+
+  /// The H1.
+  title           String  @db.VarChar(300)
+  /// The <title>, ≤ 60 characters. Falls back to `title`.
+  seoTitle        String? @db.VarChar(200)
+  metaDescription String? @db.VarChar(400)
+  /// The 40–60-word direct answer that opens the article.
+  answer          String? @db.Text
+  /// Markdown.
+  body            String  @db.Text
+  /// [{ q, a }] — the «Συχνές ερωτήσεις» of the body, for FAQPage.
+  faq             Json    @default("[]")
+  /// string[] — search phrases the copy targets; not rendered.
+  keywords        Json    @default("[]")
+  /// string[] — named entities, for `about`/`mentions` in JSON-LD.
+  entities        Json    @default("[]")
+  /// string[] — the official pages every figure was taken from.
+  sources         Json    @default("[]")
+  heroImageUrl    String? @db.VarChar(1000)
+
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  /// Who last wrote the row: an admin's email, or `import:docs/content` for
+  /// the importer — which never overwrites a row somebody else has edited.
+  updatedBy   String    @db.VarChar(120)
+
+  @@index([kind, status, publishedAt])
+  @@map("content_articles")
+}
+
+enum SeoTargetType {
+  CATEGORY
+  PLATFORM
+  MODEL
+  PRODUCT
+  PAGE
+}
+
+/// Hand-written SEO copy over the generated one, per page. Every field is
+/// optional and an empty one means "the automatic text applies"
+/// (`seoFor()` in src/lib/seo/seo-for.ts), so a page is never left blank.
+model SeoOverride {
+  id         String        @id @default(cuid())
+  targetType SeoTargetType
+  /// Category slug, platform key (m18, m12, mx-fuel, packout, milwaukee),
+  /// model root ("M18 FPD3"), product slug or page path.
+  targetKey  String        @db.VarChar(200)
+
+  h1              String? @db.VarChar(300)
+  seoTitle        String? @db.VarChar(200)
+  metaDescription String? @db.VarChar(400)
+  intro           String? @db.Text
+  /// Markdown.
+  body            String? @db.Text
+  /// [{ q, a }]
+  faq             Json?
+  /// string[] — not rendered; for the editor and for GEO.
+  keywords        Json?
+  entities        Json?
+  sources         Json?
+  /// string[] — article slugs to link once they are published (hubs).
+  relatedArticles Json?
+  /// string[] — category slugs (category pages).
+  relatedCategories Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  updatedBy String   @db.VarChar(120)
+
+  @@unique([targetType, targetKey])
+  @@map("seo_overrides")
+}
+
+enum RedirectSource {
+  MANUAL
+}
+
+/// A 301 added by hand in the admin. Checked FIRST in the proxy, from an
+/// in-memory copy refreshed every 60 seconds (src/lib/seo/manual-redirects.ts)
+/// — never a query per request. The automatic Magento 301s stay in
+/// src/config/magento-redirects.json.
+model RedirectRule {
+  id        String         @id @default(cuid())
+  fromPath  String         @unique @db.VarChar(512)
+  toPath    String         @db.VarChar(512)
+  source    RedirectSource @default(MANUAL)
+  hits      Int            @default(0)
+  lastHitAt DateTime?
+  createdAt DateTime       @default(now())
+  createdBy String         @db.VarChar(120)
+
+  @@map("redirect_rules")
+}

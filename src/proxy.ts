@@ -10,6 +10,7 @@ import {
   isMagentoCandidate,
   type MagentoTable,
 } from "@/lib/seo/magento-redirects";
+import { createManualRedirectCache } from "@/lib/seo/manual-redirects";
 
 // Edge-safe: authConfig carries no providers and no database access.
 const { auth } = NextAuth(authConfig);
@@ -56,6 +57,48 @@ function canonicalHostRedirect(request: NextRequest): NextResponse | null {
 }
 
 /**
+ * Όταν το αίτημα ήρθε στο `www.`, η ανακατεύθυνση πηγαίνει κατευθείαν στο
+ * κανονικό host: ένα βήμα, όχι δύο.
+ */
+function onCanonicalHost(url: URL, request: NextRequest): URL {
+  const host = request.headers.get("host");
+  if (CANONICAL_HOST && host && isAliasHost(host, CANONICAL_HOST)) {
+    url.host = CANONICAL_HOST;
+    url.protocol = "https:";
+    url.port = "";
+  }
+  return url;
+}
+
+/**
+ * Οι χειροκίνητες 301 του διαχειριστικού (`RedirectRule`) — ΠΡΩΤΕΣ, πριν από
+ * τον πίνακα του Magento, ώστε ένας άνθρωπος να μπορεί πάντα να διορθώσει μια
+ * αυτόματη αντιστοίχιση.
+ *
+ * Από τη μνήμη, όχι από τη βάση ανά αίτημα: οι κανόνες φορτώνονται μία φορά
+ * και ανανεώνονται στο παρασκήνιο όταν περάσει ένα λεπτό
+ * (src/lib/seo/manual-redirects.ts). Το Prisma φορτώνεται τεμπέλικα, την πρώτη
+ * φορά που χρειάζεται. Οι παράμετροι του αιτήματος (utm_*, gclid) μένουν.
+ */
+const manualRules = createManualRedirectCache({
+  load: async () => (await import("@/lib/seo/manual-redirects-db")).loadManualRules(),
+});
+
+async function manualRedirect(request: NextRequest): Promise<NextResponse | null> {
+  const { pathname, searchParams } = request.nextUrl;
+  if (pathname.startsWith("/admin")) return null;
+  const hit = (await manualRules())(pathname);
+  if (!hit) return null;
+  void import("@/lib/seo/manual-redirects-db").then((db) => db.recordManualHit(hit.id));
+
+  const url = onCanonicalHost(new URL(hit.to, request.nextUrl), request);
+  for (const [key, value] of searchParams) {
+    if (!url.searchParams.has(key)) url.searchParams.append(key, value);
+  }
+  return NextResponse.redirect(url, 301);
+}
+
+/**
  * Οι παλιές διευθύνσεις του milwaukeetoolshdc.gr (Magento) → οι νέες.
  *
  * Ο πίνακας (src/config/magento-redirects.json, από το
@@ -84,13 +127,7 @@ async function magentoRedirect(request: NextRequest): Promise<NextResponse | nul
   const hit = (await magentoResolver)(pathname, search);
   if (!hit) return null;
 
-  const url = new URL(hit.to, request.nextUrl);
-  const host = request.headers.get("host");
-  if (CANONICAL_HOST && host && isAliasHost(host, CANONICAL_HOST)) {
-    url.host = CANONICAL_HOST;
-    url.protocol = "https:";
-    url.port = "";
-  }
+  const url = onCanonicalHost(new URL(hit.to, request.nextUrl), request);
   for (const [key, value] of searchParams) {
     if (hit.kind === "search" && MAGENTO_SEARCH_PARAMS.has(key)) continue;
     if (!url.searchParams.has(key)) url.searchParams.append(key, value);
@@ -119,7 +156,11 @@ export default auth(async (request) => {
 async function route(request: NextRequest & { auth: { user?: unknown } | null }): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
 
-  // Before the host fold, so an old URL on www. is one hop, not two.
+  // Before the host fold, so an old URL on www. is one hop, not two. The
+  // manual rules first: a person can always correct an automatic mapping.
+  const manual = await manualRedirect(request);
+  if (manual) return manual;
+
   const magento = await magentoRedirect(request);
   if (magento) return magento;
 
