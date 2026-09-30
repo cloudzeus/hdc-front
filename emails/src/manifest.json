@@ -55,10 +55,6 @@
       "subject": "Λάβαμε το αίτημά σας για λογαριασμό B2B",
       "preheader": "Έλεγχος στοιχείων εντός 1–2 εργάσιμων ημερών.",
       "trigger": "Υποβολή φόρμας B2B (μετά τον έλεγχο ΑΦΜ)" },
-    "account-b2b-approved": { "category": "account", "footer": "transactional", "name": "Λογαριασμός B2B — εγκρίθηκε",
-      "subject": "Ο λογαριασμός B2B εγκρίθηκε — τιμές συνεργάτη ενεργές",
-      "preheader": "Συνδεθείτε για να δείτε τις τιμές σας.",
-      "trigger": "Έγκριση από διαχειριστή (ERP → e-shop)" },
 
     "order-confirmation": { "category": "orders", "footer": "transactional", "name": "Επιβεβαίωση παραγγελίας",
       "subject": "Παραγγελία {{order.number}} — ελήφθη",
