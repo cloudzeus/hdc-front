@@ -79,7 +79,16 @@ export async function generateMetadata(): Promise<Metadata> {
      * which also covers the few pages that do. Switched on with SITE_INDEXING=on
      * — see src/lib/seo/indexing.ts.
      */
-    ...(indexingAllowed() ? {} : { robots: { index: false, follow: false } }),
+    /*
+     * And once live, the en/it pages stay out of the index too (`noindex,
+     * follow`): SEO is Greek only (owner decision, 30/9/2026); they exist for
+     * visitors who switch language.
+     */
+    ...(indexingAllowed()
+      ? locale === "el"
+        ? {}
+        : { robots: { index: false, follow: true } }
+      : { robots: { index: false, follow: false } }),
     title: {
       default: t("titlos_site"),
       template: `%s | ${SHOP.name}`,

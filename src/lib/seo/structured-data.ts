@@ -96,7 +96,8 @@ export function siteJsonLd(locale: Locale) {
         url: absoluteUrl("/", locale),
         name: SHOP.name,
         publisher: { "@id": `${origin}/#shop` },
-        inLanguage: locale,
+        // The site is for the Greek market: SEO is Greek only (owner decision, 30/9/2026).
+        inLanguage: "el-GR",
         potentialAction: {
           "@type": "SearchAction",
           target: {

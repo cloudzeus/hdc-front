@@ -181,3 +181,11 @@ describe("groupModels", () => {
     expect(grouped.flatMap((p) => p.models)).toHaveLength(3);
   });
 });
+
+describe("llmsFullTxt: Greek first", () => {
+  it("opens with a Greek summary before the English one", () => {
+    const body = llmsFullTxt(ORIGIN, []);
+    expect(body.indexOf("> Όλα τα μοντέλα")).toBeGreaterThan(0);
+    expect(body.indexOf("> Όλα τα μοντέλα")).toBeLessThan(body.indexOf("> Every Milwaukee"));
+  });
+});

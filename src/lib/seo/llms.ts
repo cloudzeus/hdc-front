@@ -222,6 +222,10 @@ export function llmsFullTxt(origin: string, platforms: LlmsPlatform[]): string {
   const lines: string[] = [
     `# ${SHOP.name} — Milwaukee models and article numbers`,
     "",
+    `> Όλα τα μοντέλα Milwaukee ${listed} του ${SHOP.name} (${SHOP.contact.city}),`,
+    "> με τον κωδικό Milwaukee κάθε έκδοσης και τη σελίδα της. Κάθε μοντέλο έχει",
+    "> και σελίδα με όλες τις εκδόσεις του (γυμνό εργαλείο και κιτ).",
+    "",
     `> Every Milwaukee ${listed} model listed by ${SHOP.name}`,
     `> (${SHOP.contact.city}, Greece), with each version's Milwaukee article number`,
     "> and its product page. Store details: " + `${origin}/llms.txt`,

@@ -168,6 +168,12 @@ export default auth(async (request) => {
    * Read per request, so going live is a restart with SITE_INDEXING=on.
    */
   if (!indexingAllowed()) response.headers.set("X-Robots-Tag", NOINDEX_HEADER);
+  /*
+   * Live, the English and Italian pages are for visitors who switch language,
+   * not for search (SEO is Greek only): followed, never indexed — said in the
+   * header too, so a page that forgets its <meta> is still covered.
+   */
+  else if (/^\/(en|it)(\/|$)/.test(request.nextUrl.pathname)) response.headers.set("X-Robots-Tag", "noindex, follow");
   return response;
 });
 

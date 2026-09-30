@@ -142,21 +142,20 @@ export function absoluteUrl(
 }
 
 /**
- * The `alternates` block for Next's metadata.
+ * The `alternates` block for Next's metadata: the page's own address only.
  *
- * `canonical` is this language's own address, not the Greek one: each
- * translation is a page in its own right and should rank in its own market.
- * `x-default` points at Greek, which is what a visitor with no matching
- * language should be given.
+ * SEO, GEO and AEO target the Greek market only (owner decision, 30/9/2026).
+ * So a Greek page declares itself and nothing else — no hreflang pointing at
+ * /en or /it — and an en/it page, which exists for visitors who switch
+ * language, is its own canonical and `noindex, follow` (see `pageMeta`).
  */
 export function alternatesFor(path: string, locale: Locale) {
-  const languages: Record<string, string> = {};
-  for (const other of routing.locales) {
-    languages[other] = absoluteUrl(path, other);
-  }
-  languages["x-default"] = absoluteUrl(path, routing.defaultLocale);
+  return { canonical: absoluteUrl(path, locale) };
+}
 
-  return { canonical: absoluteUrl(path, locale), languages };
+/** en/it pages: for visitors, not for search. */
+export function localeRobots(locale: Locale) {
+  return locale === routing.defaultLocale ? {} : { robots: { index: false, follow: true } };
 }
 
 /**
@@ -207,6 +206,7 @@ export function pageMeta(input: {
   const image = input.image ?? absoluteUrl("/opengraph-image", input.locale);
   return {
     alternates: alternatesFor(input.path, input.locale),
+    ...localeRobots(input.locale),
     openGraph: {
       type: input.type ?? "website",
       siteName: SHOP.name,
@@ -228,11 +228,4 @@ export function pageMeta(input: {
       images: [image],
     },
   };
-}
-
-/** The same thing shaped for a sitemap entry, which wants no `x-default`. */
-export function sitemapAlternates(path: string): Record<string, string> {
-  return Object.fromEntries(
-    routing.locales.map((locale) => [locale, absoluteUrl(path, locale)]),
-  );
 }

@@ -123,3 +123,17 @@ describe("proxy: pages that moved", () => {
     expect(en.headers.get("location")).toBe("https://milwaukeetoolshdc.gr/en/milwaukee");
   });
 });
+
+describe("proxy: Greek-only indexing once live", () => {
+  it("marks /en and /it pages noindex, follow in the header; Greek pages get none", async () => {
+    vi.stubEnv("SITE_INDEXING", "on");
+    try {
+      expect((await get("/en/katalogos")).headers.get("x-robots-tag")).toBe("noindex, follow");
+      expect((await get("/it")).headers.get("x-robots-tag")).toBe("noindex, follow");
+      expect((await get("/katalogos")).headers.get("x-robots-tag")).toBeNull();
+    } finally {
+      vi.unstubAllEnvs();
+      vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://milwaukeetoolshdc.gr");
+    }
+  });
+});
