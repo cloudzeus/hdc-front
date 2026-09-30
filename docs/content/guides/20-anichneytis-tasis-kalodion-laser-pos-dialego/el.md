@@ -72,6 +72,8 @@ internalLinks:
     anchor: "πολύμετρο 2217-40"
   - href: "/proion/aberotsibida-600a-2235-40-4933427315-4933427315"
     anchor: "αμπεροτσιμπίδα 2235-40"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/anichneytis-tasis-kalodion-laser-pos-dialego/hero.webp"
+heroImageAlt: "Ανιχνευτής τάσης χωρίς επαφή Milwaukee 2225-20"
 ---
 
 **Σύντομη απάντηση:** «Ανιχνευτής» σημαίνει τρία διαφορετικά όργανα. Για να δεις γρήγορα αν ένα καλώδιο έχει ρεύμα, ανιχνευτής τάσης χωρίς επαφή, με κατηγορία CAT κατάλληλη για την εγκατάσταση. Για να βρεις καλώδια, σωλήνες και σκελετούς πριν τρυπήσεις, ανιχνευτής τοίχου. Για να βρεις τη δέσμη ενός laser στον ήλιο, δέκτης laser συμβατός με το laser σου.
@@ -129,6 +131,10 @@ internalLinks:
 - **Ανιχνευτής τάσης:** ο [2225-20](/proion/anichneytis-tasis-2225-20-4932498859-4932498859) ανιχνεύει τάση 12–1.000 V AC χωρίς επαφή, με κατηγορία CAT IV 1000 V, κόκκινη λυχνία και ηχητική ένδειξη. Έχει επιπλέον θερμόμετρο υπερύθρων από -30 έως 250 °C και προστασία IP54.
 - **Δέκτης laser:** ο [RD300G](/proion/anichneytis-desmis-laser-rd300g-4932493198-4932493198) δουλεύει έως 300 m με το περιστροφικό M18 RLOHVG300, έχει 5 βαθμίδες ακρίβειας από 0,5 έως 10 mm, οθόνη μπροστά και πίσω, IP67, αντοχή σε πτώση 2 m και τηλεχειρισμό του laser.
 - **Μετρήσεις:** το [πολύμετρο 2217-40](/proion/polymetro-2217-40-4933416976-4933416976) και η [αμπεροτσιμπίδα 2235-40](/proion/aberotsibida-600a-2235-40-4933427315-4933427315).
+
+![Αμπεροτσιμπίδα Milwaukee 2235-40](https://kolleris.b-cdn.net/papatheo/4933427315/primary-0-1751214520831.webp)
+
+![Δέκτης δέσμης laser Milwaukee RD300G](https://kolleris.b-cdn.net/papatheo/4932493198/primary-0-1751222897067.webp)
 
 Δες τους [ελεγκτές τάσης](/katalogos/elegktes-tasis-fasis-magnittikoi-aisthitires), τα [πολύμετρα και αμπεροτσιμπίδες](/katalogos/polymetra-aberotsibides), τα [όργανα μέτρησης ηλεκτρολόγου](/katalogos/organa-metrisis-ilektrologou-diktyon), τα [laser και δέκτες laser](/katalogos/grammika-peristrofika-laser-dektes-laser) και τα [ενδοσκόπια](/katalogos/endoskopia-strofometra) για επιθεώρηση μέσα σε τοίχους και σωλήνες.
 

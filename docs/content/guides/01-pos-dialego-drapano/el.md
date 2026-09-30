@@ -77,6 +77,8 @@ internalLinks:
     anchor: "M12 FPD2-202X"
   - href: "/proion/pistoleto-per-ko-skaptiko-m18-onefhpx-552x-4933478496-4933478496"
     anchor: "M18 ONEFHPX-552X"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/pos-dialego-drapano/hero.webp"
+heroImageAlt: "Τεχνίτης ανοίγει τρύπα σε σοβατισμένο τοίχο με δράπανο μπαταρίας, με σκόνη στο φως του παραθύρου"
 ---
 
 **Σύντομη απάντηση:** Διάλεξε δράπανο με βάση το υλικό που τρυπάς. Για ξύλο, μέταλλο και βίδες αρκεί ένα δραπανοκατσάβιδο. Για τούβλο και περιστασιακές μικρές τρύπες σε τοιχοποιία πάρε κρουστικό δραπανοκατσάβιδο. Για μπετό, συχνές τρύπες και βύσματα χρειάζεσαι περιστροφικό πιστολέτο SDS-Plus. Μετά κοίτα ροπή, τσοκ, βάρος και πλατφόρμα μπαταρίας.
@@ -139,6 +141,10 @@ internalLinks:
 - **Ελαφρύ δραπανοκατσάβιδο για έπιπλα, πίνακες και σκάλα:** M12. Το [M12 FPD2-202X](/proion/kroustiko-drapanokatsavido-m12-fpd2-202x-4933479868-4933479868) δίνει κατά τη Milwaukee 45 Nm και τρυπά έως 13 mm σε τοιχοποιία.
 - **Δράπανο για μεγάλες διαμέτρους και βαριά χρήση:** M18. Το [M18 FPD3-502X](/proion/kroustiko-drapanokatsavido-m18fpd3-502x-fuel-4933479860-4933479860) δίνει 158 Nm και τρυπά έως 89 mm σε ξύλο και 16 mm σε ατσάλι και τοιχοποιία, σύμφωνα με τη Milwaukee.
 - **Μπετό κάθε μέρα:** πιστολέτο SDS-Plus M18. Στο [M18 ONEFHPX-552X](/proion/pistoleto-per-ko-skaptiko-m18-onefhpx-552x-4933478496-4933478496) η Milwaukee δίνει 5,0 J και έως 32 mm σε μπετό.
+
+![Κρουστικό δραπανοκατσάβιδο Milwaukee M12 FPD2 με μπαταρία M12](https://kolleris.b-cdn.net/papatheo/4933479868/primary-0-1751220000587.webp)
+
+![Πιστολέτο SDS-Plus Milwaukee M18 ONEFHPX με ONE-KEY και μπαταρία](https://kolleris.b-cdn.net/papatheo/4933478496/primary-0-1751219080013.webp)
 
 Δες όλα τα [δραπανοκατσάβιδα και κατσαβιδιέρες](/katalogos/katsavidieres), τα [κρουστικά δραπανοκατσάβιδα μπαταρίας](/katalogos/kroustika-drapana-2), τα [πιστολέτα μπαταρίας](/katalogos/peristrofika-skaptika-pistoleta), τα [γωνιακά δράπανα](/katalogos/goniaka-drapana) και τα [δράπανα και μπουλονόκλειδα ρεύματος](/katalogos/drapana-katsavidieres-boulonokleida). Αν θέλεις και βίδωμα, τα [σετ με κρουστικό δραπανοκατσάβιδο και παλμικό](/katalogos/set-me-kroustiko-drapanokatsavido-kai-palmiko) έρχονται με κοινές μπαταρίες και φορτιστή.
 

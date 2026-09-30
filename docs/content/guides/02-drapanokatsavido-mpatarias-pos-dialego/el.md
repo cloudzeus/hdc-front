@@ -73,6 +73,8 @@ internalLinks:
     anchor: "M12 FPD2-202X"
   - href: "/katalogos/mytes-vidomatos-magnitikoi-antaptores"
     anchor: "μύτες βιδώματος"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/drapanokatsavido-mpatarias-pos-dialego/hero.webp"
+heroImageAlt: "Κρουστικό δραπανοκατσάβιδο Milwaukee M12 FPD2 με μπαταρία 6,0 Ah"
 ---
 
 **Σύντομη απάντηση:** Για να διαλέξεις δραπανοκατσάβιδο μπαταρίας, ξεκίνα από την πλατφόρμα: 12V για ελαφριά δουλειά και στενά σημεία, 18V για ισχύ. Μετά κοίτα τη ροπή σε Nm, το μεταλλικό τσοκ 13 mm, τις θέσεις του συμπλέκτη και τον κινητήρα brushless. Αν τρυπάς και τοίχους, πάρε κρουστικό. Για πρώτο εργαλείο, κιτ με δύο μπαταρίες.
@@ -145,6 +147,8 @@ internalLinks:
 
 - **[M12 FPD2-202X](/proion/kroustiko-drapanokatsavido-m12-fpd2-202x-4933479868-4933479868):** κρουστικό δραπανοκατσάβιδο M12 FUEL με 45 Nm, μεταλλικό τσοκ 13 mm και μήκος 152 mm. Ταιριάζει σε ηλεκτρολόγους, υδραυλικούς, ψυκτικούς και συναρμολόγηση.
 - **[M18 FPD3-502X](/proion/kroustiko-drapanokatsavido-m18fpd3-502x-fuel-4933479860-4933479860):** κρουστικό δραπανοκατσάβιδο M18 FUEL με 158 Nm, μεταλλικό τσοκ 13 mm και μήκος 175 mm. Κατά τη Milwaukee το κιτ -502X περιλαμβάνει δύο μπαταρίες 5,0 Ah, φορτιστή και βαλίτσα HD Box.
+
+![Κρουστικό δραπανοκατσάβιδο Milwaukee M18 FPD3 με μπαταρία REDLITHIUM 5,0 Ah](https://kolleris.b-cdn.net/papatheo/4933479860/primary-0-1751220334522.webp)
 
 Στον κωδικό των εργαλείων Milwaukee, οι εκδόσεις που τελειώνουν σε -0 είναι το σκέτο εργαλείο. Δες όλα τα [κρουστικά δραπανοκατσάβιδα μπαταρίας](/katalogos/kroustika-drapana-2) και τις [κατσαβιδιέρες και δραπανοκατσάβιδα](/katalogos/katsavidieres). Για αρχή με πολλά εργαλεία υπάρχουν τα [σετ εργαλείων M12](/katalogos/set-combo-ergaleion-12v) και τα [σετ εργαλείων M18](/katalogos/set-combo-ergaleion-18v), ενώ ξεχωριστές [μπαταρίες](/katalogos/bataries-2) θα βρεις στα εξαρτήματα.
 

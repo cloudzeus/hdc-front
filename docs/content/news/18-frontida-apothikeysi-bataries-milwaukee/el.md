@@ -68,6 +68,8 @@ internalLinks:
     anchor: "M18 HB5.5 HIGH OUTPUT"
   - href: "/katalogos/ergaleiothikes-skafakia-koutia-apothikeysis"
     anchor: "εργαλειοθήκες"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/frontida-apothikeysi-bataries-milwaukee/hero.webp"
+heroImageAlt: "Μπαταρίες εργαλείων τακτοποιημένες σε ξύλινο ράφι αποθήκης, δίπλα σε φορτιστή με αναμμένη ένδειξη"
 ---
 
 **Σύντομη απάντηση:** Φυλάτε τις μπαταρίες Milwaukee σε ξηρό μέρος, σε θερμοκρασία δωματίου και πάντως κάτω από τους 50 °C, μακριά από σώματα θέρμανσης και ήλιο. Τις φορτίζετε μόνο με φορτιστή Milwaukee της πλατφόρμας τους, κρατάτε τους πόλους μακριά από μεταλλικά αντικείμενα και σταματάτε αμέσως μια μπαταρία που μυρίζει, ζεσταίνεται ή παραμορφώνεται. Οι παλιές μπαταρίες πάνε για ανακύκλωση, όχι στα σκουπίδια.
@@ -101,7 +103,11 @@ internalLinks:
 - **Αν η μπαταρία είναι καυτή, αφήστε τη να κρυώσει.** Τα ηλεκτρονικά REDLINK PLUS σβήνουν την μπαταρία όταν υπερθερμανθεί, για να την προστατέψουν· μόλις κρυώσει, δουλεύει ξανά.
 - **Διαλέξτε φορτιστή με βάση τη χωρητικότητα.** Κατά τη Milwaukee, η M18 HB5 θέλει 39 λεπτά στον [Super Charger M18 DBSC](/proion/super-fortistis-m18-dbsc-diplis-thyras-4932492531-4932492531), 59 λεπτά στον M12-18 FC και 100 λεπτά στον M12-18 C. Η [M18 FB12 FORGE](/proion/bataria-forge-m18fb12-12-0ah-4932492651-4932492651) φτάνει στο 80% σε 35 λεπτά στον DBSC.
 
+![Διπλός Super Charger Milwaukee M18 DBSC](https://kolleris.b-cdn.net/papatheo/4932492531/primary-0-1751222758655.webp)
+
 Αν φορτίζετε πολλές μπαταρίες κάθε βράδυ, ένας πολυφορτιστής ή ο [φορτιστής PACKOUT 6 θέσεων](/proion/fortistis-6-thyron-packout-m18-4932480162-4932480162) γλιτώνει την εναλλαγή. Όλοι οι φορτιστές είναι στους [φορτιστές](/katalogos/fortistes).
+
+![Φορτιστής 6 θέσεων Milwaukee M18 PACKOUT](https://kolleris.b-cdn.net/papatheo/4932480162/primary-0-1751219979824.webp)
 
 ## Τι να αποφεύγετε;
 
@@ -131,6 +137,8 @@ internalLinks:
 - Εναλλάσσετε τις μπαταρίες, ώστε να μη δουλεύει μόνο μία κάθε μέρα.
 - Κρατάτε τις επαφές καθαρές από σκόνη μπετού και γράσα.
 - Για βαριά εργαλεία προτιμήστε HIGH OUTPUT ή FORGE, όπως η [M18 HB5.5](/proion/bataria-li-on-m18-hb5-5-5-5-ah-4932464712-4932464712): κατά τη Milwaukee οι HIGH OUTPUT δουλεύουν έως 50% πιο δροσερές υπό φορτίο.
+
+![Μπαταρία Milwaukee M18 REDLITHIUM HIGH OUTPUT 5,5 Ah](https://kolleris.b-cdn.net/papatheo/4932464712/primary-0-1751216062846.webp)
 
 Όλες τις μπαταρίες θα τις βρείτε στις [μπαταρίες Milwaukee](/katalogos/bataries-2).
 

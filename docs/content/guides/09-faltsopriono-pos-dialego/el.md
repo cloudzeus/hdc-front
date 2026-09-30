@@ -65,6 +65,8 @@ internalLinks:
     anchor: "M18 FMS305-121"
   - href: "/proion/syromeno-faltsopriono-xylou-m18-sms216-0-fuel-4933471057-4933471057"
     anchor: "M18 SMS216-0"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/faltsopriono-pos-dialego/hero.webp"
+heroImageAlt: "Συρόμενο φαλτσοπρίονο 305 mm Milwaukee M18 FMS305"
 ---
 
 **Σύντομη απάντηση:** Για να διαλέξεις φαλτσοπρίονο, ξεκίνα από το πλάτος των κομματιών σου. Για πήχεις, σοβατεπί και κουφώματα αρκεί απλό φαλτσοπρίονο με δίσκο 216–254 mm. Για σανίδες deck, ράφια και φαρδιά προφίλ πάρε συρόμενο. Αν κόβεις κορνίζες και γείσα, προτίμησε διπλή κλίση. Κοίτα ακρίβεια γωνιών, οδηγό, φωτισμό γραμμής κοπής και δίσκο.
@@ -127,6 +129,8 @@ internalLinks:
 - **254 mm:** το [M18 FMS254-0](/proion/faltsopriono-xylou-m18-fms254-0-fuel-4933451729-4933451729) κόβει έως 430 κομμάτια σανίδας deck 26 × 142 mm με μπαταρία 12,0 Ah. Έχει μεγάλους συρόμενους οδηγούς, γρήγορη ρύθμιση κλίσης με σταθερά σημεία αριστερά και δεξιά, και stop βάθους για εγκοπές.
 - **305 mm:** το [M18 FMS305-121](/proion/syrom-falts-ono-xylou-m18-fms305-121-fuel-4933471122-4933471122) κόβει έως 500 κομμάτια σοβατεπί πεύκου 78 mm με μία φόρτιση 12,0 Ah, έχει φωτισμό LED στη γραμμή κοπής και ONE-KEY για εντοπισμό και απογραφή.
 - **Compact συρόμενο:** το [M18 SMS216-0](/proion/syromeno-faltsopriono-xylou-m18-sms216-0-fuel-4933471057-4933471057), για ελαφριά και φορητή δουλειά.
+
+![Compact συρόμενο φαλτσοπρίονο Milwaukee M18 SMS216](https://kolleris.b-cdn.net/papatheo/4933471057/primary-0-1751222556787.webp)
 
 Δες τα [φαλτσοπρίονα ξύλου και αλουμινίου](/katalogos/stathera-diskopriona-faltsopriona-xylou-aloumin), όλα τα [σταθερά μηχανήματα μπαταρίας](/katalogos/stathera-michanimata-2) και τους [δίσκους](/katalogos/diskoi) στα εξαρτήματα.
 

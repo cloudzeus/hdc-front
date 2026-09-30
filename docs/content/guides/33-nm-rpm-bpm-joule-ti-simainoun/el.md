@@ -71,6 +71,8 @@ internalLinks:
     anchor: "τριβεία"
   - href: "/katalogos/ergaleia-batarias"
     anchor: "εργαλεία μπαταρίας"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/nm-rpm-bpm-joule-ti-simainoun/hero.webp"
+heroImageAlt: "Τεχνίτης βιδώνει μακριά βίδα σε ξύλινο δοκάρι στέγης με παλμικό κατσαβίδι μπαταρίας"
 ---
 
 **Σύντομη απάντηση:** Τα Nm είναι η ροπή, δηλαδή η δύναμη περιστροφής. Τα rpm είναι οι στροφές ανά λεπτό. Τα bpm είναι κρούσεις ανά λεπτό προς τα εμπρός, σε κρουστικά δράπανα και πιστολέτα, ενώ τα ipm κρούσεις στη φορά περιστροφής, σε παλμικά και μπουλονόκλειδα. Τα J είναι η ενέργεια κάθε κρούσης στα πιστολέτα. Σύγκρινέ τα πάντα μέσα στην ίδια κατηγορία εργαλείων.
@@ -124,6 +126,8 @@ internalLinks:
 ## Πώς ταιριάζει με τα Milwaukee;
 
 Με παραδείγματα από τις σελίδες της Milwaukee: το κρουστικό δραπανοκατσάβιδο M18 FPD3 δίνει 158 Nm και 0–500 / 0–2.100 rpm σε δύο ταχύτητες. Το παλμικό M18 FID3 δίνει 226 Nm και έως 4.400 ipm. Το πιστολέτο SDS-Plus M18 ONEFHPX δίνει ενέργεια κρούσης 5,0 J. Το πολυεργαλείο M18 FMT ταλαντεύεται στις 10.000–20.000 opm, η σέγα M18 FBJS κάνει 3.500 spm, και το τριβείο M12 FDSS έχει κραδασμούς 4,3 m/s².
+
+![Κρουστικό δραπανοκατσάβιδο Milwaukee M18 FPD3, σκέτο εργαλείο χωρίς μπαταρία](https://kolleris.b-cdn.net/papatheo/4933479859/primary-0-1751220216324.webp)
 
 Δες τα αντίστοιχα [κρουστικά δραπανοκατσάβιδα](/katalogos/kroustika-drapana-2), [παλμικά κατσαβίδια](/katalogos/palmika-katsavidia), [πιστολέτα](/katalogos/peristrofika-skaptika-pistoleta), [πολυεργαλεία](/katalogos/polyergaleia-2), [σέγες](/katalogos/seges-3) και [τριβεία](/katalogos/triveia-tainioleiantires-2), ή όλα τα [εργαλεία μπαταρίας](/katalogos/ergaleia-batarias).
 

@@ -71,6 +71,8 @@ internalLinks:
     anchor: "M18 FPOVCL-0"
   - href: "/proion/skoupa-ygris-xiris-anar-fisis-m12-fvcl-0-4933478186-4933478186"
     anchor: "M12 FVCL-0"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/skoupa-ergotaxiou-mpatarias-pos-dialego/hero.webp"
+heroImageAlt: "Σκούπα εργοταξίου μπαταρίας Milwaukee M18 F2VC23L με ροδάκια"
 ---
 
 **Σύντομη απάντηση:** Διάλεξε σκούπα εργοταξίου από τη σκόνη που μαζεύεις. Για γενικό καθάρισμα και μπάζα, σκούπα υγρών-στερεών κλάσης L. Για ξυλόσκονη και σκόνη από μπετό και κονιάματα, κλάση M με σύνδεση στο εργαλείο. Για επικίνδυνες σκόνες, κλάση H. Μετά κοίτα αναρρόφηση, όγκο κάδου, φίλτρο, καθαρισμό φίλτρου, μήκος σωλήνα και, στις μπαταρίας, αυτονομία.
@@ -132,6 +134,8 @@ internalLinks:
 - **Μεγάλη σκούπα κλάσης L:** η [M18 F2VC23L-0](/proion/skoupa-m18-f2vc23l-0-fuel-4933478964-4933478964) έχει κάδο 23 λίτρων, ροή αέρα 162 m³/h, υποπίεση 157 mbar, φίλτρο HEPA H13 και υποδοχή για εργαλεία. Δουλεύει με δύο μπαταρίες M18 και δίνει έως 34 λεπτά στη μέγιστη ισχύ.
 - **Στη στοίβα PACKOUT:** η [M18 FPOVCL-0](/proion/skoupa-packout-m18-fpovcl-0-4933478187-4933478187) είναι σκούπα υγρών-στερεών με φίλτρο HEPA που κουμπώνει στο σύστημα PACKOUT. Με μπαταρία HIGH OUTPUT 8,0 Ah δίνει έως 30 λεπτά στην υψηλή λειτουργία.
 - **Compact:** η [M12 FVCL-0](/proion/skoupa-ygris-xiris-anar-fisis-m12-fvcl-0-4933478186-4933478186) είναι κλάσης L, με ροή αέρα 1.275 l/min, υποπίεση 105 mbar και φίλτρο HEPA.
+
+![Σκούπα υγρής και ξηρής αναρρόφησης Milwaukee M18 FPOVCL PACKOUT](https://kolleris.b-cdn.net/papatheo/4933478187/primary-0-1751212064240.webp)
 
 Δες όλες τις [σκούπες](/katalogos/skoupes), χωρισμένες σε [σκούπες μπαταρίας](/katalogos/skoupes-batarias) και [σκούπες υγρών-στερεών](/katalogos/skoupes-ygron-stereon), καθώς και τα [εξαρτήματα και ανταλλακτικά σκουπών](/katalogos/exartimata-antallaktika-skoupon).
 

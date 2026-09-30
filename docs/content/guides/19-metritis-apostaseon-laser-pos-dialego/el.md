@@ -60,6 +60,8 @@ internalLinks:
     anchor: "LDM 100"
   - href: "/proion/apostasiometro-laser-ldm-30-4933459276-4933459276"
     anchor: "LDM 30"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/metritis-apostaseon-laser-pos-dialego/hero.webp"
+heroImageAlt: "Μετρητής αποστάσεων laser Milwaukee LDM 100 με έγχρωμη οθόνη"
 ---
 
 **Σύντομη απάντηση:** Για διαμερίσματα και εσωτερικές εργασίες αρκεί μετρητής αποστάσεων laser 30–50 m με εμβαδό, όγκο και συνεχή μέτρηση. Για μεγάλους χώρους και εργοτάξια πάρε 80–100 m με Πυθαγόρειο, αισθητήρα κλίσης και οθόνη που διαβάζεται στο φως. Κοίτα ακρίβεια σε mm, προστασία IP54, πτυσσόμενο άκρο για γωνίες και μνήμη μετρήσεων.
@@ -122,6 +124,8 @@ internalLinks:
 
 - **[LDM 50](/proion/apostasiometro-laser-ldm-50-4933447700-4933447700):** εμβέλεια 50 m, προστασία IP54, εμβαδό, όγκος, έμμεσο ύψος με Πυθαγόρειο 2 και 3 σημείων, ελάχιστο/μέγιστο, συνεχής μέτρηση, πρόσθεση και αφαίρεση, μνήμη 20 μετρήσεων και πτυσσόμενο άκρο για γωνίες.
 - **[LDM 100](/proion/apostasiometro-laser-ldm-100-4933459278-4933459278):** εμβέλεια 100 m, έγχρωμη οθόνη τριών γραμμών, ψηφιακή λειτουργία που μετρά αυτόματα όταν το όργανο φτάσει στις 0°, πτυσσόμενο άκρο τριών θέσεων και ιστορικό 30 υπολογισμών.
+
+![Μετρητής αποστάσεων laser Milwaukee LDM 50](https://kolleris.b-cdn.net/papatheo/4933447700/primary-0-1751214077607.webp)
 
 Δες τους [μετρητές αποστάσεων](/katalogos/metrites-apostaseon-anichneytes-metallon), τα [ηλεκτρονικά όργανα μέτρησης](/katalogos/organa-metrisis-power-tools) και, για τις μικρές μετρήσεις, τα [μέτρα, μετροταινίες και τροχούς μέτρησης](/katalogos/metra-metrotainies-trochoi-metrisis).
 

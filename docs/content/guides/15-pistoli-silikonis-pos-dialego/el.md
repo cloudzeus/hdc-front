@@ -63,6 +63,8 @@ internalLinks:
     anchor: "M12 PCG/400A-201B"
   - href: "/proion/solinas-alouminiou-400ml-gia-pistoli-silikonis-4932352844-4932352844"
     anchor: "σωλήνα αλουμινίου 400 ml"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/pistoli-silikonis-pos-dialego/hero.webp"
+heroImageAlt: "Πιστόλι σιλικόνης μπαταρίας Milwaukee M12 PCG/310 για φύσιγγες 310 ml"
 ---
 
 **Σύντομη απάντηση:** Διάλεξε πιστόλι σιλικόνης από τη συσκευασία του υλικού και τον όγκο της δουλειάς. Για φύσιγγες 310 ml αρκεί ανοιχτό πιστόλι. Για σαλάμια 400–600 ml χρειάζεσαι κλειστού τύπου. Για καθημερινή χρήση, πάρε μπαταρίας με ρυθμιζόμενη ταχύτητα, anti-drip και μεγάλη δύναμη ώθησης για παχύρρευστες κόλλες. Για διπλά φυσίγγια χημικών, ειδικό πιστόλι.
@@ -125,6 +127,8 @@ internalLinks:
 - **Μεγάλοι όγκοι και παχύρρευστα υλικά:** το [C18 PCG/600T-201B](/proion/pistoli-silikonis-c18-pcg-600t-201b-4933441808-milwaukee-4933441808) ανήκει στη σειρά C18 PCG/600 με σωλήνα 600 ml, για την οποία η Milwaukee δίνει δύναμη ώθησης έως 4.500 N, με επιλογέα 6 ταχυτήτων, anti-drip και μεγάλο έμβολο που αδειάζει πλήρως τη συσκευασία.
 - **Φύσιγγες 310 ml:** το [M12 PCG/310-201B](/proion/pistoli-silikonis-m12-pcg-310-201b-4933441655-4933441655) δίνει έως 1.780 N, με 6 ταχύτητες και anti-drip.
 - **Σαλάμια 400 ml σε compact σώμα:** το [M12 PCG/400A-201B](/proion/pistoli-silikonis-m12-pcg-400a-201b-4933441665-4933441665).
+
+![Πιστόλι σιλικόνης μπαταρίας Milwaukee C18 PCG/600T με διάφανο σωλήνα 600 ml](https://kolleris.b-cdn.net/mtrl-files/image/__________________C18_PCG_600T_201B_4933441808_MIL_21191200080_1782197835585.webp)
 
 Τα πιστόλια βρίσκονται στα [λοιπά μηχανήματα μπαταρίας](/katalogos/loipa-michanimata-batarias). Για αλλαγή μεγέθους υπάρχουν [ανταλλακτικά και σωλήνες πιστολιού](/katalogos/antallaktika-2), όπως ο [σωλήνας αλουμινίου 400 ml](/proion/solinas-alouminiou-400ml-gia-pistoli-silikonis-4932352844-4932352844).
 

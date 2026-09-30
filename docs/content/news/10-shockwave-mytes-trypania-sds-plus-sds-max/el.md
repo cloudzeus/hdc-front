@@ -65,6 +65,8 @@ internalLinks:
     anchor: "τρυπάνι SDS-Max 18 x 540 mm"
   - href: "/katalogos/kalemisma-2"
     anchor: "καλέμια SDS-Max"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/shockwave-mytes-trypania-sds-plus-sds-max/hero.webp"
+heroImageAlt: "Σετ 56 μυτών Milwaukee SHOCKWAVE σε ανοιχτή θήκη"
 ---
 
 **Σύντομη απάντηση:** Για παλμικό κατσαβίδι πάρτε μύτες SHOCKWAVE, που η Milwaukee σχεδιάζει για κρουστική χρήση, με σκληρυμένη μύτη WEAR GUARD TIP και ζώνη SHOCK ZONE που απορροφά τις αιχμές. Για μπετό, το SDS-Plus καλύπτει τα ελαφρύτερα περιστροφικά πιστολέτα (MX4 από 3,5 έως 32 mm) και το SDS-Max τα βαρύτερα (MX4 από 12 έως 52 mm).
@@ -109,6 +111,8 @@ internalLinks:
 - κυρτό άκρο στο στέλεχος για καλύτερη μεταφορά ενέργειας,
 - πιστοποίηση PGM για ακρίβεια στην τοποθέτηση αγκυρίων, κατασκευή στη Γερμανία.
 
+![Σετ 5 τρυπανιών SDS-Plus 4 κοπών Milwaukee σε θήκη](https://kolleris.b-cdn.net/papatheo/4932498297/primary-0-1751222830247.webp)
+
 ### SDS-Max MX4
 
 - μεγάλη κεφαλή καρβιδίου με λοξοτμήσεις για τα σίδερα του οπλισμού,
@@ -117,6 +121,8 @@ internalLinks:
 - επιπλέον καρβίδιο πάνω από Ø32 mm και ενισχυμένο αυλάκι,
 - σημάδια φθοράς στην κύρια κόψη, για να ελέγχετε αν το τρυπάνι κρατά ακόμα τη διάμετρο,
 - συμμόρφωση PGM.
+
+![Τρυπάνι SDS-Max Milwaukee 18 x 540 mm](https://kolleris.b-cdn.net/papatheo/4932352761/primary-0-1751206797068.webp)
 
 ## Πώς συγκρίνονται τα MX4 SDS-Plus και SDS-Max;
 

@@ -99,6 +99,8 @@ internalLinks:
     anchor: "τρυπάνια MX4"
   - href: "/katalogos/mesa-atomikis-prostasias-odopoiia"
     anchor: "μέσα ατομικής προστασίας"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/lexiko-texnologion-milwaukee/hero.webp"
+heroImageAlt: "Πάγκος εργασίας από ψηλά με δράπανο, παλμικό κατσαβίδι και γωνιακό τροχό μπαταρίας, τρυπάνια, μύτες, γυαλιά και γάντια"
 ---
 
 **Σύντομη απάντηση:** Τα περισσότερα ονόματα στα κουτιά της Milwaukee περιγράφουν τεχνολογίες της ίδιας της εταιρείας. Τα τρία βασικά είναι το **POWERSTATE** (brushless κινητήρας), το **REDLITHIUM** (μπαταρίες) και το **REDLINK PLUS** (ηλεκτρονικά). Όταν ένα εργαλείο τα συνδυάζει και τα τρία, λέγεται **FUEL**. Τα υπόλοιπα αφορούν μπαταρίες (HIGH OUTPUT, FORGE), σύνδεση (ONE-KEY, TICK), αποθήκευση (PACKOUT), ασφάλεια (AUTOSTOP, RAPIDSTOP) και αξεσουάρ (SHOCKWAVE, MX4).
@@ -128,6 +130,8 @@ internalLinks:
 - **COOL-CYCLE:** η ενεργή ψύξη των μπαταριών FORGE κατά τη φόρτιση.
 - **REDLITHIUM USB:** μικρές μπαταρίες (σειρά L4) που φορτίζουν από USB, για φακούς και μικρά εργαλεία.
 
+![Μπαταρία Milwaukee M18 REDLITHIUM FORGE 12,0 Ah](https://kolleris.b-cdn.net/papatheo/4932492651/primary-0-1751222845082.webp)
+
 Δείτε όλες τις [μπαταρίες](/katalogos/bataries-2) και τους [φορτιστές](/katalogos/fortistes).
 
 ## Σύνδεση και απογραφή: ONE-KEY, TICK
@@ -139,6 +143,8 @@ internalLinks:
 ## Αποθήκευση: PACKOUT
 
 - **PACKOUT:** το αρθρωτό σύστημα αποθήκευσης της Milwaukee. Τρόλεϊ, [εργαλειοθήκες PACKOUT](/katalogos/ergaleiothikes-skafakia-koutia-apothikeysis), συρταριέρες και ταμπακιέρες κουμπώνουν σε μία στοίβα. Κατά τη Milwaukee το τρόλεϊ σηκώνει έως 113 kg, με στεγάνωση IP65.
+
+![Τρόλεϊ μεταφοράς Milwaukee PACKOUT με ρόδες και τηλεσκοπική λαβή](https://kolleris.b-cdn.net/papatheo/4932464078/primary-0-1751215231573.webp)
 
 ## Ασφάλεια και έλεγχος: AUTOSTOP, RAPIDSTOP, FIXTEC, DRIVE CONTROL
 

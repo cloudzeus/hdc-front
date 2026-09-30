@@ -71,6 +71,8 @@ internalLinks:
     anchor: "M12 FHS-602X"
   - href: "/proion/tileskopiko-kontaroalysopriono-30-cm-m18-ftps30-121-fuel-4933480869-4933480869"
     anchor: "M18 FTPS30-121"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/alysopriono-mpatarias-pos-dialego/hero.webp"
+heroImageAlt: "Αλυσοπρίονο μπαταρίας Milwaukee M18 FCHS με λάμα 40 cm και μπαταρία"
 ---
 
 **Σύντομη απάντηση:** Διάλεξε αλυσοπρίονο μπαταρίας με βάση το πάχος που κόβεις. Για κλάδεμα και κλαδιά, ένα κλαδευτικό 10–15 cm μιας χειρός. Για καυσόξυλα και μέτριους κορμούς, λάμα 30–40 cm. Για ψηλά κλαδιά από το έδαφος, κονταροαλυσοπρίονο. Κοίτα φρένο αλυσίδας, εύκολο τέντωμα, διαφανές δοχείο λαδιού, μπαταρία μεγάλης χωρητικότητας και φόρα πάντα εξοπλισμό προστασίας.
@@ -131,6 +133,8 @@ internalLinks:
 - **Μεγάλο 50 cm:** το [M18 F2CHS50-802](/proion/alysopriono-50cm-m18-f2chs50-802-4933480121-4933480121) δουλεύει με δύο μπαταρίες M18, για χοντρούς κορμούς.
 - **Κλαδευτικό:** το HATCHET [M12 FHS-602X](/proion/alysopriono-kladou-m12-fhs-602x-4933472212-4933472212) έχει λάμα 15 cm, ζυγίζει 2,3 kg και κόβει σκληρό ξύλο 75 mm, με έως 120 κοπές ανά φόρτιση μπαταρίας M12 B4.
 - **Κοντάρι:** το [M18 FTPS30-121](/proion/tileskopiko-kontaroalysopriono-30-cm-m18-ftps30-121-fuel-4933480869-4933480869) είναι τηλεσκοπικό κονταροαλυσοπρίονο 30 cm.
+
+![Κλαδευτικό αλυσοπρίονο Milwaukee M12 FHS HATCHET με μπαταρία](https://kolleris.b-cdn.net/papatheo/4933472212/primary-0-1751218161218.webp)
 
 Όλα βρίσκονται στα [εργαλεία κήπου μπαταρίας](/katalogos/ergaleia-kipou-batarias), μαζί με [αλυσίδες και ανταλλακτικά](/katalogos/exartimata-antallaktika-5). Για τον εξοπλισμό σου δες την [προστασία κεφαλής και προσώπου](/katalogos/prostasia-kefalis-prosopou).
 

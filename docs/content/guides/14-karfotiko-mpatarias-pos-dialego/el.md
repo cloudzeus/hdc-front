@@ -72,6 +72,8 @@ internalLinks:
     anchor: "M12 FCN18GS-202X"
   - href: "/proion/karfotiko-diplis-kefalis-m18-fdn-0c-fuel-4933493600-4933493600"
     anchor: "M18 FDN-0C"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/karfotiko-mpatarias-pos-dialego/hero.webp"
+heroImageAlt: "Καρφωτικό πλαισίων Milwaukee M18 FFN με μπαταρία"
 ---
 
 **Σύντομη απάντηση:** Διάλεξε καρφωτικό από το είδος του καρφιού. Για σκελετούς, πέργκολες και καλούπια, καρφωτικό πλαισίων. Για κάσες, σοβατεπί και πόρτες, φινιρίσματος 16G. Για πηχάκια και διακοσμητικά, 18G με λεπτά καρφάκια. Κοίτα γωνία και χωρητικότητα γεμιστήρα, ρύθμιση βάθους χωρίς εργαλείο, διαδοχική ή παλμική βολή, κλείδωμα όταν αδειάζει και μπαταρία.
@@ -135,6 +137,10 @@ internalLinks:
 - **Φινιρίσματος 16G:** το [M18 FN16GA-202X](/proion/karf-ko-finir-tos-m18-fn16ga-202x-fuel-4933478092-4933478092), με γωνιακό γεμιστήρα και δύο λειτουργίες βολής.
 - **Compact 18G:** το [M12 FCN18GS-202X](/proion/karf-ko-finir-tos-m12-fcn18gs-202x-fuel-4933493355-4933493355) για ελαφριά δουλειά.
 - **Καλούπια:** το [M18 FDN-0C](/proion/karfotiko-diplis-kefalis-m18-fdn-0c-fuel-4933493600-4933493600) για καρφιά διπλής κεφαλής.
+
+![Καρφωτικό φινιρίσματος 18G Milwaukee M18 FN18GS με μπαταρία](https://kolleris.b-cdn.net/papatheo/4933471407/primary-0-1751216550382.webp)
+
+![Καρφωτικό καρφιών διπλής κεφαλής Milwaukee M18 FDN, χωρίς μπαταρία](https://kolleris.b-cdn.net/papatheo/4933493600/primary-0-1751222852874.webp)
 
 Δες όλα τα [καρφωτικά μπαταρίας](/katalogos/karfotika) και τα [καρφιά και εξαρτήματα καρφωτικών](/katalogos/exartimata). Για γυψοσανίδα δες τις [κατσαβιδιέρες γυψοσανίδας](/katalogos/katsavidieres).
 

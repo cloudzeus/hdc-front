@@ -67,6 +67,8 @@ internalLinks:
     anchor: "εργαλεία μπαταρίας Milwaukee"
   - href: "/proion/set-ergaleion-m18-onepp2a3-502x-fuel-4933493244-4933493244"
     anchor: "σετ M18 ONEPP2A3-502X με ONE-KEY"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/one-key-diacheirisi-ergaleion/hero.webp"
+heroImageAlt: "Πιστολέτο SDS-Plus Milwaukee M18 ONEFHPX με ONE-KEY και μπαταρία"
 ---
 
 **Σύντομη απάντηση:** Το ONE-KEY είναι η πλατφόρμα συνδεδεμένων εργαλείων της Milwaukee, που η εταιρεία παρουσιάζει ως την πρώτη του είδους. Είναι δωρεάν και λειτουργεί στο cloud: καταγράφετε τα εργαλεία σε ψηφιακό απόθεμα, βλέπετε πού βρίσκονται, λαμβάνετε ειδοποιήσεις, κλειδώνετε εξ αποστάσεως τα εργαλεία ONE-KEY και αλλάζετε ρυθμίσεις από κινητό, tablet ή υπολογιστή.
@@ -120,6 +122,8 @@ internalLinks:
 - **Φωτισμός:** ο [προβολέας M18 ONERSAL-0](/proion/provoleas-me-vasi-ip67-m18-onersal-0-4933459431-4933459431).
 - **Χάραξη:** το πράσινο περιστροφικό laser M18 RLOHVG300, όπου το ONE-KEY προσθέτει αναφορές με τη δραστηριότητα του οργάνου και πρωτόκολλο ακρίβειας.
 - **MX FUEL:** ο κόφτης MXF COS350G2 και το κατεδαφιστικό MXF DH2528H έχουν επίσης ONE-KEY.
+
+![Σπαθόσεγα Milwaukee M18 ONEFSZ SAWZALL με ONE-KEY και μπαταρία](https://kolleris.b-cdn.net/papatheo/4933478294/primary-0-1751218065108.webp)
 
 Σε πολλά μοντέλα το όνομα ξεκινά με ONE. Δεν ισχύει όμως παντού, οπότε ελέγχετε πάντα την περιγραφή του προϊόντος.
 

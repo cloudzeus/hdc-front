@@ -72,6 +72,8 @@ internalLinks:
     anchor: "Super Charger M18 DBSC"
   - href: "/proion/fortistis-m12-18fc-4932451079-4932451079"
     anchor: "φορτιστής M12-18 FC"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/posa-ah-mpataria-ergaleion/hero.webp"
+heroImageAlt: "Μπαταρία Milwaukee M18 REDLITHIUM HIGH OUTPUT 5,5 Ah"
 ---
 
 **Σύντομη απάντηση:** Τα Ah δείχνουν πόση δουλειά βγάζει η μπαταρία ανά φόρτιση. Για παλμικά, δραπανοκατσάβιδα, φακούς και όργανα αρκούν περίπου 2–3 Ah, που κρατούν το εργαλείο ελαφρύ. Για τροχούς, σπαθόσεγες και πιστολέτα, περίπου 5 Ah και πάνω. Για δισκοπρίονα, αλυσοπρίονα και ολοήμερη βαριά χρήση, 8 Ah ή περισσότερα, ιδανικά σε μπαταρία υψηλής απόδοσης. Πάντα τουλάχιστον δύο μπαταρίες.
@@ -125,7 +127,11 @@ internalLinks:
 
 Στη Milwaukee οι μπαταρίες ανήκουν στην τεχνολογία **REDLITHIUM**, που η εταιρεία δίνει με έως 40% περισσότερο χρόνο λειτουργίας, 20% περισσότερη ισχύ και 50% περισσότερες επαναφορτίσεις από τις συμβατικές μπαταρίες λιθίου. Στο **M18** υπάρχουν τρία επίπεδα: οι βασικές REDLITHIUM, όπως η [M18 B5](/proion/bataria-18v-5-0ah-m18-b5-4932430483-4932430483), οι **HIGH OUTPUT**, όπως η [M18 HB3](/proion/bataria-li-on-m18-hb3-3-0ah-4932471069-4932471069), με έως 50% περισσότερη ισχύ και έως 50% χαμηλότερη θερμοκρασία υπό φορτίο, και οι **FORGE**, με την περισσότερη ισχύ, τη γρηγορότερη φόρτιση και τη μεγαλύτερη διάρκεια ζωής. Όλες ταιριάζουν σε κάθε εργαλείο M18. Στο **M12** θα βρεις μπαταρίες από 2,0 έως 6,0 Ah.
 
+![Μπαταρία Milwaukee M18 REDLITHIUM HIGH OUTPUT 3,0 Ah](https://kolleris.b-cdn.net/papatheo/4932471069/primary-0-1751216065512.webp)
+
 Για φόρτιση, ο [φορτιστής M12-18 FC](/proion/fortistis-m12-18fc-4932451079-4932451079) φορτίζει και M12 και M18, ενώ ο [Super Charger M18 DBSC](/proion/super-fortistis-m18-dbsc-diplis-thyras-4932492531-4932492531) είναι ο ταχυφορτιστής διπλής θύρας για M18. Δες όλες τις [μπαταρίες](/katalogos/bataries-2) και τους [φορτιστές](/katalogos/fortistes), ή ξεκίνα με τα [σετ εργαλείων M18](/katalogos/set-combo-ergaleion-18v) και τα [σετ εργαλείων M12](/katalogos/set-combo-ergaleion-12v).
+
+![Ταχυφορτιστής Milwaukee M12-18 FC για μπαταρίες M12 και M18](https://kolleris.b-cdn.net/papatheo/4932451079/primary-0-1751214235621.webp)
 
 ## Στο Milwaukee Heavy Duty Centre του Πειραιά
 

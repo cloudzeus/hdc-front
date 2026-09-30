@@ -74,6 +74,8 @@ internalLinks:
     anchor: "M18 FPS55-552P"
   - href: "/proion/diskopriono-xylou-m12-fcs442-502x-4933493489-4933493489"
     anchor: "M12 FCS442-502X"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/diskopriono-pos-dialego/hero.webp"
+heroImageAlt: "Δισκοπρίονο ξύλου Milwaukee M18 FCSG66 με μπαταρία 12,0 Ah"
 ---
 
 **Σύντομη απάντηση:** Για να διαλέξεις δισκοπρίονο, ξεκίνα από το υλικό: ξύλου για ξυλεία και φύλλα, μετάλλου για λαμαρίνες και προφίλ. Μετά το βάθος κοπής, που εξαρτάται από τη διάμετρο του δίσκου: περίπου 55 mm αρκούν για σανίδες, περίπου 65–70 mm για καδρόνια. Κοίτα κλίση πέλματος, φρένο δίσκου, συμβατότητα με ράγα οδηγό και απαγωγή σκόνης.
@@ -134,6 +136,10 @@ internalLinks:
 - **Μετάλλου:** το [M18 FMCS66-121C](/proion/diskopriono-metallou-m18-fmcs66-121c-fuel-4933472111-4933472111) κόβει έως 66 mm με δίσκο μετάλλου 203 mm, έχει μεγάλο συλλέκτη ρινισμάτων και ηλεκτρικό φρένο που σταματά τον δίσκο σε λιγότερο από 1 δευτερόλεπτο.
 - **Βυθιζόμενο:** το [M18 FPS55-552P](/proion/vyth-no-disk-no-55mm-m18-fps55-552p-4933478778-4933478778), για κοπές ακριβείας σε ράγα.
 - **Compact:** το [M12 FCS442-502X](/proion/diskopriono-xylou-m12-fcs442-502x-4933493489-4933493489) για φύλλα και πήχεις.
+
+![Βυθιζόμενο δισκοπρίονο Milwaukee M18 FPS55 με σακούλα σκόνης](https://kolleris.b-cdn.net/papatheo/4933478778/primary-0-1751220489012.webp)
+
+![Τεχνίτης κόβει μεταλλικό σωλήνα με το δισκοπρίονο μετάλλου Milwaukee M18 FMCS66](https://kolleris.b-cdn.net/papatheo/4933472111/primary-0-1751218015487.webp)
 
 Δες όλα τα [δισκοπρίονα χειρός μπαταρίας](/katalogos/diskopriona-cheiros-2), χωρισμένα σε [δισκοπρίονα ξύλου και αλουμινίου](/katalogos/xylou-alouminiou-2) και [δισκοπρίονα μετάλλου](/katalogos/metallou-2), καθώς και [δίσκους δισκοπρίονου](/katalogos/diskoi) και [αξεσουάρ δισκοπρίονων](/katalogos/diskopriona-xylou-alouminiou).
 

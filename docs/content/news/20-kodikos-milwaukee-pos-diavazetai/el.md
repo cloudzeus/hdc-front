@@ -81,6 +81,8 @@ internalLinks:
     anchor: "εργαλεία μπαταρίας"
   - href: "/katalogos/bataries-2"
     anchor: "μπαταρίες"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/kodikos-milwaukee-pos-diavazetai/hero.webp"
+heroImageAlt: "Κρουστικό δραπανοκατσάβιδο Milwaukee M18 FPD3 με μπαταρία REDLITHIUM 5,0 Ah"
 ---
 
 **Σύντομη απάντηση:** Ένας κωδικός όπως το **M18 FPD3-502X** διαβάζεται από αριστερά προς τα δεξιά: **M18** η πλατφόρμα μπαταρίας, **F** η σειρά FUEL, **PD** το είδος (Percussion Drill, κρουστικό δραπανοκατσάβιδο), **3** η έκδοση του μοντέλου, και μετά την παύλα **502X** το κιτ: δύο μπαταρίες 5,0 Ah με βαλίτσα HD Box. Ο 10ψήφιος **4933479860** είναι ο κωδικός είδους της Milwaukee για τη συγκεκριμένη έκδοση.
@@ -110,6 +112,8 @@ internalLinks:
 - **M18 BPD:** «M18 Compact Percussion Drill», η compact σειρά.
 - **M18 BLPD2:** «M18 Brushless Percussion Drill», brushless χωρίς FUEL.
 - **M18 FPD3:** «M18 FUEL Percussion Drill», η σειρά FUEL.
+
+![Κρουστικό δράπανο Milwaukee M18 BLPD2 με brushless κινητήρα, χωρίς μπαταρία](https://kolleris.b-cdn.net/papatheo/4933464516/primary-0-1751215663179.webp)
 
 Άρα, στα κρουστικά, το **B** δείχνει compact, το **BL** brushless και το **F** FUEL. Και το πρόθεμα **ONE** δείχνει ONE-KEY: το [M18 ONEPD3-502X](/proion/kroustiko-drap-do-m18-onepd3-502x-fuel-4933492801-4933492801) είναι το αντίστοιχο με σύνδεση στην εφαρμογή. Σε άλλες κατηγορίες τα γράμματα μπορεί να διαφέρουν, οπότε ελέγχετε πάντα την ονομασία του προϊόντος.
 
@@ -147,6 +151,8 @@ internalLinks:
 - **Τελευταίο ψηφίο:** πόσες μπαταρίες έχει το κιτ.
 - **Γράμμα στο τέλος:** η βαλίτσα. X για HD Box, C για βαλίτσα κιτ, B για τσάντα, P για PACKOUT. Χωρίς γράμμα, χωρίς βαλίτσα.
 - **-0:** σκέτο εργαλείο, χωρίς μπαταρία και φορτιστή. **-0X:** σκέτο εργαλείο μέσα σε HD Box, όπως το [M18 FPD3-0X](/proion/kroustiko-drapanokatsavido-m18-fpd3-0x-fuel-4933479859-4933479859) ή το [M18 BLPD2-0X](/proion/drapano-kroustiko-m18-blpd2-0x-brushless-4933464516-4933464516).
+
+![Κρουστικό δραπανοκατσάβιδο Milwaukee M18 FPD3, σκέτο εργαλείο χωρίς μπαταρία](https://kolleris.b-cdn.net/papatheo/4933479859/primary-0-1751220216324.webp)
 
 Ο κανόνας δεν είναι επίσημος και έχει εξαιρέσεις, για παράδειγμα σετ με λέξεις όπως ACSR ή CU/AL που δείχνουν τα μαγουλά. Πριν αγοράσετε, διαβάστε τη σύνθεση του κιτ στη σελίδα του προϊόντος.
 

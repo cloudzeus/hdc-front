@@ -65,6 +65,8 @@ internalLinks:
     anchor: "LDM 45"
   - href: "/katalogos/organa-metrisis-power-tools"
     anchor: "όργανα μέτρησης"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/laser-milwaukee-pos-dialegeis/hero.webp"
+heroImageAlt: "Πράσινο laser σταυρού Milwaukee M12 CLL4P με 4 σημεία"
 ---
 
 **Σύντομη απάντηση:** Διαλέξτε laser Milwaukee με βάση τη δουλειά. Laser σταυρού (CLL, M12 CLL4P) για πλακάκια, κουζίνες και γρήγορες χαράξεις. Laser 3 επιπέδων 360° (M12 3PL) για γυψοσανίδες και ψευδοροφές. Περιστροφικό (M18 RLOHVG300) για εξωτερικούς χώρους και μεγάλες αποστάσεις. Όλα τα μοντέλα που εξετάσαμε έχουν πράσινη δέσμη και είναι κλάσης 2.
@@ -81,13 +83,19 @@ internalLinks:
 
 Το M12 3PL προβάλλει ένα οριζόντιο και δύο κάθετα επίπεδα 360°. Με μία τοποθέτηση «ντύνει» όλο το δωμάτιο με γραμμές: τοίχους, πάτωμα και ταβάνι. Υπάρχει και έκδοση με αυτόματη ευθυγράμμιση, το M12 A3PLO.
 
+![Laser 3 επιπέδων 360° Milwaukee M12 3PL με μπαταρία M12](https://kolleris.b-cdn.net/papatheo/4933478102/primary-0-1751218083508.webp)
+
 ### Περιστροφικά laser
 
 Η κεφαλή περιστρέφεται και δημιουργεί επίπεδο αναφοράς σε μεγάλη απόσταση, συνήθως με ανιχνευτή. Το M18 RLOHVG300 δουλεύει οριζόντια και κάθετα. Στον κατάλογο υπάρχει επίσης το M18 RLOH600.
 
+![Περιστροφικό laser Milwaukee M18 RLOHVG300 με πράσινη δέσμη και δέκτη](https://kolleris.b-cdn.net/papatheo/4933493194/primary-0-1751222569707.webp)
+
 ### Μετρητές αποστάσεων
 
 Δεν είναι αλφάδια, αλλά μετρούν απόσταση με δέσμη laser. Αν αυτό ψάχνετε, δείτε τους [μετρητές αποστάσεων](/katalogos/metrites-apostaseon-anichneytes-metallon), όπως το [LDM 45](/proion/apostasiometro-laser-ldm-45-4933459277-4933459277).
+
+![Μετρητής αποστάσεων laser Milwaukee LDM 45](https://kolleris.b-cdn.net/papatheo/4933459277/primary-0-1751214985507.webp)
 
 ## Πράσινη ή κόκκινη δέσμη: ποια φαίνεται καλύτερα;
 

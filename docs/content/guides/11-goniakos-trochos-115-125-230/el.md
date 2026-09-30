@@ -77,6 +77,8 @@ internalLinks:
     anchor: "M18 ONEFLAG230XPDB-122C"
   - href: "/proion/trochos-goniakos-m12-fcot-422x-fuel-4933464619-4933464619"
     anchor: "M12 FCOT-422X"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/goniakos-trochos-115-125-230/hero.webp"
+heroImageAlt: "Γωνιακός τροχός 125 mm Milwaukee M18 FSAG125XB με συρόμενο διακόπτη και μπαταρία"
 ---
 
 **Σύντομη απάντηση:** Για τις περισσότερες δουλειές διάλεξε γωνιακό τροχό 125 mm: κόβει σίδερα, πλακάκια και προφίλ και λειαίνει με τη μεγαλύτερη ποικιλία δίσκων. Ο 115 mm είναι λίγο πιο ευέλικτος. Ο 230 mm είναι για χοντρά υλικά, μεγάλους σωλήνες, μπετό και πέτρα, με δύο χέρια. Προτίμησε φρένο δίσκου, προστασία από επανεκκίνηση και, για φινίρισμα, ρυθμιζόμενες στροφές.
@@ -142,6 +144,10 @@ internalLinks:
 - **125 mm «τροχός ασφαλείας»:** ο [M18 FSAGSVO125X-502X](/proion/goniakos-trochos-asfaleias-m18-fsagsvo125x-502x-fuel-4933493553-4933493553) σταματά τον δίσκο σε λιγότερο από 1 δευτερόλεπτο, έχει AUTOSTOP όταν ο δίσκος μαγκώσει, ρυθμιζόμενες στροφές και ONE-KEY.
 - **230 mm:** ο [M18 ONEFLAG230XPDB-122C](/proion/goniakos-trochos-230mm-m18-oneflag230xpdb-122c-4933478783-4933478783) δίνει κατά τη Milwaukee απόδοση παρόμοια με τροχό ρεύματος 2.200 W. Έχει διακόπτη πεταλούδα που δεν κλειδώνει, RAPIDSTOP κάτω από 2 δευτερόλεπτα, παξιμάδι FIXTEC για αλλαγή δίσκου χωρίς κλειδί και ONE-KEY.
 - **Compact:** ο [M12 FCOT-422X](/proion/trochos-goniakos-m12-fcot-422x-fuel-4933464619-4933464619) είναι κόφτης πολλαπλών υλικών για λεπτά προφίλ, πλακάκια και στενά σημεία.
+
+![Γωνιακός τροχός 230 mm Milwaukee M18 ONEFLAG230XPDB με ONE-KEY και μπαταρία](https://kolleris.b-cdn.net/papatheo/4933478783/primary-0-1751219139258.webp)
+
+![Κόφτης πολλαπλών υλικών Milwaukee M12 FCOT με μπαταρία 4,0 Ah](https://kolleris.b-cdn.net/papatheo/4933464619/primary-0-1751215648146.webp)
 
 Δες τους [γωνιακούς τροχούς Φ125 μπαταρίας](/katalogos/goniakoi-trochoi-f125-2), τους [γωνιακούς τροχούς Φ230 μπαταρίας](/katalogos/goniakoi-trochoi-f230-2), τους [τροχούς μικρότερους από Φ115](/katalogos/goniakoi-trochoi-mikroteroi-apo-f115) και τους [γωνιακούς τροχούς Φ125 ρεύματος](/katalogos/goniakoi-trochoi-f125). Για αναλώσιμα, δες τους [δίσκους λείανσης και κοπής](/katalogos/leiansi-kopi).
 

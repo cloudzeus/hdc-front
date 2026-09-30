@@ -75,6 +75,8 @@ internalLinks:
     anchor: "MXF TLIC-601"
   - href: "/proion/fakos-led-gia-kapo-aytokiniton-m12-uhl-0-4933459432-4933459432"
     anchor: "M12 UHL-0"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/fakoi-provoleis-ergotaxiou-pos-dialego/hero.webp"
+heroImageAlt: "Προβολέας με τρίποδο ιστό Milwaukee M18 SAL"
 ---
 
 **Σύντομη απάντηση:** Διάλεξε φωτισμό εργασίας με βάση το πού δουλεύεις. Για φρεάτια, πίνακες και ψευδοροφές, φακός κεφαλής με μερικές εκατοντάδες lumen. Για ανακαίνιση δωματίων, προβολέας με βάση ή τρίποδο γύρω στα 1.000–3.000 lumen. Για εξωτερικά εργοτάξια, πύργος φωτισμού. Κοίτα απόδοση χρωμάτων, προστασία IP, αντοχή σε πτώση, αυτονομία και μπαταρία που ήδη έχεις.
@@ -138,6 +140,10 @@ internalLinks:
 - **Φακός κεφαλής USB:** ο [L4 HL2-301](/proion/fakos-usb-l4-hl2-301-4933479963-4933479963), επαναφορτιζόμενος φακός κεφαλής 600 lumen.
 - **Συνεργείο αυτοκινήτων:** ο φακός καπό [M12 UHL-0](/proion/fakos-led-gia-kapo-aytokiniton-m12-uhl-0-4933459432-4933459432).
 - **Εργοτάξιο:** ο compact πύργος φωτισμού [MXF TLIC-601](/proion/packout-pyrgos-fotismou-mxf-tlic-601-4933498072-milwaukee-4933498072) της πλατφόρμας MX FUEL, που η Milwaukee σχεδιάζει για ελαφρύ εξοπλισμό χωρίς καυσαέρια.
+
+![Επαναφορτιζόμενος φακός κεφαλής Milwaukee L4 HL2](https://kolleris.b-cdn.net/papatheo/4933479963/primary-0-1751220227687.webp)
+
+![Φακός LED για καπό αυτοκινήτου Milwaukee M12 UHL με πτυσσόμενους βραχίονες](https://kolleris.b-cdn.net/papatheo/4933459432/primary-0-1751215007598.webp)
 
 Δες τους [επαναφορτιζόμενους φακούς](/katalogos/fakoi-epanafortizomenoi), τους [προβολείς συνεργείου μπαταρίας](/katalogos/provoleis-synergeiou-2), τους [φακούς κεφαλής](/katalogos/fakoi-kefalis-2), τους [φακούς χειρός](/katalogos/fakoi-cheiros-2), όλους τους [φακούς και προβολείς](/katalogos/fakoi) και τους [αντιεκρηκτικούς φακούς](/katalogos/antiekriktikoi-fakoi).
 

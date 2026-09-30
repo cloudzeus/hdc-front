@@ -74,6 +74,8 @@ internalLinks:
     anchor: "M18 BQSS-502B"
   - href: "/proion/triveio-ekkentro-5-0mm-150mm-m12-fros5-0-4933493650-milwaukee-4933493650"
     anchor: "M12 FROS5-0"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/triveio-leiantiras-pos-dialego/hero.webp"
+heroImageAlt: "Παλμικό τριβείο 1/4 Milwaukee M18 BQSS με μπαταρία και σακούλα σκόνης"
 ---
 
 **Σύντομη απάντηση:** Για γενικό τρίψιμο σε ξύλο, πόρτες και έπιπλα, διάλεξε έκκεντρο τριβείο 125 ή 150 mm. Για γωνίες και λεπτό φινίρισμα, παλμικό ή δέλτα. Για γρήγορη αφαίρεση υλικού και σημεία σε μέταλλο, ταινιολειαντήρα ή ευθυλειαντήρα. Κοίτα διαδρομή ταλάντωσης, ρυθμιζόμενη ταχύτητα, κραδασμούς, στερέωση γυαλόχαρτου με velcro και καλή απαγωγή σκόνης.
@@ -140,6 +142,10 @@ internalLinks:
 - **Γωνίες και λεπτομέρειες:** το [M12 FDSS-422X](/proion/triveio-trigoniko-delta-m12-fdss-422x-4933479681-4933479681) έχει πεντάγωνο πέλμα για τις γωνίες, 4 ταχύτητες και κραδασμούς μόλις 4,3 m/s², σύμφωνα με τη Milwaukee. Στο κιτ υπάρχει μαλακό πέλμα για προφίλ και καμπύλες.
 - **Φινίρισμα σε ίσιες επιφάνειες:** το παλμικό [M18 BQSS-502B](/proion/triveio-tetragono-1-4-m18-bqss-502b-fuel-4933479967-4933479967), με πέλμα για τέταρτο φύλλου γυαλόχαρτου.
 - **Έκκεντρο 150 mm:** το [M12 FROS5-0](/proion/triveio-ekkentro-5-0mm-150mm-m12-fros5-0-4933493650-milwaukee-4933493650), με διαδρομή 5 mm, για γενικό τρίψιμο.
+
+![Τριβείο δέλτα Milwaukee M12 FDSS με μπαταρία M12](https://kolleris.b-cdn.net/papatheo/4933479681/primary-0-1751220063374.webp)
+
+![Έκκεντρο τριβείο 150 mm Milwaukee M12 FROS5](https://kolleris.b-cdn.net/mtrl-files/image/_________________5_0___150MM_M12_FROS5_0_493349365_21191200166_1782892054134.webp)
 
 Δες όλα τα [τριβεία και ταινιολειαντήρες μπαταρίας](/katalogos/triveia-tainioleiantires-2), τα [παλμικά τριβεία](/katalogos/palmika-triveia-2), τα [έκκεντρα τριβεία Φ150](/katalogos/ekkentra-treveia-f150) και τους [αλοιφαδόρους, σατινιέρες και ευθυλειαντήρες](/katalogos/aloifadoroi-satinieres-eytheis-leiantires-2). Για αναλώσιμα υπάρχουν [λειαντικά σε ταινία](/katalogos/leiantika-se-tainia) και [δίσκοι λείανσης και στίλβωσης](/katalogos/diskoi-leiansis-stilvosis).
 

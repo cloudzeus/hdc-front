@@ -70,6 +70,8 @@ internalLinks:
     anchor: "M18 FQID-0X SURGE"
   - href: "/katalogos/boulonokleida-1-2-3"
     anchor: "μπουλονόκλειδα 1/2"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/palmiko-katsavidi-pos-dialego/hero.webp"
+heroImageAlt: "Παλμικό κατσαβίδι 1/4\" Milwaukee M18 FID3, χωρίς μπαταρία"
 ---
 
 **Σύντομη απάντηση:** Διάλεξε παλμικό κατσαβίδι με βάση τις βίδες σου. Για βίδες ξυλείας, λαμαρινόβιδες και μεσαία μπουλόνια αρκεί ένα compact 12V· για μεγάλες βίδες και ολοήμερη δουλειά πάρε 18V. Κοίτα ροπή, κρούσεις ανά λεπτό, λειτουργίες ταχύτητας, μήκος κεφαλής και, για ησυχία, υδραυλικό μηχανισμό. Βάλε πάντα μύτες για παλμικά.
@@ -141,7 +143,11 @@ internalLinks:
 - **[M12 FID2-202X](/proion/palmiko-katsavidi-1-4-m12-fid2-202x-4933479877-4933479877):** 170 Nm, μήκος 127 mm και μπουλόνια έως M14, για όποιον θέλει ελαφρύ εργαλείο.
 - **[M18 FQID-0X SURGE](/proion/katsavidi-ydrayliko-palmiko-1-4-m18-fqid-0x-fuel-4933459187-4933459187):** υδραυλικό παλμικό FLUID-DRIVE, που η Milwaukee δίνει περίπου 50% πιο ήσυχο από τα συμβατικά.
 
+![Υδραυλικό παλμικό κατσαβίδι Milwaukee M18 FQID SURGE, χωρίς μπαταρία](https://kolleris.b-cdn.net/papatheo/4933459187/primary-0-1751214680283.webp)
+
 Για μύτες, η σειρά SHOCKWAVE IMPACT DUTY της Milwaukee είναι σχεδιασμένη για κρουστική χρήση. Δες τα [παλμικά κατσαβίδια](/katalogos/palmika-katsavidia), τα [σετ με κρουστικό δραπανοκατσάβιδο και παλμικό](/katalogos/set-me-kroustiko-drapanokatsavido-kai-palmiko) και τις [μύτες βιδώματος και μαγνητικούς αντάπτορες](/katalogos/mytes-vidomatos-magnitikoi-antaptores). Για παξιμάδια και μπουλόνια αυτοκινήτων και μηχανημάτων, δες τα [μπουλονόκλειδα 1/2](/katalogos/boulonokleida-1-2-3).
+
+![Σετ 32 μυτών και αντάπτορα Milwaukee SHOCKWAVE σε θήκη](https://kolleris.b-cdn.net/papatheo/4932464240/primary-0-1751215614110.webp)
 
 ## Στο Milwaukee Heavy Duty Centre του Πειραιά
 

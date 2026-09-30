@@ -69,6 +69,8 @@ internalLinks:
     anchor: "μπαταρίες Milwaukee"
   - href: "/katalogos/fortistes"
     anchor: "φορτιστές"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/bataries-redlithium-forge-high-output/hero.webp"
+heroImageAlt: "Μπαταρία Milwaukee M18 REDLITHIUM FORGE 12,0 Ah"
 ---
 
 **Σύντομη απάντηση:** Τα Ah δείχνουν χωρητικότητα, δηλαδή πόση δουλειά βγάζει μια μπαταρία Milwaukee ανά φόρτιση. Οι κατηγορίες HIGH OUTPUT και FORGE αφορούν κάτι άλλο: πόσο ρεύμα δίνει η μπαταρία υπό φορτίο και πόσο ζεσταίνεται. Για παλμικά και δράπανα συνήθως αρκεί μια απλή REDLITHIUM· για τροχούς, πιστολέτα και σέγες αξίζει HIGH OUTPUT ή FORGE.
@@ -121,6 +123,8 @@ internalLinks:
 
 Ο [Super Charger M18 DBSC](/proion/super-fortistis-m18-dbsc-diplis-thyras-4932492531-4932492531) είναι ο ταχυφορτιστής διπλής θύρας της Milwaukee για M18. Αυτοί είναι οι χρόνοι φόρτισης που δίνει η Milwaukee:
 
+![Διπλός Super Charger Milwaukee M18 DBSC](https://kolleris.b-cdn.net/papatheo/4932492531/primary-0-1751222758655.webp)
+
 | Μπαταρία | Κατηγορία | Χρόνος φόρτισης στον M18 DBSC |
 |---|---|---|
 | M18 FB6 | FORGE | 25 λεπτά |
@@ -141,6 +145,8 @@ internalLinks:
 ## Ποιες μπαταρίες υπάρχουν για το M12;
 
 Όλες οι μπαταρίες M12 REDLITHIUM δουλεύουν σε όλα τα τρέχοντα εργαλεία M12. Οι βασικές είναι οι M12 B2, B3, B4 και B6. Για τη σειρά M12 FUEL η Milwaukee ανέπτυξε τις HIGH OUTPUT M12 HB2.5 και [M12 HB5 HIGH OUTPUT](/proion/bataria-li-on-m12-hb5-5ah-4932480165-4932480165). Οι μπαταρίες M12 δεν μπαίνουν σε εργαλεία M18.
+
+![Μπαταρία Milwaukee M12 REDLITHIUM HIGH OUTPUT 5,0 Ah](https://kolleris.b-cdn.net/papatheo/4932480165/primary-0-1751219830273.webp)
 
 ## Ποια μπαταρία για ποιο εργαλείο;
 

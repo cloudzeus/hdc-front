@@ -71,6 +71,8 @@ internalLinks:
     anchor: "M12 3PL-401C"
   - href: "/proion/laser-per-ko-m18-rlohvg300-501c-4933493194-4933493194"
     anchor: "M18 RLOHVG300-501C"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/alfadi-laser-grammiko-i-peristrofiko/hero.webp"
+heroImageAlt: "Laser 3 επιπέδων 360° Milwaukee M12 3PL με μπαταρία M12"
 ---
 
 **Σύντομη απάντηση:** Για πλακάκια, κουζίνες, κάδρα και μικρές εσωτερικές χαράξεις, αρκεί laser σταυρού. Για γυψοσανίδες, ψευδοροφές και τετραγωνισμό ολόκληρου δωματίου, πάρε laser 3 επιπέδων 360°. Για εξωτερικούς χώρους, στάθμες εδάφους και μεγάλα εργοτάξια, περιστροφικό laser με ανιχνευτή. Προτίμησε πράσινη δέσμη μέσα σε κτίρια και κοίτα ακρίβεια, εμβέλεια και προστασία IP.
@@ -129,6 +131,10 @@ internalLinks:
 - **Σταυρού με 4 σημεία:** το [M12 CLL4P-301C](/proion/laser-m12-cll4p-301c-4933479203-4933479203) έχει ακρίβεια 0,3 mm/m, ορατή εμβέλεια 38 m και έως 100 m με ανιχνευτή, IP54 και προειδοποίηση εκτός στάθμης.
 - **3 επιπέδων 360°:** το [M12 3PL-401C](/proion/alfadi-laser-aytorythm-no-m12-3pl-401c-4933478102-4933478102) με ακρίβεια 0,3 mm/m και την ίδια εμβέλεια, για γυψοσανίδες και ψευδοροφές.
 - **Περιστροφικό:** το [M18 RLOHVG300-501C](/proion/laser-per-ko-m18-rlohvg300-501c-4933493194-4933493194) δίνει ακρίβεια ±1,6 mm στα 30 m, προστασία IP66 και εμβέλεια έως 300 m με τον ανιχνευτή RD300G, με ONE-KEY.
+
+![Περιστροφικό laser Milwaukee M18 RLOHVG300 με πράσινη δέσμη και δέκτη](https://kolleris.b-cdn.net/papatheo/4933493194/primary-0-1751222569707.webp)
+
+![Πράσινο laser 2 γραμμών Milwaukee L4 CLL με μπαταρία USB](https://kolleris.b-cdn.net/papatheo/4933478098/primary-0-1751217841897.webp)
 
 Δες όλα τα [γραμμικά και περιστροφικά laser και δέκτες](/katalogos/grammika-peristrofika-laser-dektes-laser) και τα [ηλεκτρονικά όργανα μέτρησης](/katalogos/organa-metrisis-power-tools). Για κλασική χάραξη υπάρχουν και τα [αλφάδια και μοιρογνωμόνια](/katalogos/alfadia-moirognomonia).
 

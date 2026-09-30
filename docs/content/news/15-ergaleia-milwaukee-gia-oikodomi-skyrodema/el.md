@@ -92,6 +92,8 @@ internalLinks:
     anchor: "M18 RLOHVG300-501C"
   - href: "/katalogos/mesa-atomikis-prostasias-odopoiia"
     anchor: "μέσα ατομικής προστασίας"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/ergaleia-milwaukee-gia-oikodomi-skyrodema/hero.webp"
+heroImageAlt: "Οικοδομή με σκελετό από οπλισμένο σκυρόδεμα και εργάτες με γιλέκα και κράνη πάνω στον οπλισμό της πλάκας"
 ---
 
 **Σύντομη απάντηση:** Για οικοδομή και σκυρόδεμα η Milwaukee έχει εξοπλισμό για κάθε φάση: πιστολέτα SDS-Plus και SDS-Max M18 με τρυπάνια MX4 για διάτρηση, κατεδαφιστικά και κόφτες MX FUEL για καθαιρέσεις και κοπές, δονητές σκυροδέματος και δονητικές πλάκες MX FUEL για σκυροδέτηση και συμπίεση, και περιστροφικό laser για χάραξη. Όλα με μπαταρία και, στο MX FUEL, χωρίς καυσαέρια.
@@ -104,6 +106,8 @@ internalLinks:
 
 - **SDS-Plus** για βύσματα, αγκύρια, διελεύσεις και ελαφρύ σκάψιμο. Το [M18 ONEFHPX-552X](/proion/pistoleto-per-ko-skaptiko-m18-onefhpx-552x-4933478496-4933478496) δίνει κατά τη Milwaukee 5,0 J, τρυπά έως 32 mm σε μπετό και αποδίδει καλύτερα στα 8–24 mm. Έχει AUTOSTOP και ONE-KEY.
 - **SDS-Max** για μεγάλες διαμέτρους, βαθιές τρύπες και καλέμισμα. Το M18 FHM είναι πιστολέτο SDS-Max κατηγορίας 8 kg, που η Milwaukee περιγράφει ως το πιο παραγωγικό εργαλείο SDS-Max που έχει φτιάξει, με ONE-KEY και AUTOSTOP που σβήνει το εργαλείο μετά από 45° απότομης κίνησης.
+
+![Πιστολέτο SDS-Plus Milwaukee M18 ONEFHPX με ONE-KEY και μπαταρία](https://kolleris.b-cdn.net/papatheo/4933478496/primary-0-1751219080013.webp)
 
 Όλα τα μοντέλα θα τα βρείτε στα [περιστροφικά και κατεδαφιστικά πιστολέτα](/katalogos/peristrofika-skaptika-pistoleta).
 
@@ -123,6 +127,8 @@ internalLinks:
 - **Κατεδαφιστικό [MXF DH2528H-602](/proion/katedafistiko-pistoleto-mxf-dh2528h-602-4933464877-4933464877):** κατηγορία 25 kg, υποδοχή 28 mm Hex, 64 J. Κατά τη Milwaukee, με μία μπαταρία XC608 σπάει έως 2,5 τόνους σκυρόδεμα ή ανοίγει χαντάκι έως 18 m. Με κραδασμούς 5,17 m/s² επιτρέπει πάνω από 7 ώρες δουλειάς πριν από το όριο έκθεσης χεριού-βραχίονα.
 - **Κόφτης [MXF COS350G2-802](/proion/koftis-350mm-mxf-cos350g2-802-4933480480-4933480480):** δίσκος 350 mm, βάθος κοπής έως 125 mm, anti-kickback και φρένο RAPIDSTOP κάτω από 2 δευτερόλεπτα.
 
+![Κατεδαφιστικό πιστολέτο μπαταρίας Milwaukee MX FUEL MXF DH2528H](https://kolleris.b-cdn.net/papatheo/4933464877/primary-0-1751219826638.webp)
+
 Για μικρότερες κοπές στο M18 υπάρχουν ο [κόφτης μπετού M18 FCOS230-121](/proion/koftis-betou-m18-fcos230-121-fuel-4933471697-4933471697) και ο [κόφτης οπλισμού M18 FRBCO32-502X](/proion/koftis-oplismou-trochos-m18-frbco32-502x-4933499367-milwaukee-4933499367). Όλα στους [κόφτες δομικών υλικών](/katalogos/koftes-kalodion-domikon-ylikon).
 
 Επειδή το MX FUEL δεν βγάζει καυσαέρια, μπορεί κατά τη Milwaukee να δουλέψει σε υπόγεια, κλειστά κτίρια, σκάμματα και τούνελ. Η σκόνη όμως μένει, και θέλει αναρρόφηση ή νερό.
@@ -130,6 +136,8 @@ internalLinks:
 ## Σκυροδέτηση: δονητές σκυροδέματος μπαταρίας
 
 Ο δονητής [MXF CVBCKIT-602](/proion/donitis-skyr-tos-mxf-cvbckit-602-4933479610-4933479610) είναι τύπου βαλίτσας. Σύμφωνα με τη Milwaukee:
+
+![Δονητής σκυροδέματος Milwaukee MX FUEL MXF CVBC με τα εξαρτήματα του κιτ](https://kolleris.b-cdn.net/papatheo/4933479610/primary-0-1751220098524.webp)
 
 - δίνει πάνω από 11.200 δονήσεις το λεπτό,
 - δονεί έως 40 m³ σκυρόδεμα με μία μπαταρία MXF XC406,
