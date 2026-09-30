@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import {
   Boxes,
   ChevronRight,
+  Drill,
   FileText,
   Frame,
   Grid2x2,
@@ -60,6 +61,7 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   content: FileText,
   translations: Languages,
   catalogue: Boxes,
+  milwaukee: Drill,
   merchandising: Tag,
   editorial: Newspaper,
   orders: Package,

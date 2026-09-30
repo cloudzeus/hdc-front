@@ -2,6 +2,7 @@ import { ADMIN_LOCALE } from "@/lib/admin/locale";
 import Link from "next/link";
 import { ArrowRight, Check, CircleAlert, ExternalLink, TriangleAlert } from "lucide-react";
 import { auth } from "@/auth";
+import { can } from "@/lib/rbac";
 import { formatMoney } from "@/lib/format";
 import { getDashboard } from "@/lib/admin/dashboard";
 import { PageShell, Panel, Stat } from "@/components/admin/PageShell";
@@ -16,11 +17,11 @@ const dt = new Intl.DateTimeFormat("el-GR", {
 });
 
 /**
- * Η ενότητα /admin/milwaukee έρχεται με το κομμάτι 2 του σχεδίου
- * (docs/superpowers/specs/2026-09-30-hdc-admin-design.md §4). Μέχρι να υπάρξει,
- * ο σύνδεσμος θα έβγαζε 404· γίνεται true μαζί με τη σελίδα.
+ * Η ενότητα /admin/milwaukee (κομμάτι 2 του σχεδίου,
+ * docs/superpowers/specs/2026-09-30-hdc-admin-design.md §4). Ο σύνδεσμος
+ * φαίνεται μόνο σε όποιον έχει `milwaukee.view`.
  */
-const MILWAUKEE_SECTION = false;
+const MILWAUKEE_SECTION = true;
 
 /** Οι γραμμές διαθεσιμότητας του πάνελ καταλόγου, με τα λόγια του eshop. */
 const AVAILABILITY_ROWS = [
@@ -148,7 +149,7 @@ export default async function AdminDashboard() {
                   </div>
                 ))}
               </dl>
-              {MILWAUKEE_SECTION && (
+              {MILWAUKEE_SECTION && can(session?.user.role, "milwaukee.view") && (
                 <div className="border-t border-k-line px-4 py-2.5">
                   <Link
                     href="/admin/milwaukee"
