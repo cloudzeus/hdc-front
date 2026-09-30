@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
-import { renderCampaign, type CampaignPayload } from "@/lib/newsletter/campaign";
+import { renderCampaignEmail, type CampaignPayload } from "@/lib/newsletter/campaign";
+import { routing, type Locale } from "@/i18n/routing";
 
 /**
  * Αποστολή καμπάνιας μέσω Mailgun.
@@ -32,29 +33,6 @@ function auth(): string {
 
 export type Recipient = { email: string; name?: string | null; subscriberId?: string | null };
 
-/**
- * Το κείμενο εναλλακτικής μορφής.
- *
- * Δεν είναι διακοσμητικό: τα φίλτρα ανεπιθύμητης αλληλογραφίας βαθμολογούν
- * αρνητικά ένα email που είναι μόνο HTML, και κάποιοι clients εξακολουθούν να
- * δείχνουν αυτό. Παράγεται από το ίδιο HTML ώστε να μη λέει άλλα.
- */
-function toPlainText(html: string): string {
-  return html
-    .replace(/<style[\s\S]*?<\/style>/gi, "")
-    .replace(/<br\s*\/?>/gi, "\n")
-    .replace(/<\/(p|tr|div|h[1-6])>/gi, "\n")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/[ \t]+/g, " ")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
-}
-
 export type SendOutcome = { ok: true; sent: number } | { ok: false; error: string };
 
 /**
@@ -69,21 +47,24 @@ export async function sendTest(input: {
   to: string;
   templateId: string;
   subject: string;
+  preheader?: string;
+  locale?: Locale;
   payload: CampaignPayload;
 }): Promise<SendOutcome> {
   if (!API_KEY || !DOMAIN) return { ok: false, error: "Το Mailgun δεν είναι ρυθμισμένο." };
 
-  const html = await renderCampaign(input.templateId, input.payload, {
-    first_name: "Δοκιμή",
-    email: input.to,
+  const email = renderCampaignEmail(input.templateId, input.payload, {
+    locale: input.locale ?? "el",
+    subject: input.subject,
+    preheader: input.preheader,
   });
 
   const form = new URLSearchParams({
     from: FROM,
     to: input.to,
     subject: `[ΔΟΚΙΜΗ] ${input.subject}`,
-    html,
-    text: toPlainText(html),
+    html: email.html,
+    text: email.text,
     "o:testmode": "no",
   });
 
@@ -117,7 +98,30 @@ export async function sendCampaign(campaignId: string, recipients: Recipient[]):
   if (campaign.status !== "draft") return { ok: false, error: "Η καμπάνια έχει ήδη σταλεί." };
 
   const payload = campaign.payload as unknown as CampaignPayload;
-  const html = await renderCampaign(campaign.templateId, payload);
+  const render = (locale: Locale) =>
+    renderCampaignEmail(campaign.templateId, payload, {
+      locale,
+      subject: campaign.subject,
+      preheader: campaign.preheader,
+    });
+
+  /*
+   * Each subscriber in their own language: the editor's words stay as written,
+   * the template's (menu, card labels, prices, footer) follow the subscriber.
+   * Addresses that are not subscribers (an uploaded list) get Greek.
+   */
+  const known = await prisma.newsletterSubscriber.findMany({
+    where: { email: { in: recipients.map((r) => r.email) } },
+    select: { email: true, locale: true },
+  });
+  const localeByEmail = new Map(known.map((k) => [k.email, k.locale as Locale]));
+  const groups = new Map<Locale, Recipient[]>();
+  for (const r of recipients) {
+    const locale = localeByEmail.get(r.email) ?? "el";
+    groups.set(locale, [...(groups.get(locale) ?? []), r]);
+  }
+  const rendered = new Map(routing.locales.filter((l) => groups.has(l)).map((l) => [l, render(l)]));
+  const html = (rendered.get("el") ?? render("el")).html;
 
   await prisma.campaign.update({
     where: { id: campaignId },
@@ -144,8 +148,13 @@ export async function sendCampaign(campaignId: string, recipients: Recipient[]):
   let sent = 0;
   const errors: string[] = [];
 
-  for (let i = 0; i < recipients.length; i += BATCH) {
-    const slice = recipients.slice(i, i + BATCH);
+  const batches: Array<{ slice: Recipient[]; locale: Locale }> = [];
+  for (const [locale, group] of groups) {
+    for (let i = 0; i < group.length; i += BATCH) batches.push({ slice: group.slice(i, i + BATCH), locale });
+  }
+
+  for (const { slice, locale } of batches) {
+    const email = rendered.get(locale)!;
     const vars = Object.fromEntries(
       slice.map((r) => [
         r.email,
@@ -156,8 +165,8 @@ export async function sendCampaign(campaignId: string, recipients: Recipient[]):
     const form = new URLSearchParams({
       from: FROM,
       subject: campaign.subject,
-      html,
-      text: toPlainText(html),
+      html: email.html,
+      text: email.text,
       "recipient-variables": JSON.stringify(vars),
       /*
        * Παρακολούθηση ανοιγμάτων και κλικ. Χωρίς αυτά τα δύο, το Events API

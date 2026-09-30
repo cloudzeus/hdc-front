@@ -5,10 +5,15 @@ import {
   availabilityLabelKey,
   availabilityOf,
 } from "@/lib/catalog/availability";
-import { renderTemplate } from "@/lib/mail/templates";
 import { grossAmount, formatMoney } from "@/lib/format";
 import { siteOrigin } from "@/lib/seo/urls";
-import manifest from "@/emails/manifest.json";
+import type { Locale } from "@/i18n/routing";
+import { upGreek } from "@/lib/greek";
+import { displayName, platformTag } from "@/lib/milwaukee/display";
+import { parseModel } from "@/lib/milwaukee/model";
+import { FREE_SHIPPING_THRESHOLD_NET } from "@/lib/cart/options";
+import { renderEmail, localeUrl, type RenderedEmail } from "@/lib/mail/hdc/render";
+import { t } from "@/lib/mail/hdc/strings";
 import {
   DEFAULT_COPY,
   type CampaignPayload,
@@ -41,46 +46,50 @@ export { EMPTY_NEWS } from "@/lib/newsletter/copy";
  */
 
 
-type ManifestShape = {
-  categories: Record<string, { title: string }>;
-  templates: Record<
-    string,
-    { category: string; name: string; subject: string; preheader: string; footer: string }
-  >;
-};
-
 /**
- * Ποια πρότυπα μπορεί να στείλει το marketing.
+ * The newsletters marketing can send, and only those: the transactional
+ * emails are triggered by an order or an account and mean nothing as a mass
+ * send. The same three the spec names — offers, new products, news — each
+ * with product, banner, text and button blocks.
  *
- * ΜΟΝΟ η οικογένεια «newsletter». Τα υπόλοιπα 21 είναι transactional — τα
- * ενεργοποιεί μια παραγγελία, μια πληρωμή, μια εγγραφή — και δεν έχουν νόημα ως
- * μαζική αποστολή. Ένα «Η παραγγελία σας στάλθηκε» σε 4.000 παραλήπτες που δεν
- * παρήγγειλαν τίποτα δεν είναι λάθος επιλογή· είναι λάθος που η επιλογή
- * υπήρχε.
+ * `nl-announcement` (a Kolleris layout) is gone; a draft saved with it renders
+ * with the news template, which takes the same content.
  */
-const CAMPAIGN_CATEGORIES = new Set(["newsletter"]);
-
-/** Ποια πρότυπα δέχονται τι. Από τη δομή τους, όχι από εικασία. */
-const CAPABILITIES: Record<string, { products: boolean; richText: boolean }> = {
-  "nl-offers": { products: true, richText: true },
-  "nl-news": { products: false, richText: true },
-  "nl-announcement": { products: false, richText: true },
-};
+const CAMPAIGN_TEMPLATES: TemplateMeta[] = [
+  {
+    id: "nl-offers",
+    name: "Newsletter · Προσφορές",
+    category: "newsletter",
+    categoryTitle: "Newsletter",
+    subject: "Προσφορές του μήνα στο Milwaukee Heavy Duty Centre",
+    preheader: "Εργαλεία, μπαταρίες και PACKOUT σε τιμές προσφοράς, έως εξαντλήσεως.",
+    takesProducts: true,
+    takesRichText: true,
+  },
+  {
+    id: "nl-new-products",
+    name: "Newsletter · Νέα προϊόντα",
+    category: "newsletter",
+    categoryTitle: "Newsletter",
+    subject: "Νέα προϊόντα Milwaukee στο κατάστημα",
+    preheader: "Όσα μόλις έφτασαν στο Milwaukee Heavy Duty Centre Πειραιά.",
+    takesProducts: true,
+    takesRichText: true,
+  },
+  {
+    id: "nl-news",
+    name: "Newsletter · Νέα",
+    category: "newsletter",
+    categoryTitle: "Newsletter",
+    subject: "Νέα από το Milwaukee Heavy Duty Centre",
+    preheader: "Οδηγοί, νέα και ό,τι αλλάζει στο κατάστημα.",
+    takesProducts: false,
+    takesRichText: false,
+  },
+];
 
 export function campaignTemplates(): TemplateMeta[] {
-  const m = manifest as ManifestShape;
-  return Object.entries(m.templates)
-    .filter(([, t]) => CAMPAIGN_CATEGORIES.has(t.category))
-    .map(([id, t]) => ({
-      id,
-      name: t.name,
-      category: t.category,
-      categoryTitle: m.categories[t.category]?.title ?? t.category,
-      subject: t.subject,
-      preheader: t.preheader,
-      takesProducts: CAPABILITIES[id]?.products ?? false,
-      takesRichText: CAPABILITIES[id]?.richText ?? true,
-    }));
+  return CAMPAIGN_TEMPLATES;
 }
 
 /**
@@ -153,6 +162,7 @@ export async function searchCampaignProducts(
       slug: true,
       name: true,
       code: true,
+      code2: true,
       priceNet: true,
       priceList: true,
       qty: true,
@@ -181,101 +191,182 @@ export async function searchCampaignProducts(
     const gross = grossAmount(net);
     const grossOld = list > net ? grossAmount(list) : 0;
     const qty = p.qty ? Number(p.qty) : 0;
+    const availability = availabilityLabelKey(availabilityOf(p), qty);
     return {
       id: p.id,
       slug: p.slug,
       name: p.name,
       code: p.code,
+      code2: p.code2 || p.code,
       brand: (p.mtrmark != null ? brandByMark.get(p.mtrmark) : "") ?? "",
       image: emailSafeImageUrl(p.images[0]?.url ?? ""),
       price: formatMoney(gross, "el"),
       priceOld: grossOld > 0 ? formatMoney(grossOld, "el") : "",
+      priceGross: gross,
+      priceOldGross: grossOld > 0 ? grossOld : undefined,
       discount: grossOld > 0 ? String(Math.round((1 - gross / grossOld) * 100)) : "",
       /*
-       * Η ετικέτα λέει την αλήθεια τη στιγμή της ΑΠΟΣΤΟΛΗΣ και παγώνει εκεί.
-       * Ένα email είναι στιγμιότυπο· δεν ενημερώνεται όταν το απόθεμα αλλάξει,
-       * και το «Σε απόθεμα» σε κάτι που εξαντλήθηκε είναι η πιο συχνή
-       * αιτία παραπόνου μετά από newsletter προσφορών. Ο ίδιος κανόνας με τη
-       * βιτρίνα: κανένας αριθμός, εκτός από το τελευταίο τεμάχιο.
+       * Frozen at the moment of sending: an email is a snapshot and does not
+       * update when the stock changes. The storefront's rule: no number, except
+       * the last piece.
        */
-      stockLabel: AVAILABILITY_LABELS_EL[availabilityLabelKey(availabilityOf(p), qty)],
+      stockLabel: AVAILABILITY_LABELS_EL[availability],
+      availability,
+      tag: platformTag(p.name) ?? (/\bPACKOUT\b/i.test(p.name) ? "PACKOUT" : null),
+      bare: parseModel(p.name)?.content === "bare",
       url: `${siteOrigin()}/proion/${p.slug}`,
     };
   });
 }
 
-/** Τα επιλεγμένα προϊόντα σε ζευγάρια — το layout του template είναι 2-up. */
-export function toProductRows(products: PickedProduct[]) {
-  const rows: Array<Array<Record<string, string>>> = [];
+/** One product card of the grid, in the reader's language. */
+function card(p: PickedProduct, locale: Locale, withDiscount: boolean) {
+  const key = p.availability;
+  return {
+    tag: p.tag === undefined ? platformTag(p.name) : p.tag,
+    pct: withDiscount && p.discount && Number(p.discount) > 0 ? p.discount : "",
+    name: displayName(p.name, p.code2 ?? p.code),
+    code: p.code2 || p.code,
+    content: p.bare ? t(locale, "card.bare") : "",
+    price: p.priceGross != null ? formatMoney(p.priceGross, locale) : p.price,
+    was: withDiscount ? (p.priceOldGross ? formatMoney(p.priceOldGross, locale) : p.priceOld) : "",
+    availability: key
+      ? { label: t(locale, `avail.${key}`), tone: key === "se_apothema" || key === "teleftaio" ? "ok" : "wait" }
+      : p.stockLabel
+        ? { label: p.stockLabel, tone: /απόθεμα|τεμάχιο/i.test(p.stockLabel) ? "ok" : "wait" }
+        : null,
+    image: p.image,
+    url: p.slug ? localeUrl(locale, `/proion/${p.slug}`) : p.url,
+  };
+}
+
+/** The picked products in pairs: the grid is two cards wide. */
+export function toProductRows(products: PickedProduct[], locale: Locale = "el", withDiscount = true) {
+  const rows: Array<Array<ReturnType<typeof card>>> = [];
   for (let i = 0; i < products.length; i += 2) {
-    rows.push(
-      products.slice(i, i + 2).map((p) => ({
-        brand: p.brand,
-        sku: p.code,
-        name: p.name,
-        price: p.price,
-        price_old: p.priceOld,
-        discount: p.discount,
-        stock_label: p.stockLabel,
-        image: p.image,
-        url: p.url,
-      })),
-    );
+    rows.push(products.slice(i, i + 2).map((p) => card(p, locale, withDiscount)));
   }
   return rows;
 }
 
+const upper = (s: string, locale: Locale) => (locale === "el" ? upGreek(s) : s.toLocaleUpperCase(locale));
+
+export type CampaignRenderOptions = {
+  assetOrigin?: string;
+  locale?: Locale;
+  subject?: string;
+  preheader?: string;
+};
 
 /**
- * Το HTML της καμπάνιας, για προεπισκόπηση ή για αποστολή.
+ * The campaign as an email, for the preview or for sending.
  *
- * Ο ίδιος δρόμος και για τα δύο — αλλιώς η προεπισκόπηση δείχνει κάτι που δεν
- * είναι αυτό που φεύγει, που είναι χειρότερο από καθόλου προεπισκόπηση.
+ * One path for both — a preview that lives on its own path shows something
+ * that is not what leaves, which is worse than no preview.
+ *
+ * The editor writes the campaign in one language; the template's own words
+ * (menu, card labels, availability, prices, footer) follow the subscriber's.
  */
+export function renderCampaignEmail(
+  templateId: string,
+  payload: CampaignPayload,
+  options: CampaignRenderOptions = {},
+): RenderedEmail {
+  const locale = options.locale ?? "el";
+  const id = templateId === "nl-announcement" ? "nl-news" : templateId;
+  const campaign = payload.campaign ?? { eyebrow: "", discount: "", title: "", text: "", url: "", valid_until: "" };
+
+  /* An override counts only when somebody wrote something other than the default. */
+  const copy = (key: keyof typeof DEFAULT_COPY, fallback: string) => {
+    const value = payload.copy?.[key]?.trim();
+    return value && value !== DEFAULT_COPY[key] ? value : fallback;
+  };
+
+  const subject = options.subject?.trim() || campaign.title || CAMPAIGN_TEMPLATES.find((x) => x.id === id)?.subject || "";
+  const preheader = options.preheader?.trim() || campaign.text || "";
+  const topline = {
+    left: campaign.eyebrow || t(locale, "nl.topline_news"),
+    right: new URL(siteOrigin()).host.replace(/^www\./, ""),
+    href: localeUrl(locale, "/"),
+  };
+
+  let data: Record<string, unknown>;
+  if (id === "nl-news") {
+    const news = payload.news;
+    const hero = news?.hero;
+    data = {
+      issue: news
+        ? {
+            label: [news.issue.label, news.issue.number].filter(Boolean).join(" · "),
+            title: news.issue.title,
+            intro: richText(news.issue.intro),
+          }
+        : {},
+      hero: hero
+        ? {
+            badge: hero.eyebrow,
+            title: [hero.title_before, hero.title_accent, hero.title_after].filter(Boolean).join(" ").trim(),
+            text: richText(hero.text),
+            image: hero.image,
+            image_alt: hero.image_alt || hero.title_accent || "",
+            cta: hero.url ? hero.cta || t(locale, "nl.read_more") : "",
+            url: hero.url,
+          }
+        : {},
+      articles: (news?.articles ?? []).map((a) => ({
+        title: a.title,
+        excerpt: richText(a.excerpt),
+        tag: a.tag,
+        image: a.image,
+        url: a.url,
+        cta: upper(a.cta || t(locale, "nl.read_more"), locale),
+      })),
+    };
+  } else {
+    const newProducts = id === "nl-new-products";
+    const target = campaign.url || localeUrl(locale, newProducts ? "/nees-afixeis" : "/prosfores");
+    data = {
+      hero: {
+        badge: campaign.eyebrow,
+        big: newProducts ? "" : campaign.discount,
+        title: campaign.title || (newProducts ? t(locale, "nl.new_section") : ""),
+        text: campaign.text,
+        image: campaign.image ?? "",
+        image_alt: campaign.title,
+        url: target,
+      },
+      intro: {
+        title: copy("section_title", t(locale, newProducts ? "nl.new_section" : "nl.section_title")),
+        paragraphs: [t(locale, "nl.delivery", { threshold: formatMoney(FREE_SHIPPING_THRESHOLD_NET, locale) })],
+      },
+      rows: toProductRows(payload.products ?? [], locale, !newProducts),
+      cta: {
+        label: upper(copy("all_button", t(locale, newProducts ? "nl.all_new" : "nl.all_offers")), locale),
+        url: target,
+        note: campaign.valid_until
+          ? t(locale, "nl.prices_until", { date: campaign.valid_until })
+          : t(locale, "nl.prices"),
+      },
+    };
+  }
+
+  return renderEmail({
+    template: id,
+    locale,
+    kind: "newsletter",
+    subject,
+    preheader,
+    topline,
+    assetOrigin: options.assetOrigin,
+    data,
+  });
+}
+
+/** The campaign's HTML (preview, frozen copy of what was sent). */
 export async function renderCampaign(
   templateId: string,
   payload: CampaignPayload,
-  recipient: { first_name?: string; last_name?: string; email?: string } = {},
-  options: { assetOrigin?: string } = {},
+  options: CampaignRenderOptions = {},
 ): Promise<string> {
-  /*
-   * Κενή τιμή σημαίνει «κράτα την προεπιλογή», όχι «άφησε το κενό». Ένας
-   * συντάκτης που σβήνει ένα πεδίο για να δει τι κάνει, δεν θέλει κουμπί χωρίς
-   * ετικέτα να φύγει σε τέσσερις χιλιάδες ανθρώπους.
-   */
-  const copy = { ...DEFAULT_COPY } as Record<string, string>;
-  for (const [k, v] of Object.entries(payload.copy ?? {})) {
-    // Τα κείμενα του αποσυρμένου μπάνερ B2B μιας παλιάς καμπάνιας αγνοούνται,
-    // αλλιώς θα το ξανάφερναν στο email.
-    if (k.startsWith("b2b_")) continue;
-    if (typeof v === "string" && v.trim()) copy[k] = v;
-  }
-
-  /*
-   * Τα κείμενα των «Νέων» περνούν από τον καθαριστή και βγαίνουν ως SafeString,
-   * ώστε ο συντάκτης να μπορεί να βάλει έμφαση και συνδέσμους χωρίς να απειλείται
-   * η διάταξη — και χωρίς να χρειαστεί να γίνουν raw τα πεδία του προτύπου.
-   */
-  const news = payload.news;
-
-  return renderTemplate(templateId, {
-    copy,
-    issue: news
-      ? { ...news.issue, intro: richText(news.issue.intro) }
-      : undefined,
-    hero: news ? { ...news.hero, text: richText(news.hero.text) } : undefined,
-    articles: (news?.articles ?? []).map((a) => ({
-      ...a,
-      excerpt: richText(a.excerpt),
-    })),
-    campaign: payload.campaign,
-    product_rows: toProductRows(payload.products ?? []),
-    body_html: payload.bodyHtml ?? "",
-    preheader: payload.campaign.text,
-    recipient: {
-      first_name: recipient.first_name ?? "",
-      last_name: recipient.last_name ?? "",
-      email: recipient.email ?? "",
-    },
-  }, options);
+  return renderCampaignEmail(templateId, payload, options).html;
 }

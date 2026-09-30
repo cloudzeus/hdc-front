@@ -68,6 +68,7 @@ export function CampaignWizard({
     text: "",
     url: "",
     valid_until: "",
+    image: "",
   });
   const [products, setProducts] = useState<PickedProduct[]>([]);
   const [copy, setCopy] = useState<Record<string, string>>({});
@@ -109,12 +110,12 @@ export function CampaignWizard({
     if (!templateId) return;
     startPreview(async () => {
       try {
-        setHtml(await previewCampaignAction({ templateId, payload }));
+        setHtml(await previewCampaignAction({ templateId, payload, subject, preheader }));
       } catch {
         setHtml("<p style='font:14px sans-serif;color:#c00;padding:24px'>Η προεπισκόπηση απέτυχε.</p>");
       }
     });
-  }, [templateId, payload]);
+  }, [templateId, payload, subject, preheader]);
 
   useEffect(() => {
     if (debounce.current) clearTimeout(debounce.current);
@@ -285,6 +286,19 @@ export function CampaignWizard({
                     />
                   </Field>
                 </div>
+                <div className="sm:col-span-2">
+                  <Field
+                    label="Εικόνα banner"
+                    hint="Προαιρετική. Διεύθυνση εικόνας από το CDN· μπαίνει δίπλα στον τίτλο, σε JPEG για το Outlook."
+                  >
+                    <input
+                      value={campaign.image}
+                      onChange={(e) => setCampaign({ ...campaign, image: e.target.value })}
+                      placeholder="https://kolleris.b-cdn.net/…"
+                      className={INPUT}
+                    />
+                  </Field>
+                </div>
               </div>
               )}
 
@@ -338,11 +352,8 @@ export function CampaignWizard({
                   <div className="grid gap-3 border-t border-neutral-100 p-4 sm:grid-cols-2">
                     {(
                       [
-                        ["hero_button", "Κουμπί hero"],
-                        ["section_eyebrow", "Επικεφαλίδα ενότητας"],
                         ["section_title", "Τίτλος ενότητας"],
-                        ["section_link", "Σύνδεσμος ενότητας"],
-                        ["all_button", "Κουμπί «όλες»"],
+                        ["all_button", "Κουμπί κάτω από τα προϊόντα"],
                       ] as const
                     ).map(([key, label]) => (
                       <Field key={key} label={label}>
@@ -411,7 +422,7 @@ export function CampaignWizard({
                     onClick={() => {
                       setTestState({ kind: "idle", message: "" });
                       startTest(async () => {
-                        const res = await sendTestAction({ to: testTo, templateId, subject, payload });
+                        const res = await sendTestAction({ to: testTo, templateId, subject, preheader, payload });
                         setTestState(
                           res.ok
                             ? { kind: "ok", message: `Στάλθηκε στο ${res.to}. Ελέγξτε και τα ανεπιθύμητα.` }

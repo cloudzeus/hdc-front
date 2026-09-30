@@ -16,25 +16,21 @@
  */
 
 /**
- * Τα «σταθερά» κείμενα του προτύπου προσφορών — κουμπιά και επικεφαλίδες.
+ * The fixed words of the product newsletters that an editor may override: the
+ * section title and the button under the grid. Shown as placeholders in the
+ * wizard; an empty or unchanged field means «the template's own words in the
+ * reader's language» (lib/mail/hdc/strings), so a Greek override is never
+ * forced on an English subscriber by accident. The template upper-cases them.
  *
- * Ήταν καρφωτά μέσα στο markup. Έγιναν μεταβλητές με ΑΥΤΕΣ τις προεπιλογές,
- * ώστε καμία καμπάνια να μην αλλάξει όψη αν δεν τις πειράξει κανείς.
- *
- * Πραγματικός χαρακτήρας αχώριστου κενού (U+00A0), ΟΧΙ «&nbsp;»: όσο τα κείμενα
- * ήταν στο markup το «&nbsp;» ήταν HTML και δούλευε· ως μεταβλητές, το
- * Handlebars κάνει escape το «&» και ο παραλήπτης βλέπει κυριολεκτικά
- * «προσφορες&nbsp;→». Ο χαρακτήρας δεν χρειάζεται escape καθόλου.
- *
- * Χωρίς τόνους στα κεφαλαία, όπως τα είχε το πρότυπο — τα ελληνικά κεφαλαία δεν
- * φέρουν τόνο.
+ * `hero_button`, `section_eyebrow` and `section_link` belonged to the Kolleris
+ * layout and are ignored by the HDC one; kept so older campaigns still parse.
  */
 export const DEFAULT_COPY = {
-  hero_button: "Δειτε τις προσφορες  →",
-  section_eyebrow: "Επιλεγμενα",
-  section_title: "Οι προσφορες του μηνα",
-  section_link: "Ολες οι προσφορες →",
-  all_button: "Ολες οι προσφορες  →",
+  hero_button: "",
+  section_eyebrow: "",
+  section_title: "Οι προσφορές του μήνα",
+  section_link: "",
+  all_button: "Όλες οι προσφορές",
   /* Το μπάνερ B2B αποσύρθηκε (το HDC πουλά μόνο σε ιδιώτες): κενό κουμπί
      σημαίνει ότι το πρότυπο δεν το αποδίδει καθόλου. */
   b2b_eyebrow: "",
@@ -55,6 +51,17 @@ export type PickedProduct = {
   discount: string;
   stockLabel: string;
   url: string;
+  /* Raw facts, so each language writes its own price and availability.
+     Missing on campaigns saved before the HDC templates: the strings above are used. */
+  /** Manufacturer code (code2), what the card prints. */
+  code2?: string;
+  priceGross?: number;
+  priceOldGross?: number;
+  availability?: "se_apothema" | "teleftaio" | "diathesimo_3_5" | "paradosi_1_3";
+  /** «M18 FUEL», «PACKOUT»… from the name; null when none. */
+  tag?: string | null;
+  /** A bare tool: «Χωρίς μπαταρία». */
+  bare?: boolean;
 };
 
 /**
@@ -115,6 +122,8 @@ export type CampaignPayload = {
     text: string;
     url: string;
     valid_until: string;
+    /** Banner picture next to the headline (absolute URL). Optional. */
+    image?: string;
   };
   products: PickedProduct[];
   /** Ελεύθερο κείμενο από τον editor, ήδη ως HTML. */

@@ -8,6 +8,7 @@ import { sendTest } from "@/lib/newsletter/send";
 import { generateCampaignCopy, type AngleId, type GeneratedCopy } from "@/lib/newsletter/ai-copy";
 import { getBlogPosts } from "@/lib/blog/blog";
 import { siteOrigin } from "@/lib/seo/urls";
+import type { Locale } from "@/i18n/routing";
 import {
   renderCampaign,
   searchCampaignProducts,
@@ -36,13 +37,16 @@ export async function searchProductsAction(filters: ProductFilters): Promise<Pic
 export async function previewCampaignAction(input: {
   templateId: string;
   payload: CampaignPayload;
+  locale?: Locale;
+  subject?: string;
+  preheader?: string;
 }): Promise<string> {
   await guard();
 
   /*
    * Η προεπισκόπηση τραβά τα εικαστικά από τον server που την σερβίρει, όχι από
    * την παραγωγή. Στην ανάπτυξη τα αρχεία υπάρχουν τοπικά και όχι ακόμη στο
-   * web.kolleris.com· χωρίς αυτό, το λογότυπο έβγαινε σπασμένο σε κάθε
+   * δημόσιο site· χωρίς αυτό, το λογότυπο έβγαινε σπασμένο σε κάθε
    * προεπισκόπηση και θα το θεωρούσε κανείς σφάλμα του template.
    */
   const h = await headers();
@@ -53,12 +57,11 @@ export async function previewCampaignAction(input: {
     input.templateId,
     input.payload,
     {
-      // Δείγμα ονόματος, ώστε να φαίνεται πώς κάθεται η προσωποποίηση στη σελίδα.
-      first_name: "Νίκος",
-      last_name: "Παπαδόπουλος",
-      email: "nikos@example.gr",
+      ...(host ? { assetOrigin: `${proto}://${host}` } : {}),
+      locale: input.locale,
+      subject: input.subject,
+      preheader: input.preheader,
     },
-    host ? { assetOrigin: `${proto}://${host}` } : {},
   );
 }
 
@@ -161,6 +164,8 @@ export async function sendTestAction(input: {
   to?: string;
   templateId: string;
   subject: string;
+  preheader?: string;
+  locale?: Locale;
   payload: CampaignPayload;
 }): Promise<{ ok: true; to: string } | { ok: false; error: string }> {
   const user = await guard();
@@ -168,7 +173,14 @@ export async function sendTestAction(input: {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(to)) {
     return { ok: false, error: "Δώστε έγκυρη διεύθυνση για το δοκιμαστικό." };
   }
-  const res = await sendTest({ to, templateId: input.templateId, subject: input.subject, payload: input.payload });
+  const res = await sendTest({
+    to,
+    templateId: input.templateId,
+    subject: input.subject,
+    preheader: input.preheader,
+    locale: input.locale,
+    payload: input.payload,
+  });
   return res.ok ? { ok: true, to } : { ok: false, error: res.error };
 }
 
