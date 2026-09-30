@@ -97,10 +97,51 @@ export function describeProduct(longDescription: string | null): string | null {
   return clean ? clean.slice(0, 1400) : null;
 }
 
+// ── What a bare tool does not come with ────────────────────────────────────
+//
+// The catalogue is not always right about a bare tool: the M18 FMTIW2F12-0X
+// lists «Σετ περιλαμβάνονται: 2 x M18 B5, M12-18 FC, HD Box». A bare tool
+// (content «bare», or a model ending -0, -0X, -0C) keeps none of that — no
+// battery or charger row, spec or sentence — so neither the writer nor the
+// numbers gate can lean on it.
+
+/** A row about what is in the box: batteries, charger, kit contents. «Παραδίδεται σε: HD Box» stays (the X of -0X). */
+export const BOX_LABEL =
+  /(σετ\s+περιλαμβ|περιλαμβάνετ|παρεχόμεν|μπαταρ|φορτιστ|\bkit\b|\bset\b|battery|batteries|charger|included|supplied)/i;
+/** A value naming batteries or a charger: «2 x M18 B5», «M12-18 FC», «5.0 Ah», «φορτιστής». */
+export const BOX_VALUE =
+  /(\d\s*[x×]\s*(M1[28]|μπαταρ|batter)|\bM1[28]\s*(B|HB|HNRG|NRG|FB)\s?\d|\bM12-18\s*[A-Z]*|\bC12\s*C\b|\d\s*Ah\b|μπαταρ|φορτιστ|batter|charger)/i;
+/** Weights are measured WITH a battery: kept, without naming it. */
+const WEIGHT_LABEL = /βάρος|weight/i;
+
+/** «-0», «-0X», «-0C»: a bare tool, whatever the catalogue says. */
+export const isBareModel = (model: string | null | undefined) => !!model && /-0[XC]?$/i.test(model.trim());
+
+export function withoutBoxRows<T extends { label: string; value: string }>(rows: T[]): T[] {
+  return rows
+    .map((r) => (WEIGHT_LABEL.test(r.label) ? { ...r, value: r.value.replace(/\(?\s*\bM1[28]\s*[A-Z]*\s?\d+(?:[.,]\d)?\s*\)?/gi, "").trim() } : r))
+    .filter((r) => r.value && (WEIGHT_LABEL.test(r.label) || (!BOX_LABEL.test(r.label) && !BOX_VALUE.test(r.value))));
+}
+
+/** A bare tool's description: no sentence about batteries or a charger, unless it says «χωρίς». */
+export function withoutBoxSentences(text: string | null): string | null {
+  if (!text) return text;
+  const kept = text
+    .split(/(?<=[.!;])\s+/)
+    .filter((s) => /χωρίς|without/i.test(s) || !BOX_VALUE.test(s))
+    .join(" ")
+    .trim();
+  return kept || null;
+}
+
 export function packProduct(raw: RawProduct, official: { specs: OfficialSpec[]; url: string | null } | null): PackProduct {
   const parsed = parseModel(raw.name);
-  const specs = parseTechBlock(raw.longDescriptionEl);
-  const content = (raw.modelContent ?? parsed?.content) === "bare" ? "bare" : (raw.modelContent ?? parsed?.content) === "kit" ? "kit" : null;
+  const allSpecs = parseTechBlock(raw.longDescriptionEl);
+  const declared = (raw.modelContent ?? parsed?.content) === "bare" ? "bare" : (raw.modelContent ?? parsed?.content) === "kit" ? "kit" : null;
+  const content = isBareModel(parsed?.code) ? "bare" : declared;
+  const bare = content === "bare";
+  const specs = bare ? withoutBoxRows(allSpecs) : allSpecs;
+  const officialSpecs = official?.specs ?? [];
   const kit = content === "kit" ? (kitFromTechBlock(specs) ?? parsed?.kit ?? null) : null;
   return {
     code: raw.code2,
@@ -113,9 +154,11 @@ export function packProduct(raw: RawProduct, official: { specs: OfficialSpec[]; 
     content: content === "bare" ? "σκέτο εργαλείο, χωρίς μπαταρίες και φορτιστή" : content === "kit" ? "κιτ" : null,
     kit: kit ? `${kit.batteries} ${kit.batteries === 1 ? "μπαταρία" : "μπαταρίες"} ${kit.ah.toFixed(1).replace(".", ",")} Ah` : null,
     url: `/proion/${raw.slug}`,
-    description: describeProduct(raw.longDescriptionEl),
+    description: bare ? withoutBoxSentences(describeProduct(raw.longDescriptionEl)) : describeProduct(raw.longDescriptionEl),
     specs: specs.filter((r) => !/^Κωδικός$/i.test(r.label)),
-    official: official?.specs ?? [],
+    official: bare
+      ? withoutBoxRows(officialSpecs.map((o) => ({ ...o, label: o.name }))).map(({ name, value, unit }) => ({ name, value, unit }))
+      : officialSpecs,
     officialUrl: official?.url ?? null,
     image: raw.image,
   };

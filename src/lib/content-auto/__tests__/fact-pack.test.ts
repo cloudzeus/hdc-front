@@ -3,7 +3,9 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("@/lib/prisma", () => ({ prisma: {} }));
 
 import {
+  BOX_LABEL,
   STORE_FACTS,
+  isBareModel,
   describeProduct,
   packNumbers,
   packProduct,
@@ -105,5 +107,70 @@ describe("the pack", () => {
     const supported = packNumbers(pack());
     expect(unsupportedNumbers("158 Nm, 0–2100 rpm, 5,0 Ah", supported)).toEqual([]);
     expect(unsupportedNumbers("135 Nm", supported)).toEqual(["135 Nm"]);
+  });
+});
+
+describe("a bare tool carries no kit contents (C2)", () => {
+  /** The real catalogue block of the M18 FMTIW2F12-0X, as it is in the database. */
+  const REAL = [
+    "Το μπουλονόκλειδο M18 FMTIW2F12-0X έχει δακτύλιο συγκράτησης.",
+    "Το σετ περιλαμβάνει δύο μπαταρίες M18 B5 5,0 Ah και φορτιστή M12-18 FC.",
+    "Παραδίδεται σε HD Box, χωρίς μπαταρίες και φορτιστή.",
+    "",
+    "Τεχνικά χαρακτηριστικά:",
+    "Μέγιστη ροπή στερέωσης (Nm): 745",
+    "Σετ περιλαμβάνονται: 2 x M18 B5, M12-18 FC, HD Box",
+    "Χωρητικότητα μπαταρίας (Ah): 5.0",
+    "Αρ. παρεχόμενων μπαταριών: 2",
+    "Παραδίδεται σε: HD Box",
+    "Βάρος με μπαταρία (EPTA) (kg): 2.3 (M18 B5)",
+  ].join("\n");
+  const bare = packProduct(
+    raw({ name: "ΜΠΟΥΛΟΝΟΚΛΕΙΔΟ 1/2\" M18 FMTIW2F12-0X", modelContent: "kit", longDescriptionEl: REAL }),
+    { specs: [{ name: "Batteries included", value: "2 x M18 B5", unit: null }, { name: "Max torque", value: "745", unit: "Nm" }], url: null },
+  );
+
+  it("knows a bare model by its suffix, whatever the catalogue says", () => {
+    expect(isBareModel("M18 FMTIW2F12-0X")).toBe(true);
+    expect(isBareModel("M18 FPD3-0")).toBe(true);
+    expect(isBareModel("M18 FPD3-0C")).toBe(true);
+    expect(isBareModel("M18 FPD3-502X")).toBe(false);
+    expect(bare.content).toMatch(/^σκέτο/);
+    expect(bare.kit).toBeNull();
+  });
+
+  it("drops the kit row «2 x M18 B5, M12-18 FC, HD Box» and every battery row, keeps HD Box and the weight", () => {
+    const values = bare.specs.map((r) => r.value).join(" | ");
+    expect(values).not.toMatch(/M18 B5|M12-18|Ah|μπαταρ/i);
+    expect(bare.specs).toContainEqual({ label: "Παραδίδεται σε", value: "HD Box" });
+    expect(bare.specs).toContainEqual({ label: "Βάρος με μπαταρία (EPTA) (kg)", value: "2.3" });
+    expect(bare.specs.some((r) => BOX_LABEL.test(r.label) && !/βάρος/i.test(r.label))).toBe(false);
+  });
+
+  it("drops battery sentences from the description unless they say «χωρίς», and battery official specs", () => {
+    expect(bare.description).not.toMatch(/M18 B5|5,0 Ah|M12-18/);
+    expect(bare.description).toContain("χωρίς μπαταρίες και φορτιστή");
+    expect(bare.official).toEqual([{ name: "Max torque", value: "745", unit: "Nm" }]);
+  });
+
+  it("so the numbers gate cannot lean on them", () => {
+    const pack: FactPack = {
+      topic: { kind: "MODEL", title: "t", keyword: "k", keywords: [], categoryName: null },
+      articleKind: "ARTICLE",
+      products: [bare],
+      links: [],
+      store: STORE_FACTS,
+      sources: [],
+      representative: null,
+      notes: [],
+    };
+    const supported = packNumbers(pack);
+    expect(unsupportedNumbers("745 Nm, 2,3 kg", supported)).toEqual([]);
+    expect(unsupportedNumbers("5,0 Ah", supported)).toEqual(["5,0 Ah"]);
+  });
+
+  it("a kit keeps its box", () => {
+    const kit = packProduct(raw({ longDescriptionEl: REAL.replace("-0X", "-502X") }), null);
+    expect(JSON.stringify(kit.specs)).toContain("M18 B5");
   });
 });

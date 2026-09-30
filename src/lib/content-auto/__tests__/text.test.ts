@@ -86,6 +86,42 @@ describe("numbers", () => {
   });
 });
 
+describe("numbers, as the review asked (I1)", () => {
+  const supported = supportedNumbers(
+    ["Μπαταρία 12,0 Ah"],
+    [
+      { label: "Μέγιστη συχνότητα κρούσης (bpm)", value: "0-33.000" },
+      { label: "Ισχύς (kW)", value: "1,5" },
+      { label: "Υποδοχή", value: '1/2"' },
+      { label: "Εγγύηση", value: "3 έτη" },
+      { label: "Στάθμη θορύβου (dB(A))", value: "95" },
+    ],
+  );
+  it("reads units in any case and the Greek look-alike Νm", () => {
+    expect(numberMentions("158 NM και 158 Νm").map((m) => m.unit)).toEqual(["nm", "nm"]);
+  });
+  it("reads kW, Wh, cm, m, dB, °C, %, m/s², inches and κιλά", () => {
+    const units = numberMentions('1,5 kW, 72 Wh, 30 cm, 2 m, 95 dB(A), 60 °C, 30%, 4,5 m/s², 1/2", ½″, 3 ίντσες, 2 κιλά').map((m) => m.unit);
+    expect(units).toEqual(["kw", "wh", "cm", "m", "db", "degc", "pct", "ms2", "inch", "kg", "inch", "inch"]);
+  });
+  it("reads a multiplier before the number", () => {
+    expect(numberMentions("2x12,0Ah")[0]).toMatchObject({ unit: "ah", readings: [[12]] });
+    expect(unsupportedNumbers("2x12,0Ah", supported)).toEqual([]);
+  });
+  it("reads number words before a unit", () => {
+    expect(numberMentions("δεκαοκτώ V")[0]).toMatchObject({ unit: "v", readings: [[18]] });
+  });
+  it("a pack range «0-33.000 bpm» does not support «33 bpm»", () => {
+    expect(unsupportedNumbers("33.000 bpm", supported)).toEqual([]);
+    expect(unsupportedNumbers("33 bpm", supported)).toEqual(["33 bpm"]);
+  });
+  it("bare numbers of ten or more, and durations, must be in the pack", () => {
+    expect(unsupportedNumbers("30 φορές πιο γρήγορο", supported)).toEqual(["30"]);
+    expect(unsupportedNumbers("εγγύηση 5 ετών", supported)).toEqual(["5 ετών"]);
+    expect(unsupportedNumbers("το M18 FPD3-502X, 4933479859, 2 μπαταρίες, 95 dB(A)", supported)).toEqual([]);
+  });
+});
+
 describe("codes and models", () => {
   it("finds models, with and without the kit suffix, whatever the spelling", () => {
     expect(modelMentions("Το M18 FPD3-502X και το Μ18FID3 είναι M18 FUEL™")).toEqual([
