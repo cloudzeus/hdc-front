@@ -1,10 +1,11 @@
 /** Μορφοποίηση και αναγνώσεις από τον browser για την ενότητα Milwaukee (el-GR). */
+import { formatMoney } from "@/lib/format";
 
-const EUR = new Intl.NumberFormat("el-GR", { style: "currency", currency: "EUR" });
 const NUM = new Intl.NumberFormat("el-GR", { maximumFractionDigits: 2 });
 const DATE = new Intl.DateTimeFormat("el-GR", { dateStyle: "short", timeStyle: "short", timeZone: "Europe/Athens" });
 
-export const money = (v: number | null | undefined) => (v == null ? "—" : EUR.format(v));
+/** «1.092,89 €» — lib/format, so every admin amount is written the same way. */
+export const money = (v: number | null | undefined) => (v == null ? "—" : formatMoney(v, "el"));
 export const num = (v: number | null | undefined) => (v == null ? "—" : NUM.format(v));
 export const pct = (v: number | null | undefined) => (v == null ? "—" : `${NUM.format(v)}%`);
 export const ratio = (v: number | null | undefined) =>

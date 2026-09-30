@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { applyOrderPostage, previewOrderPostage } from "@/app/admin/(protected)/orders/actions";
 import type { PostagePreview } from "@/lib/orders/postage-correction";
 import { cn } from "@/lib/utils";
+import { formatMoney } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,8 +22,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-const eur = (v: number) =>
-  new Intl.NumberFormat("el-GR", { style: "currency", currency: "EUR" }).format(v);
+/** «1.092,89 €», the same writing as the rest of the admin (lib/format). */
+const eur = (v: number) => formatMoney(v, "el");
 const kg = (v: number | null) =>
   v == null ? "—" : `${new Intl.NumberFormat("el-GR", { maximumFractionDigits: 2 }).format(v)} kg`;
 

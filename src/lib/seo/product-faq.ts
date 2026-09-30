@@ -1,4 +1,5 @@
 import { FREE_SHIPPING_THRESHOLD_NET } from "@/lib/cart/options";
+import { formatMoney } from "@/lib/format";
 import { availabilityLabelKey, availabilityOf } from "@/lib/catalog/availability";
 
 /**
@@ -47,7 +48,8 @@ export type FaqProduct = {
   specs: Array<{ label: string; value: string; unit: string | null }>;
 };
 
-const money = (n: number) => `${n.toFixed(2).replace(".", ",")} €`;
+/** «1.092,89 €» — with the thousands separator (lib/format). */
+const money = (n: number) => formatMoney(n, "el");
 
 /**
  * Πώς αναφέρεται ένα εργαλείο σε ερώτηση.

@@ -4,6 +4,7 @@ import { removeBackground } from "@/lib/media/claid";
 import { uploadImage } from "@/lib/media/bunny";
 import { generateCopy } from "@/lib/ai/deepseek";
 import type { Locale } from "@/i18n/routing";
+import { formatMoney } from "@/lib/format";
 
 /**
  * Ένα προϊόν, έτοιμο να μπει σε κελί banner.
@@ -51,11 +52,9 @@ export type ProductFill = {
   notes: string[];
 };
 
-const money = (value: number, locale: Locale) =>
-  new Intl.NumberFormat(locale === "el" ? "el-GR" : locale, {
-    style: "currency",
-    currency: "EUR",
-  }).format(value);
+/* lib/format, not Intl: Intl's Italian skips the separator under 10.000
+   («1092,89 €»), and the site writes «1.092,89 €». */
+const money = (value: number, locale: Locale) => formatMoney(value, locale);
 
 export async function productFill(
   slug: string,
