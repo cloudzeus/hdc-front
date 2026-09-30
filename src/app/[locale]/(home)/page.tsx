@@ -53,12 +53,11 @@ const HERO_BARE = "4933479859";
 const HERO_KIT = "4933479860";
 /*
  * The hero photo, with its size so the browser reserves the box before it
- * arrives. Still Milwaukee's own photo on milwaukeetool.gr: to move it to our
- * CDN, upload a photo we may publish with scripts/seo/upload-hero.ts and put
- * the printed URL and size here.
+ * arrives. On our own CDN (uploaded with scripts/seo/upload-hero.ts), so the
+ * home page does not depend on another site keeping the file.
  */
 const HERO = {
-  url: "https://www.milwaukeetool.gr/wp-content/uploads/2023/05/M18_FPD3-502X-App_21.jpg",
+  url: "https://kolleris.b-cdn.net/eshop/hdc/home/m18-fpd3-502x-app-21-1790758958078.webp",
   width: 1000,
   height: 667,
 };
