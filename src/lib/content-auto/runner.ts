@@ -430,11 +430,16 @@ async function doRun(run: Run, options: ExecuteOptions, state: State): Promise<R
       verifierTokens: current.verifierTokens,
       failedGates: failing.map((g) => g.id),
       problems: failing.map((g) => ({ gate: g.id, problems: g.problems })),
+      advice: current.gates.flatMap((g) => g.notes ?? []),
       droppedMetadata: current.dropped,
       verifierError: current.verifierError,
     });
     if (failing.length === 0 || revision >= MAX_REVISIONS) break;
-    const failures = failing.flatMap((g) => g.problems.map((p) => `${GATE_LABELS[g.id]}: ${p}`));
+    // Blocking failures first; the verifier's «advice» rides along as «say it more generally».
+    const failures = [
+      ...failing.flatMap((g) => g.problems.map((p) => `${GATE_LABELS[g.id]}: ${p}`)),
+      ...current.gates.flatMap((g) => (g.notes ?? []).map((n) => `${n} — αναδιατύπωσέ το πιο γενικά, χωρίς στοιχείο προϊόντος`)),
+    ];
     try {
       const revised = await reviseArticle(pack, style, written, failures, chat);
       state.tokens += revised.tokens;

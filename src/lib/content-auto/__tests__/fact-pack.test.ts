@@ -4,6 +4,8 @@ vi.mock("@/lib/prisma", () => ({ prisma: {} }));
 
 import {
   BOX_LABEL,
+  dedupeByModel,
+  versionsOf,
   STORE_FACTS,
   isBareModel,
   describeProduct,
@@ -172,5 +174,35 @@ describe("a bare tool carries no kit contents (C2)", () => {
   it("a kit keeps its box", () => {
     const kit = packProduct(raw({ longDescriptionEl: REAL.replace("-0X", "-502X") }), null);
     expect(JSON.stringify(kit.specs)).toContain("M18 B5");
+  });
+});
+
+describe("versions: one per model code", () => {
+  it("merges the same model under two article numbers, keeping the one with official specs", () => {
+    const bare = packProduct(raw({ code2: "4933493301", name: "ΦΥΣΗΤΗΡΑΣ M18 FBLG3-0", modelContent: "bare", slug: "fblg3-0" }), null);
+    const kitA = packProduct(raw({ code2: "4933493302", name: "ΦΥΣΗΤΗΡΑΣ M18 FBLG3-802", slug: "fblg3-802" }), null);
+    const kitB = packProduct(raw({ code2: "4933499233", name: "ΦΥΣΗΤΗΡΑΣ M18 FBLG3-802", slug: "fblg3-802-b" }), {
+      specs: [{ name: "Air speed", value: "193", unit: "km/h" }],
+      url: "https://www.milwaukeetool.eu/x",
+    });
+    const products = dedupeByModel([bare, kitA, kitB]);
+    expect(products.map((p) => p.code)).toEqual(["4933493301", "4933499233"]);
+    expect(products[1].otherCodes).toEqual(["4933493302"]);
+    expect(versionsOf(products)).toEqual({ count: 2, models: ["M18 FBLG3-0", "M18 FBLG3-802"] });
+  });
+  it("tells the writer the exact count", () => {
+    const products = [packProduct(raw(), null)];
+    const pack: FactPack = {
+      topic: { kind: "MODEL", title: "t", keyword: "k", keywords: [], categoryName: null },
+      articleKind: "ARTICLE",
+      products,
+      links: [],
+      store: STORE_FACTS,
+      sources: [],
+      representative: null,
+      notes: [],
+      versions: versionsOf(products),
+    };
+    expect(JSON.stringify(promptPack(pack))).toContain('"εκδόσεις":{"πλήθος":1,"μοντέλα":["M18 FPD3-502X"]}');
   });
 });

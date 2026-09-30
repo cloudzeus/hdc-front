@@ -288,6 +288,31 @@ describe("executeRun", () => {
     expect(db.articleWrites[0].data).toMatchObject({ status: "DRAFT" });
   });
 
+  it("advice from the verifier does not block: a clean text with advice notes publishes", async () => {
+    setRun("manual-publish");
+    const out = await executeRun("run1", { chat: chatWith(article(), [{ claim: "Δουλέψτε σταθερά", kind: "advice" }]) });
+    expect(out.outcome).toBe("PUBLISHED");
+    const detail = db.runUpdates[0].detail as { attempts: Array<{ advice: string[] }> };
+    expect(detail.attempts[0].advice).toEqual(["Συμβουλή πιο γενικά: «Δουλέψτε σταθερά»"]);
+  });
+
+  it("a revision asked for a fact also carries the advice, to phrase more generally", async () => {
+    setRun("manual-draft");
+    const writes: string[] = [];
+    const chat = vi.fn<Chat>(async ({ temperature, user }) => {
+      if (temperature === 0) {
+        const unsupported = writes.length === 1 ? [{ claim: "Έχει 3 ταχύτητες", kind: "fact" }, { claim: "Δουλέψτε σταθερά", kind: "advice" }] : [];
+        return { text: JSON.stringify({ unsupported }), usage: { promptTokens: 1, completionTokens: 1 } };
+      }
+      writes.push(user);
+      return { text: JSON.stringify(article()), usage: { promptTokens: 1, completionTokens: 1 } };
+    });
+    await executeRun("run1", { chat });
+    expect(writes).toHaveLength(2);
+    expect(writes[1]).toContain("Έχει 3 ταχύτητες");
+    expect(writes[1]).toMatch(/Δουλέψτε σταθερά.*πιο γενικά/);
+  });
+
   it("drops a keyword or entity with «τιμή» instead of failing, and logs it", async () => {
     setRun("manual-publish");
     const keywords = [...(article().keywords as string[]), "milwaukee m18 fpd3 τιμη", "m18 fpd3 προσφορα"];

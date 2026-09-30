@@ -34,7 +34,13 @@ export type GateId =
   | "verifier"
   | "image";
 
-export type GateResult = { id: GateId; ok: boolean; problems: string[] };
+export type GateResult = {
+  id: GateId;
+  ok: boolean;
+  problems: string[];
+  /** Not blocking: the verifier's «advice» items, for the next revision to phrase more generally. */
+  notes?: string[];
+};
 
 export const GATE_LABELS: Record<GateId, string> = {
   numbers: "Αριθμοί από το πακέτο",
@@ -403,14 +409,24 @@ export function uniqueGate(draft: Draft, slug: string, existing: Existing[]): Ga
 
 // 10. Verifier ───────────────────────────────────────────────────────────────
 
-export type Unsupported = { claim: string; reason?: string };
+/**
+ * «fact»: a spec, number, kit contents, compatibility, version count, the
+ * existence of a feature, a store claim — must be in the pack, or the text
+ * fails. «advice»: practical guidance with no product fact in it — does not
+ * block, and goes to the next revision as «say it more generally».
+ */
+export type Unsupported = { claim: string; reason?: string; kind?: "fact" | "advice" };
 
 export function verifierGate(unsupported: Unsupported[] | null): GateResult {
   if (unsupported == null) return gate("verifier", ["Ο έλεγχος ισχυρισμών δεν ολοκληρώθηκε"]);
-  return gate(
-    "verifier",
-    unsupported.map((u) => `Χωρίς στήριξη: «${u.claim}»${u.reason ? ` (${u.reason})` : ""}`),
-  );
+  const line = (u: Unsupported) => `«${u.claim}»${u.reason ? ` (${u.reason})` : ""}`;
+  // An item without a kind is a fact: fail closed.
+  const facts = unsupported.filter((u) => u.kind !== "advice");
+  const advice = unsupported.filter((u) => u.kind === "advice");
+  return {
+    ...gate("verifier", facts.map((u) => `Χωρίς στήριξη: ${line(u)}`)),
+    notes: advice.map((u) => `Συμβουλή πιο γενικά: ${line(u)}`),
+  };
 }
 
 // 11. Image ──────────────────────────────────────────────────────────────────

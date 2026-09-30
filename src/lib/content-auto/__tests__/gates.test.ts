@@ -322,9 +322,23 @@ describe("gate · verifier", () => {
   it("passes with no unsupported claim", () => {
     expect(verifierGate([]).ok).toBe(true);
   });
-  it("fails on one unsupported claim, or when the check did not run", () => {
-    expect(verifierGate([{ claim: "Έχει 3 ταχύτητες", reason: "το πακέτο λέει 2" }]).ok).toBe(false);
+  it("fails on one unsupported fact, or when the check did not run", () => {
+    expect(verifierGate([{ claim: "Έχει 3 ταχύτητες", reason: "το πακέτο λέει 2", kind: "fact" }]).ok).toBe(false);
     expect(verifierGate(null).ok).toBe(false);
+  });
+  it("an item without a kind is a fact: fail closed", () => {
+    expect(verifierGate([{ claim: "Έχει 3 ταχύτητες" }]).ok).toBe(false);
+  });
+  it("advice does not block, and is kept as a note for the next revision", () => {
+    const r = verifierGate([{ claim: "Για μεγάλες επιφάνειες δουλέψτε σταθερά", kind: "advice" }]);
+    expect(r.ok).toBe(true);
+    expect(r.notes).toEqual(["Συμβουλή πιο γενικά: «Για μεγάλες επιφάνειες δουλέψτε σταθερά»"]);
+    const mixed = verifierGate([
+      { claim: "Κλειδώνει στο cruise control", kind: "fact" },
+      { claim: "Δουλέψτε σταθερά", kind: "advice" },
+    ]);
+    expect(mixed.ok).toBe(false);
+    expect(mixed.problems).toHaveLength(1);
   });
 });
 

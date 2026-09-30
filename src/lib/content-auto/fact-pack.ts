@@ -47,6 +47,8 @@ export type PackProduct = {
   officialUrl: string | null;
   /** The catalogue photo — for the images, never sent to the writer. */
   image: string | null;
+  /** Other article numbers of the SAME model code (merged into this one). */
+  otherCodes?: string[];
 };
 
 export type PackLink = { href: string; anchor: string };
@@ -62,6 +64,8 @@ export type FactPack = {
   /** The product whose photo becomes the hero, when there is one. */
   representative: string | null;
   notes: string[];
+  /** Distinct model codes: what «N εκδόσεις» may say. */
+  versions?: { count: number; models: string[] };
 };
 
 export const STORE_FACTS = [
@@ -171,13 +175,45 @@ export function pickRepresentative(products: PackProduct[], kind: ContentTopicKi
   return (bare ?? withImage[0])?.code ?? null;
 }
 
+/**
+ * One entry per model code. The catalogue can list the same model twice under
+ * two article numbers (M18 FBLG3-802 as 4933493302 and 4933499233): they are
+ * one version, so the writer must never count them as two. The entry with
+ * official specs (or the first) stays; the other numbers are kept on it.
+ */
+export function dedupeByModel(products: PackProduct[]): PackProduct[] {
+  const byModel = new Map<string, PackProduct>();
+  for (const p of products) {
+    const key = p.model ?? `code:${p.code}`;
+    const kept = byModel.get(key);
+    if (!kept) {
+      byModel.set(key, p);
+      continue;
+    }
+    const [winner, loser] = !kept.official.length && p.official.length ? [p, kept] : [kept, p];
+    byModel.set(key, {
+      ...winner,
+      image: winner.image ?? loser.image,
+      otherCodes: [...new Set([...(winner.otherCodes ?? []), loser.code, ...(loser.otherCodes ?? [])])],
+    });
+  }
+  return [...byModel.values()];
+}
+
+export function versionsOf(products: PackProduct[]): { count: number; models: string[] } {
+  const models = [...new Set(products.map((p) => p.model ?? p.name))];
+  return { count: models.length, models };
+}
+
 /** What the writer sees: the pack without photos and bookkeeping. */
 export function promptPack(pack: FactPack) {
   return {
     θέμα: pack.topic,
     είδος: pack.articleKind === "GUIDE" ? "οδηγός αγοράς" : "άρθρο",
+    εκδόσεις: pack.versions ? { πλήθος: pack.versions.count, μοντέλα: pack.versions.models } : undefined,
     προϊόντα: pack.products.map((p) => ({
       κωδικός: p.code,
+      "άλλοι κωδικοί του ίδιου μοντέλου": p.otherCodes?.length ? p.otherCodes : undefined,
       όνομα: p.name,
       μοντέλο: p.model,
       πλατφόρμα: p.platform,
@@ -340,7 +376,7 @@ export async function loadFactPack(topic: TopicForPack, options: LoadOptions = {
   const missing = wanted.filter((code) => !officialFor.get(code));
   if (missing.length) notes.push(`Χωρίς επίσημα στοιχεία Milwaukee για ${missing.join(", ")}.`);
 
-  const products = rows.map((r) => packProduct(toRaw(r), officialFor.get(r.code2) ?? null));
+  const products = dedupeByModel(rows.map((r) => packProduct(toRaw(r), officialFor.get(r.code2) ?? null)));
 
   // The category name with its accents back, from its products' own descriptions.
   const categoryName = categories[0]
@@ -364,6 +400,7 @@ export async function loadFactPack(topic: TopicForPack, options: LoadOptions = {
     sources: [...new Set(products.map((p) => p.officialUrl).filter((u): u is string => !!u))],
     representative: null,
     notes,
+    versions: versionsOf(products),
   };
   pack.representative = pickRepresentative(products, topic.kind);
   return pack;

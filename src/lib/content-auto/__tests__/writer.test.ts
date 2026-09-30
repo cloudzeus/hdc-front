@@ -106,12 +106,21 @@ describe("writeArticle", () => {
 });
 
 describe("verifyArticle", () => {
-  it("returns the unsupported claims", async () => {
-    const chat = vi.fn<Chat>().mockResolvedValue(answer('{"unsupported":[{"claim":"3 ταχύτητες","reason":"όχι στο πακέτο"}]}'));
+  it("returns the unsupported claims with their kind, a missing or unknown kind as a fact", async () => {
+    const chat = vi.fn<Chat>().mockResolvedValue(
+      answer(
+        '{"unsupported":[{"claim":"3 ταχύτητες","reason":"όχι στο πακέτο"},{"claim":"δουλέψτε σταθερά","kind":"advice"},{"claim":"x","kind":"opinion"}]}',
+      ),
+    );
     const { draft } = parseWriterReply(JSON.stringify(reply));
     const out = await verifyArticle(pack, draft, chat);
-    expect(out.unsupported).toEqual([{ claim: "3 ταχύτητες", reason: "όχι στο πακέτο" }]);
+    expect(out.unsupported).toEqual([
+      { claim: "3 ταχύτητες", reason: "όχι στο πακέτο", kind: "fact" },
+      { claim: "δουλέψτε σταθερά", reason: undefined, kind: "advice" },
+      { claim: "x", reason: undefined, kind: "fact" },
+    ]);
     expect(chat.mock.calls[0][0].temperature).toBe(0);
+    expect(chat.mock.calls[0][0].system).toMatch(/"advice"/);
   });
 
   it("returns none when everything is supported", async () => {
