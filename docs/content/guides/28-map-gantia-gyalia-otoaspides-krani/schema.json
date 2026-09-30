@@ -1,0 +1,152 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/map-gantia-gyalia-otoaspides-krani#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/map-gantia-gyalia-otoaspides-krani",
+      "url": "{{SITE_URL}}/blog/map-gantia-gyalia-otoaspides-krani",
+      "headline": "ΜΑΠ: πώς διαλέγω γάντια, γυαλιά, ωτοασπίδες, κράνος και μάσκα",
+      "description": "Πώς διαλέγεις μέσα ατομικής προστασίας: γάντια εργασίας και επίπεδα κοπής, γυαλιά EN 166, ωτοασπίδες και SNR, κράνος εργασίας, μάσκες FFP2/FFP3, γιλέκα.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "μέσα ατομικής προστασίας, γάντια εργασίας, γάντια εργασίας νιτριλίου, γυαλιά προστασίας, γυαλιά προστασίας EN 166, ωτοασπίδες, κράνος εργασίας, μάσκα σκόνης FFP2, γαντια εργασιας, gantia ergasias, γάντια εργασίας Milwaukee, ΜΑΠ Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Μέσα ατομικής προστασίας"
+        },
+        {
+          "@type": "Thing",
+          "name": "Γάντια εργασίας"
+        },
+        {
+          "@type": "Thing",
+          "name": "Γυαλιά προστασίας"
+        },
+        {
+          "@type": "Thing",
+          "name": "Ωτοασπίδες"
+        },
+        {
+          "@type": "Thing",
+          "name": "Κράνος εργασίας"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "EN 166"
+        },
+        {
+          "@type": "Thing",
+          "name": "FFP2"
+        },
+        {
+          "@type": "Thing",
+          "name": "SMARTSWIPE"
+        },
+        {
+          "@type": "Thing",
+          "name": "BOLT"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/personal-protective-equipment/hand-and-arm-protection/safety-gloves/",
+        "https://www.milwaukeetool.eu/en-eu/personal-protective-equipment/eye-protection/safety-glasses/",
+        "https://www.milwaukeetool.eu/en-eu/personal-protective-equipment/hearing-protection/",
+        "https://www.milwaukeetool.eu/en-eu/ffp2-respirator/ffp2-respirator/"
+      ],
+      "wordCount": 1078
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/map-gantia-gyalia-otoaspides-krani#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/map-gantia-gyalia-otoaspides-krani#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνουν τα επίπεδα κοπής A έως F στα γάντια;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Δείχνουν πόση αντίσταση στην κοπή από λεπίδα έχει το γάντι, σύμφωνα με το ευρωπαϊκό πρότυπο για μηχανικούς κινδύνους. Το A είναι το χαμηλότερο και το F το υψηλότερο. Για λαμαρίνες, γυαλιά και αιχμηρά προφίλ χρειάζεσαι υψηλότερο επίπεδο, για γενικό χειρισμό υλικών αρκεί χαμηλότερο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει EN 166 στα γυαλιά προστασίας;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι το βασικό ευρωπαϊκό πρότυπο για την προστασία των ματιών. Η σήμανση στον σκελετό και στους φακούς δείχνει μεταξύ άλλων την αντοχή σε κρούση. Για τροχούς, σπαθόσεγες και καρφωτικά χρειάζεσαι γυαλιά με την κατάλληλη αντοχή σε κρούση ή προσωπίδα."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι το SNR στις ωτοασπίδες;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι ένας ενιαίος αριθμός σε dB που δείχνει κατά μέσο όρο πόσο μειώνει ο προστατευτής τον θόρυβο. Μεγαλύτερο SNR σημαίνει περισσότερη προστασία. Δεν χρειάζεται πάντα το μέγιστο: η υπερβολική απομόνωση κάνει δύσκολη την επικοινωνία και την αντίληψη προειδοποιήσεων."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "FFP2 ή FFP3 μάσκα για σκόνη;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Και οι δύο φιλτράρουν σωματίδια. Η FFP2 κρατά μεγαλύτερο ποσοστό από την FFP1 και είναι συνηθισμένη επιλογή για σκόνη από τρίψιμο και κοπές. Η FFP3 δίνει την υψηλότερη προστασία της κατηγορίας, για πιο επικίνδυνες σκόνες. Η μάσκα πρέπει να εφαρμόζει σωστά στο πρόσωπο για να λειτουργεί."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πότε πρέπει να αλλάξω κράνος εργασίας;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Αμέσως μετά από δυνατό χτύπημα, ακόμη κι αν δεν φαίνεται ζημιά, και όταν το κέλυφος έχει ρωγμές, ξεθωριάσει έντονα ή σκληρύνει από τον ήλιο. Ακολούθησε επίσης τη διάρκεια ζωής που αναφέρει ο κατασκευαστής και έλεγχε τακτικά την εσωτερική ανάρτηση."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Χρειάζομαι ανακλαστικό γιλέκο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σε εργασίες κοντά σε κυκλοφορία οχημάτων, σε οδικά έργα, σε αποθήκες με κλαρκ και σε εργοτάξια με μηχανήματα, ναι. Το γιλέκο υψηλής ορατότητας σε κάνει ορατό μέρα και νύχτα. Διάλεξε την κλάση που απαιτεί η δουλειά σου και κράτα το καθαρό, γιατί η βρωμιά μειώνει την ανακλαστικότητα."
+          }
+        }
+      ]
+    }
+  ]
+}

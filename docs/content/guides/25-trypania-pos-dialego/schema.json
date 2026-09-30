@@ -1,0 +1,146 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/trypania-pos-dialego#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/trypania-pos-dialego",
+      "url": "{{SITE_URL}}/blog/trypania-pos-dialego",
+      "headline": "Τρυπάνια: πώς διαλέγω για ξύλο, μέταλλο, μπετό, πλακάκια και SDS",
+      "description": "Πώς διαλέγεις τρυπάνια: ξύλου, μετάλλου HSS ή κοβαλτίου, μπετού, SDS-Plus και SDS-Max, πλακιδίων, ποτηροτρύπανα, βαθμιδωτά. Στροφές, ψύξη, σωστή χρήση.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "τρυπάνια, τρυπάνια μπετού, τρυπάνια μετάλλου, τρυπάνια κοβαλτίου, τρυπάνια ξύλου, τρυπάνια SDS-Plus, τρυπάνι για πλακάκια, ποτηροτρύπανο, τρυπανια μπετου, trypania, τρυπάνια Milwaukee, τρυπάνια Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Τρυπάνια"
+        },
+        {
+          "@type": "Thing",
+          "name": "Ποτηροτρύπανα"
+        },
+        {
+          "@type": "Thing",
+          "name": "Τρυπάνια SDS"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "SDS-Plus"
+        },
+        {
+          "@type": "Thing",
+          "name": "SDS-Max"
+        },
+        {
+          "@type": "Thing",
+          "name": "MX4"
+        },
+        {
+          "@type": "Thing",
+          "name": "HSS"
+        },
+        {
+          "@type": "Thing",
+          "name": "SHOCKWAVE"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://uk.milwaukeetool.eu/en-gb/sds-plus-mx4-drill-bits-4-cut/",
+        "https://www.milwaukeetool.eu/en-eu/sds-max-mx4-drill-bits-4-cut/"
+      ],
+      "wordCount": 1006
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/trypania-pos-dialego#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/trypania-pos-dialego#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Ποια η διαφορά τρυπανιού HSS και κοβαλτίου;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το HSS (ταχυχάλυβας) είναι το κλασικό τρυπάνι μετάλλου, για σίδηρο, αλουμίνιο και μαλακά μέταλλα. Τα τρυπάνια με κράμα κοβαλτίου αντέχουν σε υψηλότερες θερμοκρασίες και είναι κατάλληλα για ανοξείδωτο και σκληρότερα κράματα. Είναι πιο σκληρά αλλά και πιο εύθραυστα σε λάθος χρήση."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Μπορώ να βάλω τρυπάνι SDS σε κοινό δράπανο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Όχι απευθείας. Τα τρυπάνια SDS-Plus και SDS-Max έχουν στέλεχος με εγκοπές που κουμπώνει μόνο σε πιστολέτο με την αντίστοιχη υποδοχή. Για κρουστικό δράπανο με τσοκ χρησιμοποιείς τρυπάνια μπετού με κυλινδρικό στέλεχος."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι τρυπάνι θέλω για πλακάκια;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Για απλά κεραμικά πλακάκια, τρυπάνια πλακιδίων με μύτη καρβιδίου σε λόγχη, χωρίς κρούση. Για πορσελανάτα και σκληρά πλακάκια, διαμαντοτρύπανα ή ποτηροτρύπανα διαμαντιού, με ψύξη και χαμηλές στροφές. Η κρούση σπάει το πλακάκι, οπότε κλείσ' την μέχρι να περάσεις στον τοίχο από πίσω."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι το ποτηροτρύπανο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι τρυπάνι σε σχήμα ποτηριού που κόβει μόνο την περιφέρεια της τρύπας, οπότε ανοίγει μεγάλες διαμέτρους για σωλήνες, κουτιά διακλάδωσης, κλειδαριές και σποτάκια με λίγη ενέργεια. Υπάρχουν διμεταλλικά για ξύλο και μέταλλο, καρβιδίου για σκληρά υλικά και διαμαντιού για πλακάκια και γρανίτη."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Γιατί καίγεται το τρυπάνι μετάλλου;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Συνήθως από πολύ υψηλές στροφές, λίγη πίεση ή έλλειψη ψύξης. Στο μέταλλο οι μεγάλες διάμετροι και τα σκληρά υλικά θέλουν χαμηλές στροφές, σταθερή πίεση και λίγο κοπτικό υγρό. Αν βλέπεις σκόνη αντί για ρινίσματα ή το τρυπάνι κοκκινίζει, κάτι από αυτά δεν είναι σωστό."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι το βαθμιδωτό τρυπάνι;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι κωνικό τρυπάνι με σκαλοπάτια, που ανοίγει πολλές διαμέτρους με το ίδιο εργαλείο σε λαμαρίνες, πίνακες, προφίλ και πλαστικά. Αφήνει καθαρή τρύπα με λίγο γρέζι και είναι πολύ χρήσιμο στους ηλεκτρολόγους για τους πίνακες."
+          }
+        }
+      ]
+    }
+  ]
+}

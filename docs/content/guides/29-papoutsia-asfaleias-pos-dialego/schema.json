@@ -1,0 +1,138 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/papoutsia-asfaleias-pos-dialego#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/papoutsia-asfaleias-pos-dialego",
+      "url": "{{SITE_URL}}/blog/papoutsia-asfaleias-pos-dialego",
+      "headline": "Παπούτσια ασφαλείας: S1, S1P, S3 και πώς διαλέγω",
+      "description": "Πώς διαλέγεις παπούτσια ασφαλείας: τι σημαίνουν S1, S1P, S2, S3, μεταλλική ή σύνθετη μύτη, αντιτρυπητικός πάτος, σόλα, μποτάκι ή χαμηλό.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "παπούτσια ασφαλείας, παπούτσια ασφαλείας S3, μποτάκια ασφαλείας, παπούτσια ασφαλείας αθλητικά, παπούτσια ασφαλείας ελαφριά, S1P ή S3, τι σημαίνει S3 στα παπούτσια ασφαλείας, παπουτσια ασφαλειας, papoutsia asfaleias, παπούτσια ασφαλείας Milwaukee, παπούτσια ασφαλείας Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Παπούτσια ασφαλείας"
+        },
+        {
+          "@type": "Thing",
+          "name": "Μποτάκια ασφαλείας"
+        },
+        {
+          "@type": "Thing",
+          "name": "EN ISO 20345"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "FLEXTRED"
+        },
+        {
+          "@type": "Thing",
+          "name": "ARMOURTRED"
+        },
+        {
+          "@type": "Thing",
+          "name": "BOA"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/personal-protective-equipment/safety-footwear/safety-boots/",
+        "https://www.milwaukeetool.eu/en-eu/personal-protective-equipment/safety-footwear/safety-trainers/"
+      ],
+      "wordCount": 1017
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/papoutsia-asfaleias-pos-dialego#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/papoutsia-asfaleias-pos-dialego#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει S3 στα παπούτσια ασφαλείας;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι κατηγορία του ευρωπαϊκού προτύπου για υποδήματα ασφαλείας. Το S3 έχει προστατευτικό δακτύλων, κλειστή φτέρνα, αντιστατικές ιδιότητες, απορρόφηση ενέργειας στη φτέρνα, επάνω μέρος που αντέχει στο νερό, αντιτρυπητικό πάτο και σόλα με ανάγλυφο. Είναι η πιο συνηθισμένη επιλογή για εργοτάξια."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "S1P ή S3;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Και τα δύο έχουν προστατευτικό δακτύλων και αντιτρυπητικό πάτο. Το S3 προσθέτει αντοχή του επάνω μέρους στο νερό και ανάγλυφη σόλα. Για εσωτερικούς και στεγνούς χώρους, αποθήκες και συνεργεία, το S1P είναι συχνά πιο δροσερό. Για εργοτάξια, υγρασία και εξωτερικούς χώρους, το S3."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Μεταλλικό ή σύνθετο προστατευτικό δακτύλων;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Και τα δύο πρέπει να περνούν την ίδια βασική δοκιμή κρούσης του προτύπου. Τα σύνθετα (υαλονήματα, πλαστικά) είναι συνήθως ελαφρύτερα, δεν μεταφέρουν κρύο και ζέστη και δεν χτυπούν στους ανιχνευτές μετάλλων. Τα μεταλλικά είναι συχνά λεπτότερα. Διάλεξε με βάση την άνεση και τον χώρο εργασίας."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Είναι αρκετά τα αθλητικά παπούτσια ασφαλείας;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Αν έχουν την κατηγορία που χρειάζεται η δουλειά σου, ναι. Τα αθλητικά παπούτσια ασφαλείας είναι ελαφρύτερα και πιο άνετα για πολύ περπάτημα. Για ανώμαλο έδαφος, λάσπες, σκαλωσιές και κίνδυνο στραμπουλήγματος, ένα μποτάκι δίνει καλύτερη στήριξη στον αστράγαλο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει ESD στα παπούτσια ασφαλείας;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σημαίνει ότι το υπόδημα απάγει ελεγχόμενα τον στατικό ηλεκτρισμό, πιο αυστηρά από ένα απλό αντιστατικό. Χρειάζεται σε χώρους με ευαίσθητα ηλεκτρονικά, όπως εργαστήρια πλακετών. Δεν είναι μόνωση για ηλεκτρολογικές εργασίες υπό τάση."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πότε πρέπει να αλλάξω παπούτσια ασφαλείας;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Όταν φαίνεται το προστατευτικό δακτύλων, όταν η σόλα έχει φθαρεί και γλιστρά, όταν ο πάτος έχει τρυπηθεί ή μετά από σοβαρή πρόσκρουση στη μύτη. Ένα παπούτσι που δέχτηκε δυνατό χτύπημα μπορεί να μην προστατεύει πια σωστά, ακόμη κι αν φαίνεται εντάξει."
+          }
+        }
+      ]
+    }
+  ]
+}

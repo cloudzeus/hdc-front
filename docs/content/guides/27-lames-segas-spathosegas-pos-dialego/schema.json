@@ -1,0 +1,142 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/lames-segas-spathosegas-pos-dialego#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/lames-segas-spathosegas-pos-dialego",
+      "url": "{{SITE_URL}}/blog/lames-segas-spathosegas-pos-dialego",
+      "headline": "Λάμες σέγας και σπαθόσεγας: TPI, υλικό και πώς διαλέγω",
+      "description": "Πώς διαλέγεις λάμα σέγας ή σπαθόσεγας: δόντια ανά ίντσα (TPI), HCS, HSS, διμεταλλικές, καρβιδίου, στέλεχος T, μήκος. Για ξύλο, μέταλλο, κλάδεμα.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "λάμες σπαθόσεγας, λάμες σέγας, λάμες σπαθόσεγας μετάλλου, λάμες σπαθόσεγας για κλάδεμα, λάμες σέγας ξύλου, λάμες σέγας για μελαμίνη, τι σημαίνει TPI, λαμες σπαθοσεγας, lames spathosegas, λάμες σπαθόσεγας Milwaukee, λάμες Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Λάμες σέγας"
+        },
+        {
+          "@type": "Thing",
+          "name": "Λάμες σπαθόσεγας"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "SAWZALL"
+        },
+        {
+          "@type": "Thing",
+          "name": "AX"
+        },
+        {
+          "@type": "Thing",
+          "name": "TORCH"
+        },
+        {
+          "@type": "Thing",
+          "name": "WRECKER"
+        },
+        {
+          "@type": "Thing",
+          "name": "NITRUS CARBIDE"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/accessories/sawing-and-cutting/reciprocating-sawzall-blades/",
+        "https://www.milwaukeetool.eu/en-eu/accessories/sawing-and-cutting/jigsaw-blades/"
+      ],
+      "wordCount": 1028
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/lames-segas-spathosegas-pos-dialego#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/lames-segas-spathosegas-pos-dialego#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει TPI σε μια λάμα;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι τα δόντια ανά ίντσα (teeth per inch). Λίγα και μεγάλα δόντια, περίπου 3–10 TPI, κόβουν γρήγορα ξύλο και κλαδιά. Πολλά και μικρά, περίπου 14–24 TPI και πάνω, κόβουν μέταλλα και λεπτά υλικά. Ένας πρακτικός κανόνας είναι να υπάρχουν τουλάχιστον τρία δόντια μέσα στο πάχος του υλικού."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι οι διμεταλλικές λάμες;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι λάμες με σώμα από ελαστικό χάλυβα και δόντια από ταχυχάλυβα. Το σώμα λυγίζει χωρίς να σπάει, τα δόντια αντέχουν σε μέταλλο και καρφιά. Είναι η πιο ευέλικτη επιλογή για σπαθόσεγα και για κοπές μετάλλου με σέγα."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πότε αξίζουν οι λάμες καρβιδίου;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Όταν κόβεις σκληρά ή λειαντικά υλικά ή κάνεις πολλή κατεδάφιση: ανοξείδωτο, χυτοσίδηρο, ξύλα με πολλά καρφιά, ινοτσιμεντοσανίδες. Κρατούν πολύ περισσότερο από τις διμεταλλικές σε τέτοιες δουλειές, οπότε κάθε λάμα βγάζει περισσότερες κοπές."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι λάμα βάζω στη σέγα για μελαμίνη χωρίς σκασίματα;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Λάμα με ανάποδα δόντια (down-cut) ή λάμα καθαρής κοπής με λειασμένα δόντια, σε χαμηλή παλινδρόμηση. Τα ανάποδα δόντια κόβουν προς τα κάτω και αφήνουν καθαρή την επάνω επιφάνεια. Βοηθά και η χαρτοταινία πάνω στη γραμμή κοπής."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ταιριάζουν όλες οι λάμες σε όλες τις σέγες;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Οι περισσότερες σύγχρονες σέγες παίρνουν λάμες με στέλεχος τύπου T, που είναι το πιο διαδεδομένο. Κάποιες παλιότερες παίρνουν στέλεχος τύπου U. Οι λάμες σπαθόσεγας έχουν σχεδόν όλες το ίδιο γενικό στέλεχος. Έλεγξε πάντα τι δέχεται το εργαλείο σου."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι μήκος λάμα σπαθόσεγας να πάρω;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Η λάμα πρέπει να είναι αρκετά μακρύτερη από το πάχος που κόβεις, ώστε να μένει μέσα στο υλικό σε όλη τη διαδρομή. Για σωλήνες και προφίλ αρκούν κοντές λάμες, που λυγίζουν λιγότερο. Για χοντρά ξύλα και κλαδιά, μακριές λάμες."
+          }
+        }
+      ]
+    }
+  ]
+}

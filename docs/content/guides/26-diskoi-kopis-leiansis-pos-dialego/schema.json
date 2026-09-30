@@ -1,0 +1,147 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/diskoi-kopis-leiansis-pos-dialego#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/diskoi-kopis-leiansis-pos-dialego",
+      "url": "{{SITE_URL}}/blog/diskoi-kopis-leiansis-pos-dialego",
+      "headline": "Δίσκοι κοπής και λείανσης: πώς διαλέγω για σίδηρο, inox, μπετό και πλακάκια",
+      "description": "Πώς διαλέγεις δίσκο τροχού: κοπής σιδήρου ή inox, λείανσης, φτερωτός, διαμαντόδισκος για μπετό, πέτρα, πλακάκια. Διάμετρος, πάχος, στροφές, ασφάλεια.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "δίσκοι κοπής, δίσκοι κοπής σιδήρου, δίσκοι κοπής inox, διαμαντόδισκος, δίσκοι κοπής πλακιδίων, δίσκοι λείανσης, φτερωτός δίσκος, πώς διαλέγω δίσκο τροχού, δισκοι κοπης μεταλλου, diskoi kopis, δίσκοι Milwaukee, δίσκοι τροχού Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Δίσκοι κοπής"
+        },
+        {
+          "@type": "Thing",
+          "name": "Δίσκοι λείανσης"
+        },
+        {
+          "@type": "Thing",
+          "name": "Διαμαντόδισκοι"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "PRO+"
+        },
+        {
+          "@type": "Thing",
+          "name": "Speedcross"
+        },
+        {
+          "@type": "Thing",
+          "name": "STEELHEAD"
+        },
+        {
+          "@type": "Thing",
+          "name": "HUDD"
+        },
+        {
+          "@type": "Thing",
+          "name": "DHTi"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/accessories/material-removal/abrasive-discs/metal-cutting/",
+        "https://www.milwaukeetool.eu/en-eu/accessories/sawing-and-cutting/diamond-cutting-discs/",
+        "https://www.milwaukeetool.eu/en-eu/accessories/material-removal/flap-discs/"
+      ],
+      "wordCount": 1012
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/diskoi-kopis-leiansis-pos-dialego#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/diskoi-kopis-leiansis-pos-dialego#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Ποια είναι η διαφορά δίσκου κοπής και δίσκου λείανσης;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ο δίσκος κοπής είναι λεπτός και φτιαγμένος για να δουλεύει με την περιφέρεια, κάθετα στο υλικό. Ο δίσκος λείανσης είναι χοντρός και δουλεύει με την πλευρά, υπό μικρή γωνία. Ποτέ μη λειαίνεις με την πλευρά δίσκου κοπής, γιατί μπορεί να σπάσει."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει δίσκος για inox;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι δίσκος χωρίς σίδηρο, θείο και χλώριο στη σύνθεσή του, ώστε να μη «μολύνει» το ανοξείδωτο και να μην προκαλεί σκουριά στην κοπή. Για ανοξείδωτο χρησιμοποίησε πάντα δίσκους με αυτή την ένδειξη και μην τους ανακατεύεις με δίσκους που έκοψαν απλό σίδηρο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ποιος δίσκος κόβει μπετό και πέτρα;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ένας διαμαντόδισκος για δομικά υλικά. Οι δίσκοι με τμήματα (segmented) κόβουν γρήγορα μπετό, τούβλα και πέτρα στο στεγνό. Οι δίσκοι με συνεχή περιφέρεια κάνουν καθαρή κοπή σε πλακάκια. Οι λειαντικοί δίσκοι κοπής πέτρας υπάρχουν, αλλά φθείρονται πολύ γρήγορα."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι ο φτερωτός δίσκος (flap);",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι δίσκος με επικαλυπτόμενα φύλλα σμυριδόπανου. Λειαίνει και φινίρει ταυτόχρονα, με λιγότερους κραδασμούς και πιο λείο αποτέλεσμα από έναν χοντρό δίσκο λείανσης. Διαλέγεις κόκκο ανάλογα με τη δουλειά: 40–60 για χοντρό τρόχισμα, 80–120 για φινίρισμα."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πόσο λεπτός πρέπει να είναι ο δίσκος κοπής;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Οι λεπτοί δίσκοι, περίπου 1 mm, κόβουν γρήγορα λαμαρίνες, προφίλ και σωλήνες, με λίγη θερμότητα και γρέζι. Οι χοντρότεροι αντέχουν περισσότερο σε χοντρά υλικά και σε πλευρικές πιέσεις. Για τις περισσότερες κοπές σε σίδηρο και inox με τροχό 125 mm, οι λεπτοί δίσκοι είναι η καλύτερη επιλογή."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Έχουν ημερομηνία λήξης οι δίσκοι;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Πολλοί λειαντικοί δίσκοι με ρητίνη έχουν τυπωμένη ημερομηνία λήξης, συνήθως στο μεταλλικό δαχτυλίδι του κέντρου, γιατί η συνδετική ύλη αλλοιώνεται με τον χρόνο και την υγρασία. Αποθήκευσέ τους στεγνά και επίπεδα και μη χρησιμοποιείς ληγμένους ή χτυπημένους δίσκους."
+          }
+        }
+      ]
+    }
+  ]
+}
