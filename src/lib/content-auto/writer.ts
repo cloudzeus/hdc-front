@@ -53,16 +53,18 @@ const RULES = [
   "2. Ποτέ τιμές, ευρώ, εκπτώσεις, απόθεμα, διαθεσιμότητα, ποσότητες ή «τεμάχια».",
   "3. Ποτέ «αντιπρόσωπος», «επίσημος αντιπρόσωπος», «εξουσιοδοτημένος», «διανομέας». Ποτέ χονδρική, B2B, «εταιρικοί πελάτες».",
   "4. Ποτέ άλλες μάρκες εργαλείων και ποτέ συγκρίσεις με άλλες μάρκες.",
-  "5. Εσωτερικοί σύνδεσμοι ΜΟΝΟ από τη λίστα «σύνδεσμοι» του πακέτου, σε Markdown [κείμενο](/διαδρομή), με φυσικό κείμενο. Κανένας εξωτερικός σύνδεσμος, καμία εικόνα.",
+  "5. Εσωτερικοί σύνδεσμοι ΜΟΝΟ από τη λίστα «σύνδεσμοι» του πακέτου, σε Markdown [κείμενο](/διαδρομή). Το κείμενο του συνδέσμου το γράφεις εσύ, σε σωστά ελληνικά με τόνους (όχι κεφαλαία χωρίς τόνους). Κανένας εξωτερικός σύνδεσμος, καμία εικόνα.",
   "6. Κωδικοί και μοντέλα γράφονται ακριβώς όπως στο πακέτο (π.χ. «M18 FPD3-502X», «4933479859»).",
   "7. Φυσικά ελληνικά, με τόνους, για τεχνίτες. Απάντηση πρώτα (AEO): το answer απαντά ευθέως στο ερώτημα του θέματος.",
   "8. Για το κατάστημα γράφεις μόνο ό,τι λέει το «κατάστημα» του πακέτου: Πειραιάς, παραλαβή, αποστολή σε όλη την Ελλάδα. Χωρίς ωράρια, χρόνους παράδοσης ή ποσά.",
   "9. Οι πρακτικές συμβουλές επιλογής (ποιο για ποια δουλειά) είναι σωστό να υπάρχουν, αλλά χωρίς νέους αριθμούς ή χαρακτηριστικά.",
+  "10. Πληθυντικός ευγενείας («διαλέξτε», «δείτε»), όπως στο παράδειγμα ύφους — ποτέ ενικός.",
+  "11. Αν δύο στοιχεία του πακέτου αντιφάσκουν (π.χ. σκέτο εργαλείο που στα τεχνικά γράφει μπαταρίες), δεν γράφεις κανένα από τα δύο.",
 ].join("\n");
 
 const FORMAT = [
   "Απάντησε ΜΟΝΟ με ένα αντικείμενο JSON, με αυτά τα πεδία:",
-  '- "title": ο τίτλος (H1), φυσικός, με την κύρια λέξη-κλειδί.',
+  '- "title": ο τίτλος (H1), φυσικός, με την κύρια λέξη-κλειδί. Ο τίτλος του θέματος είναι πρόχειρος: γράψε δικό σου.',
   '- "seoTitle": τίτλος για τη Google, ΕΩΣ 60 χαρακτήρες.',
   '- "metaDescription": ΕΩΣ 155 χαρακτήρες.',
   '- "answer": η σύντομη απάντηση, 45–55 λέξεις, μία παράγραφος.',
@@ -102,7 +104,7 @@ export function writerPrompt(pack: FactPack, style: StyleExample | null): { syst
   return { system, user };
 }
 
-export function verifierPrompt(pack: FactPack, draft: Draft): { system: string; user: string } {
+export function verifierPrompt(pack: FactPack, draft: Draft, heroAlt: string | null = null): { system: string; user: string } {
   const system = [
     "Είσαι αυστηρός ελεγκτής γεγονότων για ένα ελληνικό κατάστημα εργαλείων Milwaukee.",
     "Σου δίνεται ΠΑΚΕΤΟ ΣΤΟΙΧΕΙΩΝ και ΚΕΙΜΕΝΟ. Βρες κάθε ισχυρισμό του κειμένου για προϊόντα που ΔΕΝ στηρίζεται στο πακέτο:",
@@ -112,7 +114,7 @@ export function verifierPrompt(pack: FactPack, draft: Draft): { system: string; 
   ].join("\n");
   const user = [
     `ΠΑΚΕΤΟ ΣΤΟΙΧΕΙΩΝ (JSON):\n${JSON.stringify(promptPack(pack))}`,
-    `ΚΕΙΜΕΝΟ:\n# ${draft.title}\n\n${draft.answer}\n\n${draft.body}\n\n## Συχνές ερωτήσεις\n\n${draft.faq.map((p) => `### ${p.q}\n${p.a}`).join("\n\n")}`,
+    `ΚΕΙΜΕΝΟ:\n# ${draft.title}\n\n${heroAlt ? `![${heroAlt}](κεντρική φωτογραφία)\n\n` : ""}${draft.answer}\n\n${draft.body}\n\n## Συχνές ερωτήσεις\n\n${draft.faq.map((p) => `### ${p.q}\n${p.a}`).join("\n\n")}`,
   ].join("\n\n---\n\n");
   return { system, user };
 }
@@ -216,8 +218,9 @@ export async function verifyArticle(
   pack: FactPack,
   draft: Draft,
   chat: Chat,
+  heroAlt: string | null = null,
 ): Promise<{ unsupported: Unsupported[]; tokens: number; promptTokens: number; completionTokens: number }> {
-  const { system, user } = verifierPrompt(pack, draft);
+  const { system, user } = verifierPrompt(pack, draft, heroAlt);
   const { value, tokens, promptTokens, completionTokens } = await withRetry(chat, { system, user, maxTokens: 3000, temperature: 0 }, parseVerifierReply);
   return { unsupported: value, tokens, promptTokens, completionTokens };
 }

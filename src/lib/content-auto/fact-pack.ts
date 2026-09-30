@@ -332,7 +332,10 @@ async function packLinks(products: PackProduct[], rows: Row[], topicCategories: 
   const add = (href: string, anchor: string) => {
     if (!links.some((l) => l.href === href)) links.push({ href, anchor });
   };
-  for (const c of topicCategories) add(`/katalogos/${c.slug}`, c.nameEl.toLowerCase());
+  // ERP names are capitals without accents: the products' own words give them back.
+  const texts = rows.map((r) => r.translations[0]?.shortDescription ?? null);
+  const categoryAnchor = (nameEl: string) => accentedName(nameEl, texts).toLowerCase();
+  for (const c of topicCategories) add(`/katalogos/${c.slug}`, categoryAnchor(c.nameEl));
   for (const p of products) add(p.url, p.model ?? p.name);
   const roots = [...new Set(products.map((p) => p.root).filter((r): r is string => !!r))];
   for (const root of roots.slice(0, 6)) add(modelPath(root), `Milwaukee ${root}`);
@@ -350,7 +353,7 @@ async function packLinks(products: PackProduct[], rows: Row[], topicCategories: 
     select: { slug: true, nameEl: true },
     take: 8,
   });
-  for (const c of cats) add(`/katalogos/${c.slug}`, c.nameEl.toLowerCase());
+  for (const c of cats) add(`/katalogos/${c.slug}`, categoryAnchor(c.nameEl));
 
   const platforms = [...new Set(products.map((p) => (p.platform === "MX FUEL" ? "MX" : p.platform)))];
   for (const platform of platforms) {

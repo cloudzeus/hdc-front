@@ -1,6 +1,6 @@
 import sharp from "sharp";
-import { describe, expect, it } from "vitest";
-import { HERO, heroFromPhoto, heroPath, insertInlineImages, type InlineCandidate } from "@/lib/content-auto/images";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { HERO, heroFromPhoto, heroPath, insertInlineImages, onWhite, pickHeroPhoto, type InlineCandidate } from "@/lib/content-auto/images";
 
 const candidates: InlineCandidate[] = [
   { code: "4933479860", mentions: ["M18 FPD3-502X", "4933479860"], url: "https://cdn.test/kit.webp", alt: "Δραπανοκατσάβιδο Milwaukee M18 FPD3-502X" },
@@ -53,5 +53,42 @@ describe("heroFromPhoto", () => {
 
   it("stores the hero under eshop/content/<slug>/, never eshop/eshop/", () => {
     expect(heroPath("m18-fpd3")).toBe("eshop/content/m18-fpd3/hero.webp");
+  });
+});
+
+const square = (background: string, product = "#db011c") =>
+  sharp({ create: { width: 400, height: 400, channels: 3, background } })
+    .composite([{ input: Buffer.from(`<svg width="200" height="200"><rect width="200" height="200" fill="${product}"/></svg>`), left: 100, top: 100 }])
+    .png()
+    .toBuffer();
+
+describe("the hero's photo", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("knows a packshot from a workshop photo", async () => {
+    expect(await onWhite(await square("#ffffff"))).toBe(true);
+    expect(await onWhite(await square("#556677"))).toBe(false);
+  });
+
+  it("prefers a packshot, else the first photo that downloads, and only our CDN", async () => {
+    process.env.BUNNY_CDN_HOSTNAME = "cdn.test";
+    const photos: Record<string, Buffer> = {
+      "https://cdn.test/workshop.webp": await square("#556677"),
+      "https://cdn.test/packshot.webp": await square("#ffffff"),
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string) => (photos[url] ? new Response(new Uint8Array(photos[url])) : new Response("no", { status: 404 }))),
+    );
+    const pick = await pickHeroPhoto([
+      { code: "a", url: "https://elsewhere.test/x.webp" },
+      { code: "b", url: "https://cdn.test/missing.webp" },
+      { code: "c", url: "https://cdn.test/workshop.webp" },
+      { code: "d", url: "https://cdn.test/packshot.webp" },
+    ]);
+    expect(pick?.code).toBe("d");
+    const fallback = await pickHeroPhoto([{ code: "c", url: "https://cdn.test/workshop.webp" }]);
+    expect(fallback?.code).toBe("c");
+    expect(await pickHeroPhoto([{ code: "b", url: "https://cdn.test/missing.webp" }])).toBeNull();
   });
 });

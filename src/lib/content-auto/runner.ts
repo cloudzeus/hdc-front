@@ -21,7 +21,7 @@ import {
   type Existing,
   type GateResult,
 } from "@/lib/content-auto/gates";
-import { insertInlineImages, uploadHero, type InlineCandidate } from "@/lib/content-auto/images";
+import { insertInlineImages, pickHeroPhoto, uploadHero, type InlineCandidate } from "@/lib/content-auto/images";
 import { topicOrder, type TopicPayload } from "@/lib/content-auto/planner";
 import { articleSlug, modelMentions } from "@/lib/content-auto/text";
 import { verifyArticle, writeArticle, type Chat, type StyleExample } from "@/lib/content-auto/writer";
@@ -255,10 +255,18 @@ export async function executeRun(runId: string, options: ExecuteOptions = {}): P
 
     // 3. Photos: the hero's source, then the inline ones into the body.
     const byCode = new Map(pack.products.map((p) => [p.code, p]));
-    const chosen = written.heroProductCode ? byCode.get(written.heroProductCode) : undefined;
-    const heroProduct =
-      chosen?.image && allowedImage(chosen.image) ? chosen : pack.representative ? byCode.get(pack.representative) : undefined;
-    const heroSource = heroProduct?.image && allowedImage(heroProduct.image) ? heroProduct.image : null;
+    // The writer's choice first, then the representative, then the rest; a packshot on white wins.
+    const order = [written.heroProductCode, pack.representative, ...pack.products.map((p) => p.code)];
+    const candidates = [...new Set(order.filter((c): c is string => !!c))]
+      .map((code) => byCode.get(code))
+      .filter((p): p is PackProduct => !!p?.image && allowedImage(p.image))
+      .map((p) => ({ code: p.code, url: p.image! }));
+    const hero = await pickHeroPhoto(candidates);
+    const heroProduct = hero ? byCode.get(hero.code) : undefined;
+    const heroSource = hero?.url ?? null;
+    const heroAlt = heroProduct
+      ? (heroProduct.code === written.heroProductCode && written.heroImageAlt ? written.heroImageAlt : altFor(heroProduct, written.imageAlts))
+      : null;
     const inline = insertInlineImages(written.draft.body, inlineCandidates(pack, heroProduct?.code ?? null, written.imageAlts));
     const draft = { ...written.draft, body: inline.body };
     detail.images = { hero: heroProduct?.code ?? null, inline: inline.placed };
@@ -266,7 +274,7 @@ export async function executeRun(runId: string, options: ExecuteOptions = {}): P
     // 4. The verifier.
     let unsupported: Awaited<ReturnType<typeof verifyArticle>>["unsupported"] | null = null;
     try {
-      const verified = await verifyArticle(pack, draft, chat);
+      const verified = await verifyArticle(pack, draft, chat, heroAlt);
       tokens += verified.tokens;
       unsupported = verified.unsupported;
       detail.verifier = { tokens: verified.tokens, promptTokens: verified.promptTokens, completionTokens: verified.completionTokens };
@@ -295,9 +303,9 @@ export async function executeRun(runId: string, options: ExecuteOptions = {}): P
 
     // 6. The hero, to our CDN — for a draft too, so the editor has it.
     let heroImageUrl: string | null = null;
-    if (heroSource && SLUG.test(slug)) {
+    if (hero && SLUG.test(slug)) {
       try {
-        heroImageUrl = await uploadHero(slug, heroSource);
+        heroImageUrl = await uploadHero(slug, hero.photo);
       } catch (error) {
         const image = results.find((r) => r.id === "image")!;
         image.ok = false;
@@ -326,7 +334,7 @@ export async function executeRun(runId: string, options: ExecuteOptions = {}): P
       entities: draft.entities,
       sources: pack.sources,
       heroImageUrl,
-      heroImageAlt: heroImageUrl && heroProduct ? (written.heroImageAlt ?? altFor(heroProduct, written.imageAlts)).slice(0, 300) : null,
+      heroImageAlt: heroImageUrl && heroAlt ? heroAlt.slice(0, 300) : null,
       updatedBy: AUTO_ACTOR,
       source: "AUTO" as const,
       status: publish ? ("PUBLISHED" as const) : ("DRAFT" as const),

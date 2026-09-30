@@ -53,6 +53,10 @@ vi.mock("@/lib/mail/content-auto-email", () => ({ sendContentRunEmail: vi.fn(asy
 vi.mock("@/lib/content-auto/images", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/lib/content-auto/images")>()),
   uploadHero: vi.fn(async (slug: string) => `https://cdn.test/eshop/content/${slug}/hero.webp`),
+  // No network: the first candidate is taken, as if it were a packshot.
+  pickHeroPhoto: vi.fn(async (candidates: Array<{ code: string; url: string }>) =>
+    candidates[0] ? { ...candidates[0], photo: Buffer.from("x") } : null,
+  ),
 }));
 
 const pack = vi.hoisted(() => ({
