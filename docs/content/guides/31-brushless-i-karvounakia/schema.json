@@ -1,0 +1,138 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/brushless-i-karvounakia#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/brushless-i-karvounakia",
+      "url": "{{SITE_URL}}/blog/brushless-i-karvounakia",
+      "headline": "Brushless ή με καρβουνάκια; Τι είναι ο κινητήρας brushless",
+      "description": "Τι είναι ο κινητήρας brushless και σε τι διαφέρει από τον κινητήρα με καρβουνάκια: απόδοση, αυτονομία, θερμότητα, διάρκεια ζωής, συντήρηση. Πότε αξίζει.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "brushless, brushless motor τι είναι, brushless μοτέρ, brushless δραπανοκατσάβιδο τι είναι, brushless ή με καρβουνάκια, καρβουνάκια εργαλείων, κινητήρας χωρίς ψήκτρες, brushless motor ti einai, karvounakia, brushless Milwaukee, εργαλεία brushless Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Κινητήρας brushless"
+        },
+        {
+          "@type": "Thing",
+          "name": "Κινητήρας με ψήκτρες"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "POWERSTATE"
+        },
+        {
+          "@type": "Thing",
+          "name": "FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLINK PLUS"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FSZ"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/systems/m12/fuel/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-sawzall/m18-fsz/"
+      ],
+      "wordCount": 1006
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/brushless-i-karvounakia#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/brushless-i-karvounakia#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Τι είναι ο κινητήρας brushless;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι ηλεκτρικός κινητήρας χωρίς ψήκτρες (καρβουνάκια). Αντί για μηχανική επαφή που αλλάζει τη φορά του ρεύματος, ένα ηλεκτρονικό κύκλωμα με αισθητήρες ελέγχει τα πηνία. Έτσι χάνεται λιγότερη ενέργεια σε τριβή και θερμότητα και ο κινητήρας προσαρμόζει καλύτερα την ισχύ στο φορτίο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι τα καρβουνάκια σε ένα εργαλείο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι μικρά κομμάτια άνθρακα που τρίβονται πάνω στον συλλέκτη του κινητήρα για να περνά το ρεύμα στον ρότορα. Με τη χρήση φθείρονται και κάποια στιγμή πρέπει να αλλαχτούν. Σημάδια φθοράς είναι οι έντονοι σπινθήρες, η πτώση ισχύος και τα διακοπτόμενα σταματήματα."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Κρατά περισσότερο η μπαταρία σε εργαλείο brushless;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Γενικά ναι. Επειδή ο κινητήρας brushless χάνει λιγότερη ενέργεια σε τριβή και θερμότητα, το ίδιο φορτίο μπαταρίας βγάζει περισσότερη δουλειά. Η πραγματική διαφορά εξαρτάται από το εργαλείο, τη μπαταρία και το είδος της δουλειάς."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Χρειάζεται συντήρηση ο κινητήρας brushless;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Δεν έχει καρβουνάκια για αλλαγή, οπότε η συντήρηση του κινητήρα είναι ελάχιστη. Χρειάζεται όμως, όπως κάθε εργαλείο, καθαρές σχισμές αερισμού και προστασία από νερό και υπερθέρμανση, για να δουλεύουν σωστά τα ηλεκτρονικά."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Αξίζει το brushless για ερασιτεχνική χρήση;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Για λίγες ώρες τον χρόνο, ένα καλό εργαλείο με καρβουνάκια μπορεί να αρκεί. Αν όμως σκοπεύεις να χτίσεις πλατφόρμα μπαταρίας για χρόνια ή κάνεις συχνά απαιτητικές δουλειές, το brushless δίνει περισσότερη αυτονομία, ισχύ και διάρκεια ζωής."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Υπάρχουν εργαλεία ρεύματος brushless;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ναι, αν και τα περισσότερα εργαλεία ρεύματος χρησιμοποιούν ακόμη κινητήρες με ψήκτρες. Τα πλεονεκτήματα του brushless φαίνονται περισσότερο στα εργαλεία μπαταρίας, όπου κάθε κέρδος σε απόδοση μεταφράζεται σε περισσότερη δουλειά ανά φόρτιση."
+          }
+        }
+      ]
+    }
+  ]
+}

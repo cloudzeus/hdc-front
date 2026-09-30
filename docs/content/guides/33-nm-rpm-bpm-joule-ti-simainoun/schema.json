@@ -1,0 +1,158 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/nm-rpm-bpm-joule-ti-simainoun#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/nm-rpm-bpm-joule-ti-simainoun",
+      "url": "{{SITE_URL}}/blog/nm-rpm-bpm-joule-ti-simainoun",
+      "headline": "Τι σημαίνουν Nm, rpm, bpm, ipm και J στα εργαλεία;",
+      "description": "Τα νούμερα των εργαλείων απλά: ροπή Nm, στροφές rpm, κρούσεις bpm και ipm, ενέργεια J, ταλαντώσεις opm, διαδρομές spm, κραδασμοί m/s², IP.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "τι σημαίνει Nm, ροπή στρέψης, τι σημαίνει rpm, τι σημαίνει bpm στο δράπανο, ενέργεια κρούσης J, τεχνικά χαρακτηριστικά εργαλείων, ροπή δραπάνου, ropi strepsis, ti simainei nm, Milwaukee τεχνικά χαρακτηριστικά, εργαλεία Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Ροπή (Nm)"
+        },
+        {
+          "@type": "Thing",
+          "name": "Στροφές (rpm)"
+        },
+        {
+          "@type": "Thing",
+          "name": "Κρούσεις ανά λεπτό (bpm, ipm)"
+        },
+        {
+          "@type": "Thing",
+          "name": "Ενέργεια κρούσης (J)"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FPD3"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FID3"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 ONEFHPX"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FMT"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FBJS"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FDSS"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-percussion-drill/m18-fpd3/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-1-4-hex-impact-driver/m18-fid3/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-high-performance-4-mode-32-mm-sds-plus-hammer-with-one-key-and-fixtec-chuck/m18-onefhpx/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-multi-tool/m18-fmt/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-body-grip-jigsaw/m18-fbjs/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-sub-compact-spot-sander/m12-fdss/"
+      ],
+      "wordCount": 1011
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/nm-rpm-bpm-joule-ti-simainoun#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/nm-rpm-bpm-joule-ti-simainoun#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει Nm σε ένα δράπανο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι τα νιουτονόμετρα, η μονάδα της ροπής, δηλαδή της δύναμης περιστροφής. Όσο περισσότερα Nm, τόσο πιο εύκολα το δράπανο γυρίζει μεγάλα τρυπάνια, ποτηροτρύπανα και μακριές βίδες. Οι κατασκευαστές δίνουν συνήθως τη μέγιστη ροπή στη χαμηλή ταχύτητα."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ποια η διαφορά bpm και ipm;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Και τα δύο είναι κρούσεις ανά λεπτό. Το bpm (blows per minute) χρησιμοποιείται στα κρουστικά δράπανα και πιστολέτα, όπου η κρούση είναι προς τα εμπρός, προς το υλικό. Το ipm (impacts per minute) στα παλμικά και στα μπουλονόκλειδα, όπου η κρούση είναι στη φορά περιστροφής."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνουν τα τζάουλ σε ένα πιστολέτο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι η ενέργεια κάθε κρούσης του εμβόλου. Περισσότερα τζάουλ σημαίνουν ότι το τρυπάνι ή το καλέμι προχωρά γρηγορότερα στο μπετό. Σύγκρινέ τα μαζί με το βάρος και το προτεινόμενο εύρος διαμέτρων, γιατί ο τρόπος μέτρησης δεν είναι πάντα ίδιος."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Περισσότερες στροφές σημαίνει καλύτερο εργαλείο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Όχι απαραίτητα. Οι υψηλές στροφές είναι χρήσιμες για μικρές τρύπες σε ξύλο και μέταλλο, αλλά οι μεγάλες διάμετροι και τα σκληρά υλικά θέλουν χαμηλές στροφές και ροπή. Γι' αυτό τα καλά δράπανα έχουν δύο ταχύτητες και ρυθμιζόμενη σκανδάλη."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνουν τα m/s² στα εργαλεία;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι το επίπεδο κραδασμών χεριού-βραχίονα που δηλώνει ο κατασκευαστής. Όσο μικρότερο το νούμερο, τόσο λιγότεροι κραδασμοί φτάνουν στο χέρι σου, οπότε μπορείς να δουλεύεις περισσότερο με ασφάλεια. Σημαντικό σε πιστολέτα, τροχούς, τριβεία και σπαθόσεγες."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Είναι τα βολτ μέτρο της δύναμης ενός εργαλείου;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Μόνο έμμεσα. Η τάση καθορίζει την πλατφόρμα και την κατηγορία του εργαλείου, αλλά δύο εργαλεία της ίδιας τάσης μπορεί να έχουν πολύ διαφορετική ροπή και απόδοση. Για σύγκριση κοίτα τα νούμερα της δουλειάς, όπως Nm, J ή βάθος κοπής, μέσα στην ίδια κατηγορία."
+          }
+        }
+      ]
+    }
+  ]
+}

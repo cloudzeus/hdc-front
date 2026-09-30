@@ -47,7 +47,7 @@ Intent: **I** informational, **C** commercial investigation, **T** transactional
 
 | # | Cluster (primary query) | Secondary queries seen / implied | Unaccented · Greeklish | Intent | Pri. | Catalogue target |
 |---|---|---|---|---|---|---|
-| 01 | δράπανο | δράπανο μπαταρίας, δράπανο ρεύματος, κρουστικό δράπανο, ποιο δράπανο να αγοράσω, δράπανο για μπετό | drapano, krousiko drapano | C | H | ergaleia-batarias → drapana… |
+| 01 | δράπανο | δράπανο μπαταρίας, δράπανο ρεύματος, κρουστικό δράπανο, ποιο δράπανο να αγοράσω, δράπανο για μπετό | drapano, krousiko drapano | C | H | kroustika-drapana-2, katsavidieres, peristrofika-skaptika-pistoleta |
 | 02 | δραπανοκατσάβιδο μπαταρίας | κρουστικό δραπανοκατσάβιδο, δραπανοκατσάβιδο 18v, brushless δραπανοκατσάβιδο | drapanokatsavido | C | H | kroustika-drapana-2, katsavidieres |
 | 03 | πιστολέτο | πιστολέτο μπαταρίας, πιστολέτο sds-plus, σκαπτικό πιστολέτο, κατεδαφιστικό πιστολέτο, sds max | pistoleto, skaptiko pistoleto | C | H | peristrofika-skaptika-pistoleta |
 | 04 | παλμικό κατσαβίδι | παλμικό κατσαβίδι μπαταρίας, διαφορά παλμικού και δραπανοκατσάβιδου | palmiko katsavidi | C | H | palmika-katsavidia |

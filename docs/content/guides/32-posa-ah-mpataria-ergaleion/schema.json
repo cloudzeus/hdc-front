@@ -1,0 +1,163 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/posa-ah-mpataria-ergaleion#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/posa-ah-mpataria-ergaleion",
+      "url": "{{SITE_URL}}/blog/posa-ah-mpataria-ergaleion",
+      "headline": "Πόσα Ah χρειάζομαι; Πώς διαλέγω μπαταρία εργαλείων",
+      "description": "Τι σημαίνουν τα Ah και τα Wh σε μια μπαταρία εργαλείων, πόσα Ah θέλει κάθε εργαλείο, μπαταρίες υψηλής απόδοσης, φόρτιση και πόσες μπαταρίες χρειάζεσαι.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "πόσα Ah χρειάζομαι, μπαταρία 18V, μπαταρία εργαλείων, τι σημαίνει Ah στη μπαταρία, μπαταρία 5Ah ή 2Ah, μπαταρία λιθίου εργαλείων, φορτιστής μπαταρίας εργαλείων, posa ah mpataria, mpataria 18v, μπαταρία Milwaukee, μπαταρίες εργαλείων Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Μπαταρία εργαλείων"
+        },
+        {
+          "@type": "Thing",
+          "name": "Αμπερώρια (Ah)"
+        },
+        {
+          "@type": "Thing",
+          "name": "Βατώρες (Wh)"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLITHIUM"
+        },
+        {
+          "@type": "Thing",
+          "name": "HIGH OUTPUT"
+        },
+        {
+          "@type": "Thing",
+          "name": "FORGE"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 B5"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 HB3"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 DBSC"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12-18 FC"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/systems/m18/",
+        "https://www.milwaukeetool.eu/systems/m12/",
+        "https://www.milwaukeetool.eu/systems/m12/fuel/"
+      ],
+      "wordCount": 1010
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/posa-ah-mpataria-ergaleion#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/posa-ah-mpataria-ergaleion#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνουν τα Ah σε μια μπαταρία;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Τα αμπερώρια (Ah) δείχνουν τη χωρητικότητα, δηλαδή πόση δουλειά βγάζει η μπαταρία ανά φόρτιση. Στην ίδια τάση, μια μπαταρία 5 Ah κρατά περίπου δυόμισι φορές περισσότερο από μια 2 Ah στο ίδιο εργαλείο και την ίδια δουλειά. Δεν δείχνουν όμως πόση ισχύ δίνει υπό φορτίο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι οι βατώρες (Wh);",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι η ενέργεια της μπαταρίας και βγαίνει πολλαπλασιάζοντας την ονομαστική τάση με τα Ah. Μια μπαταρία 18 V και 5 Ah έχει περίπου 90 Wh. Οι βατώρες βοηθούν να συγκρίνεις μπαταρίες διαφορετικής τάσης και ενδιαφέρουν, για παράδειγμα, σε κανόνες μεταφοράς."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Χρειάζομαι πάντα τη μεγαλύτερη μπαταρία;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Όχι. Οι μεγάλες μπαταρίες είναι βαρύτερες και κάνουν ένα μικρό εργαλείο δύσχρηστο, ειδικά πάνω από το κεφάλι. Για παλμικά, δραπανοκατσάβιδα και φακούς οι μικρές μπαταρίες είναι πιο άνετες. Κράτα τις μεγάλες για τροχούς, δισκοπρίονα, πιστολέτα και αλυσοπρίονα."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι οι μπαταρίες υψηλής απόδοσης;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι μπαταρίες σχεδιασμένες να δίνουν περισσότερο ρεύμα υπό φορτίο με λιγότερη θερμότητα, συνήθως με καλύτερες κυψέλες και εσωτερική κατασκευή. Κάνουν διαφορά σε εργαλεία μεγάλης κατανάλωσης. Σε ένα παλμικό ή ένα φακό η διαφορά είναι μικρή."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πόσες μπαταρίες χρειάζομαι;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Τουλάχιστον δύο, ώστε η μία να φορτίζει όσο δουλεύεις με την άλλη. Αν ο φορτιστής σου χρειάζεται περισσότερο χρόνο από όσο κρατά η μπαταρία στη βαριά δουλειά, πάρε τρίτη μπαταρία ή πιο γρήγορο φορτιστή."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Μπορώ να βάλω μεγαλύτερη μπαταρία στο ίδιο εργαλείο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Μέσα στην ίδια πλατφόρμα συνήθως ναι: οι μπαταρίες της ίδιας πλατφόρμας ταιριάζουν στα εργαλεία της. Ένα εργαλείο μεγάλης κατανάλωσης μπορεί να δουλεύει καλύτερα με μπαταρία υψηλής απόδοσης. Διάβασε πάντα τις οδηγίες του εργαλείου για προτεινόμενες μπαταρίες."
+          }
+        }
+      ]
+    }
+  ]
+}

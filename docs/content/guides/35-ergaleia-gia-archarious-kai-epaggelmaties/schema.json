@@ -1,0 +1,139 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/ergaleia-gia-archarious-kai-epaggelmaties#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/ergaleia-gia-archarious-kai-epaggelmaties",
+      "url": "{{SITE_URL}}/blog/ergaleia-gia-archarious-kai-epaggelmaties",
+      "headline": "Εργαλεία για αρχάριους και για επαγγελματίες: τι χρειάζομαι πρώτα",
+      "description": "Ποια εργαλεία χρειάζεσαι πρώτα; Βασικός εξοπλισμός για το σπίτι, τι αλλάζει στα επαγγελματικά εργαλεία και πώς χτίζεις σταδιακά πλατφόρμα μπαταρίας.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "βασικά εργαλεία για το σπίτι, εργαλεία για αρχάριους, επαγγελματικά εργαλεία, ερασιτεχνικά ή επαγγελματικά εργαλεία, σετ εργαλείων μπαταρίας, ποια εργαλεία να αγοράσω πρώτα, εργαλεία μπαταρίας σετ, vasika ergaleia, epaggelmatika ergaleia, εργαλεία Milwaukee, κατάστημα εργαλείων Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Βασικά εργαλεία"
+        },
+        {
+          "@type": "Thing",
+          "name": "Επαγγελματικά εργαλεία"
+        },
+        {
+          "@type": "Thing",
+          "name": "Σετ εργαλείων μπαταρίας"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "PACKOUT"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/systems/m12/",
+        "https://www.milwaukeetool.eu/systems/m18/",
+        "https://www.milwaukeetool.eu/range/packout/"
+      ],
+      "wordCount": 1011
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/ergaleia-gia-archarious-kai-epaggelmaties#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/ergaleia-gia-archarious-kai-epaggelmaties#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Ποια είναι τα πρώτα εργαλεία που χρειάζομαι στο σπίτι;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ένα σετ κατσαβίδια, μια πένσα και ένα μυτοτσίμπιδο, ένα γαλλικό κλειδί, ένα σφυρί, μια μετροταινία, ένα αλφάδι, ένα κοπίδι και ένα δραπανοκατσάβιδο μπαταρίας με τρυπάνια και μύτες. Με αυτά καλύπτεις τις περισσότερες μικροεπισκευές, συναρμολογήσεις και κρεμάσματα."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Σε τι διαφέρουν τα επαγγελματικά εργαλεία από τα ερασιτεχνικά;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι σχεδιασμένα για πολλές ώρες καθημερινής χρήσης, σε σκόνη, χτυπήματα και ζέστη. Έχουν πιο ανθεκτικά μέρη, κινητήρες και μπαταρίες για συνεχές φορτίο, καλύτερη εργονομία, ανταλλακτικά και σέρβις, και ανήκουν σε πλατφόρμες με πολλά εργαλεία που μοιράζονται μπαταρίες."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Αξίζει ένα μεγάλο σετ με πολλά εργαλεία;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Μόνο αν θα χρησιμοποιήσεις τα περισσότερα. Τα μεγάλα σετ με δεκάδες κομμάτια έχουν συχνά εργαλεία που δεν πιάνεις ποτέ. Καλύτερα λίγα, καλά εργαλεία που χρησιμοποιείς συχνά, και προσθήκες όταν εμφανιστεί η ανάγκη."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Να ξεκινήσω με 12V ή 18V;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Για σπίτι, ηλεκτρολογικά, υδραυλικά και ελαφριές δουλειές, το 12V είναι ελαφρύ και αρκετό. Αν σκοπεύεις να τρυπάς μπετό, να κόβεις ξύλα και να χρησιμοποιείς τροχό, ξεκίνα από 18V. Πολλοί επαγγελματίες έχουν και τα δύο, με κοινό φορτιστή."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Χρειάζομαι μέσα προστασίας ως αρχάριος;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ναι, από την πρώτη μέρα. Γυαλιά προστασίας, γάντια εργασίας και ωτοασπίδες είναι απλή και αποτελεσματική προστασία για τα μάτια, τα χέρια και τα αυτιά σου. Σε σκόνη από τρίψιμο και τρύπημα πρόσθεσε μάσκα FFP2."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πώς φυλάω τα εργαλεία μου τακτοποιημένα;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Με μια εργαλειοθήκη για τα εργαλεία χειρός, μια θήκη για το δράπανο και τις μπαταρίες και μια ταμπακιέρα για βίδες, βύσματα και μύτες. Όταν ο εξοπλισμός μεγαλώσει, ένα αρθρωτό σύστημα που στοιβάζεται κρατά την τάξη και διευκολύνει τη μεταφορά."
+          }
+        }
+      ]
+    }
+  ]
+}
