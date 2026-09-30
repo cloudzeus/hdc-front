@@ -183,7 +183,8 @@ export function bareKitGate(draft: Draft, alts: string[] = []): GateResult {
     const bare = modelMentions(sentence).filter((m) => m.full && BARE_MODEL.test(m.full));
     if (!bare.length) continue;
     const text = searchKey(sentence);
-    if (/(?<!\p{L})(χωρισ|without)(?!\p{L})/u.test(text)) continue;
+    // «χωρίς», or the reader's own batteries: «αν έχετε», «έχετε ήδη», «δικές σας μπαταρίες».
+    if (/(?<!\p{L})(χωρισ|without)(?!\p{L})|εχετε\s+ηδη|(?<!\p{L})αν\s+εχετε|δικεσ\s+σασ\s+μπαταριεσ/u.test(text)) continue;
     const claim = BATTERY_CLAIM.exec(text);
     if (claim) problems.push(`Το ${bare[0].full} είναι σκέτο εργαλείο, αλλά η πρόταση γράφει «${claim[0].trim()}»: «${sentence.trim().slice(0, 140)}»`);
   }
@@ -416,6 +417,46 @@ export function uniqueGate(draft: Draft, slug: string, existing: Existing[]): Ga
  * block, and goes to the next revision as «say it more generally».
  */
 export type Unsupported = { claim: string; reason?: string; kind?: "fact" | "advice" };
+
+/**
+ * A «fact» finding whose claim carries no product fact at all is advice:
+ * nothing it could be wrong about. A claim stays a fact when it has a number,
+ * a unit, a model or article code, a technology or feature term (the
+ * glossary's names, the pack's spec labels, or the fixed words below), a kit
+ * or compatibility word, or a store claim. Deterministic, after the verifier.
+ */
+const FACT_MARKERS: RegExp[] = [
+  /\d/,
+  /(?<![\p{L}])(v|ah|nm|mm|cm|rpm|bpm|ipm|kg|w|wh|kw|j|db|km\/h|m³|m\/s|°|%|volt|watt|joule|min-1|min⁻¹)(?![\p{L}])/iu,
+  // Technology and feature words.
+  /(?<!\p{L})(αδιαβροχ|αντοχ|διαρκεια\s+μπαταριασ|συμβατ|ταιριαζει\s+με|brushless|καρβουνακι|ip\s?\d|cruise|μεταβλητ\p{L}*\s+ταχυτ|variable\s+speed|ροπ|ισχυ|ταχυτητ|βαρ(οσ|ουσ|υ)|θορυβ|κραδασμ|στροφ|κρουσ|χωρητικοτητ|τασ(η|ησ)(?!\p{L})|δυναμ|αυτονομ|προστασ\p{L}*\s+απο|υπερφορτ|υπερθερμ)/u,
+  // Kit and compatibility.
+  /(?<!\p{L})(μπαταρ|φορτιστ|κιτ(?!\p{L})|περιλαμβ|ερχεται\s+με|kit(?!\p{L}))/u,
+  // Store claims.
+  /(?<!\p{L})(παραδοσ|αποστολ|εγγυησ|καταστημ)/u,
+];
+
+export function carriesFact(claim: string, terms: string[] = []): boolean {
+  const text = searchKey(claim);
+  if (FACT_MARKERS.some((re) => re.test(text) || re.test(claim))) return true;
+  if (modelMentions(claim).length || codeMentions(claim).length) return true;
+  return terms.some((t) => t && text.includes(searchKey(t)));
+}
+
+/** The verifier's findings with contentless «facts» turned into advice, and which ones were. */
+export function reclassify(
+  unsupported: Unsupported[] | null,
+  terms: string[] = [],
+): { items: Unsupported[] | null; reclassified: string[] } {
+  if (unsupported == null) return { items: null, reclassified: [] };
+  const reclassified: string[] = [];
+  const items = unsupported.map((u) => {
+    if (u.kind === "advice" || carriesFact(u.claim, terms)) return u;
+    reclassified.push(u.claim);
+    return { ...u, kind: "advice" as const };
+  });
+  return { items, reclassified };
+}
 
 export function verifierGate(unsupported: Unsupported[] | null): GateResult {
   if (unsupported == null) return gate("verifier", ["Ο έλεγχος ισχυρισμών δεν ολοκληρώθηκε"]);

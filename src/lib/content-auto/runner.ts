@@ -11,13 +11,14 @@ import { siteOrigin } from "@/lib/seo/urls";
 import { getSetting } from "@/lib/settings/settings";
 import { contentAdminUrl, sendContentRunEmail } from "@/lib/mail/content-auto-email";
 import { athensTime } from "@/lib/content-auto/cadence";
-import { STORE_FACTS, loadFactPack, packNumbers, promptPack, type FactPack, type PackProduct } from "@/lib/content-auto/fact-pack";
+import { STORE_FACTS, loadFactPack, packNumbers, packTerms, promptPack, type FactPack, type PackProduct } from "@/lib/content-auto/fact-pack";
 import {
   GATE_LABELS,
   failedGates,
   imageGate,
   linkTargets,
   namesFrom,
+  reclassify,
   sanitizeMetadata,
   textGates,
   visibleText,
@@ -355,6 +356,7 @@ async function doRun(run: Run, options: ExecuteOptions, state: State): Promise<R
   ]);
   const packText = JSON.stringify(promptPack(pack));
   const supported = packNumbers(pack);
+  const terms = packTerms(pack);
   const byCode = new Map(pack.products.map((p) => [p.code, p]));
   const tries: Array<Record<string, unknown>> = [];
   detail.attempts = tries;
@@ -402,6 +404,9 @@ async function doRun(run: Run, options: ExecuteOptions, state: State): Promise<R
     }
     state.tokens += verifierTokens;
     check();
+    // A «fact» with no number, unit, code, feature, kit or store word in it is advice.
+    const { items: judged, reclassified } = reclassify(unsupported, terms);
+    unsupported = judged;
 
     const slug = own?.slug ?? articleSlug(draft.title);
     const broken = await brokenLinks(internalPaths(visibleText(draft)));
@@ -417,12 +422,20 @@ async function doRun(run: Run, options: ExecuteOptions, state: State): Promise<R
       existing,
       unsupported,
     });
-    return { hero, heroProduct, heroAlt, placed, draft, dropped, alts, unsupported, verifierTokens, verifierError, slug, gates };
+    return { hero, heroProduct, heroAlt, placed, draft, dropped, alts, unsupported, reclassified, verifierTokens, verifierError, slug, gates };
   };
 
   let current = await evaluate(written);
+  // The attempt that is saved: the first that passes, else the one with the fewest failed gates.
+  let best = current;
+  let bestAttempt = 0;
+  const failedCount = (e: typeof current) => e.gates.filter((g) => !g.ok).length;
   for (let revision = 0; ; revision++) {
     const failing = current.gates.filter((g) => !g.ok);
+    if (failing.length < failedCount(best)) {
+      best = current;
+      bestAttempt = revision;
+    }
     tries.push({
       attempt: revision,
       title: current.draft.title,
@@ -431,6 +444,7 @@ async function doRun(run: Run, options: ExecuteOptions, state: State): Promise<R
       failedGates: failing.map((g) => g.id),
       problems: failing.map((g) => ({ gate: g.id, problems: g.problems })),
       advice: current.gates.flatMap((g) => g.notes ?? []),
+      reclassifiedAsAdvice: current.reclassified,
       droppedMetadata: current.dropped,
       verifierError: current.verifierError,
     });
@@ -454,6 +468,8 @@ async function doRun(run: Run, options: ExecuteOptions, state: State): Promise<R
     check();
     current = await evaluate(written);
   }
+  detail.savedAttempt = bestAttempt;
+  current = best;
   const { hero, heroAlt, draft, gates, slug, unsupported } = current;
   detail.writer = { tokens: tries.reduce((sum, a) => sum + Number(a.writerTokens ?? 0), 0), revisions: tries.filter((a) => !a.error).length - 1 };
   detail.images = { hero: current.heroProduct?.code ?? null, inline: current.placed.map((c) => c.code) };

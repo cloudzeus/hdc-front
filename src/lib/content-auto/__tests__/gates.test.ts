@@ -13,7 +13,9 @@ import {
   linksGate,
   namesFrom,
   numbersGate,
+  carriesFact,
   metadataProblem,
+  reclassify,
   runGates,
   sanitizeMetadata,
   uniqueGate,
@@ -215,8 +217,11 @@ describe("gate · a bare tool comes without batteries", () => {
   ])("fails on «%s»", (answer) => {
     expect(bareKitGate({ ...goodDraft(), answer }).ok).toBe(false);
   });
-  it("passes «χωρίς», a kit, and batteries in general", () => {
+  it("passes «χωρίς», a kit, batteries in general, and the reader's own batteries", () => {
     for (const answer of [
+      "Αν έχετε ήδη μπαταρίες M18 και φορτιστή, το M18 FBLG3-0 δουλεύει με ό,τι έχετε.",
+      "Αν έχετε φορτιστή M12-18 FC, πάρτε το M18 FPD3-0X.",
+      "Το M18 FPD3-0X δουλεύει με τις δικές σας μπαταρίες 5,0 Ah.",
       "Το M18 FPD3-0X έρχεται χωρίς μπαταρίες και φορτιστή.",
       "Το M18 FPD3-502X έχει δύο μπαταρίες 5,0 Ah.",
       "Το M18 FPD3-0X δουλεύει με όλες τις μπαταρίες M18.",
@@ -339,6 +344,48 @@ describe("gate · verifier", () => {
     ]);
     expect(mixed.ok).toBe(false);
     expect(mixed.problems).toHaveLength(1);
+  });
+});
+
+describe("verifier findings: deterministic reclassification", () => {
+  it.each([
+    "Σε αποθήκη καθαρίζει ράφια",
+    "Σε συνεργείο σπρώχνει ρινίσματα από τις γωνίες",
+    "Αν δουλεύετε σε χώρο με πολλή σκόνη, ένα προστατευτικό ματιών βοηθά",
+    "Σε αυλές και πεζοδρόμια μαζεύει φύλλα και χαλαρά υλικά",
+  ])("«%s» carries no product fact: advice", (claim) => {
+    expect(carriesFact(claim)).toBe(false);
+  });
+  it.each([
+    ["a number", "Φτάνει σε 1 δευτερόλεπτο"],
+    ["a unit", "Δίνει περισσότερα Nm"],
+    ["a model", "Το M18 FBLG3-0 καθαρίζει ράφια"],
+    ["a code", "Ο 4933493301 καθαρίζει ράφια"],
+    ["a glossary term", "Το REDLINK PLUS το προστατεύει"],
+    ["a spec label of the pack", "Έχει cruise control για μεγάλες επιφάνειες"],
+    ["«αδιάβροχο»", "Είναι αδιάβροχο"],
+    ["«αντοχή»", "Έχει μεγάλη αντοχή στη σκόνη"],
+    ["«διάρκεια μπαταρίας»", "Καλή διάρκεια μπαταρίας"],
+    ["«συμβατό»", "Συμβατό με τα αξεσουάρ"],
+    ["«ταιριάζει με»", "Ταιριάζει με όλα τα ακροφύσια"],
+    ["a battery", "Δουλεύει με όλες τις μπαταρίες"],
+    ["a charger", "Φορτίζει στον φορτιστή σας"],
+    ["a kit", "Το κιτ είναι πλήρες"],
+    ["«έρχεται με»", "Έρχεται με θήκη"],
+    ["a store claim", "Γρήγορη αποστολή από το κατάστημα"],
+    ["a guarantee", "Με εγγύηση Milwaukee"],
+  ])("%s keeps it a fact", (_label, claim) => {
+    expect(carriesFact(claim, ["Cruise control", "REDLINK PLUS"])).toBe(true);
+  });
+  it("turns only contentless facts into advice, and says which", () => {
+    const { items, reclassified } = reclassify([
+      { claim: "Σε αποθήκη καθαρίζει ράφια", kind: "fact" },
+      { claim: "Δίνει 250 Nm", kind: "fact" },
+    ]);
+    expect(items!.map((u) => u.kind)).toEqual(["advice", "fact"]);
+    expect(reclassified).toEqual(["Σε αποθήκη καθαρίζει ράφια"]);
+    expect(verifierGate(items).ok).toBe(false);
+    expect(reclassify(null).items).toBeNull();
   });
 });
 

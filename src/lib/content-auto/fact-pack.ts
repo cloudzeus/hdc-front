@@ -247,6 +247,17 @@ export function promptPack(pack: FactPack) {
   };
 }
 
+/**
+ * The technology and feature terms of a pack, for the verifier's
+ * reclassification: the glossary's names and every spec label, without its
+ * unit in parentheses or brackets («Cruise control», «Variable speed»).
+ */
+export function packTerms(pack: FactPack): string[] {
+  const labels = pack.products.flatMap((p) => [...p.specs.map((r) => r.label), ...p.official.map((o) => o.name)]);
+  const clean = labels.map((l) => l.replace(/\([^)]*\)|\[[^\]]*\]/g, " ").replace(/\s+/g, " ").trim()).filter((l) => l.length >= 4);
+  return [...new Set([...(pack.glossary ?? []).map((g) => g.term), "FUEL", "POWERSTATE", "REDLINK", "REDLITHIUM", "ONE-KEY", "PACKOUT", ...clean])];
+}
+
 /** The «unit:value» pairs the pack states (the numbers gate). */
 export function packNumbers(pack: FactPack): Set<string> {
   const texts = [

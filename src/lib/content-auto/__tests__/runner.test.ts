@@ -249,7 +249,7 @@ describe("executeRun", () => {
 
   it("leaves a text that fails a gate as a draft, counts the attempt and names the gates", async () => {
     setRun("cron");
-    const out = await executeRun("run1", { chat: chatWith(article({ answer: "Κοστίζει 199 € και δίνει 135 Nm." }), [{ claim: "x" }]) });
+    const out = await executeRun("run1", { chat: chatWith(article({ answer: "Κοστίζει 199 € και δίνει 135 Nm." }), [{ claim: "Έχει 3 ταχύτητες" }]) });
     expect(out.outcome).toBe("DRAFT");
     expect(out.failedGates).toEqual(expect.arrayContaining(["numbers", "forbidden", "lengths", "verifier"]));
     expect(db.articleWrites[0].data).toMatchObject({ status: "DRAFT" });
@@ -279,7 +279,7 @@ describe("executeRun", () => {
 
   it("stops after two revisions and fails closed", async () => {
     setRun("manual-publish");
-    const chat = chatWith(article(), [{ claim: "κάτι χωρίς στήριξη" }]);
+    const chat = chatWith(article(), [{ claim: "Δίνει 250 Nm ροπή" }]);
     const out = await executeRun("run1", { chat });
     expect(out.outcome).toBe("DRAFT");
     expect(out.failedGates).toEqual(["verifier"]);
@@ -311,6 +311,41 @@ describe("executeRun", () => {
     expect(writes).toHaveLength(2);
     expect(writes[1]).toContain("Έχει 3 ταχύτητες");
     expect(writes[1]).toMatch(/Δουλέψτε σταθερά.*πιο γενικά/);
+  });
+
+  it("a «fact» with no product fact in it is reclassified as advice, and logged", async () => {
+    setRun("manual-publish");
+    const out = await executeRun("run1", { chat: chatWith(article(), [{ claim: "Σε αποθήκη καθαρίζει ράφια", kind: "fact" }]) });
+    expect(out.outcome).toBe("PUBLISHED");
+    const detail = db.runUpdates[0].detail as { attempts: Array<{ reclassifiedAsAdvice: string[] }> };
+    expect(detail.attempts[0].reclassifiedAsAdvice).toEqual(["Σε αποθήκη καθαρίζει ράφια"]);
+  });
+
+  it("keeps the attempt with the fewest failed gates when none passes, and asks for 850 words", async () => {
+    setRun("manual-publish");
+    const writes: string[] = [];
+    // Attempt 0 fails 1 gate (verifier); attempts 1 and 2 fail 2 (numbers + verifier).
+    const chat = vi.fn<Chat>(async ({ temperature, user }) => {
+      if (temperature === 0) return { text: JSON.stringify({ unsupported: [{ claim: "Δίνει 250 Nm ροπή", kind: "fact" }] }), usage: { promptTokens: 1, completionTokens: 1 } };
+      writes.push(user);
+      const text = writes.length === 1 ? article() : article({ title: `Χειρότερο ${writes.length}`, answer: `${article().answer.split(" ").slice(0, 45).join(" ")} 999 Nm.` });
+      return { text: JSON.stringify(text), usage: { promptTokens: 1, completionTokens: 1 } };
+    });
+    const out = await executeRun("run1", { chat });
+    expect(writes).toHaveLength(3);
+    expect(writes[1]).toContain("Κράτα το σώμα τουλάχιστον 850 λέξεις");
+    expect(out.outcome).toBe("DRAFT");
+    expect(out.failedGates).toEqual(["verifier"]);
+    expect(db.articleWrites[0].data.title).toBe(article().title);
+    expect((db.runUpdates[0].detail as { savedAttempt: number }).savedAttempt).toBe(0);
+  });
+
+  it("stops at the first attempt that passes", async () => {
+    setRun("manual-draft");
+    const chat = chatWith(article());
+    await executeRun("run1", { chat });
+    expect(chat).toHaveBeenCalledTimes(2);
+    expect((db.runUpdates[0].detail as { attempts: unknown[] }).attempts).toHaveLength(1);
   });
 
   it("drops a keyword or entity with «τιμή» instead of failing, and logs it", async () => {
