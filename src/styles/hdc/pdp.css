@@ -340,6 +340,18 @@
   .hdc-pdp-mcodes {
     display: none;
   }
+  .hdc-pdp-model {
+    margin: 8px 0 0;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-13);
+  }
+  .hdc-pdp-model a {
+    color: var(--hdc-red);
+  }
+  .hdc-pdp-model a:hover {
+    text-decoration: underline;
+  }
   .hdc-pdp-rv {
     display: inline-block;
     margin-top: 8px;
@@ -1303,6 +1315,10 @@
       font-size: var(--fs-17);
       font-stretch: 130%;
       line-height: 1.05;
+    }
+    .hdc-pdp-model {
+      order: 2;
+      margin: 0 0 6px;
     }
     .hdc-pdp-mcodes {
       order: 2;

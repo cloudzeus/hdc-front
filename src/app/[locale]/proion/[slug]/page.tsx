@@ -43,6 +43,7 @@ import { formatMoney, grossAmount } from "@/lib/format";
 import { upGreek } from "@/lib/greek";
 import { displayName, platformTag } from "@/lib/milwaukee/display";
 import { parseModel } from "@/lib/milwaukee/model";
+import { modelPath } from "@/lib/milwaukee/model-slug";
 import {
   ahLabel,
   boxFacts,
@@ -554,6 +555,14 @@ async function ProductBody({ params }: PageProps) {
                 </div>
               )}
             </dl>
+            {/* The model page: every version of this model, side by side. */}
+            {model && (
+              <p className="hdc-pdp-model">
+                <Link href={modelPath(model.root)} prefetch={false}>
+                  {t("oles_oi_ekdoseis", { model: model.root })} →
+                </Link>
+              </p>
+            )}
             <p className="hdc-pdp-mcodes">{[code, model?.code].filter(Boolean).join(" · ")}</p>
 
             {average != null ? (

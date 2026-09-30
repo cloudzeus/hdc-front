@@ -428,3 +428,66 @@ export function productJsonLd(input: ProductLdInput) {
       : {}),
   };
 }
+
+/**
+ * A model page (/montelo/m18-fpd3) as a `ProductGroup`: the model, with each
+ * version the store lists as a variant — its article number, model code, a
+ * GTIN when valid, its page, and the price the page shows.
+ */
+export function modelGroupJsonLd(input: {
+  url: string;
+  origin: string;
+  root: string;
+  name: string;
+  description: string | null;
+  image: string | null;
+  versions: Array<{
+    url: string;
+    name: string;
+    code: string;
+    code2: string;
+    ean: string | null;
+    image: string | null;
+    priceGross: number | null;
+    availability: Availability;
+  }>;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ProductGroup",
+    "@id": `${input.url}#model`,
+    name: input.name,
+    productGroupID: input.root,
+    brand: { "@type": "Brand", name: "Milwaukee" },
+    url: input.url,
+    ...(input.description ? { description: input.description } : {}),
+    ...(input.image ? { image: input.image } : {}),
+    hasVariant: input.versions.map((v) => {
+      const ean = v.ean?.replace(/\D/g, "") ?? "";
+      return {
+        "@type": "Product",
+        "@id": `${v.url}#product`,
+        name: v.name,
+        sku: v.code2,
+        mpn: v.code2,
+        model: v.code,
+        ...(isValidGtin(ean) ? (ean.length === 13 ? { gtin13: ean } : { gtin: ean }) : {}),
+        url: v.url,
+        ...(v.image ? { image: v.image } : {}),
+        ...(v.priceGross != null
+          ? {
+              offers: {
+                "@type": "Offer",
+                url: v.url,
+                price: v.priceGross.toFixed(2),
+                priceCurrency: "EUR",
+                availability: schemaOrgAvailability(v.availability),
+                itemCondition: "https://schema.org/NewCondition",
+                seller: { "@id": `${input.origin}/#shop` },
+              },
+            }
+          : {}),
+      };
+    }),
+  };
+}

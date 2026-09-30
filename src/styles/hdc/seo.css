@@ -326,3 +326,34 @@
     }
   }
 }
+
+/* ── 404: the search box ─────────────────────────────────────────────── */
+@layer components {
+  .hdc-404-search {
+    max-width: 640px;
+  }
+  .hdc-404-search label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+    font-size: var(--fs-15);
+    color: var(--hdc-ink);
+  }
+  .hdc-404-search > div {
+    display: flex;
+    gap: 8px;
+  }
+  .hdc-404-search input {
+    flex: 1;
+    min-width: 0;
+    min-height: 48px;
+    padding: 0 14px;
+    border: 2px solid var(--hdc-ink);
+    font-size: var(--fs-16);
+    font-family: inherit;
+  }
+  .hdc-404-search input:focus-visible {
+    outline: 2px solid var(--hdc-red);
+    outline-offset: 2px;
+  }
+}

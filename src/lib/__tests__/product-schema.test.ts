@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { SUPPLIER_HANDLING_DAYS } from "@/lib/catalog/availability";
 import { FREE_SHIPPING_THRESHOLD_NET } from "@/lib/cart/options";
-import { productJsonLd, shippingDetails } from "@/lib/seo/product-schema";
+import { modelGroupJsonLd, productJsonLd, shippingDetails } from "@/lib/seo/product-schema";
 
 /**
  * The offer's delivery promise has to match its availability: the supplier's
@@ -95,5 +95,29 @@ describe("productJsonLd", () => {
     expect(ld.aggregateRating).toMatchObject({ ratingValue: "4.5", reviewCount: 2 });
     expect(ld.review).toHaveLength(2);
     expect(ld.review![0]).toMatchObject({ author: { "@type": "Person", name: "Γιώργος Π." }, datePublished: "2026-09-01" });
+  });
+});
+
+describe("modelGroupJsonLd", () => {
+  it("is a ProductGroup of the model with each version as a variant", () => {
+    const ld = modelGroupJsonLd({
+      url: "https://milwaukeetoolshdc.gr/montelo/m18-fpd3",
+      origin: "https://milwaukeetoolshdc.gr",
+      root: "M18 FPD3",
+      name: "Milwaukee M18 FPD3 — Κρουστικό δραπανοκατσάβιδο",
+      description: null,
+      image: null,
+      versions: [
+        { url: "https://milwaukeetoolshdc.gr/proion/a", name: "M18 FPD3-0X", code: "M18 FPD3-0X", code2: "4933479859", ean: "4058546376536 ", image: null, priceGross: 219, availability: "stock" },
+        { url: "https://milwaukeetoolshdc.gr/proion/b", name: "M18 FPD3-502X", code: "M18 FPD3-502X", code2: "4933479860", ean: "123", image: null, priceGross: null, availability: "order" },
+      ],
+    });
+    expect(ld["@type"]).toBe("ProductGroup");
+    expect(ld.productGroupID).toBe("M18 FPD3");
+    expect(ld.hasVariant).toHaveLength(2);
+    expect(ld.hasVariant[0]).toMatchObject({ model: "M18 FPD3-0X", mpn: "4933479859", gtin13: "4058546376536" });
+    expect(ld.hasVariant[0].offers).toMatchObject({ price: "219.00", seller: { "@id": "https://milwaukeetoolshdc.gr/#shop" } });
+    expect(ld.hasVariant[1]).not.toHaveProperty("gtin13");
+    expect(ld.hasVariant[1]).not.toHaveProperty("offers");
   });
 });

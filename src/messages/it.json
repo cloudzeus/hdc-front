@@ -328,7 +328,8 @@
       "megethos_3_5": "Taglia {size} · codice {code} · consegna in 3–5 giorni lavorativi",
       "paradosi_1_3": "Consegna in 1–3 giorni lavorativi",
       "megethi_3_5": "DISPONIBILE · 3–5 GIORNI LAVORATIVI",
-      "kodikoi": "Codici"
+      "kodikoi": "Codici",
+      "oles_oi_ekdoseis": "Tutte le versioni di {model}"
     }
   },
   "orders": {
@@ -1573,5 +1574,56 @@
     "anagnosi": "{minutes} min di lettura",
     "selides": "Pagine",
     "mono_ellinika": "Disponibile in greco"
+  },
+  "seoPages": {
+    "ekdoseis_kodikoi": "Versioni e codici",
+    "th_ekdosi": "Versione",
+    "th_periechomeno": "Contenuto",
+    "th_kodikos": "Codice",
+    "th_ean": "EAN",
+    "th_timi": "Prezzo",
+    "th_diathesimotita": "Disponibilità",
+    "mono_ergaleio": "Solo utensile, senza batteria né caricabatterie",
+    "kit": "Kit con batterie e caricabatterie",
+    "me_fpa": "IVA inclusa",
+    "techn_char": "Dati tecnici",
+    "techn_pigi": "Dati Milwaukee, dalla descrizione di {code}.",
+    "syxnes_erotiseis": "Domande frequenti",
+    "kyries_katigories": "Categorie principali",
+    "dimofili_montela": "Modelli più richiesti",
+    "ekdoseis_count": "{count, plural, one {# versione} other {# versioni}}",
+    "proionta_count": "{count, plural, one {# prodotto} other {# prodotti}}",
+    "bataries": "Batterie",
+    "fortistes": "Caricabatterie",
+    "packout_proionta": "Prodotti PACKOUT",
+    "platformes": "Le piattaforme",
+    "sxetika_arthra": "Articoli correlati",
+    "oles_oi_ekdoseis": "Tutte le versioni di {model}",
+    "mono_ellinika": "Disponibile in greco",
+    "se_apothema": "Disponibile",
+    "teleftaio": "Ultimo pezzo",
+    "diathesimo_3_5": "Disponibile · consegna in 3–5 giorni lavorativi",
+    "paradosi_1_3": "Consegna in 1–3 giorni lavorativi",
+    "hub_milwaukee_h1": "Utensili Milwaukee",
+    "hub_milwaukee_lead": "La gamma Milwaukee in un unico negozio al Pireo: utensili a batteria M12 e M18, attrezzature MX FUEL, contenitori PACKOUT, accessori e utensili manuali. Scegli una piattaforma o una categoria, vedi ogni modello con i suoi codici e ritira in negozio o ricevi a domicilio.",
+    "hub_m18_h1": "Milwaukee M18: utensili a batteria 18V",
+    "hub_m18_lead": "M18 è la piattaforma 18 V di Milwaukee: una sola batteria per trapani, avvitatori a impulsi, smerigliatrici, seghe, tassellatori e luci. Qui trovi gli utensili M18 e M18 FUEL del negozio per categoria, i modelli con le loro versioni, batterie e caricabatterie.",
+    "hub_m12_h1": "Milwaukee M12: utensili a batteria 12V",
+    "hub_m12_lead": "M12 è la piattaforma compatta 12 V di Milwaukee, per spazi stretti e lavoro con una mano. Qui trovi gli utensili M12 e M12 FUEL del negozio per categoria, i modelli con le loro versioni, batterie e caricabatterie.",
+    "hub_mxfuel_h1": "Milwaukee MX FUEL: attrezzature da cantiere a batteria",
+    "hub_mxfuel_lead": "MX FUEL è la piattaforma Milwaukee per attrezzature pesanti da cantiere senza cavo e senza carburante: troncatrici, carotatrici, demolitori, luci e generatori con la propria batteria. Qui trovi le attrezzature MX FUEL del negozio.",
+    "hub_packout_h1": "Milwaukee PACKOUT: sistema modulare",
+    "hub_packout_lead": "PACKOUT è il sistema modulare di stoccaggio e trasporto di Milwaukee: valigette, cassette, organizer e carrelli che si agganciano tra loro. Qui trovi i prodotti PACKOUT del negozio per categoria."
+  },
+  "notFound": {
+    "titlos": "Pagina non trovata",
+    "keimeno": "Questo indirizzo non corrisponde a una pagina del negozio: il prodotto potrebbe essere stato ritirato o l'indirizzo è cambiato. Cerca per codice Milwaukee, modello o EAN.",
+    "anazitisi_label": "Cerca un prodotto",
+    "anazitisi_placeholder": "es. M18 FPD3 o 4933479859",
+    "anazitisi": "Cerca",
+    "i_deite": "Oppure continua da qui",
+    "katalogos": "Catalogo",
+    "odigoi": "Guide all'acquisto",
+    "epikoinonia": "Contatti"
   }
 }
