@@ -24,7 +24,8 @@ const STOPWORDS = new Set(
   ).split(/\s+/),
 );
 
-const GREEK_ENDINGS = ["ουσ", "εισ", "ων", "ου", "οι", "οσ", "εσ", "ασ", "ησ", "α", "ο", "ι", "η", "ε", "υ", "ω"];
+/** Longest first: «σφυριά» and «σφυρί» are both «σφυρ». */
+const GREEK_ENDINGS = ["ιουσ", "ιων", "ιου", "ιεσ", "ιασ", "ια", "ιο", "ουσ", "εισ", "ων", "ου", "οι", "οσ", "εσ", "ασ", "ησ", "α", "ο", "ι", "η", "ε", "υ", "ω"];
 
 /** A light stem, so «δράπανο» and «δράπανα» are one word. Greek words over 4 letters only. */
 function stem(word: string): string {
