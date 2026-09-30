@@ -15,11 +15,12 @@ import type { RecentOrder } from "@/lib/admin/dashboard";
  * chances to feel slow.
  */
 
-export type OrderFilter = "all" | "erp-pending" | "unpaid" | "to-ship" | "shipped";
+export type OrderFilter = "all" | "erp-pending" | "supplier" | "unpaid" | "to-ship" | "shipped";
 
 export const FILTERS: ReadonlyArray<{ id: OrderFilter; label: string }> = [
   { id: "all", label: "Όλες" },
   { id: "erp-pending", label: "Εκτός ERP" },
+  { id: "supplier", label: "Από προμηθευτή" },
   { id: "unpaid", label: "Απλήρωτες" },
   { id: "to-ship", label: "Προς αποστολή" },
   { id: "shipped", label: "Απεσταλμένες" },
@@ -27,7 +28,7 @@ export const FILTERS: ReadonlyArray<{ id: OrderFilter; label: string }> = [
 
 const PAGE_SIZE = 25;
 
-function whereFor(filter: OrderFilter, query: string) {
+export function whereFor(filter: OrderFilter, query: string) {
   const base: Record<string, unknown> = {};
 
   switch (filter) {
@@ -35,6 +36,11 @@ function whereFor(filter: OrderFilter, query: string) {
       // Paid but never reached SoftOne — the only filter here that is costing
       // money while it sits.
       Object.assign(base, { paymentStatus: "PAID", erpPushedAt: null });
+      break;
+    case "supplier":
+      // Παραγγελίες που πάνε ολόκληρες στον Παπαθεοδοσίου (Order.supplierOrder,
+      // παγωμένο στην τοποθέτηση): 3–5 εργάσιμες, PURDOC στο βήμα 3.
+      Object.assign(base, { supplierOrder: true });
       break;
     case "unpaid":
       Object.assign(base, { paymentStatus: { in: ["PENDING", "FAILED"] } });
@@ -85,7 +91,7 @@ export async function getOrders({
   const where = whereFor(filter, query);
   const skip = (Math.max(1, page) - 1) * PAGE_SIZE;
 
-  const [rows, total, erpPending, unpaid, toShip, shipped, all] = await Promise.all([
+  const [rows, total, erpPending, supplier, unpaid, toShip, shipped, all] = await Promise.all([
     prisma.order.findMany({
       where,
       orderBy: { createdAt: "desc" },
@@ -122,6 +128,7 @@ export async function getOrders({
     prisma.order.count({ where }),
     // Counts ignore the search box: they describe the queue, not the search.
     prisma.order.count({ where: whereFor("erp-pending", "") }),
+    prisma.order.count({ where: whereFor("supplier", "") }),
     prisma.order.count({ where: whereFor("unpaid", "") }),
     prisma.order.count({ where: whereFor("to-ship", "") }),
     prisma.order.count({ where: whereFor("shipped", "") }),
@@ -165,6 +172,7 @@ export async function getOrders({
     counts: {
       all,
       "erp-pending": erpPending,
+      supplier,
       unpaid,
       "to-ship": toShip,
       shipped,
