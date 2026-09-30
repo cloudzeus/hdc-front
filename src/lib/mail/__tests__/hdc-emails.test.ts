@@ -154,6 +154,8 @@ const { EMAIL_TEMPLATES, previewEmail } = await import("@/lib/mail/hdc/catalog")
 const { STRING_TABLES } = await import("@/lib/mail/hdc/strings");
 const { templateFiles } = await import("@/lib/mail/hdc/render");
 const { mailImageUrl, decodeMailImage } = await import("@/lib/mail/hdc/image");
+const { grossAmount } = await import("@/lib/format");
+const { discountedNet } = await import("@/lib/offers/badges");
 
 const VOID = new Set(["meta", "link", "br", "img", "hr", "input"]);
 
@@ -286,21 +288,76 @@ describe("HDC email templates", () => {
     expect(en.ok && plain(en.email.text)).toContain("Includes VAT 24%: €213.90");
   });
 
+  /**
+   * What checkout stores for a basket, from one net basis, with the same
+   * functions and steps as `computeTotals` (lib/cart/cart.ts) and the order
+   * insert (lib/checkout/actions.ts): discounted net per unit, each line
+   * `grossAmount(net × qty, rate)`, shipping at 24%, total = rounded sum,
+   * VAT = total gross − total net.
+   */
+  function storedOrder(
+    basket: Array<{ listNet: number; quantity: number; discountPercent: number }>,
+    shippingNet: number,
+  ) {
+    const lines = basket.map((b) => {
+      const unitNet = discountedNet(b.listNet, b.discountPercent);
+      const lineNet = round(unitNet * b.quantity);
+      const lineGross = grossAmount(unitNet * b.quantity, { vatRate: 24 });
+      return { unitNet, unitGross: lineGross / b.quantity, lineNet, lineGross, discountPercent: b.discountPercent };
+    });
+    const subtotalNet = round(lines.reduce((sum, l) => sum + l.lineNet, 0));
+    const subtotalGross = round(lines.reduce((sum, l) => sum + l.lineGross, 0));
+    const shippingGross = grossAmount(shippingNet, { vatRate: 24 });
+    const totalGross = round(subtotalGross + shippingGross);
+    const vatAmount = round(totalGross - round(subtotalNet + shippingNet));
+    return { lines, order: { subtotalNet, subtotalGross, shippingNet, shippingGross, totalGross, vatAmount } };
+  }
+  const round = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
+  const basket = (offer: number) => [
+    { listNet: 321.08, quantity: 1, discountPercent: offer },
+    { listNet: 133.4, quantity: 2, discountPercent: 0 },
+    { listNet: 293.48, quantity: 1, discountPercent: 0 },
+  ];
+
+  it("the fixture is what checkout stores", () => {
+    const { lines, order } = storedOrder(basket(0), 9.88);
+    expect(order).toMatchObject({
+      subtotalNet: ORDER.subtotalNet,
+      subtotalGross: ORDER.subtotalGross,
+      shippingGross: ORDER.shippingGross,
+      totalGross: ORDER.totalGross,
+      vatAmount: ORDER.vatAmount,
+    });
+    expect(lines.map((l) => l.lineGross)).toEqual(ORDER.lines.map((l) => l.lineGross));
+  });
+
   it("an offer is shown once, as a gross discount that lands on the stored total", async () => {
-    // Line 1 at −15%: 321,08 → 272,92 net, 338,42 gross (was 398,14). Total net 820,08.
+    // Line 1 at −15%, every stored field derived from the same net basis.
+    const { lines, order } = storedOrder(basket(15), 9.88);
+    expect(order).toEqual({
+      subtotalNet: 833.2,
+      subtotalGross: 1033.17,
+      shippingNet: 9.88,
+      shippingGross: 12.25,
+      totalGross: 1045.42,
+      vatAmount: 202.34,
+    });
     const saved = { ...ORDER, lines: ORDER.lines.map((l) => ({ ...l })) };
-    Object.assign(ORDER.lines[0], { unitNet: 272.92, unitGross: 338.42, lineNet: 272.92, lineGross: 338.42, discountPercent: 15 });
-    Object.assign(ORDER, { subtotalNet: 810.2, subtotalGross: 1033.17, vatAmount: 225.34, totalGross: 1045.42 });
+    lines.forEach((l, i) => Object.assign(ORDER.lines[i], l));
+    Object.assign(ORDER, order);
     try {
       const r = await previewEmail("order-confirmation", { locale: "el", realOrders: true, admin: { email: "a@example.gr" } });
       if (!r.ok) throw new Error(r.error);
       const totals = totalsOf(r.email.text);
+      // The line shows its price before the offer (398,14 €), the offer comes off once.
       expect(plain(r.email.text)).toContain("1 × 398,14 €");
       expect(totals).toMatch(/Υποσύνολο 1\.092,89 €/);
       expect(totals).toMatch(/Έκπτωση −59,72 €/);
       expect(totals).toMatch(/Μεταφορικά · ACS Express 12,25 €/);
       expect(totals).toMatch(/ΣΥΝΟΛΟ 1\.045,42 €/);
-      expect(totals).toContain("Περιλαμβάνεται ΦΠΑ 24%: 225,34 €");
+      expect(totals).toContain("Περιλαμβάνεται ΦΠΑ 24%: 202,34 €");
+      // 1.092,89 − 59,72 + 12,25 = 1.045,42
+      expect(round(1092.89 - 59.72 + 12.25)).toBe(order.totalGross);
     } finally {
       Object.assign(ORDER, saved);
     }
