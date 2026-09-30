@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { upGreek } from "@/lib/greek";
+import { HdcAdminMark } from "@/components/admin/HdcAdminMark";
 import { checkAdminResetToken, completeAdminPasswordReset } from "@/lib/admin/password-reset";
 import { PASSWORD_MIN } from "@/lib/admin/users-types";
 
 export const metadata: Metadata = {
-  title: "Νέος κωδικός",
+  title: { absolute: "Διαχείριση · Milwaukee Heavy Duty Centre" },
   // The token is in this page's URL: never hand it to another site in a Referer.
   referrer: "no-referrer",
   robots: { index: false, follow: false },
@@ -49,8 +50,8 @@ export default async function AdminResetPasswordPage({
   return (
     <div className="flex min-h-screen items-center justify-center bg-k-ink-deep px-6">
       <div className="w-full max-w-sm">
-        <p className="text-[length:var(--fs-14)] font-bold tracking-widest text-white">{upGreek("Kolleris")}</p>
-        <h1 className="mt-1 text-[length:var(--fs-12)] tracking-widest text-k-text-5">
+        <HdcAdminMark tone="dark" width={200} priority />
+        <h1 className="mt-6 text-[length:var(--fs-12)] tracking-widest text-k-text-5">
           {upGreek("Νέος κωδικός διαχείρισης")}
         </h1>
 

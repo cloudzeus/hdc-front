@@ -134,10 +134,10 @@ export async function requestAdminPasswordReset(rawEmail: string): Promise<Forgo
     });
     const result = await sendMail({
       to: user.email,
-      subject: "Επαναφορά κωδικού διαχείρισης",
+      subject: "Επαναφορά κωδικού διαχείρισης — Milwaukee Heavy Duty Centre",
       html,
       text: [
-        "Επαναφορά κωδικού διαχείρισης — Kolleris",
+        "Επαναφορά κωδικού διαχείρισης — Milwaukee Heavy Duty Centre",
         "",
         `Ορισμός νέου κωδικού: ${link}`,
         "",

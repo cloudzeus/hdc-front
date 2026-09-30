@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { HdcAdminMark } from "@/components/admin/HdcAdminMark";
 import { usePathname } from "next/navigation";
 import {
   Boxes,
@@ -187,8 +188,8 @@ export function AdminNav({
         )}
       >
         <div className="flex items-center justify-between border-b border-white/10 px-5 py-[18px]">
-          <Link href="/admin" className="text-[13px] font-bold tracking-[0.14em] text-white">
-            KOLLERIS
+          <Link href="/admin" aria-label="Επισκόπηση">
+            <HdcAdminMark tone="dark" width={150} />
           </Link>
           <button
             type="button"

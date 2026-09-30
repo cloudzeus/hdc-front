@@ -2,9 +2,11 @@ import { AuthError } from "next-auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { signIn } from "@/auth";
+import { HdcAdminMark } from "@/components/admin/HdcAdminMark";
 import { upGreek } from "@/lib/greek";
 
-export const metadata = { title: "Είσοδος διαχείρισης" };
+// absolute: το template του root layout θα πρόσθετε δεύτερη φορά το όνομα του καταστήματος.
+export const metadata = { title: { absolute: "Διαχείριση · Milwaukee Heavy Duty Centre" } };
 
 export default async function AdminLoginPage({
   searchParams,
@@ -39,11 +41,8 @@ export default async function AdminLoginPage({
   return (
     <div className="flex min-h-screen items-center justify-center bg-k-ink-deep px-6">
       <div className="w-full max-w-sm">
-        <p className="text-[length:var(--fs-14)] font-bold tracking-widest text-white">
-          {upGreek("Kolleris")}
-        </p>
-        <h1 className="mt-1 text-[length:var(--fs-12)] tracking-widest text-k-text-5">
-          {upGreek("Διαχείριση E-shop")}
+        <h1>
+          <HdcAdminMark tone="dark" width={200} priority />
         </h1>
 
         <form action={login} className="mt-8 space-y-4">

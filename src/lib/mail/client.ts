@@ -25,7 +25,7 @@ import "server-only";
 const ENDPOINT = process.env.MAILGUN_ENDPOINT ?? "https://api.eu.mailgun.net";
 const DOMAIN = process.env.MAILGUN_DOMAIN ?? "";
 const API_KEY = process.env.MAILGUN_API_KEY ?? "";
-const FROM = process.env.MAIL_FROM ?? "Kolleris <no-reply@kolleris.com>";
+const FROM = process.env.MAIL_FROM ?? "Milwaukee Heavy Duty Centre <no-reply@kolleris.com>";
 
 /** Long enough for a slow relay, short enough not to hold a request open. */
 const TIMEOUT_MS = 15_000;

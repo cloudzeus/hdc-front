@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { upGreek } from "@/lib/greek";
+import { HdcAdminMark } from "@/components/admin/HdcAdminMark";
 import { requestAdminPasswordReset } from "@/lib/admin/password-reset";
 
-export const metadata = { title: "Ξέχασα τον κωδικό" };
+// absolute: το template του root layout θα πρόσθετε δεύτερη φορά το όνομα του καταστήματος.
+export const metadata = { title: { absolute: "Διαχείριση · Milwaukee Heavy Duty Centre" } };
 
 export default async function AdminForgotPasswordPage({
   searchParams,
@@ -21,8 +23,8 @@ export default async function AdminForgotPasswordPage({
   return (
     <div className="flex min-h-screen items-center justify-center bg-k-ink-deep px-6">
       <div className="w-full max-w-sm">
-        <p className="text-[length:var(--fs-14)] font-bold tracking-widest text-white">{upGreek("Kolleris")}</p>
-        <h1 className="mt-1 text-[length:var(--fs-12)] tracking-widest text-k-text-5">{upGreek("Ξέχασα τον κωδικό")}</h1>
+        <HdcAdminMark tone="dark" width={200} priority />
+        <h1 className="mt-6 text-[length:var(--fs-12)] tracking-widest text-k-text-5">{upGreek("Ξέχασα τον κωδικό")}</h1>
 
         {sent ? (
           <p role="status" className="mt-8 text-[length:var(--fs-14)] leading-relaxed text-white">
