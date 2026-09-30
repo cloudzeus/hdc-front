@@ -26,12 +26,16 @@
   .hdc-art-card:hover {
     border-top-color: var(--hdc-red);
   }
-  .hdc-art-card img {
+  .hdc-art-thumb {
+    position: relative;
     display: block;
     width: 100%;
     aspect-ratio: 16 / 9;
-    object-fit: cover;
+    overflow: hidden;
     background: var(--hdc-g1);
+  }
+  .hdc-art-thumb img {
+    object-fit: cover;
   }
   .hdc-art-card > div {
     display: flex;
@@ -98,11 +102,40 @@
 
   /* ── One article ─────────────────────────────────────────────────────── */
   .hdc-art-hero {
-    display: block;
+    position: relative;
     width: 100%;
     max-width: 72ch;
-    height: auto;
+    aspect-ratio: 16 / 9;
     margin: 0 0 24px;
+    overflow: hidden;
+    background: var(--hdc-g1);
+  }
+  .hdc-art-hero img {
+    object-fit: cover;
+  }
+  /* Inline pictures in an article body (Markdown, our CDN only). */
+  .hdc-prose img {
+    display: inline-block;
+    max-width: 100%;
+    height: auto;
+    vertical-align: middle;
+  }
+  .hdc-prose .md-figure {
+    margin: 24px 0;
+  }
+  .hdc-prose .md-figure img {
+    display: block;
+    max-height: 520px;
+    width: auto;
+    margin: 0 auto;
+    background: #fff;
+  }
+  .hdc-prose .md-figure figcaption {
+    margin-top: 8px;
+    font-size: var(--fs-13);
+    line-height: 1.45;
+    color: var(--hdc-g5);
+    text-align: center;
   }
   .hdc-art-draft {
     display: inline-block;

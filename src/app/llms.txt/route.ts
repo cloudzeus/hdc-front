@@ -1,6 +1,7 @@
 import { siteOrigin } from "@/lib/seo/urls";
 import { llmsTxt } from "@/lib/seo/llms";
 import { getSetting } from "@/lib/settings/settings";
+import { publishedForLlms } from "@/lib/blog/articles";
 
 /**
  * llms.txt — the shop in plain sentences for language models, Greek first.
@@ -15,8 +16,11 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const summaryEl = await getSetting("llms.summary.el").catch(() => null);
-  return new Response(llmsTxt(siteOrigin(), { summaryEl }), {
+  const [summaryEl, articles] = await Promise.all([
+    getSetting("llms.summary.el").catch(() => null),
+    publishedForLlms().catch(() => []),
+  ]);
+  return new Response(llmsTxt(siteOrigin(), { summaryEl, articles }), {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
       "Cache-Control": "public, max-age=3600",

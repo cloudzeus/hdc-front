@@ -16,6 +16,8 @@ slug: "m18-fuel-i-m18-odigos-epilogis"
 lang: el
 status: draft
 date: "2026-09-30"
+heroImage: "https://kolleris.b-cdn.net/eshop/content/m18/hero.webp"
+heroImageAlt: "Κρουστικό δραπανοκατσάβιδο Milwaukee M18 FPD3"
 keywords:
   - "M18 FUEL ή M18"
   - "Milwaukee M18 FUEL"
@@ -108,6 +110,13 @@ describe("parseArticleFile", () => {
     expect(article.keywords).toEqual(["M18 FUEL ή M18", "Milwaukee M18 FUEL"]);
     expect(article.entities).toEqual(["Milwaukee", "M18", "Δράπανο"]);
     expect(article.sources).toEqual(["https://www.milwaukeetool.eu/systems/m18/"]);
+  });
+
+  it("reads the hero image and its alt text, https only", () => {
+    expect(article.heroImageUrl).toBe("https://kolleris.b-cdn.net/eshop/content/m18/hero.webp");
+    expect(article.heroImageAlt).toBe("Κρουστικό δραπανοκατσάβιδο Milwaukee M18 FPD3");
+    const insecure = parseArticleFile(ARTICLE.replace("https://kolleris", "http://kolleris"), "ARTICLE")!;
+    expect(insecure.heroImageUrl).toBeNull();
   });
 
   it("splits the answer off the body and keeps the FAQ in its own field only", () => {

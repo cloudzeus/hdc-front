@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { HdcContentPage } from "@/components/content/HdcContentPage";
 import { Link } from "@/i18n/navigation";
@@ -55,8 +56,16 @@ export async function ArticleView({ article, locale }: { article: Article; local
 
       <div lang="el">
         {article.image && (
-          // eslint-disable-next-line @next/next/no-img-element -- CDN image; the optimiser is off
-          <img src={article.image.url} alt="" className="hdc-art-hero" fetchPriority="high" />
+          /* A 16:9 box reserved before the picture arrives: nothing moves. */
+          <div className="hdc-art-hero">
+            <Image
+              src={article.image.url}
+              alt={article.image.alt ?? ""}
+              fill
+              preload
+              sizes="(max-width: 1023px) 100vw, 72ch"
+            />
+          </div>
         )}
 
         {article.answer && (

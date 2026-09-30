@@ -1873,6 +1873,8 @@ model ContentArticle {
   /// string[] — the official pages every figure was taken from.
   sources         Json    @default("[]")
   heroImageUrl    String? @db.VarChar(1000)
+  /// What the hero image shows, in Greek — its alt text.
+  heroImageAlt    String? @db.VarChar(300)
 
   publishedAt DateTime?
   createdAt   DateTime  @default(now())

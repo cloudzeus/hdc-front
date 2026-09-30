@@ -14,6 +14,8 @@
 
 export type BlogImage = {
   url: string;
+  /** What the picture shows; empty for a decorative one. */
+  alt?: string | null;
   mainImage: boolean;
   width: number | null;
   height: number | null;

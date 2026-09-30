@@ -45,3 +45,31 @@ describe("readingMinutes", () => {
     expect(readingMinutes("")).toBe(1);
   });
 });
+
+describe("renderMarkdown: images", () => {
+  const hosts = { imageHosts: ["kolleris.b-cdn.net"] };
+
+  it("renders an image from our CDN, lazy, as a figure when it stands alone", () => {
+    const html = renderMarkdown("![Κρουστικό M18 BLPD2](https://kolleris.b-cdn.net/papatheo/x.webp)", hosts);
+    expect(html).toBe(
+      '<figure class="md-figure"><img src="https://kolleris.b-cdn.net/papatheo/x.webp" alt="Κρουστικό M18 BLPD2" loading="lazy" decoding="async"></figure>\n',
+    );
+  });
+
+  it("captions a figure with the image's title", () => {
+    const html = renderMarkdown('![Μπαταρία](https://kolleris.b-cdn.net/a.webp "Η M18 B5, 5,0 Ah")', hosts);
+    expect(html).toContain("<figcaption>Η M18 B5, 5,0 Ah</figcaption>");
+  });
+
+  it("drops an image from any other host to its alt text", () => {
+    const html = renderMarkdown("![Ξένη εικόνα](https://tracker.example/pixel.gif)", hosts);
+    expect(html).not.toContain("<img");
+    expect(html).toContain("Ξένη εικόνα");
+    expect(renderMarkdown("![x](http://kolleris.b-cdn.net/a.webp)", hosts)).not.toContain("<img");
+  });
+
+  it("keeps an image inside text inline", () => {
+    const html = renderMarkdown("Δείτε ![μύτη](https://kolleris.b-cdn.net/b.webp) εδώ.", hosts);
+    expect(html).toMatch(/^<p>Δείτε <img [^>]+> εδώ\.<\/p>/);
+  });
+});

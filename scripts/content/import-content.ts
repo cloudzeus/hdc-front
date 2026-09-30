@@ -1,7 +1,7 @@
 /**
  * Import the drafted content in docs/content/** into the database, as drafts.
  *
- *   npx tsx --env-file=.env scripts/content/import-content.ts [--dry-run]
+ *   npx tsx --env-file=.env scripts/content/import-content.ts [--dry-run] [--publish]
  *
  *   docs/content/news/<nn>-<slug>/el.md        → ContentArticle ARTICLE (DRAFT)
  *   docs/content/guides/<nn>-<slug>/el.md      → ContentArticle GUIDE   (DRAFT)
@@ -12,8 +12,12 @@
  * by target, and a row whose content is unchanged is not written at all.
  * A row that somebody has edited in the admin — `updatedBy` is no longer the
  * importer — is left alone and reported, so re-running the import after
- * writers add files never undoes an editor's work. A new article is always a
- * DRAFT, and re-importing never changes an article's status.
+ * writers add files never undoes an editor's work.
+ *
+ * Status: a new article is a DRAFT and re-importing never changes it —
+ * unless `--publish` is given, which publishes every ARTICLE and GUIDE the
+ * importer owns (keeping an existing publishedAt). Rows edited in the admin
+ * are still left alone.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -32,9 +36,17 @@ export const IMPORT_ACTOR = "import:docs/content";
 
 const ROOT = path.resolve(__dirname, "../../docs/content");
 const dryRun = process.argv.includes("--dry-run");
+const publish = process.argv.includes("--publish");
 
-type Tally = { created: number; updated: number; unchanged: number; skipped: string[]; warnings: string[] };
-const tally: Tally = { created: 0, updated: 0, unchanged: 0, skipped: [], warnings: [] };
+type Tally = {
+  created: number;
+  updated: number;
+  unchanged: number;
+  published: number;
+  skipped: string[];
+  warnings: string[];
+};
+const tally: Tally = { created: 0, updated: 0, unchanged: 0, published: 0, skipped: [], warnings: [] };
 
 function greekFiles(dir: string): string[] {
   const abs = path.join(ROOT, dir);
@@ -76,14 +88,26 @@ async function importArticle(file: string, draft: ArticleDraft) {
     keywords: draft.keywords,
     entities: draft.entities,
     sources: draft.sources,
+    heroImageUrl: draft.heroImageUrl,
+    heroImageAlt: draft.heroImageAlt,
   };
+  const now = new Date();
 
   const existing = await prisma.contentArticle.findUnique({ where: { slug: draft.slug } });
   if (!existing) {
     if (!dryRun) {
-      await prisma.contentArticle.create({ data: { ...data, slug: draft.slug, status: "DRAFT", updatedBy: IMPORT_ACTOR } });
+      await prisma.contentArticle.create({
+        data: {
+          ...data,
+          slug: draft.slug,
+          status: publish ? "PUBLISHED" : "DRAFT",
+          publishedAt: publish ? now : null,
+          updatedBy: IMPORT_ACTOR,
+        },
+      });
     }
     tally.created++;
+    if (publish) tally.published++;
     return;
   }
   if (existing.updatedBy !== IMPORT_ACTOR) {
@@ -100,16 +124,28 @@ async function importArticle(file: string, draft: ArticleDraft) {
     existing.metaDescription === data.metaDescription &&
     existing.answer === data.answer &&
     existing.body === data.body &&
+    existing.heroImageUrl === data.heroImageUrl &&
+    existing.heroImageAlt === data.heroImageAlt &&
     json(existing.faq) === json(data.faq) &&
     json(existing.keywords) === json(data.keywords) &&
     json(existing.entities) === json(data.entities) &&
     json(existing.sources) === json(data.sources);
-  if (same) {
+  const toPublish = publish && existing.status !== "PUBLISHED";
+  if (same && !toPublish) {
     tally.unchanged++;
     return;
   }
-  if (!dryRun) await prisma.contentArticle.update({ where: { id: existing.id }, data });
-  tally.updated++;
+  if (!dryRun) {
+    await prisma.contentArticle.update({
+      where: { id: existing.id },
+      data: {
+        ...data,
+        ...(toPublish ? { status: "PUBLISHED" as const, publishedAt: existing.publishedAt ?? now } : {}),
+      },
+    });
+  }
+  if (!same) tally.updated++;
+  if (toPublish) tally.published++;
 }
 
 async function importOverride(file: string, draft: OverrideDraft) {
@@ -198,7 +234,8 @@ async function main() {
   }
 
   console.log(
-    `${dryRun ? "[dry run] " : ""}created ${tally.created}, updated ${tally.updated}, unchanged ${tally.unchanged}, skipped ${tally.skipped.length}`,
+    `${dryRun ? "[dry run] " : ""}created ${tally.created}, updated ${tally.updated}, unchanged ${tally.unchanged}, ` +
+      `published ${tally.published}, skipped ${tally.skipped.length}`,
   );
   for (const s of tally.skipped) console.log(`  skipped  ${s}`);
   for (const w of tally.warnings) console.log(`  WARNING  ${w}`);

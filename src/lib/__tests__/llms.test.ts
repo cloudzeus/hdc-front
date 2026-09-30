@@ -189,3 +189,26 @@ describe("llmsFullTxt: Greek first", () => {
     expect(body.indexOf("> Όλα τα μοντέλα")).toBeLessThan(body.indexOf("> Every Milwaukee"));
   });
 });
+
+describe("llms: published guides and articles", () => {
+  const articles = [
+    { kind: "GUIDE" as const, path: "/odigoi/pos-dialego-drapano", title: "Πώς διαλέγω δράπανο", answer: "Διάλεξε από τη δουλειά." },
+    { kind: "ARTICLE" as const, path: "/blog/m18-fuel-i-m18", title: "M18 FUEL ή M18;", answer: null },
+  ];
+
+  it("lists them in the Greek section of llms.txt, guides first", () => {
+    const body = llmsTxt(ORIGIN, { articles });
+    expect(body).toContain("## Οδηγοί αγοράς και άρθρα");
+    expect(body.indexOf(`${ORIGIN}/odigoi/pos-dialego-drapano`)).toBeLessThan(body.indexOf(`${ORIGIN}/blog/m18-fuel-i-m18`));
+    expect(body.indexOf("## Οδηγοί αγοράς και άρθρα")).toBeLessThan(body.indexOf("## In English"));
+  });
+
+  it("gives each one's short answer in llms-full.txt", () => {
+    const body = llmsFullTxt(ORIGIN, [], articles);
+    expect(body).toContain(`### Πώς διαλέγω δράπανο\n\n${ORIGIN}/odigoi/pos-dialego-drapano\n\nΔιάλεξε από τη δουλειά.`);
+  });
+
+  it("says nothing about articles when none is published", () => {
+    expect(llmsTxt(ORIGIN)).not.toContain("## Οδηγοί αγοράς και άρθρα");
+  });
+});

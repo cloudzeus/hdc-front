@@ -30,6 +30,9 @@ export type ArticleDraft = {
   keywords: string[];
   entities: string[];
   sources: string[];
+  /** An https URL (the CDN), or null. */
+  heroImageUrl: string | null;
+  heroImageAlt: string | null;
 };
 
 export type OverrideDraft = {
@@ -80,6 +83,12 @@ function faqPairs(value: unknown): FaqPair[] {
       return q && a ? { q, a } : null;
     })
     .filter((p): p is FaqPair => p != null);
+}
+
+/** An absolute https URL, or null: a hero image must come from the CDN. */
+function httpsUrl(value: unknown): string | null {
+  const url = str(value);
+  return url && /^https:\/\/[^\s]+$/.test(url) ? url : null;
 }
 
 /** Lines of one paragraph joined into one line: Markdown's soft wrap. */
@@ -160,6 +169,8 @@ export function parseArticleFile(text: string, kind: ArticleDraft["kind"]): Arti
     keywords: strings(data.keywords),
     entities: [...new Set([...strings(data.entities), ...strings(data.about)])],
     sources: strings(data.sources),
+    heroImageUrl: httpsUrl(data.heroImage),
+    heroImageAlt: str(data.heroImageAlt),
   };
 }
 

@@ -44,8 +44,8 @@ export function draftPreviewAllowed(): boolean {
   return process.env.NODE_ENV !== "production";
 }
 
-const image = (url: string | null): BlogImage | null =>
-  url ? { url, mainImage: true, width: null, height: null } : null;
+const image = (url: string | null, alt: string | null): BlogImage | null =>
+  url ? { url, alt, mainImage: true, width: null, height: null } : null;
 
 type Row = {
   kind: ArticleKind;
@@ -55,6 +55,7 @@ type Row = {
   answer: string | null;
   body: string;
   heroImageUrl: string | null;
+  heroImageAlt: string | null;
   publishedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
@@ -68,6 +69,7 @@ const summarySelect = {
   answer: true,
   body: true,
   heroImageUrl: true,
+  heroImageAlt: true,
   publishedAt: true,
   createdAt: true,
   updatedAt: true,
@@ -79,7 +81,7 @@ function toSummary(row: Row): ArticleSummary {
     slug: row.slug,
     title: row.title,
     shortDescription: row.metaDescription ?? row.answer,
-    image: image(row.heroImageUrl),
+    image: image(row.heroImageUrl, row.heroImageAlt ?? row.title),
     publishedAt: (row.publishedAt ?? row.createdAt).toISOString(),
     updatedAt: row.updatedAt.toISOString(),
     readingMinutes: readingMinutes(row.answer, row.body),
@@ -138,4 +140,16 @@ export async function publishedAmong(slugs: string[]): Promise<ArticleSummary[]>
   });
   const bySlug = new Map(rows.map((r) => [r.slug, toSummary(r)]));
   return slugs.map((s) => bySlug.get(s)).filter((a): a is ArticleSummary => a != null);
+}
+
+/** Every published article and guide, for llms.txt and llms-full.txt: guides first, newest first. */
+export async function publishedForLlms(): Promise<
+  Array<{ kind: ArticleKind; path: string; title: string; answer: string | null }>
+> {
+  const rows = await prisma.contentArticle.findMany({
+    where: { status: "PUBLISHED", publishedAt: { not: null } },
+    orderBy: [{ kind: "desc" }, { publishedAt: "desc" }],
+    select: { kind: true, slug: true, title: true, answer: true },
+  });
+  return rows.map((r) => ({ kind: r.kind, path: `${ARTICLE_BASE[r.kind]}/${r.slug}`, title: r.title, answer: r.answer }));
 }

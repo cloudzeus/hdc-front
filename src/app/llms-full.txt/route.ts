@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { siteOrigin } from "@/lib/seo/urls";
 import { groupModels, llmsFullTxt } from "@/lib/seo/llms";
 import { sharedCatalogue } from "@/lib/catalog/shared-cache";
+import { publishedForLlms } from "@/lib/blog/articles";
 
 /**
  * llms-full.txt — every M12, M18 and MX FUEL model the store lists, with each
@@ -28,8 +29,8 @@ const modelRows = sharedCatalogue("llms-full-models-v2", DAY, () =>
 );
 
 export async function GET() {
-  const rows = await modelRows();
-  return new Response(llmsFullTxt(siteOrigin(), groupModels(rows)), {
+  const [rows, articles] = await Promise.all([modelRows(), publishedForLlms().catch(() => [])]);
+  return new Response(llmsFullTxt(siteOrigin(), groupModels(rows), articles), {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
       "Cache-Control": "public, max-age=86400, s-maxage=86400",

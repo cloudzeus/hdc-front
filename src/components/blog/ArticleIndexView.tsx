@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { HdcContentPage } from "@/components/content/HdcContentPage";
 import { Link } from "@/i18n/navigation";
@@ -59,8 +60,9 @@ export async function ArticleIndexView({
             {posts.map((post) => (
               <Link key={post.slug} href={articlePath(post)} className="hdc-art-card" prefetch={false}>
                 {post.image && (
-                  // eslint-disable-next-line @next/next/no-img-element -- CDN image; the optimiser is off
-                  <img src={post.image.url} alt="" loading="lazy" />
+                  <span className="hdc-art-thumb">
+                    <Image src={post.image.url} alt={post.image.alt ?? ""} fill sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw" />
+                  </span>
                 )}
                 <div>
                   <h2>{post.title}</h2>
@@ -86,6 +88,12 @@ export async function ArticleIndexView({
           )}
         </>
       )}
+      {/* The other half of the content: guides from the blog, the blog from the guides. */}
+      <p className="hdc-art-back">
+        <Link href={kind === "GUIDE" ? ARTICLE_PATH.ARTICLE : ARTICLE_PATH.GUIDE} className="hdc-btn hdc-btn-ink" prefetch={false}>
+          {upGreek(kind === "GUIDE" ? t("ola_ta_arthra") : t("oloi_oi_odigoi"))} →
+        </Link>
+      </p>
     </HdcContentPage>
   );
 }

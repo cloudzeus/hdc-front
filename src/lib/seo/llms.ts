@@ -60,7 +60,28 @@ const HOURS_EL =
   `Δευτέρα–Παρασκευή ${C.hours.weekdays.open}–${C.hours.weekdays.close}, ` +
   `Σάββατο ${C.hours.saturday.open}–${C.hours.saturday.close}, Κυριακή κλειστά.`;
 
-export function llmsTxt(origin: string, options: { summaryEl?: string | null } = {}): string {
+/** A published article or guide, for the Greek lists of llms.txt and llms-full.txt. */
+export type LlmsArticle = { kind: "ARTICLE" | "GUIDE"; path: string; title: string; answer?: string | null };
+
+function articleList(origin: string, articles: LlmsArticle[]): string {
+  if (articles.length === 0) return "";
+  const line = (a: LlmsArticle) => `- [${a.title}](${origin}${a.path})`;
+  const guides = articles.filter((a) => a.kind === "GUIDE");
+  const posts = articles.filter((a) => a.kind === "ARTICLE");
+  return [
+    "",
+    "## Οδηγοί αγοράς και άρθρα",
+    "",
+    ...(guides.length ? [...guides.map(line), ""] : []),
+    ...posts.map(line),
+    "",
+  ].join("\n");
+}
+
+export function llmsTxt(
+  origin: string,
+  options: { summaryEl?: string | null; articles?: LlmsArticle[] } = {},
+): string {
   const url = (path: string) => `${origin}${path}`;
   const summary = greekSummary(options.summaryEl)
     .split(/(?<=[.;!;])\s+/)
@@ -85,7 +106,7 @@ ${summary}
 - [Οδηγοί αγοράς](${url("/odigoi")}) και [Blog](${url("/blog")}).
 - [Όλα τα μοντέλα και οι κωδικοί](${url("/llms-full.txt")}).
 - [Συχνές ερωτήσεις](${url("/syxnes-erotiseis")}), [Επικοινωνία](${url("/epikoinonia")}).
-
+${articleList(origin, options.articles ?? [])}
 ## In English
 
 > Milwaukee tools and nothing else, from a store in Piraeus, Greece: M12 and
@@ -215,7 +236,7 @@ const PLATFORM_LABEL: Record<LlmsPlatform["platform"], string> = {
  * number and page. The data comes from the database (see the route); this
  * only writes it down.
  */
-export function llmsFullTxt(origin: string, platforms: LlmsPlatform[]): string {
+export function llmsFullTxt(origin: string, platforms: LlmsPlatform[], articles: LlmsArticle[] = []): string {
   const present = platforms.filter((p) => p.models.length > 0).map((p) => SHORT_LABEL[p.platform]);
   const listed =
     present.length > 1 ? `${present.slice(0, -1).join(", ")} and ${present.at(-1)}` : (present[0] ?? "");
@@ -231,6 +252,16 @@ export function llmsFullTxt(origin: string, platforms: LlmsPlatform[]): string {
     "> and its product page. Store details: " + `${origin}/llms.txt`,
     "",
   ];
+
+  /* The guides and articles, with the short answer each opens with — what an
+     assistant quotes when asked the question the title asks. */
+  if (articles.length) {
+    lines.push("## Οδηγοί αγοράς και άρθρα", "");
+    for (const a of articles) {
+      lines.push(`### ${a.title}`, "", `${origin}${a.path}`, "");
+      if (a.answer) lines.push(a.answer, "");
+    }
+  }
 
   for (const { platform, models } of platforms) {
     if (!models.length) continue;

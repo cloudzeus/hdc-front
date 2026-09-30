@@ -56,6 +56,8 @@ export function SiteFooter({ categories }: { categories: CategoryTile[] }) {
         { href: nav.hand, label: t("ergaleia_cheiros") },
         { href: "/prosfores", label: t("prosfores") },
         { href: "/nees-afixeis", label: t("nees_afixeis") },
+        { href: "/odigoi", label: t("odigoi") },
+        { href: "/blog", label: "Blog" },
         { href: "/etaireia", label: t("schetika") },
       ],
     },
