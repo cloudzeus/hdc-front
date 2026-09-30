@@ -17,6 +17,10 @@ import { StorefrontPreview } from "@/components/admin/StorefrontPreview";
 type Section = { href: string; label: string; icon: string; capability: Capability | null };
 
 /**
+ * Μόνο σελίδες που υπάρχουν: «Επιστροφές» (/admin/service) και «Άρθρα & FAQ»
+ * (/admin/editorial) ήρθαν από το eshop της Kolleris χωρίς σελίδα εδώ και
+ * έβγαζαν 404.
+ *
  * Grouped by how often the work happens, not by data model. "Καθημερινά" is
  * what an operator opens on arrival; "Σύστημα" is what they touch twice a year.
  */
@@ -28,7 +32,6 @@ const GROUPS: Array<{ title: string; sections: Section[] }> = [
       { href: "/admin/orders", label: "Παραγγελίες", icon: "orders", capability: "orders" },
       { href: "/admin/courier", label: "Αποστολές", icon: "courier", capability: "orders" },
       { href: "/admin/customers", label: "Πελάτες", icon: "customers", capability: "customers" },
-      { href: "/admin/service", label: "Επιστροφές", icon: "service", capability: "service" },
     ],
   },
   /*
@@ -59,7 +62,6 @@ const GROUPS: Array<{ title: string; sections: Section[] }> = [
       { href: "/admin/translations", label: "Μεταφράσεις", icon: "translations", capability: "content" },
       { href: "/admin/catalogue", label: "Κατάλογος", icon: "catalogue", capability: "catalogue" },
       { href: "/admin/offers", label: "Προσφορές", icon: "merchandising", capability: "merchandising" },
-      { href: "/admin/editorial", label: "Άρθρα & FAQ", icon: "editorial", capability: "editorial" },
       { href: "/admin/reviews", label: "Αξιολογήσεις", icon: "reviews", capability: "content" },
     ],
   },
