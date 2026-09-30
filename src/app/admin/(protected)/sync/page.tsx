@@ -27,7 +27,7 @@ export default async function SyncPage() {
   // Hiding the nav item is not authorisation.
   assertCan(session?.user.role, "sync");
 
-  const [states, runs, products, categories, brands] = await Promise.all([
+  const [states, runs, products, categories] = await Promise.all([
     prisma.syncState.findMany({ orderBy: { channel: "asc" } }),
     prisma.syncRun.findMany({
       orderBy: { startedAt: "desc" },
@@ -36,7 +36,6 @@ export default async function SyncPage() {
     }),
     prisma.product.count({ where: { isActive: true } }),
     prisma.category.count(),
-    prisma.brand.count(),
   ]);
 
   return (
@@ -49,11 +48,10 @@ export default async function SyncPage() {
         αποκλειστικά από εδώ.
       </p>
 
-      <div className="mt-8 grid gap-px border border-k-line bg-k-line sm:grid-cols-3">
+      <div className="mt-8 grid gap-px border border-k-line bg-k-line sm:grid-cols-2">
         {[
           { label: "Ενεργά προϊόντα", value: products },
           { label: "Κατηγορίες", value: categories },
-          { label: "Brands", value: brands },
         ].map((stat) => (
           <div key={stat.label} className="bg-white p-6">
             <p className="text-xs tracking-wider text-k-text-4">
