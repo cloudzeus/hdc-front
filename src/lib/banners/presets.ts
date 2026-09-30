@@ -131,17 +131,15 @@ const picture = (
 /**
  * Το σήμα του καταστήματος ως στρώση.
  *
- * Σταθερή διεύθυνση CDN και όχι `{image}`: αυτό ΔΕΝ είναι η φωτογραφία του
- * προϊόντος, είναι η υπογραφή πάνω της. Η λευκή εκδοχή γιατί μπαίνει πάντα σε
- * σκούρο — πάνω σε φωτογραφία με scrim ή σε κόκκινο πλακίδιο.
+ * Σταθερή διεύθυνση και όχι `{image}`: αυτό ΔΕΝ είναι η φωτογραφία του
+ * προϊόντος, είναι η υπογραφή πάνω της. Το lockup του Milwaukee Heavy Duty
+ * Centre (κόκκινο και μαύρο πλακίδιο) στέκεται σε φωτογραφία με scrim και σε
+ * χρώμα· σχετική διεύθυνση του site, όπως τα σήματα του editor.
  */
-const mark = (
-  frame: ImageLayer["frame"],
-  variant: "white" | "red" | "on-red" | "on-ink" = "white",
-): ImageLayer => {
+const mark = (frame: ImageLayer["frame"]): ImageLayer => {
   const layer = newLayer("image") as ImageLayer;
-  layer.name = "Σήμα Κολλέρη";
-  layer.src = `https://kolleris.b-cdn.net/eshop/brand/kolleris-lockup-${variant}.svg`;
+  layer.name = "Σήμα HDC";
+  layer.src = "/brand/hdc-lockup-440.png";
   layer.frame = frame;
   layer.fit = "contain";
   return layer;
@@ -706,7 +704,7 @@ export const PRESETS: Preset[] = [
   },
   {
     id: "brand-corner",
-    label: "Υπογραφή Κολλέρη",
+    label: "Υπογραφή HDC",
     hint: "Το σήμα επάνω αριστερά, σήμανση δεξιά, τίτλος και τιμή κάτω.",
     category: "photo",
     suits: ["product", "offer", "none"],
@@ -748,7 +746,7 @@ export const PRESETS: Preset[] = [
       layers: [
         /* Πλακίδιο και όχι διάφανο σήμα: πάνω σε φωτογραφία εργοταξίου ένα
            λευκό λογότυπο χάνεται μέσα στον θόρυβο· ένα κόκκινο ορθογώνιο όχι. */
-        mark({ x: 5, y: 6, w: 20, h: 12 }, "on-red"),
+        mark({ x: 5, y: 6, w: 20, h: 12 }),
         brandMark({ x: 74, y: 7, w: 20, h: 10 }),
         text(
           "Υπέρτιτλος",

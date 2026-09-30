@@ -18,6 +18,9 @@ import {
   unassignZone,
 } from "@/lib/banners/banners";
 import { resolveCells } from "@/lib/banners/resolve";
+import { mergeDemo } from "@/lib/banners/demo";
+import { emptyComposition } from "@/lib/banners/contract";
+import { prisma } from "@/lib/prisma";
 import { productAssets, searchProductsForPicker } from "@/lib/media/picker";
 import { productFill } from "@/lib/banners/product-fill";
 import { generateCopy, translateText } from "@/lib/ai/deepseek";
@@ -144,6 +147,38 @@ export async function actionUnassign(zone: string) {
 export async function actionResolve(content: BannerContent, locale: Locale) {
   await requireEditor();
   return Object.fromEntries(await resolveCells(content, locale));
+}
+
+/**
+ * Το δείγμα της γκαλερί παραλλαγών: πραγματικά ενεργά προϊόντα Milwaukee του
+ * καταλόγου, με φωτογραφία, λυμένα από τον ίδιο resolver με τον καμβά.
+ * Προτιμά ένα M18 FUEL σε απόθεμα· αλλιώς οποιοδήποτε ενεργό με φωτογραφία.
+ */
+export async function actionDemoCell(locale: Locale) {
+  await requireEditor();
+  const withPhoto = { isActive: true, priceNet: { gt: 0 }, images: { some: {} } };
+  const pick = (where: object) =>
+    prisma.product.findMany({
+      where: { ...withPhoto, ...where },
+      orderBy: { priceNet: "desc" },
+      take: 3,
+      select: { slug: true },
+    });
+  let rows = await pick({ inStock: true, name: { contains: "M18 FUEL", mode: "insensitive" } });
+  if (rows.length === 0) rows = await pick({});
+  if (rows.length === 0) return mergeDemo(undefined, undefined);
+
+  const slugs = rows.map((r) => r.slug);
+  const resolved = await resolveCells(
+    {
+      cells: {
+        product: { ...emptyComposition(), binding: { source: "product", slug: slugs[0] } },
+        set: { ...emptyComposition(), binding: { source: "products", slugs } },
+      },
+    } as BannerContent,
+    locale,
+  );
+  return mergeDemo(resolved.get("product"), resolved.get("set"));
 }
 
 /* ───────────────────────── Pickers ───────────────────────── */

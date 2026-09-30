@@ -55,15 +55,14 @@ import {
   applyPreset,
   type PresetCategory,
 } from "@/lib/banners/presets";
+import { actionRemoveBackground } from "@/app/admin/(protected)/media/actions";
 import {
-  actionListLogos,
-  actionRemoveBackground,
-} from "@/app/admin/(protected)/media/actions";
-import {
+  actionDemoCell,
   actionProductAssets,
   actionProductFill,
   actionResolve,
 } from "@/app/admin/(protected)/banners/actions";
+import { STATIC_DEMO } from "@/lib/banners/demo";
 import { uploadFiles } from "@/lib/media/upload-client";
 import { measureMedia, roundAspect } from "@/lib/media/measure";
 import type { ResolvedCell } from "@/lib/banners/resolve-tokens";
@@ -124,9 +123,9 @@ import { cn } from "@/lib/utils";
  */
 
 /** Private drag payloads. A plain string would collide with dragged text. */
-const LAYER_MIME = "application/x-kolleris-layer";
-const ASSET_MIME = "application/x-kolleris-asset";
-const TOKEN_MIME = "application/x-kolleris-token";
+const LAYER_MIME = "application/x-hdc-layer";
+const ASSET_MIME = "application/x-hdc-asset";
+const TOKEN_MIME = "application/x-hdc-token";
 
 const LAYER_ICON: Record<
   LayerKind,
@@ -148,43 +147,30 @@ const COLORS: Array<{ value: ColorToken; label: string; swatch: string }> = [
   { value: "white-70", label: "Λευκό 70%", swatch: "#b9b9bd" },
 ];
 
-/** Demo values so a preset thumbnail reads as a design rather than as `{title}`. */
-const DEMO: ResolvedCell = {
-  tokens: {
-    "{title}": 'Κλειδί ρατσέτας 1/2"',
-    "{brand}": "FACOM",
-    "{code}": "SL.171",
-    "{price}": "79,26 €",
-    "{compare}": "112,00 €",
-    "{desc}": "Επαγγελματικό εργαλείο με σπαστό σώμα.",
-    "{badge}": "-30%",
-    "{ends}": "3 ημέρες",
-    // A real photograph, so a thumbnail of a layout built around one is not a
-    // picture of an empty rectangle.
-    "{image}": "https://kolleris.b-cdn.net/mtrl-files/images/SL.171_1.webp",
-    /* Και το σήμα της μάρκας, αλλιώς κάθε παραλλαγή που το χρησιμοποιεί
-       δείχνει στη γκαλερί ένα κενό στη γωνία της. */
-    "{brandLogo}":
-      "https://kolleris.b-cdn.net/super-product-brands/cmdbrkyco05qwd41o9by1eikb-logo-processed-1753021318794.webp",
-  },
-  href: "#",
-  image: "",
-  // Enough items for a ticker thumbnail to read as a rotation.
-  items: [
-    {
-      slug: "demo-1",
-      name: "Κλειδί ρατσέτας",
-      image: "https://kolleris.b-cdn.net/mtrl-files/images/SL.171_1.webp",
-      price: "79,26 €",
-    },
-    {
-      slug: "demo-2",
-      name: "Κατσαβίδι",
-      image: "https://kolleris.b-cdn.net/mtrl-files/images/SL.171_2.webp",
-      price: "24,80 €",
-    },
-  ],
-};
+/**
+ * Το δείγμα της γκαλερί: πραγματικό προϊόν Milwaukee από τον κατάλογο, ένα
+ * αίτημα ανά σελίδα (η γκαλερί ανοίγει πολλές φορές, ο κατάλογος δεν αλλάζει
+ * ανάμεσα). Μέχρι να έρθει, το στατικό δείγμα.
+ */
+let demoRequest: Promise<ResolvedCell> | null = null;
+
+function useDemo(): ResolvedCell {
+  const [demo, setDemo] = useState<ResolvedCell>(STATIC_DEMO);
+  useEffect(() => {
+    let cancelled = false;
+    demoRequest ??= actionDemoCell("el").catch(() => {
+      demoRequest = null;
+      return STATIC_DEMO;
+    });
+    void demoRequest.then((value) => {
+      if (!cancelled) setDemo(value);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  return demo;
+}
 
 /**
  * Η πραγματική αναλογία του υλικού, ως κατάσταση.
@@ -849,122 +835,33 @@ function SourceRail({
  * or outdated version, and that is a supplier problem rather than a design one.
  */
 /**
- * Το σήμα του Κολλέρη, στις εκδοχές που χρειάζεται ένα banner.
+ * Τα σήματα του καταστήματος: το lockup του Milwaukee Heavy Duty Centre, όπως το
+ * δείχνει και η κεφαλίδα του eshop.
  *
- * ── Γιατί έξι αρχεία και όχι ένα ───────────────────────────────────────────
- *
- * Το πρωτότυπο είναι ένα: κόκκινο σήμα, γκρίζα γράμματα, φτιαγμένο για λευκό
- * χαρτί. Πάνω σε σκούρα φωτογραφία εξαφανίζεται, και πάνω σε κόκκινη ζώνη
- * χάνεται το σήμα μέσα στο φόντο. Στην πράξη έμπαινε ένα PNG από κάπου, σε
- * όποιο χρώμα βρισκόταν πρόχειρο.
- *
- * Οι έξι εκδοχές παράγονται από το ΙΔΙΟ διάνυσμα — ίδια γεωμετρία, μόνο το
- * `fill` αλλάζει — οπότε δεν υπάρχει εκδοχή που να έχει ξεμείνει πίσω από τις
- * άλλες. Το σήμα χωρίς γράμματα έχει το δικό του viewBox, κομμένο στο πλαίσιο
- * του σχήματος: με το viewBox ολόκληρου του λογοτύπου θα ερχόταν με 190px
- * κενού δεξιά του, και θα φαινόταν μικρό χωρίς να είναι.
+ * Σχετικές διευθύνσεις `/brand/…` του site: τα banners αποδίδονται μόνο σε αυτό
+ * το domain (eshop και προεπισκόπηση του διαχειριστή). Τα υπόλοιπα αρχεία του
+ * `public/brand/` (`kolleris-*`, `logo-horizontal-white.png`,
+ * `logo-symbol-white.png`) είναι σήματα της Kolleris και δεν προσφέρονται εδώ.
  */
-/*
- * Από το CDN, όχι από το `public/` της εφαρμογής.
- *
- * Η διεύθυνση γράφεται ΜΕΣΑ στο banner και ζει όσο και αυτό. Ένα
- * `/brand/…svg` λύνεται σωστά μόνο όσο το banner αποδίδεται σε αυτό το
- * domain — και τα banner διαβάζονται και από την προεπισκόπηση του
- * διαχειριστή, και από ό,τι άλλο κοιτάξει τη σύνθεση αύριο. Κάθε άλλο
- * εικαστικό του συστήματος (λογότυπα μαρκών, φωτογραφίες, cutouts) είναι ήδη
- * απόλυτη διεύθυνση του CDN· αυτά ήταν η μόνη εξαίρεση.
- *
- * Τα αρχεία μένουν και στο `public/brand/` — από εκεί παράγονται, και από
- * εκεί τα παίρνει το favicon και η εικόνα κοινοποίησης.
- */
-const MARK_CDN = "https://kolleris.b-cdn.net/eshop/brand";
-
-const KOLLERIS_MARKS = [
-  /* Διάφανα — για να κάτσουν πάνω σε φωτογραφία ή σε χρώμα του banner. */
+const HDC_MARKS = [
   {
-    src: `${MARK_CDN}/kolleris-lockup-black.svg`,
-    name: "Κολλέρης — μαύρο",
-    dark: false,
-  },
-  {
-    src: `${MARK_CDN}/kolleris-lockup-white.svg`,
-    name: "Κολλέρης — λευκό",
+    src: "/brand/hdc-lockup.png",
+    name: "Milwaukee Heavy Duty Centre",
     dark: true,
   },
   {
-    src: `${MARK_CDN}/kolleris-lockup-red.svg`,
-    name: "Κολλέρης — κόκκινο",
-    dark: false,
-  },
-  {
-    src: `${MARK_CDN}/kolleris-symbol-black.svg`,
-    name: "Σήμα — μαύρο",
-    dark: false,
-  },
-  {
-    src: `${MARK_CDN}/kolleris-symbol-white.svg`,
-    name: "Σήμα — λευκό",
+    src: "/brand/hdc-lockup-440.png",
+    name: "Milwaukee Heavy Duty Centre — μικρό αρχείο",
     dark: true,
-  },
-  {
-    src: `${MARK_CDN}/kolleris-symbol-red.svg`,
-    name: "Σήμα — κόκκινο",
-    dark: false,
-  },
-  /* Πλακίδια — το σήμα σκαλισμένο μέσα σε συμπαγές χρώμα, για όταν το φόντο
-     από κάτω είναι πολυάσχολο και ένα διάφανο λογότυπο χάνεται μέσα του. */
-  {
-    src: `${MARK_CDN}/kolleris-lockup-on-red.svg`,
-    name: "Πλακίδιο κόκκινο — λευκά γράμματα",
-    dark: false,
-  },
-  {
-    src: `${MARK_CDN}/kolleris-lockup-on-ink.svg`,
-    name: "Πλακίδιο μαύρο — λευκά γράμματα",
-    dark: false,
-  },
-  {
-    src: `${MARK_CDN}/kolleris-lockup-on-white.svg`,
-    name: "Πλακίδιο λευκό — μαύρα γράμματα",
-    dark: false,
-  },
-  {
-    src: `${MARK_CDN}/kolleris-symbol-on-red.svg`,
-    name: "Σήμα σε κόκκινο πλακίδιο",
-    dark: false,
-  },
-  {
-    src: `${MARK_CDN}/kolleris-symbol-on-ink.svg`,
-    name: "Σήμα σε μαύρο πλακίδιο",
-    dark: false,
-  },
-  {
-    src: `${MARK_CDN}/kolleris-symbol-on-white.svg`,
-    name: "Σήμα σε λευκό πλακίδιο",
-    dark: false,
   },
 ] as const;
 
 function LogoRail() {
-  const [logos, setLogos] = useState<
-    Array<{ slug: string; name: string; logo: string }>
-  >([]);
-
-  useEffect(() => {
-    let cancelled = false;
-    void actionListLogos().then((rows) => {
-      if (!cancelled) setLogos(rows);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
   return (
     <div className="space-y-1">
-      <p className="text-[11px] text-k-text-4">Λογότυπα — σύρετε στον καμβά</p>
+      <p className="text-[length:var(--fs-11)] text-k-text-4">Λογότυπα — σύρετε στον καμβά</p>
       <ul className="scroll-slim flex gap-1.5 overflow-x-auto pb-1">
-        {KOLLERIS_MARKS.map((mark) => (
+        {HDC_MARKS.map((mark) => (
           <li key={mark.src} className="shrink-0">
             <button
               type="button"
@@ -976,7 +873,7 @@ function LogoRail() {
               title={mark.name}
               className={cn(
                 "relative block size-12 cursor-grab border transition-colors active:cursor-grabbing",
-                /* Η λευκή εκδοχή σε λευκό πλακίδιο είναι ένα άδειο τετράγωνο. */
+                /* Η λευκή υπογραφή του lockup χάνεται σε λευκό πλακίδιο. */
                 mark.dark
                   ? "border-k-ink bg-k-ink hover:border-k-red"
                   : "border-k-line bg-white hover:border-k-ink",
@@ -985,36 +882,6 @@ function LogoRail() {
               <NextImage
                 src={mark.src}
                 alt={mark.name}
-                fill
-                sizes="48px"
-                className="object-contain p-1.5"
-                unoptimized
-              />
-            </button>
-          </li>
-        ))}
-
-        {/* Χωρίστρα: το σήμα του καταστήματος δεν είναι μια μάρκα ανάμεσα στις
-            μάρκες που διανέμει. */}
-        {logos.length > 0 && (
-          <li className="w-px shrink-0 self-stretch bg-k-line" />
-        )}
-
-        {logos.map((brand) => (
-          <li key={brand.slug} className="shrink-0">
-            <button
-              type="button"
-              draggable
-              onDragStart={(e) => {
-                e.dataTransfer.setData(ASSET_MIME, brand.logo);
-                e.dataTransfer.effectAllowed = "copy";
-              }}
-              title={brand.name}
-              className="relative block size-12 cursor-grab border border-k-line bg-white transition-colors hover:border-k-ink active:cursor-grabbing"
-            >
-              <NextImage
-                src={brand.logo}
-                alt={brand.name}
                 fill
                 sizes="48px"
                 className="object-contain p-1.5"
@@ -2452,6 +2319,7 @@ function PresetGallery({
   const categories = [
     ...new Set(sorted.map((p) => p.category)),
   ] as PresetCategory[];
+  const demo = useDemo();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -2503,7 +2371,7 @@ function PresetGallery({
                                 layers: previewLayers,
                                 href: "#",
                               }}
-                              resolved={DEMO}
+                              resolved={demo}
                               locale="el"
                               interactive={false}
                               placeholders
