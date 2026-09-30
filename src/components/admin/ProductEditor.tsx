@@ -162,8 +162,7 @@ export function ProductEditor({ product, locale }: { product: PimProduct; locale
     <div className="space-y-4">
       <p className="flex items-start gap-2 border-l-[3px] border-k-blue border border-k-line bg-white px-4 py-3 text-[12px] leading-[1.55] text-k-text-2">
         <Info className="mt-px size-3.5 shrink-0 text-k-blue" />
-        Οι αλλαγές γράφονται στο HDCtool και ισχύουν παντού — και στο Magento και στο Skroutz. Στο
-        κατάστημα εμφανίζονται μετά τον επόμενο συγχρονισμό.
+        Οι αλλαγές γράφονται στο HDCtool και φτάνουν στο eshop με τον επόμενο συγχρονισμό.
       </p>
       {product.mtrl < 0 && (
         <p className="flex items-start gap-2 border border-l-[3px] border-amber-500 bg-amber-50 px-4 py-3 text-[length:var(--fs-12)] leading-[1.55] text-k-text-2">

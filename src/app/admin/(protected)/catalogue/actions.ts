@@ -19,9 +19,8 @@ import type { Locale } from "@/i18n/routing";
  *
  * These write to HDCtool, not here. The local projection is not touched: it is
  * a copy, and editing the copy would make the two disagree until the next sync
- * papered over it. The screen tells the operator the change lands on the
- * storefront after that sync — which is honest, and is the price of edits that
- * apply on Magento and Skroutz too.
+ * papered over it. The screen tells the operator: «Οι αλλαγές γράφονται στο
+ * HDCtool και φτάνουν στο eshop με τον επόμενο συγχρονισμό.»
  */
 
 async function requireCatalogue(): Promise<void> {

@@ -14,7 +14,7 @@
 @import "./typography.css";
 
 /*
- * Kolleris design tokens.
+ * Admin design tokens (Milwaukee HDC palette).
  *
  * Tailwind 4.1 is CSS-first — these replace the `tailwind.config.ts` extension
  * shown in the development spec. Same values, different mechanism; there is no

@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 /**
  * Admin screen — the catalogue.
  *
- * Search then edit, rather than a browsable list of 5,305 products. Nobody
+ * Search then edit, rather than a browsable list of thousands of products. Nobody
  * opens this screen to see what exists; they open it because one product's
  * photos are in the wrong order.
  *
