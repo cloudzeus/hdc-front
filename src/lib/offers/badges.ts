@@ -49,6 +49,9 @@ export type OfferBadge = {
    * Η έκπτωση σε ΠΟΣΟ μετατρέπεται εδώ σε ποσοστό για τον ίδιο λόγο.
    */
   discountPercent: number;
+  /** Πότε αρχίζει και λήγει η καμπάνια (ISO), για το JSON-LD και το feed. */
+  startsAt?: string | null;
+  endsAt?: string | null;
 };
 
 /**
@@ -106,6 +109,8 @@ const liveCampaigns = cache(async (locale: string): Promise<Live[]> => {
       productSlugs: true,
       brandSlug: true,
       categorySlug: true,
+      startsAt: true,
+      endsAt: true,
     },
     // Σταθερή σειρά: με δύο καμπάνιες πάνω στο ίδιο προϊόν, η κάρτα πρέπει να
     // δείχνει την ίδια και στις δύο επισκέψεις, αλλιώς μοιάζει με σφάλμα.
@@ -124,6 +129,8 @@ const liveCampaigns = cache(async (locale: string): Promise<Live[]> => {
         // Το ποσό εξαρτάται από την τιμή του προϊόντος, οπότε λύνεται στο σημείο
         // της κλήσης· εδώ μένει ό,τι είναι κοινό για όλη την καμπάνια.
         discountPercent: campaignDiscountPercent(row.discount, Number(row.discountValue), null),
+        startsAt: row.startsAt?.toISOString() ?? null,
+        endsAt: row.endsAt?.toISOString() ?? null,
       };
 
       if (row.scope === "products") {
@@ -179,7 +186,25 @@ export async function offerBadgeFor(
   product: { slug: string; brandSlug: string | null; unitNet?: number | null },
   locale: string,
 ): Promise<OfferBadge | null> {
+  return matchOffer(await liveCampaigns(locale), product);
+}
+
+/**
+ * Οι ζωντανές καμπάνιες μία φορά, και ένας σύγχρονος έλεγχος ανά προϊόν —
+ * για ό,τι διατρέχει όλο τον κατάλογο έξω από render (το feed του Merchant),
+ * όπου το `cache()` της React δεν κρατά τίποτα ανάμεσα σε κλήσεις.
+ */
+export async function offerMatcher(
+  locale: string,
+): Promise<(product: { slug: string; brandSlug: string | null; unitNet?: number | null }) => OfferBadge | null> {
   const campaigns = await liveCampaigns(locale);
+  return (product) => matchOffer(campaigns, product);
+}
+
+function matchOffer(
+  campaigns: Live[],
+  product: { slug: string; brandSlug: string | null; unitNet?: number | null },
+): OfferBadge | null {
   for (const c of campaigns) {
     const hit =
       c.productSlugs?.has(product.slug) ||

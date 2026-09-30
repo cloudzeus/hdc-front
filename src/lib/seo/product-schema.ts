@@ -1,6 +1,11 @@
 import type { Locale } from "@/i18n/routing";
-import { SUPPLIER_HANDLING_DAYS, type Availability } from "@/lib/catalog/availability";
+import {
+  SUPPLIER_HANDLING_DAYS,
+  schemaOrgAvailability,
+  type Availability,
+} from "@/lib/catalog/availability";
 import { FREE_SHIPPING_THRESHOLD_NET } from "@/lib/cart/options";
+import { isValidGtin } from "@/lib/seo/gtin";
 import { absoluteUrl } from "@/lib/seo/urls";
 
 /**
@@ -95,45 +100,69 @@ export function specsAsProperties(
  * παραδίδονται την ίδια μέρα, και ένα «1 εργάσιμη» θα ήταν σωστό για τον μισό
  * πληθυσμό και ψέμα για τον άλλον.
  */
-export function shippingDetails(locale: Locale, availability: Availability) {
+export function shippingDetails(
+  availability: Availability,
+  options: {
+    /** This product's own postage below the threshold, with VAT (ACS tariff). */
+    postageGross?: number | null;
+    /** The product's net price: above the threshold on its own, only the free rule applies. */
+    priceNet?: number | null;
+  } = {},
+) {
   const supplier = availability === "supplier";
-  return {
-    "@type": "OfferShippingDetails",
-    shippingRate: {
-      "@type": "MonetaryAmount",
-      value: "0",
-      currency: "EUR",
-      /* Το «0» ισχύει πάνω από το κατώφλι — δηλωμένο, όχι υπονοούμενο. */
-      eligibleTransactionVolume: {
-        "@type": "PriceSpecification",
-        priceCurrency: "EUR",
-        minPrice: FREE_SHIPPING_THRESHOLD_NET,
-      },
+  const deliveryTime = {
+    "@type": "ShippingDeliveryTime",
+    // Παραγγελία πριν τις 15:00 φεύγει αυθημερόν — εκτός αν έρχεται από τον
+    // προμηθευτή: τότε φεύγει σε 3–5 εργάσιμες (lib/catalog/availability.ts).
+    handlingTime: {
+      "@type": "QuantitativeValue",
+      minValue: supplier ? SUPPLIER_HANDLING_DAYS.min : 0,
+      maxValue: supplier ? SUPPLIER_HANDLING_DAYS.max : 1,
+      unitCode: "DAY",
     },
-    shippingDestination: {
-      "@type": "DefinedRegion",
-      addressCountry: "GR",
+    // Αττική 1 εργάσιμη · νησιά και δυσπρόσιτες έως 3.
+    transitTime: {
+      "@type": "QuantitativeValue",
+      minValue: 1,
+      maxValue: 3,
+      unitCode: "DAY",
     },
-    deliveryTime: {
-      "@type": "ShippingDeliveryTime",
-      // Παραγγελία πριν τις 15:00 φεύγει αυθημερόν — εκτός αν έρχεται από τον
-      // προμηθευτή: τότε φεύγει σε 3–5 εργάσιμες (lib/catalog/availability.ts).
-      handlingTime: {
-        "@type": "QuantitativeValue",
-        minValue: supplier ? SUPPLIER_HANDLING_DAYS.min : 0,
-        maxValue: supplier ? SUPPLIER_HANDLING_DAYS.max : 1,
-        unitCode: "DAY",
-      },
-      // Αττική 1 εργάσιμη · νησιά και δυσπρόσιτες έως 3.
-      transitTime: {
-        "@type": "QuantitativeValue",
-        minValue: 1,
-        maxValue: 3,
-        unitCode: "DAY",
-      },
-    },
-    ...(locale ? {} : {}),
   };
+  const destination = { "@type": "DefinedRegion", addressCountry: "GR" };
+
+  /* Δύο κανόνες, όπως τους εφαρμόζει το ταμείο: δωρεάν πάνω από το όριο
+     (καθαρή αξία), και κάτω από αυτό το πραγματικό κόστος του δέματος. */
+  const free = {
+    "@type": "OfferShippingDetails",
+    shippingRate: { "@type": "MonetaryAmount", value: "0", currency: "EUR" },
+    eligibleTransactionVolume: {
+      "@type": "PriceSpecification",
+      priceCurrency: "EUR",
+      minPrice: FREE_SHIPPING_THRESHOLD_NET,
+      valueAddedTaxIncluded: false,
+    },
+    shippingDestination: destination,
+    deliveryTime,
+  };
+  const belowThreshold =
+    options.postageGross != null &&
+    options.postageGross > 0 &&
+    (options.priceNet == null || options.priceNet < FREE_SHIPPING_THRESHOLD_NET);
+  if (!belowThreshold) return [free];
+
+  const paid = {
+    "@type": "OfferShippingDetails",
+    shippingRate: { "@type": "MonetaryAmount", value: options.postageGross!.toFixed(2), currency: "EUR" },
+    eligibleTransactionVolume: {
+      "@type": "PriceSpecification",
+      priceCurrency: "EUR",
+      maxPrice: FREE_SHIPPING_THRESHOLD_NET,
+      valueAddedTaxIncluded: false,
+    },
+    shippingDestination: destination,
+    deliveryTime,
+  };
+  return [free, paid];
 }
 
 /**
@@ -272,5 +301,130 @@ export function categoryBreadcrumb(
       name: item.name,
       item: absoluteUrl(item.path, locale),
     })),
+  };
+}
+
+export type ProductLdInput = {
+  /** The page's own address. */
+  url: string;
+  origin: string;
+  name: string;
+  /** Our code (the SKU the page shows). */
+  sku: string;
+  /** Milwaukee article number. */
+  code2: string | null;
+  /** «M18 FPD3-502X», when the product is a model. */
+  model: string | null;
+  ean: string | null;
+  images: string[];
+  description?: string | null;
+  category?: string | null;
+  availability: Availability;
+  /** The price the page shows and the cart charges, with VAT; null = not sold online. */
+  priceGross: number | null;
+  /** The price before a campaign discount, with VAT — only while one runs. */
+  listPriceGross?: number | null;
+  /** When the running campaign ends (ISO), if it does. */
+  offerEndsAt?: string | null;
+  priceNet?: number | null;
+  postageGross?: number | null;
+  specs?: Array<{ label: string; value: string }>;
+  reviews?: Array<{ rating: number; title: string | null; body: string; author: string; date: string }>;
+  /** Extra Product fields for a size of a family (`sizeFamilyLd().product`). */
+  extra?: Record<string, unknown>;
+};
+
+/**
+ * The product as structured data, agreeing with the page and the Merchant
+ * feed: the price is the one the buy box shows (the campaign price while a
+ * campaign runs, with the list price as a strikethrough), the identifiers are
+ * the article number, model and a GTIN only when its check digit holds, the
+ * seller is the store (`#shop`), and ratings exist only when real reviews do.
+ */
+export function productJsonLd(input: ProductLdInput) {
+  const today = new Date();
+  const ean = input.ean?.replace(/\D/g, "") ?? "";
+  const gtin = isValidGtin(ean) ? (ean.length === 13 ? { gtin13: ean } : { gtin: ean }) : {};
+  const discounted =
+    input.priceGross != null && input.listPriceGross != null && input.listPriceGross > input.priceGross;
+  const validUntil =
+    discounted && input.offerEndsAt ? input.offerEndsAt.slice(0, 10) : priceValidUntil(today);
+
+  const reviews = (input.reviews ?? []).filter((r) => r.rating >= 1 && r.rating <= 5);
+  const average = reviews.length ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : null;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "@id": `${input.url}#product`,
+    ...(input.extra ?? {}),
+    name: input.name,
+    sku: input.sku,
+    ...(input.code2 ? { mpn: input.code2, productID: input.code2 } : {}),
+    ...(input.model ? { model: input.model } : {}),
+    ...gtin,
+    image: input.images,
+    ...(input.description ? { description: input.description } : {}),
+    brand: { "@type": "Brand", name: "Milwaukee" },
+    ...(input.category ? { category: input.category } : {}),
+    ...(input.priceGross != null
+      ? {
+          offers: {
+            "@type": "Offer",
+            url: input.url,
+            price: input.priceGross.toFixed(2),
+            priceCurrency: "EUR",
+            ...(discounted
+              ? {
+                  priceSpecification: [
+                    { "@type": "UnitPriceSpecification", price: input.priceGross.toFixed(2), priceCurrency: "EUR" },
+                    {
+                      "@type": "UnitPriceSpecification",
+                      priceType: "https://schema.org/StrikethroughPrice",
+                      price: input.listPriceGross!.toFixed(2),
+                      priceCurrency: "EUR",
+                    },
+                  ],
+                }
+              : {}),
+            priceValidUntil: validUntil,
+            itemCondition: "https://schema.org/NewCondition",
+            /*
+             * The offer has to agree with the Merchant Center feed, which Google
+             * reads this page to keep current — ours or the supplier's is
+             * `InStock` (buyable), neither is `OutOfStock`.
+             */
+            availability: schemaOrgAvailability(input.availability),
+            seller: { "@id": `${input.origin}/#shop` },
+            shippingDetails: shippingDetails(input.availability, {
+              postageGross: input.postageGross,
+              priceNet: input.priceNet,
+            }),
+            hasMerchantReturnPolicy: returnPolicy(),
+          },
+        }
+      : {}),
+    ...(input.specs?.length
+      ? { additionalProperty: input.specs.map((r) => ({ "@type": "PropertyValue", name: r.label, value: r.value })) }
+      : {}),
+    ...(average != null
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: average.toFixed(1),
+            reviewCount: reviews.length,
+            bestRating: 5,
+            worstRating: 1,
+          },
+          review: reviews.map((r) => ({
+            "@type": "Review",
+            reviewRating: { "@type": "Rating", ratingValue: r.rating, bestRating: 5, worstRating: 1 },
+            author: { "@type": "Person", name: r.author },
+            datePublished: r.date.slice(0, 10),
+            ...(r.title ? { name: r.title } : {}),
+            reviewBody: r.body,
+          })),
+        }
+      : {}),
   };
 }

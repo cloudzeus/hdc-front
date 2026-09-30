@@ -228,3 +228,12 @@ export function productDescription(
   }
   return clampDescription(build(false, text.storeShort));
 }
+
+/**
+ * The Merchant feed title: «Milwaukee {model} {kind} {code}» — the same words
+ * as the page title, without the separator, within Google's 150 characters.
+ */
+export function productFeedTitle(input: ProductSeoInput): string {
+  const code = modelCode(input.erpName);
+  return tidy(["Milwaukee", code, localKind(input), input.code2].filter(Boolean).join(" ")).slice(0, 150);
+}

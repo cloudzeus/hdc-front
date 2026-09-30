@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { greekKind, productDescription, productH1, productTitle } from "@/lib/seo/product-seo";
+import { greekKind, productDescription, productFeedTitle, productH1, productTitle } from "@/lib/seo/product-seo";
 
 const FPD3_KIT = {
   erpName: "ΚΡΟΥΣΤΙΚΟ ΔΡΑΠΑΝΟΚΑΤΣΑΒΙΔΟ  M18FPD3-502X FUEL 4933479860",
@@ -118,5 +118,13 @@ describe("productDescription", () => {
   it("has English and Italian versions", () => {
     expect(productDescription({ ...base, locale: "en" })).toMatch(/Piraeus/);
     expect(productDescription({ ...base, locale: "it" })).toMatch(/Pireo/);
+  });
+});
+
+describe("productFeedTitle", () => {
+  it("is «Milwaukee {model} {kind} {code}»", () => {
+    expect(productFeedTitle({ ...FPD3_KIT, locale: "el", name: FPD3_KIT.erpName })).toBe(
+      "Milwaukee M18 FPD3-502X Κρουστικό δραπανοκατσάβιδο 4933479860",
+    );
   });
 });

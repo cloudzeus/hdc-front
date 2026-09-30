@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { handlingTimeLines, isValidGtin, merchantId } from "../feeds/google-merchant";
+import { handlingTimeLines, isValidGtin, merchantId, salePriceLines } from "../feeds/google-merchant";
 
 /**
  * A wrong GTIN is a disapproval; an absent one is fine, because every product
@@ -69,5 +69,20 @@ describe("merchantId", () => {
 
   it("falls back to the feed sequence when the code is missing", () => {
     expect(merchantId({ mtrl: -17, xmlCode: null })).toBe("X-17");
+  });
+});
+
+describe("salePriceLines — the campaign price, as the page charges it", () => {
+  it("adds sale_price only while it is lower than the price", () => {
+    expect(salePriceLines(100, null)).toEqual([]);
+    expect(salePriceLines(100, 100)).toEqual([]);
+    expect(salePriceLines(100, 80)).toEqual(["<g:sale_price>80.00 EUR</g:sale_price>"]);
+  });
+
+  it("dates it when the campaign has an end", () => {
+    expect(salePriceLines(100, 80, "2026-10-01T00:00:00.000Z", "2026-10-31T21:59:59.000Z")).toEqual([
+      "<g:sale_price>80.00 EUR</g:sale_price>",
+      "<g:sale_price_effective_date>2026-10-01T00:00:00.000Z/2026-10-31T21:59:59.000Z</g:sale_price_effective_date>",
+    ]);
   });
 });

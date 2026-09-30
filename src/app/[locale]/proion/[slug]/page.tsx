@@ -25,7 +25,6 @@ import { isBattery } from "@/lib/hdc-nav";
 import {
   availabilityLabelKey,
   availabilityOf,
-  schemaOrgAvailability,
 } from "@/lib/catalog/availability";
 import { getProductBySlug } from "@/lib/catalog/pdp";
 import { variantsOf } from "@/lib/catalog/variants";
@@ -58,12 +57,8 @@ import {
 } from "@/lib/milwaukee/pdp";
 import { kitFromTechBlock, parseTechBlock } from "@/lib/milwaukee/tech-block";
 import { discountedNet, offerBadgeFor } from "@/lib/offers/badges";
-import {
-  priceValidUntil,
-  productBreadcrumb,
-  returnPolicy,
-  shippingDetails,
-} from "@/lib/seo/product-schema";
+import { productBreadcrumb, productJsonLd } from "@/lib/seo/product-schema";
+import { quotePostage } from "@/lib/shipping/acs-tariff";
 import { absoluteUrl, pageMeta, siteOrigin } from "@/lib/seo/urls";
 import { clampDescription, sizeFamilyLd, sizedText, sizeTitleEl } from "@/lib/seo/size-variant";
 import { SHOP } from "@/config/shop";
@@ -451,52 +446,44 @@ async function ProductBody({ params }: PageProps) {
     new Intl.NumberFormat(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(n);
 
   // ── Structured data ──────────────────────────────────────────────────────
-  /** Product JSON-LD — real values only; no invented ratings. */
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    ...(familyLd?.product ?? {}),
-    name: sizedText(displayName(product.name, product.code2), sizes, sizeCode),
+  /**
+   * Product JSON-LD — real values only (src/lib/seo/product-schema.ts): the
+   * price the buy box shows, identifiers that hold, the store as seller,
+   * postage as the checkout computes it, and reviews only when there are.
+   */
+  const postage = quotePostage({
+    items: [{ quantity: 1, weight: product.weight, width: product.width, length: product.length, height: product.height }],
+    postcode: null,
+  });
+  const jsonLd = productJsonLd({
+    url: absoluteUrl(`/proion/${product.slug}`, locale),
+    origin: siteOrigin(),
+    extra: familyLd?.product,
+    // The H1's words; a size of a family keeps its size-and-code name.
+    name: sizes.length > 1 ? sizedText(displayName(product.name, product.code2), sizes, sizeCode) : h1,
     sku: code,
-    mpn: product.code2 || undefined,
-    ...(ean ? (ean.length === 13 ? { gtin13: ean } : { gtin: ean }) : {}),
-    image: product.images.map((i) => i.url),
-    description: product.shortDescription ?? paragraphs[0] ?? undefined,
-    brand: { "@type": "Brand", name: "Milwaukee" },
-    category: product.categoryChain.at(-1)?.name ?? undefined,
-    /*
-     * The offer has to agree with the Merchant Center feed, which Google reads
-     * this page to keep current — ours or the supplier's is `InStock`
-     * (buyable), neither is `OutOfStock`, not a promise of `BackOrder`.
-     */
-    offers:
-      product.priceNet != null
-        ? {
-            "@type": "Offer",
-            url: absoluteUrl(`/proion/${product.slug}`, locale),
-            price: grossAmount(product.priceNet, ctx).toFixed(2),
-            priceCurrency: "EUR",
-            itemCondition: "https://schema.org/NewCondition",
-            availability: schemaOrgAvailability(availability),
-            priceValidUntil: priceValidUntil(),
-            shippingDetails: shippingDetails(locale, availability),
-            hasMerchantReturnPolicy: returnPolicy(),
-          }
-        : undefined,
+    code2: product.code2 || null,
+    model: model?.code ?? null,
+    ean,
+    images: product.images.map((i) => i.url),
+    description: product.shortDescription ?? paragraphs[0] ?? null,
+    category: product.categoryChain.at(-1)?.name ?? null,
+    availability,
+    priceGross: gross,
+    listPriceGross: discounted && product.priceNet != null ? grossAmount(product.priceNet, ctx) : null,
+    offerEndsAt: offer?.endsAt ?? null,
+    priceNet: finalNet,
+    postageGross: grossAmount(postage.totalNet),
     /* The manufacturer's figures, as data — the same rows as the table. */
-    additionalProperty: specs.length
-      ? specs.map((r) => ({ "@type": "PropertyValue", name: r.label, value: r.value }))
-      : undefined,
-    ...(average != null
-      ? {
-          aggregateRating: {
-            "@type": "AggregateRating",
-            ratingValue: average.toFixed(1),
-            reviewCount,
-          },
-        }
-      : {}),
-  };
+    specs,
+    reviews: reviews.map((r) => ({
+      rating: r.rating,
+      title: r.title,
+      body: r.body,
+      author: `${r.customer.firstName.trim()}${r.customer.lastName.trim() ? ` ${r.customer.lastName.trim().charAt(0)}.` : ""}`,
+      date: r.createdAt.toISOString(),
+    })),
+  });
   const breadcrumbLd = productBreadcrumb(locale, {
     name: displayName(product.name, product.code2),
     slug: product.slug,

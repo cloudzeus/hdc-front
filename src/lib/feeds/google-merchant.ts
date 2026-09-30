@@ -10,6 +10,9 @@ import { absoluteUrl } from "@/lib/seo/urls";
 import { SHOP } from "@/config/shop";
 import { isPlausibleWeightKg } from "@/lib/shipping/acs-tariff";
 import type { Locale } from "@/i18n/routing";
+import { isValidGtin } from "@/lib/seo/gtin";
+import { productFeedTitle } from "@/lib/seo/product-seo";
+import { discountedNet, offerMatcher } from "@/lib/offers/badges";
 
 /**
  * The Google Merchant Center feed.
@@ -34,19 +37,27 @@ import type { Locale } from "@/i18n/routing";
  * done properly later without touching this file.
  */
 
-/** EAN-8/12/13/14 check digit. The one rule that turns a code into an identifier. */
-export function isValidGtin(raw: string | null | undefined): boolean {
-  const digits = (raw ?? "").replace(/\D/g, "");
-  if (![8, 12, 13, 14].includes(digits.length)) return false;
+/** EAN-8/12/13/14 check digit — shared with the product page's JSON-LD. */
+export { isValidGtin };
 
-  const body = digits.split("").map(Number);
-  const check = body.pop()!;
-  let sum = 0;
-  // Weights alternate 3 and 1, starting at 3 from the rightmost body digit.
-  for (let i = body.length - 1, weight = 3; i >= 0; i--, weight = weight === 3 ? 1 : 3) {
-    sum += body[i]! * weight;
+/**
+ * The campaign price, while a campaign runs: `sale_price` next to the
+ * regular `price`, as the product page shows it struck through. The
+ * effective dates only when the campaign has an end (Google needs both ends).
+ */
+export function salePriceLines(
+  gross: number,
+  saleGross: number | null,
+  startsAt?: string | null,
+  endsAt?: string | null,
+): string[] {
+  if (saleGross == null || !(saleGross < gross) || saleGross <= 0) return [];
+  const lines = [`<g:sale_price>${saleGross.toFixed(2)} EUR</g:sale_price>`];
+  if (endsAt) {
+    const start = startsAt ?? new Date().toISOString();
+    lines.push(`<g:sale_price_effective_date>${start}/${endsAt}</g:sale_price_effective_date>`);
   }
-  return (10 - (sum % 10)) % 10 === check;
+  return lines;
 }
 
 /** XML text. Five characters, and forgetting one breaks the whole document. */
@@ -120,8 +131,11 @@ export async function buildMerchantFeed(locale: Locale = "el"): Promise<string> 
   const marks = [...new Set(products.map((p) => p.mtrmark).filter((m): m is number => m != null))];
   const brands = await prisma.brand.findMany({
     where: { mtrmark: { in: marks } },
-    select: { mtrmark: true, nameEl: true, nameEn: true, nameIt: true },
+    select: { mtrmark: true, slug: true, nameEl: true, nameEn: true, nameIt: true },
   });
+  const brandSlugByMark = new Map(brands.map((b) => [b.mtrmark, b.slug]));
+  /* The running campaigns, loaded once: the same price the page charges. */
+  const offerFor = await offerMatcher(locale);
   const brandByMark = new Map(
     brands.map((b) => [b.mtrmark, (locale === "en" ? b.nameEn : locale === "it" ? b.nameIt : b.nameEl) || b.nameEl]),
   );
@@ -149,7 +163,23 @@ export async function buildMerchantFeed(locale: Locale = "el"): Promise<string> 
     const gross = Math.round(net * (1 + vat / 100) * 100) / 100;
 
     const translation = product.translations[0];
-    const title = (translation?.name || product.name).slice(0, MAX_TITLE);
+    /* «Milwaukee {model} {kind} {code}», the page title's words. */
+    const title = productFeedTitle({
+      locale,
+      name: translation?.name || product.name,
+      erpName: product.name,
+      code2: product.code2 || product.code,
+      greekTexts: locale === "el" ? [translation?.shortDescription, translation?.longDescription] : [],
+    }).slice(0, MAX_TITLE);
+    const offer = offerFor({
+      slug: product.slug,
+      brandSlug: product.mtrmark != null ? (brandSlugByMark.get(product.mtrmark) ?? null) : null,
+      unitNet: net,
+    });
+    const saleGross =
+      offer && offer.discountPercent > 0
+        ? Math.round(discountedNet(net, offer.discountPercent) * (1 + vat / 100) * 100) / 100
+        : null;
     const description = (
       translation?.shortDescription ||
       translation?.longDescription ||
@@ -179,6 +209,7 @@ export async function buildMerchantFeed(locale: Locale = "el"): Promise<string> 
       `<g:availability>${merchantAvailability(availabilityOf(product))}</g:availability>`,
       ...handlingTimeLines(availabilityOf(product)),
       `<g:price>${gross.toFixed(2)} EUR</g:price>`,
+      ...salePriceLines(gross, saleGross, offer?.startsAt, offer?.endsAt),
       `<g:condition>new</g:condition>`,
       `<g:mpn>${xml(product.code2 || product.code)}</g:mpn>`,
     ];
