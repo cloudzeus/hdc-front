@@ -16,6 +16,7 @@
     "db:studio": "prisma studio",
     "reconcile:catalog": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env scripts/reconcile-catalog.ts",
     "backfill:milwaukee": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env scripts/backfill-milwaukee-fields.ts",
+    "content:import": "tsx --env-file=.env scripts/content/import-content.ts",
     "emails:build": "node emails/build.mjs",
     "emails:docs": "node emails/docs-gen.mjs",
     "emails:upload": "node emails/mailgun/upload-templates.mjs"
@@ -57,6 +58,7 @@
     "handlebars": "^4.7.9",
     "lucide-react": "^0.548.0",
     "maplibre-gl": "^5.24.0",
+    "marked": "^18.0.14",
     "next": "16.2.7",
     "next-auth": "^5.0.0-beta.32",
     "next-intl": "^4.13.4",
@@ -69,6 +71,7 @@
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
     "vaul": "^1.1.2",
+    "yaml": "^2.9.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {
