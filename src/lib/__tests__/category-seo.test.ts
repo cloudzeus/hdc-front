@@ -31,13 +31,15 @@ describe("categoryDescription", () => {
       platforms: ["M12", "M18"],
       children: ["Δράπανα μπαταρίας", "Δράπανα ρεύματος"],
     });
-    expect(d).toContain("Κρουστικά δράπανα Milwaukee για M12 & M18: 24 κωδικοί");
+    expect(d).toContain("Κρουστικά δράπανα Milwaukee για M12 & M18");
     expect(d).toContain("Πειραιά");
+    // No quantities, stock or prices in HDC copy.
+    expect(d).not.toMatch(/\d+ κωδικ|απόθεμα|διαθεσιμ|€/);
     expect(d.length).toBeLessThanOrEqual(155);
   });
 
   it("quotes a name that kept its capitals", () => {
-    expect(categoryDescription({ name: "ΚΑΤΣΑΒΙΔΙΑ", total: 96, platforms: [], children: [] })).toMatch(/^«ΚΑΤΣΑΒΙΔΙΑ» Milwaukee: 96 κωδικοί\./);
+    expect(categoryDescription({ name: "ΚΑΤΣΑΒΙΔΙΑ", total: 96, platforms: [], children: [] })).toMatch(/^«ΚΑΤΣΑΒΙΔΙΑ» Milwaukee\. /);
   });
 });
 

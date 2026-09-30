@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DEALER_WORDING, DEFAULT_SUMMARY_EL, greekSummary, groupModels, llmsFullTxt, llmsTxt } from "@/lib/seo/llms";
-import { brandFaq, categoryFaq } from "@/lib/seo/category-copy";
+import { brandFaq } from "@/lib/seo/category-copy";
 import { SHOP } from "@/config/shop";
 import { DEFAULT_VAT_RATE } from "@/lib/format";
 
@@ -124,23 +124,10 @@ describe("llmsFullTxt", () => {
   });
 });
 
-describe("category and brand FAQ copy", () => {
+describe("brand FAQ copy", () => {
   it("never claims to be a dealer or distributor", () => {
     const brand = brandFaq({ name: "Milwaukee", total: 100, inStock: 40, categories: ["Δράπανα", "Μπαταρίες"] });
-    const category = categoryFaq({
-      name: "Δράπανα",
-      total: 40,
-      facets: {
-        availability: [{ slug: "in-stock", count: 10 }],
-        priceBounds: { min: 10, max: 400 },
-        subcategories: [],
-        brands: [
-          { label: "Milwaukee", count: 30 },
-          { label: "Other", count: 10 },
-        ],
-      },
-    } as unknown as Parameters<typeof categoryFaq>[0]);
-    for (const pair of [...brand, ...category]) {
+    for (const pair of brand) {
       expect(pair.q).not.toMatch(DEALER_WORDING);
       expect(pair.a).not.toMatch(DEALER_WORDING);
     }

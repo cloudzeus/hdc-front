@@ -921,7 +921,7 @@
       "katharismos_filtron": "Καθαρισμός φίλτρων",
       "brands_me_kodikoys_se_apothema": "{brandCount} brands με {n} κωδικούς σε απόθεμα. Γνήσια προϊόντα, γνήσια ανταλλακτικά, τεχνική υποστήριξη.",
       "ta_brands_poy_mas_zitate": "Τα {length} brands που μας ζητάτε περισσότερο",
-      "kodikoi_se_apothema_episimi_antiprosopeysi": "{n} κωδικοί {name} σε απόθεμα. Γνήσια προϊόντα με εγγύηση κατασκευαστή, παράδοση 24-48 ώρες."
+      "kodikoi_se_apothema_episimi_antiprosopeysi": "Εργαλεία {name}: γνήσια προϊόντα με εγγύηση κατασκευαστή, παραλαβή στον Πειραιά ή αποστολή σε όλη την Ελλάδα."
     }
   },
   "blog": {
@@ -1337,7 +1337,7 @@
       "ta_toy_katalogoy": "Τα {topShare}% του καταλόγου",
       "kai_oi_ypoloipes": "Και οι υπόλοιπες {n}",
       "akomi": "+ {remaining} ακόμη",
-      "kodikoi_se_ypokatigories_amesi_diathesimotita": "{productCount} κωδικοί σε {childCount} υποκατηγορίες. Άμεση διαθεσιμότητα, παράδοση 24-48 ώρες.",
+      "kodikoi_se_ypokatigories_amesi_diathesimotita": "Γνήσια εργαλεία Milwaukee με εγγύηση, παραλαβή στον Πειραιά ή αποστολή σε όλη την Ελλάδα.",
       "titlos_katalogos": "Κατάλογος",
       "perigrafi_oles_oi_katigories_ergaleion": "Όλες οι κατηγορίες εργαλείων — 23 κατηγορίες, 467 υποκατηγορίες, με πλήθος κωδικών σε κάθε επίπεδο.",
       "ola_ta_proionta": "Όλα τα προϊόντα",

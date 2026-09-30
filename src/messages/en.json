@@ -921,7 +921,7 @@
       "katharismos_filtron": "Clear filters",
       "brands_me_kodikoys_se_apothema": "{brandCount} brands with {n} codes in stock. Genuine products, genuine spare parts, technical support.",
       "ta_brands_poy_mas_zitate": "The {length} brands you request the most",
-      "kodikoi_se_apothema_episimi_antiprosopeysi": "{n} {name} codes in stock. Genuine products with the manufacturer's warranty, delivery in 24-48 hours."
+      "kodikoi_se_apothema_episimi_antiprosopeysi": "{name} tools: genuine products with the manufacturer's warranty, pickup in Piraeus or delivery across Greece."
     }
   },
   "blog": {
@@ -1337,7 +1337,7 @@
       "ta_toy_katalogoy": "Top {topShare}% of the catalog",
       "kai_oi_ypoloipes": "And the remaining {n}",
       "akomi": "+ {remaining} more",
-      "kodikoi_se_ypokatigories_amesi_diathesimotita": "{productCount} codes in {childCount} subcategories. Immediate availability, delivery in 24-48 hours.",
+      "kodikoi_se_ypokatigories_amesi_diathesimotita": "Genuine Milwaukee tools with warranty, pickup in Piraeus or delivery across Greece.",
       "titlos_katalogos": "Catalog",
       "perigrafi_oles_oi_katigories_ergaleion": "All tool categories — 23 categories, 467 subcategories, with a wealth of codes at every level.",
       "ola_ta_proionta": "All products",

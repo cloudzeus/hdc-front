@@ -48,8 +48,8 @@ export function categoryTitle(input: Pick<CategorySeoInput, "name" | "platforms"
 export function categoryDescription(input: CategorySeoInput): string {
   const lower = /\p{Ll}/u.test(input.name) ? input.name : `«${input.name}»`;
   const platforms = input.platforms.length ? ` για ${joinPlatforms(input.platforms)}` : "";
-  const head = `${lower} Milwaukee${platforms}: ${input.total.toLocaleString("el-GR")} κωδικοί`;
-  const end = "Τιμές με ΦΠΑ, διαθεσιμότητα, παραλαβή στον Πειραιά ή αποστολή.";
+  const head = `${lower} Milwaukee${platforms}`;
+  const end = "Γνήσια εργαλεία Milwaukee με εγγύηση, παραλαβή στον Πειραιά ή αποστολή σε όλη την Ελλάδα.";
   for (let k = Math.min(3, input.children.length); k >= 0; k--) {
     const kids = k ? `, ανάμεσά τους ${input.children.slice(0, k).join(", ")}` : "";
     const text = `${head}${kids}. ${end}`;

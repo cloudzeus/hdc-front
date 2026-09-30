@@ -10,7 +10,6 @@ import { getProductBySlug } from "@/lib/catalog/pdp";
 import { parseModel } from "@/lib/milwaukee/model";
 import { ahLabel, boxFacts, keyNumbers } from "@/lib/milwaukee/pdp";
 import { parseTechBlock } from "@/lib/milwaukee/tech-block";
-import { categoryFaq, categoryIntro } from "@/lib/seo/category-copy";
 import { accentedName, categoryDescription, categoryTitle } from "@/lib/seo/category-seo";
 import { HUBS, type HubKey } from "@/lib/seo/hubs";
 import { modelAnswer, modelDescription, modelFaq, modelH1, modelTitle, type ModelCopyInput } from "@/lib/seo/model-copy";
@@ -45,7 +44,6 @@ export async function autoCategorySeo(slug: string): Promise<(AutoSeo & { name: 
     .map((c) => accentedName(c.label, texts, lexicon))
     .filter((c) => /\p{Ll}/u.test(c));
   const total = summary.platforms.all;
-  const copy = { name, total, facets: summary };
   return {
     name,
     h1: name,
@@ -57,8 +55,10 @@ export async function autoCategorySeo(slug: string): Promise<(AutoSeo & { name: 
             productCount: category.productCount,
             childCount: category.childCount,
           }),
-    intro: categoryIntro(copy),
-    faq: categoryFaq(copy),
+    /*
+     * No automatic intro or FAQ: HDC copy carries no quantities, stock counts
+     * or price ranges. A category gets them only when written in /admin/seo.
+     */
   };
 }
 
