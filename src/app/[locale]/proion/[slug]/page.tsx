@@ -63,6 +63,7 @@ import {
   shippingDetails,
 } from "@/lib/seo/product-schema";
 import { absoluteUrl, pageMeta } from "@/lib/seo/urls";
+import { sizeFamilyLd, sizedText } from "@/lib/seo/size-variant";
 import { jsonLdHtml } from "@/lib/seo/json-ld";
 
 type PageProps = {
@@ -77,10 +78,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const product = await getProductBySlug(slug, locale);
   if (!product) return {};
 
-  const title = displayName(product.name, product.code2);
-  const description =
-    product.shortDescription ??
-    t("meta_description", { name: title, code: product.code2 || product.sku });
+  const baseTitle = displayName(product.name, product.code2);
+  /* A size of a family (boots, gloves, clothing) names its size and code in the
+     title and the description — see src/lib/seo/size-variant.ts. */
+  const sizes = await variantsOf(product);
+  const sizeCode = (size: string, code: string) => t("megethos_kodikos", { size, code });
+  const title = sizedText(baseTitle, sizes, sizeCode);
+  const currentSize = sizedText(null, sizes, sizeCode) ? sizes.find((s) => s.current) : undefined;
+  const code = product.code2 || product.sku;
+  const description = currentSize
+    ? product.shortDescription
+      ? `${title}. ${product.shortDescription}`
+      : t("meta_description_megethos", { name: baseTitle, size: currentSize.label, code: currentSize.code || code })
+    : (product.shortDescription ?? t("meta_description", { name: baseTitle, code }));
   return {
     ...pageMeta({
       path: `/proion/${slug}`,
@@ -197,6 +207,17 @@ export default async function ProductPage({ params }: PageProps) {
 
   // ── Title, tags, codes ───────────────────────────────────────────────────
   const title = upGreek(pdpTitle(product.name, product.code2));
+  /* «Μέγεθος 43 · κωδικός …» for one size of a family — in the H1 and the
+     JSON-LD as in the <title>. */
+  const sizeCode = (size: string, code: string) => t("megethos_kodikos", { size, code });
+  const sizePart = sizedText(null, sizes, sizeCode);
+  const familyLd = sizeFamilyLd({
+    groupId: product.variantGroup,
+    name: displayName(product.name, product.code2),
+    sizes,
+    url: (s) => absoluteUrl(`/proion/${s}`, locale),
+    sizeCode,
+  });
   const tag = platformTag(product.erpName);
   const platformText = tag ? withTrademark(tag) : null;
   const galleryTags: GalleryTag[] = [
@@ -352,7 +373,8 @@ export default async function ProductPage({ params }: PageProps) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
-    name: displayName(product.name, product.code2),
+    ...(familyLd?.product ?? {}),
+    name: sizedText(displayName(product.name, product.code2), sizes, sizeCode),
     sku: code,
     mpn: product.code2 || undefined,
     ...(ean ? (ean.length === 13 ? { gtin13: ean } : { gtin: ean }) : {}),
@@ -415,6 +437,9 @@ export default async function ProductPage({ params }: PageProps) {
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(breadcrumbLd) }} />
+      {familyLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(familyLd.group) }} />
+      )}
 
       <main id="main" className="hdc-pdp-page">
         <nav aria-label="Breadcrumb" className="hdc-wrap hdc-pdp-crumb">
@@ -435,7 +460,10 @@ export default async function ProductPage({ params }: PageProps) {
 
           <div className="hdc-pdp-buy">
             {platformText && <span className="hdc-slant hdc-pdp-tag hdc-pdp-tag--ink hdc-pdp-buytag">{platformText}</span>}
-            <h1 className="hdc-disp hdc-pdp-h1">{title}</h1>
+            <h1 className="hdc-disp hdc-pdp-h1">
+              {title}
+              {sizePart && <span className="hdc-pdp-h1-size">{sizePart}</span>}
+            </h1>
 
             <div className="hdc-pdp-codes">
               <span>

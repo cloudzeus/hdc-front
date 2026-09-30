@@ -307,6 +307,14 @@
     font-stretch: 140%;
     overflow-wrap: anywhere;
   }
+  /* One size of a family: «Μέγεθος 43 · κωδικός …», under the name. */
+  .hdc-pdp-h1-size {
+    display: block;
+    margin-top: 8px;
+    font-size: var(--fs-17);
+    font-stretch: 100%;
+    color: var(--hdc-g5);
+  }
   .hdc-pdp-codes {
     display: flex;
     flex-wrap: wrap;
