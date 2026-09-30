@@ -1882,9 +1882,111 @@ model ContentArticle {
   /// Who last wrote the row: an admin's email, or `import:docs/content` for
   /// the importer — which never overwrites a row somebody else has edited.
   updatedBy   String    @db.VarChar(120)
+  /// Written by a person (MANUAL) or by the automatic writer (AUTO,
+  /// src/lib/content-auto) — the admin shows «Αυτόματο» on the latter.
+  source      ContentSource @default(MANUAL)
+
+  topics ContentTopic[]
+  runs   ContentJobRun[]
 
   @@index([kind, status, publishedAt])
   @@map("content_articles")
+}
+
+enum ContentSource {
+  MANUAL
+  AUTO
+}
+
+enum ContentTopicKind {
+  /// A model family with ≥ 2 versions and no article about it.
+  MODEL
+  /// A catalogue category with products and no guide or written intro.
+  CATEGORY
+  /// A model family with products new in the ERP (last 30 days).
+  NEW_PRODUCT
+  /// A cluster of docs/content/guides/keyword-map.md left for later.
+  KEYWORD
+  /// (later) A Search Console query with impressions and position > 10.
+  QUERY
+}
+
+enum ContentTopicStatus {
+  PENDING
+  DONE
+  SKIPPED
+  FAILED
+}
+
+enum ContentRunOutcome {
+  PUBLISHED
+  DRAFT
+  FAILED
+  SKIPPED
+}
+
+/// One subject the automatic writer may write about (spec
+/// docs/superpowers/specs/2026-09-30-auto-content-design.md §3). The planner
+/// refreshes PENDING rows once a day and never resets DONE, SKIPPED or pinned
+/// ones; the admin can skip a topic or pin it to the top.
+model ContentTopic {
+  id       String             @id @default(cuid())
+  kind     ContentTopicKind
+  /// "model:M18 FPD3", "category:gantia", "keyword:thermou-aera" …
+  key      String             @unique @db.VarChar(200)
+  title    String             @db.VarChar(300)
+  /// Why it is in the queue, in Greek, for the admin.
+  reason   String             @db.VarChar(500)
+  /// Demand × gap; higher first.
+  score    Float              @default(0)
+  status   ContentTopicStatus @default(PENDING)
+  pinned   Boolean            @default(false)
+  /// Runs that did not publish; three make it SKIPPED.
+  attempts Int                @default(0)
+  /// What the fact pack needs: model root, category slug, search hints.
+  payload  Json               @default("{}")
+
+  articleId String?
+  article   ContentArticle? @relation(fields: [articleId], references: [id], onDelete: SetNull)
+
+  runs ContentJobRun[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, pinned, score])
+  @@map("content_topics")
+}
+
+/// One run of the automatic writer, from the cron or from «Γράψε ένα τώρα».
+/// `finishedAt` null = still running (the admin polls this row).
+model ContentJobRun {
+  id      String        @id @default(cuid())
+  topicId String?
+  topic   ContentTopic? @relation(fields: [topicId], references: [id], onDelete: SetNull)
+
+  /// "cron" | "manual-draft" | "manual-publish"
+  trigger String  @db.VarChar(32)
+  /// The admin's email for a manual run; null for the cron.
+  actor   String? @db.VarChar(120)
+
+  startedAt   DateTime           @default(now())
+  finishedAt  DateTime?
+  outcome     ContentRunOutcome?
+  /// string[] — the ids of the gates that failed.
+  failedGates Json               @default("[]")
+  /// Every gate with its details, the image, the verifier's findings.
+  detail      Json?
+  /// DeepSeek tokens, prompt + completion, writer + verifier.
+  tokens      Int                @default(0)
+
+  articleId String?
+  article   ContentArticle? @relation(fields: [articleId], references: [id], onDelete: SetNull)
+  error     String?         @db.Text
+
+  @@index([startedAt])
+  @@index([outcome, startedAt])
+  @@map("content_job_runs")
 }
 
 enum SeoTargetType {

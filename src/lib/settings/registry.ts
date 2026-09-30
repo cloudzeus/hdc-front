@@ -197,6 +197,38 @@ export const SETTINGS: ReadonlyArray<SettingDef> = [
     kind: "textarea",
     envVar: "LLMS_SUMMARY_EL",
   },
+  {
+    key: "content.auto.enabled",
+    group: "seo",
+    label: "Αυτόματα άρθρα",
+    help:
+      "Όταν είναι ενεργό, το κατάστημα γράφει μόνο του άρθρα και οδηγούς (εργάσιμες 09:00–19:00) " +
+      "και δημοσιεύει όσα περνούν όλους τους ελέγχους. Προεπιλογή: ανενεργό.",
+    kind: "select",
+    options: [
+      { value: "off", label: "Ανενεργό" },
+      { value: "on", label: "Ενεργό" },
+    ],
+    envVar: "CONTENT_AUTO_ENABLED",
+  },
+  {
+    key: "content.auto.notifyEmail",
+    group: "seo",
+    label: "Email ειδοποίησης αυτόματων άρθρων",
+    help: "Εδώ έρχεται το link κάθε νέου άρθρου, ή οι έλεγχοι που απέτυχαν. Κενό = καμία ειδοποίηση.",
+    kind: "text",
+    envVar: "CONTENT_AUTO_NOTIFY_EMAIL",
+    placeholder: "info@kolleris.com",
+  },
+  {
+    key: "content.auto.maxPerWeek",
+    group: "seo",
+    label: "Αυτόματα άρθρα: ανώτατο την εβδομάδα",
+    help: "1 έως 3. Η συχνότητα προσαρμόζεται στα θέματα που περιμένουν, ποτέ πάνω από αυτό.",
+    kind: "number",
+    envVar: "CONTENT_AUTO_MAX_PER_WEEK",
+    placeholder: "3",
+  },
 ] as const;
 
 export const SETTINGS_BY_KEY = new Map(SETTINGS.map((s) => [s.key, s]));
