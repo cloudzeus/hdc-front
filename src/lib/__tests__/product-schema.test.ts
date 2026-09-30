@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { SUPPLIER_HANDLING_DAYS } from "@/lib/catalog/availability";
 import { FREE_SHIPPING_THRESHOLD_NET } from "@/lib/cart/options";
-import { modelGroupJsonLd, productJsonLd, shippingDetails } from "@/lib/seo/product-schema";
+import { categoryBreadcrumb, modelGroupJsonLd, productBreadcrumb, productJsonLd, shippingDetails } from "@/lib/seo/product-schema";
 
 /**
  * The offer's delivery promise has to match its availability: the supplier's
@@ -119,5 +119,19 @@ describe("modelGroupJsonLd", () => {
     expect(ld.hasVariant[0].offers).toMatchObject({ price: "219.00", seller: { "@id": "https://milwaukeetoolshdc.gr/#shop" } });
     expect(ld.hasVariant[1]).not.toHaveProperty("gtin13");
     expect(ld.hasVariant[1]).not.toHaveProperty("offers");
+  });
+});
+
+describe("breadcrumbs", () => {
+  it("a category's trail goes through its parent, labelled in the page's language", () => {
+    const el = categoryBreadcrumb("el", { name: "Κρουστικά δράπανα", slug: "kroustika", parent: { name: "Δράπανα", slug: "drapana" } });
+    expect(el.itemListElement.map((i) => i.name)).toEqual(["Αρχική", "Κατάλογος", "Δράπανα", "Κρουστικά δράπανα"]);
+    const en = categoryBreadcrumb("en", { name: "Hammer drills", slug: "kroustika" });
+    expect(en.itemListElement.map((i) => i.name)).toEqual(["Home", "Catalogue", "Hammer drills"]);
+  });
+
+  it("a product's trail is labelled in the page's language", () => {
+    const it_ = productBreadcrumb("it", { name: "M18 FPD3", slug: "x", categories: [{ name: "Trapani", slug: "t" }] });
+    expect(it_.itemListElement.map((i) => i.name)).toEqual(["Home", "Catalogo", "Trapani", "M18 FPD3"]);
   });
 });

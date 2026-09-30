@@ -357,3 +357,21 @@
     outline-offset: 2px;
   }
 }
+
+/* ── Category: the intro under the band and the FAQ under the listing ── */
+@layer components {
+  .hdc-cat-intro {
+    padding-top: 22px;
+    padding-bottom: 4px;
+  }
+  .hdc-cat-intro p {
+    max-width: 90ch;
+    margin: 0;
+    font-size: var(--fs-16);
+    line-height: 1.6;
+    color: var(--hdc-g7);
+  }
+  .hdc-cat-faq {
+    padding-bottom: 48px;
+  }
+}

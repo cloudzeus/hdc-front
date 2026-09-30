@@ -329,7 +329,8 @@
       "paradosi_1_3": "Παράδοση 1–3 εργάσιμες",
       "megethi_3_5": "ΔΙΑΘΕΣΙΜΟ · 3–5 ΕΡΓΑΣΙΜΕΣ",
       "kodikoi": "Κωδικοί",
-      "oles_oi_ekdoseis": "Όλες οι εκδόσεις του {model}"
+      "oles_oi_ekdoseis": "Όλες οι εκδόσεις του {model}",
+      "nav_erotiseis": "Ερωτήσεις"
     }
   },
   "orders": {
@@ -1338,7 +1339,8 @@
       "ola_ta_proionta": "Όλα τα προϊόντα",
       "olos_o_katalogos_se_mia_lista": "Ολόκληρος ο κατάλογος σε μία λίστα, με φίλτρα για μάρκα, κατηγορία, τιμή και διαθεσιμότητα.",
       "kodikoi_filtrarete_aristera": "κωδικοί. Φιλτράρετε αριστερά ή περιορίστε με κατηγορία.",
-      "prosfores": "Προσφορές"
+      "prosfores": "Προσφορές",
+      "syxnes_erotiseis": "Συχνές ερωτήσεις"
     }
   },
   "epibebaiosi": {

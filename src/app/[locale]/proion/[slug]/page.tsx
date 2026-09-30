@@ -59,12 +59,14 @@ import {
 import { kitFromTechBlock, parseTechBlock } from "@/lib/milwaukee/tech-block";
 import { discountedNet, offerBadgeFor } from "@/lib/offers/badges";
 import { productBreadcrumb, productJsonLd } from "@/lib/seo/product-schema";
+import { faqJsonLd, productFaq } from "@/lib/seo/product-faq";
 import { quotePostage } from "@/lib/shipping/acs-tariff";
 import { absoluteUrl, pageMeta, siteOrigin } from "@/lib/seo/urls";
 import { clampDescription, sizeFamilyLd, sizedText, sizeTitleEl } from "@/lib/seo/size-variant";
 import { SHOP } from "@/config/shop";
 import { jsonLdHtml } from "@/lib/seo/json-ld";
-import { productDescription, productH1, productTitle, type ProductSeoInput } from "@/lib/seo/product-seo";
+import { productDescription, productH1, productTitle, type Lexicon, type ProductSeoInput } from "@/lib/seo/product-seo";
+import { getGreekLexicon } from "@/lib/catalog/greek-lexicon";
 import { seoFor } from "@/lib/seo/seo-for";
 
 type PageProps = {
@@ -111,7 +113,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     /* «Milwaukee M18 FPD3-502X Κρουστικό δραπανοκατσάβιδο | 4933479860» and a
        description with code, model, key figure, availability and Piraeus
        (src/lib/seo/product-seo.ts) — under the admin's override, if any. */
-    const input = productSeoInput(product, locale);
+    const input = productSeoInput(product, locale, await getGreekLexicon());
     const seo = await seoFor("PRODUCT", product.slug, locale, {
       h1: productH1(input),
       title: productTitle(input),
@@ -143,8 +145,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 function productSeoInput(
   product: NonNullable<Awaited<ReturnType<typeof getProductBySlug>>>,
   locale: Locale,
+  lexicon?: Lexicon,
 ): ProductSeoInput {
   return {
+    lexicon,
     locale,
     name: product.name,
     erpName: product.erpName,
@@ -281,7 +285,13 @@ async function ProductBody({ params }: PageProps) {
   const h1 =
     sizes.length > 1
       ? `Milwaukee ${pdpTitle(product.name, product.code2)}`
-      : (await seoFor("PRODUCT", product.slug, locale, { h1: productH1(productSeoInput(product, locale)), title: "", description: "" })).h1;
+      : (
+          await seoFor("PRODUCT", product.slug, locale, {
+            h1: productH1(productSeoInput(product, locale, await getGreekLexicon())),
+            title: "",
+            description: "",
+          })
+        ).h1;
   const title = upGreek(h1);
   /* «Μέγεθος 43 · κωδικός …» for one size of a family — in the H1 and the
      JSON-LD as in the <title>. */
@@ -415,12 +425,38 @@ async function ProductBody({ params }: PageProps) {
   const toolImage =
     variants.find((v) => v.content === "bare")?.image ?? product.images[0]?.url ?? null;
 
+  /*
+   * The questions a buyer asks, answered from this product's own data
+   * (src/lib/seo/product-faq.ts) — Greek only, like all SEO copy — and the
+   * same pairs as FAQPage JSON-LD. The figures are the manufacturer's block,
+   * not the AI-filled spec table.
+   */
+  const faq =
+    locale === "el"
+      ? productFaq({
+          name: displayName(product.name, product.code2),
+          sku: code,
+          brandName: "Milwaukee",
+          inStock: product.inStock,
+          supplierAvailable: product.supplierAvailable,
+          qty: product.qty,
+          guaranteeMonths: product.guaranteeMonths,
+          priceGross: gross,
+          specs: [
+            ...(model ? [{ label: "Μοντέλο", value: model.code, unit: null }] : []),
+            ...specs.map((r) => ({ label: r.label, value: r.value, unit: null })),
+          ],
+        })
+      : [];
+  const faqLd = faqJsonLd(faq);
+
   const sections = [
     paragraphs.length > 0 && { id: "perigrafi", label: t("nav_perigrafi") },
     specs.length > 0 && { id: "prodiagrafes", label: t("nav_prodiagrafes") },
     box.length > 0 && { id: "syskevasia", label: t("nav_syskevasia") },
     product.documents.length > 0 && { id: "eggrafa", label: t("nav_eggrafa") },
     { id: "kritikes", label: t("nav_kritikes") },
+    faq.length > 0 && { id: "erotiseis", label: t("nav_erotiseis") },
   ].filter((s): s is { id: string; label: string } => Boolean(s));
 
   // ── Compare, band link ───────────────────────────────────────────────────
@@ -509,6 +545,12 @@ async function ProductBody({ params }: PageProps) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(breadcrumbLd) }} />
       {familyLd && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(familyLd.group) }} />
+      )}
+      {faqLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdHtml({ ...faqLd, inLanguage: "el-GR" }) }}
+        />
       )}
 
       <main id="main" className="hdc-pdp-page">
@@ -944,6 +986,21 @@ async function ProductBody({ params }: PageProps) {
               </>
             )}
           </HdcSection>
+
+          {faq.length > 0 && (
+            <HdcSection id="erotiseis" title={t("nav_erotiseis")}>
+              <div className="hdc-faq" lang="el">
+                {faq.map((pair) => (
+                  <details key={pair.q}>
+                    <summary>{pair.q}</summary>
+                    <div className="hdc-prose">
+                      <p>{pair.a}</p>
+                    </div>
+                  </details>
+                ))}
+              </div>
+            </HdcSection>
+          )}
         </div>
 
         <Zone id="product.aboveRelated" locale={locale} />

@@ -7,6 +7,7 @@ import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { publishedAmong } from "@/lib/blog/articles";
 import { articlePath } from "@/lib/blog/post-page";
+import { getGreekLexicon } from "@/lib/catalog/greek-lexicon";
 import { getAllModels, getHubGroups, getPackoutCodes, getPlatformPower } from "@/lib/catalog/models";
 import { getProductsByCode2, getRootCategories } from "@/lib/catalog/queries";
 import { modelPath } from "@/lib/milwaukee/model-slug";
@@ -65,7 +66,7 @@ async function HubPage({ hub, locale }: { hub: Hub; locale: Locale }) {
   const localName = (row: { nameEl: string; nameEn: string; nameIt: string }) =>
     (locale === "en" ? row.nameEn : locale === "it" ? row.nameIt : row.nameEl) || row.nameEl;
 
-  const [groups, roots, models, power, packout, related] = await Promise.all([
+  const [groups, roots, models, power, packout, related, lexicon] = await Promise.all([
     hub.platform
       ? getHubGroups({ platform: hub.platform })
       : hub.nameFilter
@@ -76,6 +77,7 @@ async function HubPage({ hub, locale }: { hub: Hub; locale: Locale }) {
     hub.platform && hub.platform !== "MX" ? getPlatformPower(hub.platform) : Promise.resolve(null),
     hub.nameFilter ? getPackoutCodes() : Promise.resolve([]),
     publishedAmong(seo.relatedArticles),
+    getGreekLexicon(),
   ]);
 
   const categories =
@@ -182,7 +184,7 @@ async function HubPage({ hub, locale }: { hub: Hub; locale: Locale }) {
               <Link key={m.root} href={modelPath(m.root)} className="hdc-hub-tile" prefetch={false}>
                 Milwaukee {m.root}
                 <small>
-                  {greekKind({ erpName: m.leadName, code2: m.leadCode2, greekTexts: [] })} ·{" "}
+                  {greekKind({ erpName: m.leadName, code2: m.leadCode2, greekTexts: [], lexicon })} ·{" "}
                   {t("ekdoseis_count", { count: m.versions })}
                 </small>
               </Link>

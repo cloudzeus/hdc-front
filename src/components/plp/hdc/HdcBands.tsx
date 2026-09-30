@@ -20,11 +20,14 @@ import { upGreek } from "@/lib/greek";
 export function HdcCategoryBand({
   locale,
   name,
+  h1,
   stats,
   image,
 }: {
   locale: Locale;
   name: string;
+  /** The heading when it says more than the name («Γάντια εργασίας Milwaukee»). */
+  h1?: string;
   stats: { groups: number; products: number; platforms: number };
   image: string | null;
 }) {
@@ -45,7 +48,7 @@ export function HdcCategoryBand({
       <section className="hdc-band">
         <div className="hdc-wrap">
           <div>
-            <h1 className="hdc-disp">{upGreek(name)}</h1>
+            <h1 className="hdc-disp">{upGreek(h1 || name)}</h1>
             {/* The synced taxonomy carries no description, so a short line of
                 our own; the platform sentence only where platforms exist. */}
             <p>

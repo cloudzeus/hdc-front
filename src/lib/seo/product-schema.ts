@@ -199,6 +199,13 @@ export function priceValidUntil(from: Date = new Date()): string {
   return until.toISOString().slice(0, 10);
 }
 
+/** The first two steps of every trail, in the page's language. */
+const CRUMB: Record<Locale, { home: string; catalogue: string }> = {
+  el: { home: "Αρχική", catalogue: "Κατάλογος" },
+  en: { home: "Home", catalogue: "Catalogue" },
+  it: { home: "Home", catalogue: "Catalogo" },
+};
+
 /**
  * Η θέση του προϊόντος στον κατάλογο, ως διαδρομή.
  *
@@ -218,8 +225,8 @@ export function productBreadcrumb(
   },
 ) {
   const items: Array<{ name: string; path: string }> = [
-    { name: "Αρχική", path: "/" },
-    { name: "Κατάλογος", path: "/katalogos" },
+    { name: CRUMB[locale].home, path: "/" },
+    { name: CRUMB[locale].catalogue, path: "/katalogos" },
   ];
   const chain = product.categories?.length
     ? product.categories
@@ -285,11 +292,12 @@ export function categoryItemList(
  */
 export function categoryBreadcrumb(
   locale: Locale,
-  category: { name: string; slug: string },
+  category: { name: string; slug: string; parent?: { name: string; slug: string } | null },
 ) {
   const items = [
-    { name: "Αρχική", path: "/" },
-    { name: "Κατάλογος", path: "/katalogos" },
+    { name: CRUMB[locale].home, path: "/" },
+    { name: CRUMB[locale].catalogue, path: "/katalogos" },
+    ...(category.parent ? [{ name: category.parent.name, path: `/katalogos/${category.parent.slug}` }] : []),
     { name: category.name, path: `/katalogos/${category.slug}` },
   ];
   return {

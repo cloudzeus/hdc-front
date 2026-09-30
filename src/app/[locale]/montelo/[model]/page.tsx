@@ -6,6 +6,7 @@ import { HdcContentPage } from "@/components/content/HdcContentPage";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { availabilityLabelKey, availabilityOf } from "@/lib/catalog/availability";
+import { getGreekLexicon } from "@/lib/catalog/greek-lexicon";
 import { getModelProducts, type ModelProduct } from "@/lib/catalog/models";
 import { formatMoney, grossAmount } from "@/lib/format";
 import { parseModel } from "@/lib/milwaukee/model";
@@ -70,7 +71,12 @@ async function loadModel(slug: string, locale: Locale) {
   const techRows = parseTechBlock(lead.longDescriptionEl);
   const input: ModelCopyInput = {
     root,
-    kind: greekKind({ erpName: lead.name, code2: lead.code2, greekTexts: [lead.shortDescriptionEl, lead.longDescriptionEl] }),
+    kind: greekKind({
+      erpName: lead.name,
+      code2: lead.code2,
+      greekTexts: [lead.shortDescriptionEl, lead.longDescriptionEl],
+      lexicon: await getGreekLexicon(),
+    }),
     platform,
     fuel: parsed?.fuel ?? false,
     keySpec: keyNumbers(techRows, "el")[0] ?? null,

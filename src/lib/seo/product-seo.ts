@@ -32,6 +32,8 @@ export type ProductSeoInput = {
   code2: string;
   /** Greek text about the product (short and long description), for accents. */
   greekTexts: Array<string | null | undefined>;
+  /** Every Greek word we hold, for the accents the product's own text lacks. */
+  lexicon?: Lexicon;
 };
 
 export type KeySpec = { key: "torque" | "speed" | "impact" | "energy" | "chuck" | "drive"; value: string; unit: string };
@@ -61,8 +63,16 @@ function accentIndex(texts: Array<string | null | undefined>): Map<string, strin
   return index;
 }
 
+/**
+ * Greek words by their accent-free key (`searchKey`), spelt as written:
+ * «κρουστικα» → «κρουστικά». Built from any Greek text we hold
+ * (src/lib/catalog/greek-lexicon.ts); a fallback when the product's own
+ * descriptions do not use a word.
+ */
+export type Lexicon = Record<string, string>;
+
 /** «ΚΡΟΥΣΤΙΚΟ ΔΡΑΠΑΝΟΚΑΤΣΑΒΙΔΟ» → «Κρουστικό δραπανοκατσάβιδο», or as is. */
-function withAccents(kind: string, texts: Array<string | null | undefined>): string {
+export function withAccents(kind: string, texts: Array<string | null | undefined>, lexicon: Lexicon = {}): string {
   const words = kind.split(" ");
   if (!words.some((w) => /\p{Script=Greek}/u.test(w))) return kind;
   const index = accentIndex(texts);
@@ -72,7 +82,8 @@ function withAccents(kind: string, texts: Array<string | null | undefined>): str
       out.push(word);
       continue;
     }
-    const found = GREEK_WORD.test(word) ? index.get(searchKey(word)) : undefined;
+    const key = searchKey(word);
+    const found = GREEK_WORD.test(word) ? (index.get(key) ?? lexicon[key]) : undefined;
     if (!found) return kind; // one word we cannot spell: keep the capitals
     out.push(found);
   }
@@ -81,7 +92,7 @@ function withAccents(kind: string, texts: Array<string | null | undefined>): str
 }
 
 /** What the product is, in Greek, from the ERP name. */
-export function greekKind(input: Pick<ProductSeoInput, "erpName" | "code2" | "greekTexts">): string {
+export function greekKind(input: Pick<ProductSeoInput, "erpName" | "code2" | "greekTexts" | "lexicon">): string {
   const clean = normalizeModelText(displayName(input.erpName, input.code2));
   const code = modelCode(clean);
   let kind = clean;
@@ -97,7 +108,7 @@ export function greekKind(input: Pick<ProductSeoInput, "erpName" | "code2" | "gr
       .filter((w) => !NOISE.test(w))
       .join(" "),
   );
-  return kind ? withAccents(kind, input.greekTexts) : "";
+  return kind ? withAccents(kind, input.greekTexts, input.lexicon) : "";
 }
 
 /** What the product is, in the page's language (en/it from the translated name). */

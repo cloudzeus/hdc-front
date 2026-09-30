@@ -33,6 +33,14 @@ import {
 import { prisma } from "@/lib/prisma";
 import { Zone } from "@/components/zones/Zone";
 import { jsonLdHtml } from "@/lib/seo/json-ld";
+import { FaqSection } from "@/components/blog/ArticleView";
+import { categoryGreekTexts } from "@/lib/catalog/category-names";
+import { getGreekLexicon } from "@/lib/catalog/greek-lexicon";
+import { categoryFaq, categoryIntro } from "@/lib/seo/category-copy";
+import { accentedName, categoryDescription, categoryTitle } from "@/lib/seo/category-seo";
+import { faqJsonLd } from "@/lib/seo/product-faq";
+import { seoFor } from "@/lib/seo/seo-for";
+import { titleWithSite } from "@/lib/seo/title";
 
 type PageProps = {
   params: Promise<{ locale: Locale; kathgoria: string }>;
@@ -59,26 +67,57 @@ const getCategory = cache(async (slug: string) =>
   }),
 );
 
+/**
+ * The category's words: the CATEGORY SeoOverride (Greek, admin or
+ * docs/content/seo/categories) over the automatic ones — a title in lower case
+ * with accents, «Milwaukee» and the platforms; a description of its own; the
+ * intro and FAQ from the category's live facets (src/lib/seo/category-copy.ts).
+ * en/it keep their generic text: SEO copy is Greek only.
+ */
+const categorySeo = cache(async (slug: string, locale: Locale) => {
+  const category = await getCategory(slug);
+  if (!category) return null;
+  const t = await getTranslations({ locale, namespace: "katalogos.page" });
+  const localName =
+    locale === "en" ? category.nameEn : locale === "it" ? category.nameIt : category.nameEl;
+  const genericDescription = t("kodikoi_se_ypokatigories_amesi_diathesimotita", {
+    productCount: category.productCount,
+    childCount: category.childCount,
+  });
+  if (locale !== "el") {
+    return { h1: localName, title: localName, description: genericDescription, intro: null, faq: [] };
+  }
+
+  const [summary, texts, lexicon] = await Promise.all([
+    getPlpSummary({ categorySlug: slug }, locale),
+    categoryGreekTexts(category.erpType, category.erpCode),
+    getGreekLexicon(),
+  ]);
+  const name = accentedName(category.nameEl, texts, lexicon);
+  const platforms = (["M12", "M18", "MX"] as const)
+    .filter((p) => summary.platforms[p] > 0)
+    .map((p) => (p === "MX" ? "MX FUEL" : p));
+  const children = summary.subcategories
+    .filter((c) => c.count > 0)
+    .map((c) => accentedName(c.label, texts, lexicon))
+    .filter((c) => /\p{Ll}/u.test(c));
+  const total = summary.platforms.all;
+  const copy = { name, total, facets: summary };
+  return seoFor("CATEGORY", slug, locale, {
+    h1: name,
+    title: categoryTitle({ name, platforms }),
+    description: total > 0 ? categoryDescription({ name, total, platforms, children }) : genericDescription,
+    intro: categoryIntro(copy),
+    faq: categoryFaq(copy),
+  });
+});
+
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { kathgoria, locale } = await params;
-  // Explicit locale: `setRequestLocale` belongs to the render pass, and metadata
-  // is generated outside it.
-  const t = await getTranslations({ locale, namespace: "katalogos.page" });
-  const category = await getCategory(kathgoria);
-  if (!category) return {};
-  const name =
-    locale === "en"
-      ? category.nameEn
-      : locale === "it"
-        ? category.nameIt
-        : category.nameEl;
-  const title = name;
-  const description = t("kodikoi_se_ypokatigories_amesi_diathesimotita", {
-    productCount: category.productCount,
-    childCount: category.childCount,
-  });
+  const seo = await categorySeo(kathgoria, locale);
+  if (!seo) return {};
   return {
     /* Canonical, γλώσσες και Open Graph μαζί: το `openGraph` κληρονομείται
        ολόκληρο από όποια σελίδα δεν ορίζει δικό της, οπότε 12 από 16 σελίδες
@@ -86,11 +125,11 @@ export async function generateMetadata({
     ...pageMeta({
       path: `/katalogos/${kathgoria}`,
       locale,
-      title,
-      description,
+      title: seo.title,
+      description: seo.description,
     }),
-    title,
-    description,
+    title: titleWithSite(seo.title),
+    description: seo.description,
   };
 }
 
@@ -119,6 +158,7 @@ async function CategoryBody({
 }: PageProps) {
   const { locale, kathgoria } = await params;
   setRequestLocale(locale);
+  const t = await getTranslations("katalogos.page");
 
   const asked = await searchParams;
 
@@ -221,7 +261,9 @@ async function CategoryBody({
    * με το «Περισσότερα προϊόντα» η σελίδα δείχνει τα προϊόντα 1..N μαζί.
    */
   const itemListLd = categoryItemList(locale, data.products, 0);
-  const breadcrumbLd = categoryBreadcrumb(locale, { name, slug: kathgoria });
+  const breadcrumbLd = categoryBreadcrumb(locale, { name, slug: kathgoria, parent });
+  const seo = await categorySeo(kathgoria, locale);
+  const faqLd = faqJsonLd(seo?.faq ?? []);
   const basePath = `/katalogos/${kathgoria}`;
 
   return (
@@ -234,6 +276,12 @@ async function CategoryBody({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLdHtml(itemListLd) }}
+        />
+      )}
+      {faqLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdHtml({ ...faqLd, inLanguage: "el-GR" }) }}
         />
       )}
       <SiteChrome
@@ -250,9 +298,15 @@ async function CategoryBody({
         <HdcCategoryBand
           locale={locale}
           name={name}
+          h1={seo?.h1}
           stats={bandStats}
           image={image}
         />
+        {seo?.intro && (
+          <section className="hdc-wrap hdc-cat-intro" lang="el">
+            <p>{seo.intro}</p>
+          </section>
+        )}
         <Zone id="category.middle" locale={locale} />
         <HdcListing
           variant="category"
@@ -264,6 +318,11 @@ async function CategoryBody({
           rememberedPlatform={remembered != null}
           category={{ name, parent }}
         />
+        {seo && seo.faq.length > 0 && (
+          <div className="hdc-wrap hdc-cat-faq" lang="el">
+            <FaqSection title={t("syxnes_erotiseis")} faq={seo.faq} />
+          </div>
+        )}
         <Zone id="category.bottom" locale={locale} />
       </main>
 
