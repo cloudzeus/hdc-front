@@ -72,8 +72,10 @@ export default auth((request) => {
   if (pathname.startsWith("/admin")) {
     const isLoginPage = pathname === "/admin/login";
     const isAuthed = !!request.auth?.user;
+    // «Ξέχασα τον κωδικό» is for people who cannot sign in, so it is public.
+    const isRecoveryPage = pathname === "/admin/forgot-password" || pathname === "/admin/reset-password";
 
-    if (!isAuthed && !isLoginPage) {
+    if (!isAuthed && !isLoginPage && !isRecoveryPage) {
       const url = new URL("/admin/login", request.nextUrl);
       url.searchParams.set("redirect", pathname);
       return NextResponse.redirect(url);

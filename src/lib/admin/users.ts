@@ -39,11 +39,11 @@ const passwordSchema = z
   .max(PASSWORD_MAX, "Ο κωδικός είναι πολύ μεγάλος.");
 
 // Same parameters the seed script and the verifier in auth.ts expect.
-function hashPassword(password: string) {
+export function hashPassword(password: string) {
   return hash(password, { memoryCost: 19456, timeCost: 2, parallelism: 1, outputLen: 32 });
 }
 
-function lockoutSince() {
+export function lockoutSince() {
   return new Date(Date.now() - LOCKOUT_MINUTES * 60_000);
 }
 
@@ -93,6 +93,7 @@ const ACTION_LABEL: Record<string, string> = {
   "user.activate": "Ενεργοποίηση",
   "user.deactivate": "Απενεργοποίηση",
   "user.password_reset": "Νέος κωδικός",
+  "user.password_forgot_reset": "Νέος κωδικός μέσω email",
   "user.unlock": "Ξεκλείδωμα",
   "role.update": "Δικαιώματα ρόλου",
 };

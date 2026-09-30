@@ -1,4 +1,5 @@
 import { AuthError } from "next-auth";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { signIn } from "@/auth";
 import { upGreek } from "@/lib/greek";
@@ -8,9 +9,9 @@ export const metadata = { title: "Είσοδος διαχείρισης" };
 export default async function AdminLoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ redirect?: string; error?: string }>;
+  searchParams: Promise<{ redirect?: string; error?: string; reset?: string }>;
 }) {
-  const { redirect: redirectTo, error } = await searchParams;
+  const { redirect: redirectTo, error, reset } = await searchParams;
 
   async function login(formData: FormData) {
     "use server";
@@ -38,10 +39,10 @@ export default async function AdminLoginPage({
   return (
     <div className="flex min-h-screen items-center justify-center bg-k-ink-deep px-6">
       <div className="w-full max-w-sm">
-        <p className="text-sm font-bold tracking-widest text-white">
+        <p className="text-[length:var(--fs-14)] font-bold tracking-widest text-white">
           {upGreek("Kolleris")}
         </p>
-        <h1 className="mt-1 text-xs tracking-widest text-k-text-5">
+        <h1 className="mt-1 text-[length:var(--fs-12)] tracking-widest text-k-text-5">
           {upGreek("Διαχείριση E-shop")}
         </h1>
 
@@ -51,7 +52,7 @@ export default async function AdminLoginPage({
           <div>
             <label
               htmlFor="email"
-              className="block text-xs tracking-wider text-k-text-5"
+              className="block text-[length:var(--fs-12)] tracking-wider text-k-text-5"
             >
               EMAIL
             </label>
@@ -68,7 +69,7 @@ export default async function AdminLoginPage({
           <div>
             <label
               htmlFor="password"
-              className="block text-xs tracking-wider text-k-text-5"
+              className="block text-[length:var(--fs-12)] tracking-wider text-k-text-5"
             >
               ΚΩΔΙΚΟΣ
             </label>
@@ -82,13 +83,19 @@ export default async function AdminLoginPage({
             />
           </div>
 
+          {reset && !error ? (
+            <p role="status" className="text-[length:var(--fs-14)] text-white">
+              Ο κωδικός άλλαξε. Συνδεθείτε με τον νέο κωδικό.
+            </p>
+          ) : null}
+
           {error === "revoked" ? (
-            <p role="alert" className="text-sm text-k-red">
+            <p role="alert" className="text-[length:var(--fs-14)] text-k-red">
               Η συνεδρία σας έληξε επειδή άλλαξε ο κωδικός ή η πρόσβαση του
               λογαριασμού. Συνδεθείτε ξανά.
             </p>
           ) : error ? (
-            <p role="alert" className="text-sm text-k-red">
+            <p role="alert" className="text-[length:var(--fs-14)] text-k-red">
               Λάθος στοιχεία ή ο λογαριασμός δεν είναι ενεργός. Μετά από 5
               αποτυχημένες προσπάθειες η πρόσβαση κλειδώνει για 15 λεπτά.
             </p>
@@ -96,11 +103,18 @@ export default async function AdminLoginPage({
 
           <button
             type="submit"
-            className="w-full bg-k-red px-4 py-3 text-sm font-semibold tracking-wider text-white transition-colors hover:bg-k-red-hover"
+            className="w-full bg-k-red px-4 py-3 text-[length:var(--fs-14)] font-semibold tracking-wider text-white transition-colors hover:bg-k-red-hover"
           >
             {upGreek("Είσοδος")}
           </button>
         </form>
+
+        <Link
+          href="/admin/forgot-password"
+          className="mt-6 inline-block text-[length:var(--fs-12)] tracking-wider text-k-text-5 underline-offset-4 hover:text-white hover:underline"
+        >
+          Ξέχασα τον κωδικό
+        </Link>
       </div>
     </div>
   );

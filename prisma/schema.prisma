@@ -63,10 +63,42 @@ model AdminUser {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  auditEntries AdminAuditLog[]
+  auditEntries   AdminAuditLog[]
+  passwordResets AdminPasswordReset[]
 
   @@index([isActive])
   @@map("admin_users")
+}
+
+/// A «Ξέχασα τον κωδικό» link for an operator. Only the SHA-256 of the token is
+/// kept; the token itself exists in the email and nowhere else. Single use,
+/// 30 minutes, and issuing a new one removes the unused ones before it.
+model AdminPasswordReset {
+  id          String    @id @default(cuid())
+  adminUserId String
+  adminUser   AdminUser @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  tokenHash   String    @unique @db.VarChar(64)
+  expiresAt   DateTime
+  usedAt      DateTime?
+  requestIp   String?   @db.VarChar(64)
+  createdAt   DateTime  @default(now())
+
+  @@index([adminUserId])
+  @@map("admin_password_resets")
+}
+
+/// Every submission of the admin forgot-password form, known address or not —
+/// the rate limit (3 per email and per IP in 15 minutes) counts these rows.
+model AdminPasswordResetRequest {
+  id        String   @id @default(cuid())
+  email     String   @db.VarChar(320)
+  ipAddress String?  @db.VarChar(64)
+  createdAt DateTime @default(now())
+
+  @@index([email, createdAt])
+  @@index([ipAddress, createdAt])
+  @@index([createdAt])
+  @@map("admin_password_reset_requests")
 }
 
 /// What a role may do, when it differs from the defaults in `src/lib/rbac.ts`.
