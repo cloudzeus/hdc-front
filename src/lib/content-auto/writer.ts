@@ -2,6 +2,7 @@ import { z } from "zod";
 import { stripFaqSection } from "@/lib/seo/content-files";
 import type { Draft, Unsupported } from "@/lib/content-auto/gates";
 import { promptPack, type FactPack } from "@/lib/content-auto/fact-pack";
+import { cutAtWord } from "@/lib/seo/size-variant";
 
 /**
  * The writer and the verifier (spec §5): two DeepSeek calls in JSON mode.
@@ -193,6 +194,12 @@ export function extractJson(reply: string): unknown {
  * the writer was told not to add, and a «Συχνές ερωτήσεις» section, if it
  * wrote one anyway, moved into `faq` (the page renders it from there).
  */
+const META_MAX = 155;
+
+export function fitMeta(meta: string): string {
+  return meta.length <= META_MAX ? meta : `${cutAtWord(meta, META_MAX - 1).replace(/[\s,;:·—–-]+$/, "")}…`;
+}
+
 export function normalizeDraft(d: z.infer<typeof writerSchema>): Draft {
   let body = d.body.replace(/\r\n/g, "\n");
   body = body.replace(/^#\s+.*\n+/gm, "");
@@ -204,7 +211,9 @@ export function normalizeDraft(d: z.infer<typeof writerSchema>): Draft {
   return {
     title: d.title.trim(),
     seoTitle: d.seoTitle.trim(),
-    metaDescription: d.metaDescription.trim(),
+    // Over the limit is trimmed at a word, not failed: a revision spent on a
+    // few characters tended to bring new problems into the text.
+    metaDescription: fitMeta(d.metaDescription.trim()),
     answer: d.answer.replace(/^\*{0,2}Σύντομη απάντηση:?\*{0,2}:?\s*/i, "").trim(),
     body: withoutFaq.trim(),
     faq: faq.length ? faq : bodyFaq,

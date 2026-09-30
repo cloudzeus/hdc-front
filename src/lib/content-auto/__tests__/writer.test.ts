@@ -133,3 +133,17 @@ describe("verifyArticle", () => {
     expect((await verifyArticle(pack, draft, chat)).unsupported).toEqual([]);
   });
 });
+
+describe("fitMeta", () => {
+  it("keeps a description within 155 characters and trims a longer one at a word", async () => {
+    const { fitMeta } = await import("@/lib/content-auto/writer");
+    const short = "Φυσητήρας μπαταρίας Milwaukee M18 FBLG3.";
+    expect(fitMeta(short)).toBe(short);
+    const long = "Ο φυσητήρας μπαταρίας Milwaukee M18 FBLG3 σε δύο εκδόσεις, σκέτο εργαλείο ή κιτ με μπαταρίες, για αυλές, πεζοδρόμια, εργοτάξια και αποθήκες, με σταθερή δύναμη.";
+    const out = fitMeta(long);
+    expect(long.length).toBeGreaterThan(155);
+    expect(out.length).toBeLessThanOrEqual(155);
+    expect(out.endsWith("…")).toBe(true);
+    expect(long.startsWith(out.slice(0, -1))).toBe(true);
+  });
+});
