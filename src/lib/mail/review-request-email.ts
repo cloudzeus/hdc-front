@@ -2,7 +2,7 @@ import "server-only";
 import { renderEmail, localeUrl } from "@/lib/mail/hdc/render";
 import { t } from "@/lib/mail/hdc/strings";
 import { renderAndDeliver } from "@/lib/mail/hdc/deliver";
-import { buildOrderView, loadOrder, orderLocale } from "@/lib/mail/hdc/order-view";
+import { buildOrderView, loadOrder, orderLocale, type OrderRef } from "@/lib/mail/hdc/order-view";
 import type { MailOptions } from "@/lib/mail/order-email";
 
 /**
@@ -18,7 +18,7 @@ import type { MailOptions } from "@/lib/mail/order-email";
  */
 
 export async function buildReviewRequestEmail(
-  orderNumber: string,
+  orderNumber: OrderRef,
   options: MailOptions & { preview?: boolean } = {},
 ) {
   const order = await loadOrder(orderNumber);

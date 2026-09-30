@@ -34,9 +34,6 @@ export async function sendTemplateTestAction(input: {
 
   const entry = templateEntry(input.id);
   if (!entry) return { ok: false, error: "Άγνωστο πρότυπο." };
-  if (entry.needsOrder && !can(session?.user.role, "orders")) {
-    return { ok: false, error: "Χρειάζεται το δικαίωμα «Παραγγελίες»: η προεπισκόπηση δείχνει πραγματική παραγγελία." };
-  }
   if (!mailConfigured()) return { ok: false, error: "Το Mailgun δεν είναι ρυθμισμένο." };
 
   const locale: Locale = routing.locales.includes(input.locale as Locale) ? (input.locale as Locale) : "el";
@@ -44,6 +41,7 @@ export async function sendTemplateTestAction(input: {
     locale,
     variant: input.variant,
     orderNumber: input.order,
+    realOrders: can(session?.user.role, "orders"),
     assetOrigin: mailAssetOrigin(),
     admin: { email: to, name: session?.user.name },
     fingerprint: await requestFingerprint(await headers()),

@@ -12,6 +12,7 @@ import {
   orderLocale,
   paymentLabel,
   stamp,
+  type OrderRef,
 } from "@/lib/mail/hdc/order-view";
 
 /**
@@ -52,7 +53,7 @@ function alreadyConfirmed(order: { paymentMethod: string; shippingQuote: unknown
 }
 
 export async function buildOrderEmail(
-  orderNumber: string,
+  orderNumber: OrderRef,
   options: MailOptions & { trigger?: "placed" | "payment"; preview?: OrderPreviewVariant } = {},
 ) {
   const order = await loadOrder(orderNumber);

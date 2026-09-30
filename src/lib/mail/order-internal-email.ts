@@ -10,6 +10,7 @@ import {
   orderLocale,
   paymentLabel,
   shippingLabel,
+  type OrderRef,
 } from "@/lib/mail/hdc/order-view";
 
 /**
@@ -38,7 +39,7 @@ export function statusNoticeRecipients(): string {
 
 export type InternalOrderMailOutcome = { ok: true; id: string } | { ok: false; error: string };
 
-export async function buildInternalOrderEmail(orderNumber: string, options: { assetOrigin?: string } = {}) {
+export async function buildInternalOrderEmail(orderNumber: OrderRef, options: { assetOrigin?: string } = {}) {
   const order = await loadOrder(orderNumber);
   if (!order) return null;
   const view = await buildOrderView(order, "el");
@@ -104,7 +105,7 @@ export async function sendInternalOrderEmail(orderNumber: string): Promise<Inter
 }
 
 export async function buildInternalStatusEmail(
-  orderNumber: string,
+  orderNumber: OrderRef,
   statusName: string,
   options: { assetOrigin?: string } = {},
 ) {

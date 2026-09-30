@@ -190,6 +190,7 @@ describe("HDC email templates", () => {
       const result = await previewEmail(entry.id, {
         locale,
         variant,
+        realOrders: true,
         assetOrigin: "https://milwaukeetoolshdc.gr",
         admin: { email: "admin@example.gr", name: "Γιάννης" },
       });
@@ -232,25 +233,35 @@ describe("HDC email templates", () => {
     const result = await previewEmail("order-confirmation", {
       locale: "el",
       variant: "supplier",
+      realOrders: true,
       admin: { email: "admin@example.gr" },
     });
     expect(result.ok && result.email.text).toMatch(/ΠΑΡΑΔΟΣΗ ΣΕ 3–5 ΕΡΓΑΣΙΜΕΣ/);
   });
 
   it("amounts keep the thousands separator", async () => {
-    const el = await previewEmail("order-confirmation", { locale: "el", admin: { email: "a@example.gr" } });
-    const en = await previewEmail("order-confirmation", { locale: "en", admin: { email: "a@example.gr" } });
+    const el = await previewEmail("order-confirmation", { locale: "el", realOrders: true, admin: { email: "a@example.gr" } });
+    const en = await previewEmail("order-confirmation", { locale: "en", realOrders: true, admin: { email: "a@example.gr" } });
     expect(el.ok && el.email.text).toContain("1.092,89 €");
     expect(en.ok && en.email.text).toContain("€1,092.89");
   });
 
+  it("without the orders permission the preview uses a sample order, no customer data", async () => {
+    const result = await previewEmail("order-confirmation", { locale: "el", realOrders: false, admin: { email: "a@example.gr" } });
+    if (!result.ok) throw new Error(result.error);
+    expect(result.source).toMatch(/Δείγμα παραγγελίας/);
+    expect(result.email.html).not.toContain(ORDER.email);
+    expect(result.email.html).not.toContain(ORDER.orderNumber);
+    expect(unbalanced(result.email.html)).toBeNull();
+  });
+
   it("links follow the reader's language", async () => {
-    const result = await previewEmail("order-shipped", { locale: "it", admin: { email: "a@example.gr" } });
+    const result = await previewEmail("order-shipped", { locale: "it", realOrders: true, admin: { email: "a@example.gr" } });
     expect(result.ok && result.email.html).toContain("/it/checkout/epibebaiosi/HDC-20260930-0012");
   });
 
   it("the footer links the HDC's own Facebook and Instagram, and no TikTok", async () => {
-    const result = await previewEmail("nl-offers", { locale: "el", admin: { email: "a@example.gr" } });
+    const result = await previewEmail("nl-offers", { locale: "el", realOrders: true, admin: { email: "a@example.gr" } });
     // Handlebars writes «=» in attributes as &#x3D;, which every client decodes.
     const html = (result.ok ? result.email.html : "").replaceAll("&#x3D;", "=");
     expect(html).toContain("https://www.facebook.com/profile.php?id=61585656644198");

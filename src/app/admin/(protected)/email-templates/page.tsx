@@ -5,6 +5,7 @@ import { assertCan, can } from "@/lib/rbac";
 import { routing, type Locale } from "@/i18n/routing";
 import { PageShell, Panel } from "@/components/admin/PageShell";
 import { SendTestButton } from "@/components/admin/email-templates/SendTestButton";
+import { PreviewFrame } from "@/components/admin/email-templates/PreviewFrame";
 import { EMAIL_TEMPLATES, previewEmail, templateEntry, type TemplateGroup } from "@/lib/mail/hdc/catalog";
 import { requestFingerprint } from "@/lib/mail/request-context";
 import { cn } from "@/lib/utils";
@@ -21,8 +22,9 @@ type Search = { t?: string; lang?: string; device?: string; variant?: string; or
  * latest order, real products), per language and on phone or desktop — and
  * sent to yourself before a customer ever sees it.
  *
- * Emails built from an order show a customer's name, address and basket, so
- * those previews also need the «orders» permission.
+ * A real order shows a customer's name, address and basket, so it is used
+ * only with the «orders» permission; otherwise (or before the first order)
+ * the preview uses a sample order made of real catalogue products.
  */
 export default async function EmailTemplatesPage({ searchParams }: { searchParams: Promise<Search> }) {
   const session = await auth();
@@ -51,17 +53,15 @@ export default async function EmailTemplatesPage({ searchParams }: { searchParam
   const host = h.get("host");
   const proto = h.get("x-forwarded-proto") ?? (host?.startsWith("localhost") ? "http" : "https");
 
-  const blocked = entry.needsOrder && !canOrders;
-  const preview = blocked
-    ? null
-    : await previewEmail(entry.id, {
-        locale,
-        variant,
-        orderNumber: params.order,
-        assetOrigin: host ? `${proto}://${host}` : undefined,
-        admin: { email: session?.user.email ?? "admin@example.com", name: session?.user.name },
-        fingerprint: await requestFingerprint(h),
-      });
+  const preview = await previewEmail(entry.id, {
+    locale,
+    variant,
+    orderNumber: params.order,
+    realOrders: canOrders,
+    assetOrigin: host ? `${proto}://${host}` : undefined,
+    admin: { email: session?.user.email ?? "admin@example.com", name: session?.user.name },
+    fingerprint: await requestFingerprint(h),
+  });
 
   return (
     <PageShell
@@ -111,7 +111,7 @@ export default async function EmailTemplatesPage({ searchParams }: { searchParam
               locale={locale}
               variant={variant}
               order={params.order}
-              disabled={!preview?.ok}
+              disabled={!preview.ok}
             />
           }
         >
@@ -146,14 +146,9 @@ export default async function EmailTemplatesPage({ searchParams }: { searchParam
             )}
           </div>
 
-          {blocked ? (
-            <p className="mt-4 border border-l-[3px] border-amber-500 bg-amber-50 px-4 py-3 text-[length:var(--fs-13)] text-k-text-2">
-              Αυτό το email δείχνει πραγματική παραγγελία πελάτη (όνομα, διεύθυνση, είδη). Η προεπισκόπηση
-              χρειάζεται το δικαίωμα «Παραγγελίες».
-            </p>
-          ) : !preview?.ok ? (
+          {!preview.ok ? (
             <p className="mt-4 border border-l-[3px] border-red-500 bg-red-50 px-4 py-3 text-[length:var(--fs-13)] text-k-text-2">
-              {preview?.error ?? "Η προεπισκόπηση απέτυχε."}
+              {preview.error}
             </p>
           ) : (
             <>
@@ -167,12 +162,11 @@ export default async function EmailTemplatesPage({ searchParams }: { searchParam
               </dl>
 
               <div className="mt-4 overflow-x-auto border border-k-line bg-k-surface-2 p-3 sm:p-6">
-                <iframe
+                <PreviewFrame
+                  key={`${entry.id}-${locale}-${device}-${variant ?? ""}`}
+                  html={preview.email.html}
                   title={`Προεπισκόπηση: ${entry.name}`}
-                  srcDoc={preview.email.html}
-                  sandbox="allow-popups allow-popups-to-escape-sandbox"
-                  className="mx-auto block h-[70rem] border-0 bg-white shadow-sm"
-                  style={{ width: device === "mobile" ? 375 : "100%", maxWidth: device === "mobile" ? 375 : 680 }}
+                  mobile={device === "mobile"}
                 />
               </div>
 

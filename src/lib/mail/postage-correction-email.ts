@@ -4,7 +4,7 @@ import { siteOrigin } from "@/lib/seo/urls";
 import { renderEmail } from "@/lib/mail/hdc/render";
 import { t } from "@/lib/mail/hdc/strings";
 import { renderAndDeliver } from "@/lib/mail/hdc/deliver";
-import { loadOrder, orderLocale } from "@/lib/mail/hdc/order-view";
+import { loadOrder, orderLocale, type OrderRef } from "@/lib/mail/hdc/order-view";
 import type { MailOptions } from "@/lib/mail/order-email";
 
 /**
@@ -20,7 +20,7 @@ import type { MailOptions } from "@/lib/mail/order-email";
 export type PostageCorrection = { previousShippingGross: number; previousTotalGross: number; message?: string };
 
 export async function buildPostageCorrectionEmail(
-  orderNumber: string,
+  orderNumber: OrderRef,
   correction: PostageCorrection,
   options: MailOptions = {},
 ) {

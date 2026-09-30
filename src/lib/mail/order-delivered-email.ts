@@ -2,7 +2,7 @@ import "server-only";
 import { renderEmail } from "@/lib/mail/hdc/render";
 import { t } from "@/lib/mail/hdc/strings";
 import { renderAndDeliver } from "@/lib/mail/hdc/deliver";
-import { buildOrderView, loadOrder, orderLocale, stamp } from "@/lib/mail/hdc/order-view";
+import { buildOrderView, loadOrder, orderLocale, stamp, type OrderRef } from "@/lib/mail/hdc/order-view";
 import type { MailOptions } from "@/lib/mail/order-email";
 
 /**
@@ -17,7 +17,7 @@ import type { MailOptions } from "@/lib/mail/order-email";
  * a third person's name, often a neighbour's.
  */
 
-export async function buildDeliveredEmail(orderNumber: string, options: MailOptions = {}) {
+export async function buildDeliveredEmail(orderNumber: OrderRef, options: MailOptions = {}) {
   const order = await loadOrder(orderNumber);
   if (!order) return null;
   const locale = options.locale ?? orderLocale(order);

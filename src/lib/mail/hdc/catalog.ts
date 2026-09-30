@@ -23,6 +23,8 @@ import {
 import { renderCampaignEmail, searchCampaignProducts } from "@/lib/newsletter/campaign";
 import type { CampaignPayload, PickedProduct } from "@/lib/newsletter/copy";
 import { localeUrl } from "@/lib/mail/hdc/render";
+import type { OrderWithLines } from "@/lib/mail/hdc/order-view";
+import { displayName } from "@/lib/milwaukee/display";
 
 /**
  * Every email the shop sends, for the admin page «Πρότυπα email» and the tests.
@@ -103,6 +105,12 @@ export type PreviewContext = {
   assetOrigin?: string;
   /** Which order; the latest one when not given. */
   orderNumber?: string;
+  /**
+   * May the preview show a real customer's order? Without the «orders»
+   * permission — or with no order yet — it shows a sample order built from
+   * real catalogue products and an invented customer.
+   */
+  realOrders: boolean;
   /** The signed-in admin — the sample recipient of account emails. */
   admin: { email: string; name?: string | null };
   fingerprint?: RequestFingerprint;
@@ -120,6 +128,119 @@ export async function previewOrderNumber(orderNumber?: string): Promise<string |
   }
   const latest = await prisma.order.findFirst({ orderBy: { createdAt: "desc" }, select: { orderNumber: true } });
   return latest?.orderNumber ?? null;
+}
+
+/**
+ * A sample order: three real catalogue products, sample customer, paid by
+ * card, one of them from the supplier. For previews only — never saved.
+ */
+export async function sampleOrder(): Promise<OrderWithLines | null> {
+  const products = await prisma.product.findMany({
+    where: { isActive: true, priceNet: { not: null }, images: { some: {} } },
+    orderBy: { firstListedAt: "desc" },
+    take: 3,
+    select: {
+      id: true,
+      name: true,
+      code2: true,
+      priceNet: true,
+      vatRate: true,
+      weight: true,
+      images: { orderBy: [{ isFeature: "desc" }, { order: "asc" }], take: 1, select: { url: true } },
+    },
+  });
+  if (products.length === 0) return null;
+  const round = (n: number) => Math.round(n * 100) / 100;
+  const lines = products.map((p, i) => {
+    const quantity = i === 1 ? 2 : 1;
+    const unitNet = round(Number(p.priceNet));
+    const vatRate = Number(p.vatRate ?? 24);
+    return {
+      id: `sample-${i}`,
+      orderId: "sample",
+      productId: p.id,
+      mtrl: null,
+      xmlCode: null,
+      sku: p.code2,
+      name: p.name,
+      brand: "MILWAUKEE",
+      imageUrl: p.images[0]?.url ?? null,
+      quantity,
+      unitNet,
+      unitGross: round(unitNet * (1 + vatRate / 100)),
+      discountPercent: 0,
+      offerTitle: null,
+      vatRate,
+      lineNet: round(unitNet * quantity),
+      lineGross: round(unitNet * quantity * (1 + vatRate / 100)),
+      weightKg: p.weight == null ? null : Number(p.weight),
+    };
+  });
+  const net = round(lines.reduce((sum, l) => sum + l.lineNet, 0));
+  const vat = round(lines.reduce((sum, l) => sum + (l.lineGross - l.lineNet), 0));
+  const now = new Date();
+  const stampDate = now.toISOString().slice(0, 10).replaceAll("-", "");
+  return {
+    id: "sample",
+    orderNumber: `HDC-${stampDate}-0000`,
+    status: "CONFIRMED",
+    paymentStatus: "PAID",
+    customerId: null,
+    guestToken: "PREVIEW",
+    email: "pelatis@example.gr",
+    phone: "+30 690 000 0000",
+    firstName: "Νίκος",
+    lastName: "Παπαδόπουλος",
+    shipLine1: "Ηρώων Πολυτεχνείου 45",
+    shipLine2: null,
+    shipCity: "Πειραιάς",
+    shipPostcode: "18536",
+    shipRegion: null,
+    shipAdminRegion: null,
+    shipCountry: "GR",
+    wantsInvoice: false,
+    companyName: null,
+    vatNumber: null,
+    taxOffice: null,
+    companyTrade: null,
+    billLine1: null,
+    billCity: null,
+    billPostcode: null,
+    shippingMethod: "courier",
+    paymentMethod: "card",
+    notes: null,
+    supplierOrder: true,
+    subtotalNet: net,
+    subtotalGross: round(net + vat),
+    shippingNet: 0,
+    shippingGross: 0,
+    paymentFeeNet: 0,
+    paymentFeeGross: 0,
+    vatAmount: vat,
+    totalGross: round(net + vat),
+    savingsGross: 0,
+    shippingQuote: { etaDays: 2 },
+    vivaOrderCode: null,
+    vivaTransactionId: null,
+    paidAt: now,
+    reservedUntil: null,
+    acsVoucherNo: null,
+    acsPickupDate: null,
+    shippedAt: null,
+    deliveredAt: now,
+    reviewRequestedAt: null,
+    vivaPaymentMethodId: null,
+    erpTrdr: null,
+    erpFindoc: null,
+    erpFincode: null,
+    erpSeries: null,
+    erpResponse: null,
+    erpPushedAt: null,
+    erpError: null,
+    createdAt: now,
+    updatedAt: now,
+    lines,
+  } as unknown as OrderWithLines;
 }
 
 async function sampleProducts(onSale: boolean): Promise<PickedProduct[]> {
@@ -143,18 +264,18 @@ function newsletterPayload(id: string, products: PickedProduct[]): CampaignPaylo
         },
         hero: {
           eyebrow: "Νέο στο κατάστημα",
-          title_before: first ? first.name : "Milwaukee M18 FUEL",
+          title_before: first ? displayName(first.name, first.code2) : "Milwaukee M18 FUEL",
           title_accent: "",
           title_after: "",
           text: "Δείτε το από κοντά στο κατάστημα του Πειραιά ή παραγγείλτε το online.",
           image: first?.image ?? "",
-          image_alt: first?.name ?? "",
+          image_alt: first ? displayName(first.name, first.code2) : "",
           cta: "Δείτε το",
           url: first ? `${origin}/proion/${first.slug}` : `${origin}/nees-afixeis`,
         },
         articles: rest.slice(0, 3).map((p, i) => ({
           id: `a${i}`,
-          title: p.name,
+          title: displayName(p.name, p.code2),
           excerpt: `Κωδικός ${p.code2 || p.code}. ${p.price} με ΦΠΑ.`,
           tag: p.tag ?? "MILWAUKEE",
           image: p.image,
@@ -214,7 +335,7 @@ export async function previewEmail(id: string, ctx: PreviewContext): Promise<Pre
       case "account-verify":
         email = await buildVerifyEmail(
           ctx.variant === "claim"
-            ? { to, url: sampleLink("/eggrafi"), hours: 72, mode: "claim", orderNumber: (await previewOrderNumber()) ?? "HDC-20260930-0001" }
+            ? { to, url: sampleLink("/eggrafi"), hours: 72, mode: "claim", orderNumber: (ctx.realOrders && (await previewOrderNumber())) || "HDC-20260930-0001" }
             : { to, url: sampleLink("/logariasmos/epivevaiosi-email"), hours: 24, mode: "verify" },
           opts,
         );
@@ -249,12 +370,10 @@ export async function previewEmail(id: string, ctx: PreviewContext): Promise<Pre
     return { ok: true, email, source: `Σύνδεσμοι δείγματος · παραλήπτης ${ctx.admin.email}` };
   }
 
-  const orderNumber = await previewOrderNumber(ctx.orderNumber);
-  if (!orderNumber) return { ok: false, error: "Δεν υπάρχει ακόμη καμία παραγγελία για προεπισκόπηση." };
-  const order = await prisma.order.findUnique({
-    where: { orderNumber },
-    select: { acsVoucherNo: true, shippingGross: true, totalGross: true },
-  });
+  const realNumber = ctx.realOrders ? await previewOrderNumber(ctx.orderNumber) : null;
+  const order = realNumber ? await prisma.order.findUnique({ where: { orderNumber: realNumber }, include: { lines: true } }) : await sampleOrder();
+  if (!order) return { ok: false, error: "Δεν υπάρχει ούτε παραγγελία ούτε ενεργό προϊόν για δείγμα." };
+  const orderNumber = realNumber ?? order;
 
   let built: { email: RenderedEmail } | null = null;
   switch (id) {
@@ -297,5 +416,13 @@ export async function previewEmail(id: string, ctx: PreviewContext): Promise<Pre
       break;
   }
   if (!built) return { ok: false, error: "Η παραγγελία δεν έχει ό,τι χρειάζεται αυτό το email." };
-  return { ok: true, email: built.email, source: `Πραγματική παραγγελία ${orderNumber}` };
+  return {
+    ok: true,
+    email: built.email,
+    source: realNumber
+      ? `Πραγματική παραγγελία ${realNumber}`
+      : ctx.realOrders
+        ? "Δείγμα παραγγελίας με πραγματικά προϊόντα (δεν υπάρχει ακόμη παραγγελία)"
+        : "Δείγμα παραγγελίας με πραγματικά προϊόντα (χωρίς δικαίωμα «Παραγγελίες» δεν εμφανίζονται στοιχεία πελατών)",
+  };
 }

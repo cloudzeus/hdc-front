@@ -25,10 +25,17 @@ import { localeUrl } from "@/lib/mail/hdc/render";
  * prices and would count twice.
  */
 
-export type OrderWithLines = NonNullable<Awaited<ReturnType<typeof loadOrder>>>;
-
-export function loadOrder(orderNumber: string) {
+function findOrder(orderNumber: string) {
   return prisma.order.findUnique({ where: { orderNumber }, include: { lines: true } });
+}
+
+export type OrderWithLines = NonNullable<Awaited<ReturnType<typeof findOrder>>>;
+
+/** An order number (read afresh) or an order already in hand (the admin preview's sample). */
+export type OrderRef = string | OrderWithLines;
+
+export async function loadOrder(ref: OrderRef): Promise<OrderWithLines | null> {
+  return typeof ref === "string" ? findOrder(ref) : ref;
 }
 
 /**

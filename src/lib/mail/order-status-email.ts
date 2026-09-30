@@ -2,7 +2,7 @@ import "server-only";
 import { renderEmail } from "@/lib/mail/hdc/render";
 import { t } from "@/lib/mail/hdc/strings";
 import { deliver, renderAndDeliver } from "@/lib/mail/hdc/deliver";
-import { buildOrderView, loadOrder, orderLocale } from "@/lib/mail/hdc/order-view";
+import { buildOrderView, loadOrder, orderLocale, type OrderRef } from "@/lib/mail/hdc/order-view";
 import { buildInternalStatusEmail } from "@/lib/mail/order-internal-email";
 import type { MailOptions } from "@/lib/mail/order-email";
 
@@ -26,7 +26,7 @@ function trackingUrl(voucherNo: string): string {
   return `https://www.acscourier.net/el/track-and-trace/?paramtracknr=${encodeURIComponent(voucherNo)}`;
 }
 
-export async function buildOrderStatusEmail(orderNumber: string, statusName: string, options: MailOptions = {}) {
+export async function buildOrderStatusEmail(orderNumber: OrderRef, statusName: string, options: MailOptions = {}) {
   const order = await loadOrder(orderNumber);
   if (!order) return null;
   const locale = options.locale ?? orderLocale(order);

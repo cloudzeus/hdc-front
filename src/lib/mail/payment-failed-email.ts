@@ -4,7 +4,7 @@ import { formatMoney } from "@/lib/format";
 import { renderEmail } from "@/lib/mail/hdc/render";
 import { t } from "@/lib/mail/hdc/strings";
 import { renderAndDeliver } from "@/lib/mail/hdc/deliver";
-import { loadOrder, orderLocale, paymentLabel } from "@/lib/mail/hdc/order-view";
+import { loadOrder, orderLocale, paymentLabel, type OrderRef } from "@/lib/mail/hdc/order-view";
 import type { MailOptions } from "@/lib/mail/order-email";
 
 /**
@@ -29,7 +29,7 @@ const BANK = {
 };
 
 export async function buildPaymentFailedEmail(
-  orderNumber: string,
+  orderNumber: OrderRef,
   detail: { statusId?: string | null },
   options: MailOptions = {},
 ) {
