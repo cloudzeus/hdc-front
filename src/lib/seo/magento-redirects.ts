@@ -124,8 +124,8 @@ const MAGENTO_PREFIXES: Array<[RegExp, string]> = [
 
 const SEARCH_PATH = /^\/(catalogsearch\/result|search)(\/|$)/;
 const CATEGORY_PATH = /^\/category-\d+-([a-z0-9-]+?)(\/.*)?$/;
-/** A Google/Bing site-verification file — must reach the file, not the search. */
-const VERIFICATION_FILE = /^\/(google[0-9a-f]+|BingSiteAuth|yandex_[0-9a-f]+)\.html$/i;
+/** A Google/Yandex site-verification file — must reach the file, not the search. */
+const VERIFICATION_FILE = /^\/(google[0-9a-f]+|yandex_[0-9a-f]+)\.html$/i;
 /** One segment, hyphenated, ending in a token that holds a code (≥ 4 digits). */
 const PRODUCT_SHAPE = /^\/[a-z0-9]+(?:-[a-z0-9]+)*-(?=[a-z0-9]*\d[a-z0-9]*\d[a-z0-9]*\d[a-z0-9]*\d)[a-z0-9]+\/?$/i;
 

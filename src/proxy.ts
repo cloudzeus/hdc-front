@@ -56,33 +56,54 @@ function canonicalHostRedirect(request: NextRequest): NextResponse | null {
 }
 
 /**
- * Two middlewares, one matcher.
- *
- * /admin is NOT localised (staff UI is Greek only) and is gated on a valid JWT.
- * Everything else goes through next-intl locale negotiation.
- */
-/**
- * Οι παλιές διευθύνσεις του milwaukeetoolshdc.gr (Magento) → 301 στις νέες.
+ * Οι παλιές διευθύνσεις του milwaukeetoolshdc.gr (Magento) → οι νέες.
  *
  * Ο πίνακας (src/config/magento-redirects.json, από το
  * scripts/seo/magento-redirects.ts) φορτώνεται την πρώτη φορά που έρχεται
  * διεύθυνση με σχήμα Magento, και οι Maps του χτίζονται μία φορά. Μια κανονική
  * σελίδα του καταστήματος δεν περνά καν από εδώ: το `isMagentoCandidate`
  * απορρίπτει κάθε δική μας διαδρομή πριν αγγίξει τον πίνακα.
+ *
+ * - Ακριβές ταίριασμα (προϊόν, κατηγορία, σελίδα): 301.
+ * - Καταφυγή στην αναζήτηση: 302 — δεν είναι μόνιμη αντιστοίχιση, και όταν
+ *   μπει το προϊόν στον κατάλογο η ίδια παλιά διεύθυνση πρέπει να βρει αυτό.
+ * - Οι παράμετροι του αιτήματος (utm_*, gclid, fbclid) μένουν, εκτός από τις
+ *   παραμέτρους αναζήτησης του Magento που έγιναν ήδη το `q`.
+ * - Σε `www.` πηγαίνει κατευθείαν στο κανονικό host: ένα βήμα, όχι δύο.
  */
 let magentoResolver: Promise<ReturnType<typeof createMagentoResolver>> | null = null;
 
+const MAGENTO_SEARCH_PARAMS = new Set(["q", "query", "text"]);
+
 async function magentoRedirect(request: NextRequest): Promise<NextResponse | null> {
-  const { pathname, search } = request.nextUrl;
+  const { pathname, search, searchParams } = request.nextUrl;
   if (!isMagentoCandidate(pathname)) return null;
   magentoResolver ??= import("@/config/magento-redirects.json").then((table) =>
     createMagentoResolver(table.default as unknown as MagentoTable),
   );
   const hit = (await magentoResolver)(pathname, search);
   if (!hit) return null;
-  return NextResponse.redirect(new URL(hit.to, request.nextUrl), 301);
+
+  const url = new URL(hit.to, request.nextUrl);
+  const host = request.headers.get("host");
+  if (CANONICAL_HOST && host && isAliasHost(host, CANONICAL_HOST)) {
+    url.host = CANONICAL_HOST;
+    url.protocol = "https:";
+    url.port = "";
+  }
+  for (const [key, value] of searchParams) {
+    if (hit.kind === "search" && MAGENTO_SEARCH_PARAMS.has(key)) continue;
+    if (!url.searchParams.has(key)) url.searchParams.append(key, value);
+  }
+  return NextResponse.redirect(url, hit.kind === "search" ? 302 : 301);
 }
 
+/**
+ * Two middlewares, one matcher.
+ *
+ * /admin is NOT localised (staff UI is Greek only) and is gated on a valid JWT.
+ * Everything else goes through next-intl locale negotiation.
+ */
 export default auth(async (request) => {
   const response = await route(request);
   /*
@@ -98,11 +119,19 @@ export default auth(async (request) => {
 async function route(request: NextRequest & { auth: { user?: unknown } | null }): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
 
+  // Before the host fold, so an old URL on www. is one hop, not two.
+  const magento = await magentoRedirect(request);
+  if (magento) return magento;
+
   const canonical = canonicalHostRedirect(request);
   if (canonical) return canonical;
 
-  const magento = await magentoRedirect(request);
-  if (magento) return magento;
+  /*
+   * An `.html` that is not an old Magento page is a real file in public/ — a
+   * search-engine verification file. Served as is: no locale rewrite, no
+   * locale cookie (the `.html` matcher is only there for the step above).
+   */
+  if (pathname.endsWith(".html")) return NextResponse.next();
 
   if (pathname.startsWith("/admin")) {
     const isLoginPage = pathname === "/admin/login";

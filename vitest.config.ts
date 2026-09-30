@@ -14,5 +14,8 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
+    // next-intl's middleware imports "next/server" without an extension, which
+    // Node's ESM resolver refuses; inlined, Vite resolves it (proxy.test.ts).
+    server: { deps: { inline: ["next-intl"] } },
   },
 });
