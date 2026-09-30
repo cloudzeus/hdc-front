@@ -41,10 +41,20 @@
   .hdc-hero-slide[hidden] {
     display: none;
   }
+  .hdc-hero-img {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 70% 40%;
+  }
   .hdc-hero-slide::before {
     content: "";
     position: absolute;
     inset: 0;
+    z-index: 1;
     background: linear-gradient(
       90deg,
       rgba(10, 10, 10, 0.92) 0%,
@@ -54,6 +64,7 @@
   }
   .hdc-hero-inner {
     position: relative;
+    z-index: 2;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -637,7 +648,9 @@
     .hdc-hero-slide {
       position: relative;
       min-height: 520px;
-      background-position: 70% 30%;
+    }
+    .hdc-hero-img {
+      object-position: 70% 30%;
     }
     .hdc-hero-slide::before {
       background: linear-gradient(
@@ -786,6 +799,34 @@
     .hdc-nl-row button {
       height: 48px;
       flex: none;
+    }
+  }
+}
+
+/* ── The store in one paragraph: the page's H1 and its answer ─────────── */
+@layer components {
+  .hdc-home-intro {
+    padding: 36px 0 32px;
+    background: #fff;
+    border-bottom: 1px solid var(--hdc-g3);
+  }
+  .hdc-home-intro h1 {
+    max-width: 30ch;
+    margin: 0 0 12px;
+    font-size: var(--fs-30);
+    line-height: 1.1;
+    color: var(--hdc-ink);
+  }
+  .hdc-home-intro p {
+    max-width: 80ch;
+    margin: 0;
+    font-size: var(--fs-16);
+    line-height: 1.6;
+    color: var(--hdc-g7);
+  }
+  @media (max-width: 767px) {
+    .hdc-home-intro {
+      padding: 24px 0 22px;
     }
   }
 }

@@ -4,6 +4,7 @@ import { SiteFooter } from "@/components/chrome/SiteFooter";
 import { BestSellers } from "@/components/home/BestSellers";
 import { HdcHero, type HeroSlide } from "@/components/home/HdcHero";
 import { HomeCategories } from "@/components/home/HomeCategories";
+import { HomeIntro } from "@/components/home/HomeIntro";
 import { NewArrivalsBand } from "@/components/home/NewArrivalsBand";
 import { NewsletterBand } from "@/components/home/NewsletterBand";
 import { PackoutBand } from "@/components/home/PackoutBand";
@@ -50,8 +51,17 @@ export const dynamic = "force-dynamic";
 /** The mockup's hero slide: the M18 FPD3, bare tool and kit. */
 const HERO_BARE = "4933479859";
 const HERO_KIT = "4933479860";
-const HERO_IMAGE =
-  "https://www.milwaukeetool.gr/wp-content/uploads/2023/05/M18_FPD3-502X-App_21.jpg";
+/*
+ * The hero photo, with its size so the browser reserves the box before it
+ * arrives. Still Milwaukee's own photo on milwaukeetool.gr: to move it to our
+ * CDN, upload a photo we may publish with scripts/seo/upload-hero.ts and put
+ * the printed URL and size here.
+ */
+const HERO = {
+  url: "https://www.milwaukeetool.gr/wp-content/uploads/2023/05/M18_FPD3-502X-App_21.jpg",
+  width: 1000,
+  height: 667,
+};
 
 export default async function HomePage({
   params,
@@ -108,7 +118,9 @@ export default async function HomePage({
   const slides: HeroSlide[] = [
     {
       id: "m18-fpd3",
-      image: HERO_IMAGE,
+      image: HERO.url,
+      imageWidth: HERO.width,
+      imageHeight: HERO.height,
       tag: "M18 FUEL™",
       title: t("titlos"),
       text: t("keimeno"),
@@ -147,6 +159,7 @@ export default async function HomePage({
             slide: t("diafaneia"),
           }}
         />
+        <HomeIntro />
         <PlatformBand />
         <HomeCategories cards={categoryCards} />
         <Zone id="home.belowCategories" locale={locale} />

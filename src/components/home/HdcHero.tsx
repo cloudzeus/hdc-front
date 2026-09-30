@@ -5,8 +5,14 @@ import { Link } from "@/i18n/navigation";
 
 export type HeroSlide = {
   id: string;
-  /** Photo, set as a CSS background (not next/image: a remote host outside the image config). */
+  /**
+   * The photo, as a real <img> with its size — the page's largest paint, so
+   * the first slide's is fetched with high priority instead of being found
+   * late in the stylesheet as a background.
+   */
   image: string;
+  imageWidth: number;
+  imageHeight: number;
   tag: string;
   title: string;
   text: string;
@@ -45,19 +51,28 @@ export function HdcHero({
       aria-label={labels.region}
       aria-roledescription={many ? "carousel" : undefined}
     >
-      {slides.map((slide, i) => {
-        const Title = i === 0 ? "h1" : "h2";
-        return (
+      {slides.map((slide, i) => (
           <div
             key={slide.id}
             className="hdc-hero-slide"
             hidden={i !== active}
-            style={{ backgroundImage: `url("${slide.image}")` }}
             aria-roledescription={many ? "slide" : undefined}
           >
+            {/* eslint-disable-next-line @next/next/no-img-element -- CDN image; the optimiser is off */}
+            <img
+              className="hdc-hero-img"
+              src={slide.image}
+              width={slide.imageWidth}
+              height={slide.imageHeight}
+              alt=""
+              fetchPriority={i === 0 ? "high" : "low"}
+              loading={i === 0 ? "eager" : "lazy"}
+              decoding="async"
+            />
             <div className="hdc-wrap hdc-hero-inner">
               <span className="hdc-slant hdc-hero-tag">{slide.tag}</span>
-              <Title className="hdc-disp hdc-hero-title">{slide.title}</Title>
+              {/* The page's H1 is the store itself (HomeIntro); slides are H2. */}
+              <h2 className="hdc-disp hdc-hero-title">{slide.title}</h2>
               <p className="hdc-hero-text">{slide.text}</p>
               {slide.price && (
                 <p className="hdc-hero-price">
@@ -77,8 +92,7 @@ export function HdcHero({
               </div>
             </div>
           </div>
-        );
-      })}
+      ))}
 
       {many && (
         <>
