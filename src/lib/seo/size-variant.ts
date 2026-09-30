@@ -40,6 +40,9 @@ export function sizedText(name: string | null, sizes: SizeOption[], sizeCode: Si
  *
  * The group's `@id` is built from the first size's page, so every member's
  * page declares the same group.
+ *
+ * Greek only: search is for the Greek market (owner decision, 30/9/2026), and
+ * the en/it pages are for visitors, not for search — no group there.
  */
 export function sizeFamilyLd(input: {
   groupId: string | null;
@@ -47,9 +50,12 @@ export function sizeFamilyLd(input: {
   sizes: SizeOption[];
   url: (slug: string) => string;
   sizeCode: SizeCodeText;
+  /** The page's language; anything but Greek gets nothing. Default Greek. */
+  locale?: string;
 }) {
   const { groupId, name, sizes, url, sizeCode } = input;
   const current = sizes.find((s) => s.current);
+  if ((input.locale ?? "el") !== "el") return null;
   if (!groupId || sizes.length < 2 || !current) return null;
 
   const groupRef = `${url(sizes[0].slug)}#group`;

@@ -75,6 +75,11 @@ describe("sizeFamilyLd", () => {
     });
   });
 
+  it("is Greek-only: nothing on an en/it page", () => {
+    expect(sizeFamilyLd({ groupId: "G", name: "x", sizes, url, sizeCode, locale: "en" })).toBeNull();
+    expect(sizeFamilyLd({ groupId: "G", name: "x", sizes, url, sizeCode, locale: "el" })).not.toBeNull();
+  });
+
   it("is nothing for a product outside a size family", () => {
     expect(sizeFamilyLd({ groupId: null, name: "x", sizes, url, sizeCode })).toBeNull();
     expect(sizeFamilyLd({ groupId: "G", name: "x", sizes: sizes.slice(0, 1), url, sizeCode })).toBeNull();

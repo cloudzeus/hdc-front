@@ -217,6 +217,7 @@ export default async function ProductPage({ params }: PageProps) {
     sizes,
     url: (s) => absoluteUrl(`/proion/${s}`, locale),
     sizeCode,
+    locale,
   });
   const tag = platformTag(product.erpName);
   const platformText = tag ? withTrademark(tag) : null;

@@ -49,6 +49,11 @@ describe("llmsTxt", () => {
     expect(body).toContain("1-3 working days");
   });
 
+  it("points only at the Greek site, never at /en or /it", () => {
+    expect(body).not.toContain(`${ORIGIN}/en`);
+    expect(body).not.toContain(`${ORIGIN}/it`);
+  });
+
   it("links the main pages on the given origin", () => {
     for (const path of ["/katalogos", "/epikoinonia", "/oroi-chrisis", "/syxnes-erotiseis", "/llms-full.txt"]) {
       expect(body).toContain(`${ORIGIN}${path}`);

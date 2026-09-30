@@ -49,7 +49,7 @@ Phone: ${C.phones.map((p) => p.display).join(", ")}
 Email: ${C.email}
 Hours: ${HOURS}
 Operated by: ${SHOP.operator.name} (VAT EL${SHOP.operator.vat})
-Languages: Greek (default, ${url("/")}), English (${url("/en")}), Italian (${url("/it")}).
+Language: Greek.
 Currency: EUR. Displayed prices include Greek VAT (24%) and exclude shipping.
 
 ## What the store carries
