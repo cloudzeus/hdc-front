@@ -64,6 +64,63 @@ export async function chat(system: string, user: string, maxTokens = 500): Promi
   return text;
 }
 
+export type ChatUsage = { promptTokens: number; completionTokens: number };
+
+/**
+ * One JSON answer, for the automatic articles (src/lib/content-auto).
+ *
+ * Unlike `chat`: JSON mode, a caller-chosen temperature, a long timeout (a
+ * 700-word article is a few thousand tokens, well past 30 seconds), and the
+ * token usage, which the admin shows per run. The text is returned as it
+ * came; the caller parses it and decides whether to ask again.
+ */
+export async function chatJson({
+  system,
+  user,
+  maxTokens,
+  temperature,
+  timeoutMs = 240_000,
+}: {
+  system: string;
+  user: string;
+  maxTokens: number;
+  temperature: number;
+  timeoutMs?: number;
+}): Promise<{ text: string; usage: ChatUsage }> {
+  const { key, url } = config();
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+    body: JSON.stringify({
+      model: "deepseek-chat",
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: user },
+      ],
+      temperature,
+      max_tokens: maxTokens,
+      response_format: { type: "json_object" },
+    }),
+    signal: AbortSignal.timeout(timeoutMs),
+  });
+
+  if (!response.ok) {
+    const detail = await response.text().catch(() => "");
+    throw new DeepSeekError(`DeepSeek ${response.status}: ${detail.slice(0, 200)}`);
+  }
+
+  const data = (await response.json()) as {
+    choices?: Array<{ message?: { content?: string } }>;
+    usage?: { prompt_tokens?: number; completion_tokens?: number };
+  };
+  const text = data.choices?.[0]?.message?.content?.trim();
+  if (!text) throw new DeepSeekError("Η DeepSeek δεν επέστρεψε κείμενο.");
+  return {
+    text,
+    usage: { promptTokens: data.usage?.prompt_tokens ?? 0, completionTokens: data.usage?.completion_tokens ?? 0 },
+  };
+}
+
 const LANGUAGE: Record<string, string> = {
   el: "Ελληνικά",
   en: "English",
