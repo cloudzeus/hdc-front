@@ -1,11 +1,25 @@
 import type { MetadataRoute } from "next";
 import { siteOrigin } from "@/lib/seo/urls";
+import { AI_CRAWLERS, indexingAllowed } from "@/lib/seo/indexing";
+
+/*
+ * Built per request, not at build time: the switch below is a runtime variable,
+ * and a robots.txt baked during `next build` would keep saying "blocked" after
+ * go-live (or, worse, "open" on a new staging copy).
+ */
+export const dynamic = "force-dynamic";
 
 /**
  * What a crawler may take.
  *
- * Everything on the storefront is open. What is closed is closed for a reason
- * and not out of caution:
+ * While the shop is not on its final domain (`SITE_INDEXING` is not "on"),
+ * nothing: every crawler, and each common AI crawler by name, gets
+ * `Disallow: /`. No sitemap and no host line either — the sitemap and the
+ * Merchant feeds stay reachable for whoever already knows their address, but
+ * robots.txt does not advertise them.
+ *
+ * Once live, everything on the storefront is open. What is closed is closed
+ * for a reason and not out of caution:
  *
  *   /admin        staff only, and behind auth anyway
  *   /api          machine surfaces; the agent API is metered per key
@@ -23,6 +37,15 @@ import { siteOrigin } from "@/lib/seo/urls";
  * ranking.
  */
 export default function robots(): MetadataRoute.Robots {
+  if (!indexingAllowed()) {
+    return {
+      rules: [
+        { userAgent: "*", disallow: "/" },
+        ...AI_CRAWLERS.map((userAgent) => ({ userAgent, disallow: "/" })),
+      ],
+    };
+  }
+
   return {
     rules: [
       {

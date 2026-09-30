@@ -3,6 +3,7 @@ import createIntlMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 import { authConfig } from "@/auth.config";
 import { routing } from "@/i18n/routing";
+import { indexingAllowed, NOINDEX_HEADER } from "@/lib/seo/indexing";
 
 // Edge-safe: authConfig carries no providers and no database access.
 const { auth } = NextAuth(authConfig);
@@ -64,9 +65,21 @@ function canonicalHostRedirect(request: NextRequest): NextResponse | null {
  * Everything else goes through next-intl locale negotiation.
  */
 export default auth((request) => {
+  const response = route(request);
+  /*
+   * Not on the final domain yet: every page says so in a header as well as in
+   * robots.txt and the <meta> tag. The header is the one crawlers honour even
+   * for a URL they reached from a link elsewhere, without reading robots.txt.
+   * Read per request, so going live is a restart with SITE_INDEXING=on.
+   */
+  if (!indexingAllowed()) response.headers.set("X-Robots-Tag", NOINDEX_HEADER);
+  return response;
+});
+
+function route(request: NextRequest & { auth: { user?: unknown } | null }): NextResponse {
   const { pathname } = request.nextUrl;
 
-  const canonical = canonicalHostRedirect(request as NextRequest);
+  const canonical = canonicalHostRedirect(request);
   if (canonical) return canonical;
 
   if (pathname.startsWith("/admin")) {
@@ -85,7 +98,7 @@ export default auth((request) => {
   }
 
   return intlMiddleware(request as NextRequest);
-});
+}
 
 export const config = {
   // Skip Next internals, the auth endpoints and anything with a file extension.

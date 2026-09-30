@@ -21,6 +21,7 @@ import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { GoogleTagManager, GoogleTagManagerNoScript } from "@/components/analytics/GoogleTagManager";
 import type { Locale } from "@/i18n/routing";
 import { jsonLdHtml } from "@/lib/seo/json-ld";
+import { indexingAllowed } from "@/lib/seo/indexing";
 
 /*
  * Root layout owns <html>/<body> for BOTH trees — the localised storefront
@@ -83,6 +84,13 @@ export async function generateMetadata(): Promise<Metadata> {
         process.env.GOOGLE_SITE_VERIFICATION ||
         "KQ3VCyEKM40wz6J0F86WUhuE8kOmtOLKo0K7_aW6jl4",
     },
+    /*
+     * Not on the final domain yet: `noindex, nofollow` on every page that does
+     * not set its own. The proxy sends the same as an `X-Robots-Tag` header,
+     * which also covers the few pages that do. Switched on with SITE_INDEXING=on
+     * — see src/lib/seo/indexing.ts.
+     */
+    ...(indexingAllowed() ? {} : { robots: { index: false, follow: false } }),
     title: {
       default: t("titlos_site"),
       template: `%s | ${SHOP.name}`,

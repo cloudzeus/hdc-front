@@ -7,6 +7,7 @@ import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { upGreek } from "@/lib/greek";
 import { PRIMARY_PHONE } from "@/config/shop";
+import { indexingAllowed } from "@/lib/seo/indexing";
 
 export async function generateMetadata({
   params,
@@ -20,7 +21,8 @@ export async function generateMetadata({
   return {
     title: t("titlos_entopismos_paraggelias"),
     description: t("perigrafi_deite_poy_vrisketai_i"),
-    robots: { index: true, follow: true },
+    // Indexable once the shop is live; until then it follows the site-wide block.
+    robots: indexingAllowed() ? { index: true, follow: true } : { index: false, follow: false },
   };
 }
 
