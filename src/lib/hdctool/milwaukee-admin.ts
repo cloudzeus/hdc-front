@@ -1,6 +1,10 @@
 import "server-only";
 import type {
   AnalysisRawView,
+  AnalyzeOk,
+  BulkActivateOk,
+  OfficialSearchOk,
+  TranslateOk,
   AvailabilityCounts,
   AvailabilityRow,
   CategoryChoice,
@@ -10,14 +14,12 @@ import type {
   ItemContent,
   ItemPatch,
   MilwaukeeOverview,
-  OfficialSearchResult,
   OfficialView,
   PeersSuggestion,
   SoftOneCategories,
   SpecLabelRow,
   XmlItemDetail,
   XmlItemRow,
-  XmlMissing,
 } from "@/lib/hdctool/milwaukee-admin-contract";
 
 /**
@@ -32,7 +34,8 @@ import type {
  * Καμία συνάρτηση δεν πετάει: επιστρέφει `{ ok: true, ... }` ή
  * `{ ok: false, error, status }` με ελληνικό μήνυμα, έτοιμο για τη σελίδα.
  * Κανένα retry: οι εγγραφές δεν είναι ασφαλές να ξανασταλούν στα τυφλά, και
- * το HDCtool απαντά 409 σε διπλή ανάλυση/μετάφραση/ενεργοποίηση.
+ * το HDCtool απαντά 409 σε διπλή ανάλυση/μετάφραση/ενεργοποίηση. Οι μακριές
+ * κλήσεις τρέχουν ως εργασίες στο παρασκήνιο (`milwaukee-admin-jobs.ts`).
  */
 
 export const MISSING_KEY_ERROR = "Λείπει το κλειδί HDC_ADMIN_API_KEY";
@@ -40,10 +43,10 @@ export const BAD_KEY_ERROR = "Λείπει ή είναι λάθος το κλε�
 export const NO_ANSWER_ERROR = "Το HDCtool δεν απάντησε";
 
 const DEFAULT_TIMEOUT_MS = 20_000;
-/** Ανάλυση/μετάφραση με AI, αναζήτηση στο επίσημο site και μαζικές (HDCtool: έως 120″/300″). */
+/** Ανάλυση/μετάφραση με AI, αναζήτηση στο επίσημο site και οι υπόλοιπες μαζικές (HDCtool: έως 120″). */
 const LONG_TIMEOUT_MS = 130_000;
-/** Καταχώριση στο SoftOne με ανάγνωση μετά την εγγραφή (HDCtool: `maxDuration` 300). */
-const ERP_TIMEOUT_MS = 310_000;
+/** Καταχώριση στο SoftOne και ενεργοποίηση (HDCtool: `maxDuration` 300). */
+const VERY_LONG_TIMEOUT_MS = 310_000;
 
 export type MilwaukeeFail = {
   ok: false;
@@ -66,7 +69,7 @@ export function isKeyError(result: { ok: boolean; status?: number }): boolean {
 /** Χρόνος αναμονής ανά διαδρομή (σχετική με το `/api/hdc-admin/milwaukee/`). */
 export function timeoutFor(path: string): number {
   const route = path.split("?")[0]!;
-  if (route.endsWith("/erp-register")) return ERP_TIMEOUT_MS;
+  if (route.endsWith("/erp-register") || route === "bulk/activate") return VERY_LONG_TIMEOUT_MS;
   if (
     route.startsWith("bulk/") ||
     route.endsWith("/analyze") ||
@@ -187,7 +190,7 @@ export const getErpPreview = (actor: string, id: string) =>
 
 /** Αναζήτηση του κωδικού στο επίσημο site (έως 3 σελίδες· 409 αν τρέχει άλλη). */
 export const searchItemOfficial = (actor: string, id: string) =>
-  call<{ search: OfficialSearchResult; official: OfficialView | null }>(actor, "POST", `items/${seg(id)}/official-search`);
+  call<OfficialSearchOk>(actor, "POST", `items/${seg(id)}/official-search`);
 
 /** Ξεκινά τη σάρωση του επίσημου site στο παρασκήνιο (202, ή 409 αν τρέχει). */
 export const startOfficialSync = (actor: string) => call<{ started: boolean }>(actor, "POST", "official-sync");
@@ -199,10 +202,10 @@ export const updateItemContent = (actor: string, id: string, content: ItemConten
   call(actor, "POST", `items/${seg(id)}/content`, content);
 
 export const translateItem = (actor: string, id: string) =>
-  call<{ nameEn: string; nameIt: string }>(actor, "POST", `items/${seg(id)}/translate`);
+  call<TranslateOk>(actor, "POST", `items/${seg(id)}/translate`);
 
 export const analyzeItem = (actor: string, id: string) =>
-  call<{ dropped: string[]; written: boolean }>(actor, "POST", `items/${seg(id)}/analyze`);
+  call<AnalyzeOk>(actor, "POST", `items/${seg(id)}/analyze`);
 
 export const registerInErp = (actor: string, id: string, input: ErpRegisterInput) =>
   call<ErpRegisterOk>(actor, "POST", `items/${seg(id)}/erp-register`, input);
@@ -214,9 +217,7 @@ export const bulkAcceptSuggested = (actor: string, ids: string[]) =>
   call<{ updated: number }>(actor, "POST", "bulk/accept-suggested", { ids });
 
 export const bulkActivate = (actor: string, ids: string[]) =>
-  call<{ activated: number; skipped: Array<{ id: string; missing: XmlMissing[] }> }>(actor, "POST", "bulk/activate", {
-    ids,
-  });
+  call<BulkActivateOk>(actor, "POST", "bulk/activate", { ids });
 
 export const bulkArchive = (actor: string, ids: string[]) =>
   call<{ archived: number }>(actor, "POST", "bulk/archive", { ids });

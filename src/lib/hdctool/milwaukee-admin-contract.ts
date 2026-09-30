@@ -259,6 +259,18 @@ export type ItemPatch = {
   category?: CategoryChoice | null;
 };
 
+/** Αποτέλεσμα του `POST bulk/activate`: όσα λείπουν επιστρέφονται στο `skipped`. */
+export type BulkActivateOk = { activated: number; skipped: Array<{ id: string; missing: XmlMissing[] }> };
+
+/** Αποτέλεσμα του `POST items/[id]/analyze`. */
+export type AnalyzeOk = { dropped: string[]; written: boolean };
+
+/** Αποτέλεσμα του `POST items/[id]/translate`. */
+export type TranslateOk = { nameEn: string; nameIt: string };
+
+/** Αποτέλεσμα του `POST items/[id]/official-search`. */
+export type OfficialSearchOk = { search: OfficialSearchResult; official: OfficialView | null };
+
 /** Σώμα του `POST items/[id]/content`: και οι τρεις γλώσσες. */
 export type ItemContent = Record<"el" | "en" | "it", XmlContent>;
 

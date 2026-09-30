@@ -181,14 +181,15 @@ describe("σφάλματα", () => {
 });
 
 describe("χρόνοι αναμονής", () => {
-  it("20″ για αναγνώσεις, 130″ για AI/μαζικές/αναζήτηση, 310″ για την καταχώριση", () => {
+  it("20″ για αναγνώσεις, 130″ για AI/μαζικές/αναζήτηση, 310″ για καταχώριση και ενεργοποίηση", () => {
     expect(api.timeoutFor("overview")).toBe(20_000);
     expect(api.timeoutFor("items/a")).toBe(20_000);
     expect(api.timeoutFor("items/a/erp-preview")).toBe(20_000);
     expect(api.timeoutFor("items/a/analyze")).toBe(130_000);
     expect(api.timeoutFor("items/a/translate")).toBe(130_000);
     expect(api.timeoutFor("items/a/official-search")).toBe(130_000);
-    expect(api.timeoutFor("bulk/activate")).toBe(130_000);
+    expect(api.timeoutFor("bulk/activate")).toBe(310_000);
+    expect(api.timeoutFor("bulk/archive")).toBe(130_000);
     expect(api.timeoutFor("bulk/category")).toBe(130_000);
     expect(api.timeoutFor("items/a/erp-register")).toBe(310_000);
   });
