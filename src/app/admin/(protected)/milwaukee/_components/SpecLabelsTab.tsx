@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import type { SpecLabelRow } from "@/lib/hdctool/milwaukee-admin-contract";
 import { milwaukeeApproveLabels } from "../actions";
 import { attempt, num, when } from "./format";
-import { TablePager, Tag, pageSlice } from "./kit";
+import { PAGE_SIZE, TablePager, Tag, pageSlice } from "./kit";
 
 type Filter = "pending" | "approved" | "all";
 
@@ -65,7 +65,9 @@ export function SpecLabelsTab({ labels, canEdit }: { labels: SpecLabelRow[]; can
     startRefresh(() => router.refresh());
   };
 
-  const pageRows = pageSlice(filtered, page);
+  // Μετά από έγκριση η λίστα «Προς έγκριση» μικραίνει: η σελίδα δεν ξεπερνά την τελευταία.
+  const currentPage = Math.min(page, Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)));
+  const pageRows = pageSlice(filtered, currentPage);
   const allOnPage = pageRows.length > 0 && pageRows.every((r) => selected.has(r.en));
   const toggle = (en: string, on: boolean) =>
     setSelected((prev) => {
@@ -195,7 +197,7 @@ export function SpecLabelsTab({ labels, canEdit }: { labels: SpecLabelRow[]; can
             ))}
           </ul>
         )}
-        <TablePager page={page} total={filtered.length} onPage={setPage} />
+        <TablePager page={currentPage} total={filtered.length} onPage={setPage} />
       </section>
     </div>
   );

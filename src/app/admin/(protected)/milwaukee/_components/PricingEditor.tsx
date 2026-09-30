@@ -76,24 +76,29 @@ export function PricingEditor({
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap gap-px border border-k-line bg-k-line" role="radiogroup" aria-label="Τρόπος τιμής">
+      {/* Φυσικά radio: βέλη, Tab και αναγνώστες οθόνης δουλεύουν χωρίς δικό μας κώδικα. */}
+      <fieldset className="flex flex-wrap gap-px border border-k-line bg-k-line" disabled={disabled}>
+        <legend className="sr-only">Τρόπος τιμής</legend>
         {MODES.map((m) => (
-          <button
+          <label
             key={m.key}
-            type="button"
-            role="radio"
-            aria-checked={value.mode === m.key}
-            disabled={disabled}
-            onClick={() => onChange({ ...value, mode: m.key })}
             className={cn(
-              "min-h-9 flex-1 px-3 text-[length:var(--fs-12-5)] font-medium transition-colors disabled:opacity-60",
+              "flex min-h-9 flex-1 cursor-pointer items-center justify-center px-3 text-center text-[length:var(--fs-12-5)] font-medium transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-k-ink has-[:focus-visible]:ring-inset has-[:disabled]:cursor-default has-[:disabled]:opacity-60",
               value.mode === m.key ? "bg-k-ink text-white" : "bg-white text-k-text-2 hover:bg-k-surface-3",
             )}
           >
+            <input
+              type="radio"
+              name="xml-pricing-mode"
+              value={m.key}
+              checked={value.mode === m.key}
+              onChange={() => onChange({ ...value, mode: m.key })}
+              className="sr-only"
+            />
             {m.label}
-          </button>
+          </label>
         ))}
-      </div>
+      </fieldset>
 
       {value.mode === "SUGGESTED" &&
         (suggestion === undefined ? (

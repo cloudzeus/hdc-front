@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState, type KeyboardEvent } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Loader2, RefreshCw, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,7 @@ import {
 import { ratioLabel } from "@/lib/hdctool/milwaukee-admin-pricing";
 import { cn } from "@/lib/utils";
 import { money, num, read } from "./format";
-import { Notice, TablePager, Tag, pageSlice, type Tone } from "./kit";
+import { Notice, PAGE_SIZE, TablePager, Tag, pageSlice, type Tone } from "./kit";
 import { BulkBar } from "./BulkBar";
 import { ItemSheet } from "./ItemSheet";
 
@@ -54,9 +54,13 @@ export function XmlItemsTab({
   const [openId, setOpenId] = useState<string | null>(null);
   const [reloading, setReloading] = useState(false);
 
+  // Μόνο η τελευταία ανανέωση μετράει: μια παλιότερη απάντηση που φτάνει αργά αγνοείται.
+  const latest = useRef(0);
   const reload = useCallback(async () => {
+    const request = ++latest.current;
     setReloading(true);
     const r = await read<{ items: XmlItemRow[] }>("items");
+    if (request !== latest.current) return;
     setReloading(false);
     if (r.ok) setItems(r.items);
     else toast.error(`Η ανανέωση της λίστας απέτυχε: ${r.error}`);
@@ -102,7 +106,9 @@ export function XmlItemsTab({
     setPage(1);
     setSelected(new Set());
   };
-  const pageRows = pageSlice(filtered, page);
+  // Μετά από ανανέωση η λίστα μπορεί να μίκρυνε: η σελίδα δεν ξεπερνά την τελευταία.
+  const currentPage = Math.min(page, Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)));
+  const pageRows = pageSlice(filtered, currentPage);
   const allOnPage = pageRows.length > 0 && pageRows.every((r) => selected.has(r.id));
   const toggle = (id: string, on: boolean) =>
     setSelected((prev) => {
@@ -273,16 +279,15 @@ export function XmlItemsTab({
               </thead>
               <tbody>
                 {pageRows.map((item) => (
+                  // Το κλικ σε όλη τη γραμμή είναι ευκολία για το ποντίκι· για πληκτρολόγιο
+                  // και αναγνώστες οθόνης ανοίγει το κουμπί του προϊόντος.
                   <tr
                     key={item.id}
                     className={cn(
-                      "cursor-pointer border-b border-k-line align-top last:border-0 hover:bg-k-surface-3 focus-visible:bg-k-surface-3 focus-visible:outline-none",
+                      "cursor-pointer border-b border-k-line align-top last:border-0 hover:bg-k-surface-3",
                       selected.has(item.id) && "bg-k-gold-tint",
                     )}
-                    tabIndex={0}
-                    aria-label={`Άνοιγμα ${item.alternativeCode}`}
                     onClick={() => setOpenId(item.id)}
-                    onKeyDown={openKeys(() => setOpenId(item.id))}
                   >
                     {canEdit && (
                       <td className="px-3 py-2.5" onClick={(e) => e.stopPropagation()}>
@@ -297,7 +302,17 @@ export function XmlItemsTab({
                       <Thumb image={item.image} />
                     </td>
                     <td className="px-2 py-2.5">
-                      <ProductInfo item={item} />
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenId(item.id);
+                        }}
+                        aria-label={`Άνοιγμα ${item.alternativeCode}`}
+                        className="block w-full text-left outline-none focus-visible:ring-2 focus-visible:ring-k-ink"
+                      >
+                        <ProductInfo item={item} />
+                      </button>
                     </td>
                     <td className="px-2 py-2.5">
                       <Prices item={item} />
@@ -323,38 +338,39 @@ export function XmlItemsTab({
               )}
               <ul className="divide-y divide-k-line">
                 {pageRows.map((item) => (
-                  <li
-                    key={item.id}
-                    className={cn(
-                      "flex cursor-pointer gap-3 px-4 py-3 hover:bg-k-surface-3 focus-visible:bg-k-surface-3 focus-visible:outline-none",
-                      selected.has(item.id) && "bg-k-gold-tint",
-                    )}
-                    tabIndex={0}
-                    role="button"
-                    aria-label={`Άνοιγμα ${item.alternativeCode}`}
-                    onClick={() => setOpenId(item.id)}
-                    onKeyDown={openKeys(() => setOpenId(item.id))}
-                  >
+                  <li key={item.id} className={cn("flex gap-1 py-1 pr-1 pl-2", selected.has(item.id) && "bg-k-gold-tint")}>
                     {canEdit && (
-                      <div
-                        className="-m-2 flex size-11 shrink-0 items-start justify-center pt-2"
-                        onClick={(e) => e.stopPropagation()}
-                      >
+                      <label className="flex size-11 shrink-0 cursor-pointer items-start justify-center pt-3">
                         <Checkbox
                           checked={selected.has(item.id)}
                           onCheckedChange={(v) => toggle(item.id, v === true)}
                           aria-label={`Επιλογή ${item.alternativeCode}`}
                         />
-                      </div>
+                      </label>
                     )}
-                    <Thumb image={item.image} />
-                    <div className="min-w-0 flex-1 space-y-2">
-                      <ProductInfo item={item} />
-                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                        <Prices item={item} />
-                        <SoftOneCategory item={item} />
+                    {/* Το σώμα της κάρτας είναι το κουμπί· το checkbox είναι δίπλα, όχι μέσα του. */}
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Άνοιγμα ${item.alternativeCode}`}
+                      onClick={() => setOpenId(item.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setOpenId(item.id);
+                        }
+                      }}
+                      className="flex min-w-0 flex-1 cursor-pointer gap-3 px-2 py-2 hover:bg-k-surface-3 focus-visible:bg-k-surface-3 focus-visible:outline-none"
+                    >
+                      <Thumb image={item.image} />
+                      <div className="min-w-0 flex-1 space-y-2">
+                        <ProductInfo item={item} />
+                        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                          <Prices item={item} />
+                          <SoftOneCategory item={item} />
+                        </div>
+                        <StatusTags item={item} />
                       </div>
-                      <StatusTags item={item} />
                     </div>
                   </li>
                 ))}
@@ -362,7 +378,7 @@ export function XmlItemsTab({
             </div>
           </>
         )}
-        <TablePager page={page} total={filtered.length} onPage={setPage} />
+        <TablePager page={currentPage} total={filtered.length} onPage={setPage} />
       </section>
 
       <ItemSheet
@@ -378,17 +394,6 @@ export function XmlItemsTab({
       />
     </div>
   );
-}
-
-/** Enter/Space ανοίγει το πάνελ μόνο όταν το focus είναι στην ίδια τη γραμμή/κάρτα. */
-function openKeys(onOpen: () => void) {
-  return (e: KeyboardEvent) => {
-    if (e.target !== e.currentTarget) return;
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      onOpen();
-    }
-  };
 }
 
 function Thumb({ image }: { image: string | null }) {
@@ -409,15 +414,19 @@ function Thumb({ image }: { image: string | null }) {
 function ProductInfo({ item }: { item: XmlItemRow }) {
   const title = item.xmlTitle ?? item.nameEl;
   return (
-    <div className="min-w-0 space-y-0.5">
-      <p className="font-mono text-[length:var(--fs-11)] text-k-text-3">{item.alternativeCode}</p>
-      <p className="line-clamp-2 break-words text-[length:var(--fs-12-5)] font-medium text-k-ink" title={title}>
+    // Μόνο <span>: μπαίνει και μέσα σε <button>.
+    <span className="block min-w-0 space-y-0.5">
+      <span className="block font-mono text-[length:var(--fs-11)] text-k-text-3">{item.alternativeCode}</span>
+      <span className="line-clamp-2 break-words text-[length:var(--fs-12-5)] font-medium text-k-ink" title={title}>
         {title}
-      </p>
-      <p className="line-clamp-1 break-words text-[length:var(--fs-11)] text-k-text-4" title={item.xmlCategory ?? undefined}>
+      </span>
+      <span
+        className="line-clamp-1 break-words text-[length:var(--fs-11)] text-k-text-4"
+        title={item.xmlCategory ?? undefined}
+      >
         {item.xmlCategory ?? "—"}
-      </p>
-    </div>
+      </span>
+    </span>
   );
 }
 

@@ -12,8 +12,6 @@ import { SpecLabelsTab } from "./_components/SpecLabelsTab";
 import { OfficialTab } from "./_components/OfficialTab";
 
 export const dynamic = "force-dynamic";
-/** Η καταχώριση στο SoftOne περιμένει έως 310″ το HDCtool (server action αυτής της σελίδας). */
-export const maxDuration = 320;
 
 const TABS = [
   { id: "overview", label: "Επισκόπηση" },
@@ -37,7 +35,7 @@ type TabId = (typeof TABS)[number]["id"];
 export default async function MilwaukeePage({
   searchParams,
 }: {
-  searchParams: Promise<{ tab?: string; code?: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const session = await auth();
   assertCan(session?.user.role, "milwaukee.view");
@@ -46,7 +44,9 @@ export default async function MilwaukeePage({
   const canErp = can(session.user.role, "milwaukee.erp");
 
   const params = await searchParams;
-  const tab: TabId = TABS.some((t) => t.id === params.tab) ? (params.tab as TabId) : "overview";
+  // `?tab=a&tab=b` δίνει πίνακα: μόνο ένα απλό string μετράει.
+  const tab: TabId = TABS.find((t) => t.id === params.tab)?.id ?? "overview";
+  const code = typeof params.code === "string" ? params.code : undefined;
 
   return (
     <PageShell
@@ -73,7 +73,7 @@ export default async function MilwaukeePage({
       {tab === "availability" && <Availability actor={actor} />}
       {tab === "xml" && <XmlItems actor={actor} canEdit={canEdit} canErp={canErp} />}
       {tab === "labels" && <Labels actor={actor} canEdit={canEdit} />}
-      {tab === "official" && <Official actor={actor} code={params.code} canEdit={canEdit} />}
+      {tab === "official" && <Official actor={actor} code={code} canEdit={canEdit} />}
     </PageShell>
   );
 }

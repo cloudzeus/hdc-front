@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Bot, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -30,11 +30,16 @@ export function AnalysisDialog({ itemId }: { itemId: string }) {
   const [data, setData] = useState<AnalysisRawView | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  /** Φόρτωση όταν ανοίγει ο διάλογος και με το «Ξανά»· απαντήσεις μετά το κλείσιμο αγνοούνται. */
+  // Κάθε άνοιγμα/κλείσιμο αλλάζει τη «συνεδρία»: παλιές απαντήσεις αγνοούνται.
+  const session = useRef(0);
+
+  /** Φόρτωση όταν ανοίγει ο διάλογος και με το «Ξανά». */
   const load = async () => {
+    const token = ++session.current;
     setData(null);
     setError(null);
     const r = await read<{ analysis: AnalysisRawView }>("analysis", itemId);
+    if (token !== session.current) return;
     if (r.ok) setData(r.analysis);
     else setError(r.error);
   };
@@ -42,6 +47,11 @@ export function AnalysisDialog({ itemId }: { itemId: string }) {
   const show = () => {
     setOpen(true);
     void load();
+  };
+
+  const onOpenChange = (o: boolean) => {
+    if (!o) session.current++;
+    setOpen(o);
   };
 
   const trace = (data?.analysisRaw ?? null) as Trace | null;
@@ -52,7 +62,7 @@ export function AnalysisDialog({ itemId }: { itemId: string }) {
         <Bot className="size-4" aria-hidden />
         Απάντηση DeepSeek
       </Button>
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent size="wide" className="max-h-[90vh] overflow-y-auto rounded-none border-k-line">
           <DialogHeader>
             <DialogTitle>Απάντηση DeepSeek</DialogTitle>
