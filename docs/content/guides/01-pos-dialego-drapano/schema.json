@@ -1,0 +1,165 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/pos-dialego-drapano#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/pos-dialego-drapano",
+      "url": "{{SITE_URL}}/blog/pos-dialego-drapano",
+      "headline": "Πώς διαλέγω δράπανο: δραπανοκατσάβιδο, κρουστικό ή πιστολέτο;",
+      "description": "Ποιο δράπανο να αγοράσεις; Διαφορές δραπανοκατσάβιδου, κρουστικού και πιστολέτου SDS, τι σημαίνουν Nm και J, μπαταρία ή ρεύμα, λίστα ελέγχου.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "δράπανο, πώς διαλέγω δράπανο, ποιο δράπανο να αγοράσω, δράπανο μπαταρίας, κρουστικό δράπανο, δράπανο για μπετό, δράπανο ρεύματος ή μπαταρίας, διαφορά κρουστικού δραπάνου και πιστολέτου, πως διαλεγω δραπανο, drapano mpatarias, δράπανο Milwaukee, δράπανα Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Δράπανο"
+        },
+        {
+          "@type": "Thing",
+          "name": "Κρουστικό δράπανο"
+        },
+        {
+          "@type": "Thing",
+          "name": "Δραπανοκατσάβιδο"
+        },
+        {
+          "@type": "Thing",
+          "name": "Περιστροφικό πιστολέτο SDS"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FPD3"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FPD2"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 ONEFHPX"
+        },
+        {
+          "@type": "Thing",
+          "name": "SDS-Plus"
+        },
+        {
+          "@type": "Thing",
+          "name": "SDS-Max"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-percussion-drill/m18-fpd3/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-sub-compact-percussion-drill/m12-fpd2/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-high-performance-4-mode-32-mm-sds-plus-hammer-with-one-key-and-fixtec-chuck/m18-onefhpx/",
+        "https://www.milwaukeetool.eu/systems/m12/",
+        "https://www.milwaukeetool.eu/systems/m18/"
+      ],
+      "wordCount": 1170
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/pos-dialego-drapano#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/pos-dialego-drapano#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Μπορώ να τρυπήσω μπετό με κρουστικό δράπανο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Για λίγες και μικρές τρύπες, π.χ. για ένα ράφι, συνήθως ναι, με τρυπάνι μπετού και υπομονή. Για οπλισμένο σκυρόδεμα, πολλές τρύπες ή διαμέτρους πάνω από 10–12 mm το σωστό εργαλείο είναι ένα περιστροφικό πιστολέτο SDS-Plus, που τρυπά γρηγορότερα και κουράζει λιγότερο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι καλύτερο, δράπανο μπαταρίας ή ρεύματος;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Για τα περισσότερα συνεργεία και σπίτια το δράπανο μπαταρίας είναι πιο πρακτικό, γιατί πάει παντού χωρίς μπαλαντέζα. Το ρεύμα έχει νόημα σε σταθερή θέση εργασίας με πολλές ώρες συνεχούς διάτρησης. Αν έχεις ήδη μπαταρίες μιας πλατφόρμας, η μπαταρία κερδίζει σχεδόν πάντα."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πόσα Nm χρειάζεται ένα δραπανοκατσάβιδο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Για έπιπλα, ντουλάπια και μικροεπισκευές αρκούν περίπου 30–50 Nm. Για ξυλοκατασκευές, μεγάλες βίδες και ποτηροτρύπανα καλό είναι να ξεπερνά τα 100 Nm. Η ροπή είναι ένδειξη, όχι το μόνο κριτήριο: μετρούν επίσης οι στροφές, το τσοκ και το βάρος."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει SDS-Plus σε ένα δράπανο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το SDS-Plus είναι σύστημα υποδοχής για τρυπάνια και καλέμια, που χρησιμοποιείται στα περιστροφικά πιστολέτα. Το τρυπάνι κουμπώνει χωρίς κλειδί και κινείται ελεύθερα μπρος-πίσω, ώστε η κρούση να περνά αποτελεσματικά στο υλικό. Ένα κοινό δράπανο με τσοκ δεν δέχεται τρυπάνια SDS."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Χρειάζομαι και δράπανο και παλμικό κατσαβίδι;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Αν βιδώνεις πολύ, ναι. Το δράπανο κάνει τρύπες και βίδωμα με συμπλέκτη, το παλμικό βιδώνει μεγάλες βίδες γρηγορότερα και με λιγότερη καταπόνηση στον καρπό. Όταν παίρνουν την ίδια μπαταρία, το δεύτερο εργαλείο δεν σημαίνει δεύτερο σύστημα."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ποιο δράπανο να πάρω για πρώτη φορά;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Για πρώτο εργαλείο ένα κρουστικό δραπανοκατσάβιδο μπαταρίας με δύο μπαταρίες καλύπτει τις περισσότερες ανάγκες: τρύπες σε ξύλο, μέταλλο και τούβλο και βίδωμα. Αν τρυπάς συχνά μπετό, πρόσθεσε αργότερα ένα πιστολέτο SDS-Plus στην ίδια πλατφόρμα."
+          }
+        }
+      ]
+    }
+  ]
+}

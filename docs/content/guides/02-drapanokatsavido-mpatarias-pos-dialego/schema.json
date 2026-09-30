@@ -1,0 +1,161 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/drapanokatsavido-mpatarias-pos-dialego#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/drapanokatsavido-mpatarias-pos-dialego",
+      "url": "{{SITE_URL}}/blog/drapanokatsavido-mpatarias-pos-dialego",
+      "headline": "Δραπανοκατσάβιδο μπαταρίας: πώς διαλέγω το σωστό",
+      "description": "Πώς διαλέγεις δραπανοκατσάβιδο μπαταρίας: 12V ή 18V, πόσα Nm, συμπλέκτης, τσοκ, brushless, κιτ ή σκέτο εργαλείο. Πρακτικός οδηγός με λίστα ελέγχου.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "δραπανοκατσάβιδο μπαταρίας, δραπανοκατσάβιδο, κρουστικό δραπανοκατσάβιδο μπαταρίας, πώς διαλέγω δραπανοκατσάβιδο, δραπανοκατσάβιδο 12V ή 18V, brushless δραπανοκατσάβιδο τι είναι, πόσα Nm δραπανοκατσάβιδο, δραπανοκατσαβιδο μπαταριας, drapanokatsavido, δραπανοκατσάβιδο Milwaukee, δραπανοκατσάβιδο Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Δραπανοκατσάβιδο μπαταρίας"
+        },
+        {
+          "@type": "Thing",
+          "name": "Κρουστικό δραπανοκατσάβιδο"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FPD3"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FPD2"
+        },
+        {
+          "@type": "Thing",
+          "name": "POWERSTATE"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLINK PLUS"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLITHIUM"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-percussion-drill/m18-fpd3/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-sub-compact-percussion-drill/m12-fpd2/",
+        "https://www.milwaukeetool.eu/systems/m12/fuel/",
+        "https://www.milwaukeetool.eu/systems/m12/",
+        "https://www.milwaukeetool.eu/systems/m18/"
+      ],
+      "wordCount": 1126
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/drapanokatsavido-mpatarias-pos-dialego#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/drapanokatsavido-mpatarias-pos-dialego#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Ποια είναι η διαφορά δραπανοκατσάβιδου και κρουστικού δραπανοκατσάβιδου;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το κρουστικό έχει μια επιπλέον λειτουργία κρούσης, που βοηθά το τρυπάνι να προχωρήσει σε τούβλο και τοιχοποιία. Στο βίδωμα και στο τρύπημα ξύλου και μετάλλου δουλεύουν το ίδιο. Αν δεν τρυπάς ποτέ τοίχους, αρκεί το απλό· διαφορετικά το κρουστικό είναι πιο ευέλικτο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Φτάνουν τα 12V για δουλειά;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Για ηλεκτρολογικά, υδραυλικά, συναρμολόγηση επίπλων, κουφώματα και δουλειά σε στενά σημεία, ένα καλό εργαλείο 12V είναι αρκετό και κουράζει λιγότερο. Για μεγάλες διαμέτρους σε ξύλο και μέταλλο και για πολύωρη βαριά χρήση, το 18V έχει περισσότερο περιθώριο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνουν οι αριθμοί στον συμπλέκτη;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι οι θέσεις ροπής στις οποίες ο συμπλέκτης αποσυνδέει τον κινητήρα. Με μικρό αριθμό η βίδα σταματά νωρίς, κατάλληλο για μαλακά υλικά και μικρές βίδες. Με μεγάλο αριθμό βιδώνεις πιο δυνατά. Η θέση με το σύμβολο τρυπανιού παρακάμπτει τον συμπλέκτη για τρύπημα."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Αξίζει το brushless δραπανοκατσάβιδο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Για επαγγελματική ή συχνή χρήση, ναι. Ο κινητήρας χωρίς ψήκτρες χάνει λιγότερη ενέργεια σε θερμότητα, αξιοποιεί καλύτερα τη μπαταρία και δεν έχει καρβουνάκια που φθείρονται. Για πολύ περιστασιακή χρήση ένα απλό εργαλείο μπορεί να αρκεί."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Να πάρω κιτ με μπαταρίες ή σκέτο εργαλείο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Αν είναι το πρώτο σου εργαλείο στην πλατφόρμα, πάρε κιτ με δύο μπαταρίες και φορτιστή, ώστε η μία να φορτίζει όσο δουλεύεις με την άλλη. Αν έχεις ήδη μπαταρίες της ίδιας πλατφόρμας, το σκέτο εργαλείο είναι η λογική επιλογή."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πόσα Ah μπαταρία θέλει ένα δραπανοκατσάβιδο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Για βίδωμα και μικρές τρύπες οι μπαταρίες 2–3 Ah κρατούν το εργαλείο ελαφρύ. Για ποτηροτρύπανα, μεγάλες διαμέτρους και ολοήμερη δουλειά μακριά από πρίζα, οι 4–5 Ah δίνουν περισσότερη αυτονομία, με λίγο περισσότερο βάρος."
+          }
+        }
+      ]
+    }
+  ]
+}

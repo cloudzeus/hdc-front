@@ -1,0 +1,156 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/spathosega-pos-dialego#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/spathosega-pos-dialego",
+      "url": "{{SITE_URL}}/blog/spathosega-pos-dialego",
+      "headline": "Σπαθόσεγα: πώς διαλέγω για κατεδάφιση, σωλήνες και κλάδεμα",
+      "description": "Πώς διαλέγεις σπαθόσεγα: μεγάλη ή μιας χειρός, διαδρομή λάμας, παλινδρόμηση, κραδασμοί, λάμες για ξύλο με καρφιά, μέταλλο και κλάδεμα. Με λίστα ελέγχου.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "σπαθόσεγα, σπαθόσεγα μπαταρίας, σπαθόσεγα ρεύματος, πώς διαλέγω σπαθόσεγα, σπαθόσεγα για κλάδεμα, σπαθόσεγα μιας χειρός, σπαθόσεγα ή σέγα, σπαθοσεγα μπαταριας, spathosega, σπαθόσεγα Milwaukee, sawzall, σπαθόσεγα Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Σπαθόσεγα"
+        },
+        {
+          "@type": "Thing",
+          "name": "Λάμες σπαθόσεγας"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "SAWZALL"
+        },
+        {
+          "@type": "Thing",
+          "name": "HACKZALL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FSZ"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FSX"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FHZ"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 CHZ"
+        },
+        {
+          "@type": "Thing",
+          "name": "FIXTEC"
+        },
+        {
+          "@type": "Thing",
+          "name": "POWERSTATE"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-sawzall/m18-fsz/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-super-sawzall/m18-fsx/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-hackzall/m18-fhz/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-sub-compact-hackzall/m12-chz/"
+      ],
+      "wordCount": 1033
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/spathosega-pos-dialego#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/spathosega-pos-dialego#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Ποια είναι η διαφορά σπαθόσεγας και σέγας;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Η σπαθόσεγα κρατά τη λάμα οριζόντια μπροστά από το σώμα και κόβει με δυνατή παλινδρομική κίνηση. Είναι για κατεδάφιση, σωλήνες, ξύλα με καρφιά και κλαδιά, όπου η ακρίβεια δεν είναι το ζητούμενο. Η σέγα κόβει κάθετα με λεπτή λάμα και είναι για καθαρές κοπές και καμπύλες."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Μπορώ να κλαδέψω με σπαθόσεγα;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ναι, για κλαδιά μικρής και μεσαίας διαμέτρου, με λάμα κλαδέματος με μεγάλα δόντια. Κράτα σταθερά το εργαλείο, στήριξε το πέλμα στο κλαδί και πρόσεξε πού θα πέσει. Για χοντρούς κορμούς και πολύ κλάδεμα, ένα αλυσοπρίονο είναι πιο γρήγορο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι λάμα βάζω για ξύλο με καρφιά;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Λάμα κατεδάφισης για ξύλο με μέταλλο, συνήθως διμεταλλική ή με δόντια καρβιδίου και μεσαία πυκνότητα δοντιών. Αντέχει τα καρφιά και τις βίδες που κρύβονται σε παλιά ξύλα, όπου μια απλή λάμα ξύλου θα έχανε γρήγορα τα δόντια της."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι η παλινδρόμηση στη σπαθόσεγα;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι μια κυκλική κίνηση της λάμας που τη σπρώχνει μέσα στο υλικό στη διαδρομή κοπής. Κάνει την κοπή σε ξύλο πιο γρήγορη. Σε μέταλλο και σε λεπτά υλικά την κλείνεις, για να έχεις λιγότερους κραδασμούς και μεγαλύτερη διάρκεια λάμας."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Σπαθόσεγα μιας χειρός ή μεγάλη;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Η σπαθόσεγα μιας χειρός είναι μικρή και ελαφριά, ιδανική για σωλήνες, προφίλ, κοπές πάνω από το κεφάλι και στενά σημεία. Η μεγάλη, με δύο χέρια, έχει μεγαλύτερη διαδρομή και ισχύ για κατεδάφιση, χοντρά ξύλα και ολοήμερη χρήση."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Είναι επικίνδυνη η σπαθόσεγα;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Όπως κάθε πριόνι, θέλει προσοχή. Κράτα τη σταθερά, με τα δύο χέρια όπου γίνεται, στήριξε το πέλμα στο υλικό για να μην τινάζεται, έλεγξε για καλώδια και σωλήνες πριν κόψεις σε τοίχο και φόρα γυαλιά και γάντια. Άλλαξε λάμα μόνο με τη μπαταρία αφαιρεμένη."
+          }
+        }
+      ]
+    }
+  ]
+}

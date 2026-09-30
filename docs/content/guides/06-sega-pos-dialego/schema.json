@@ -1,0 +1,156 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/sega-pos-dialego#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/sega-pos-dialego",
+      "url": "{{SITE_URL}}/blog/sega-pos-dialego",
+      "headline": "Σέγα: πώς διαλέγω την κατάλληλη για ξύλο, μέταλλο και καμπύλες",
+      "description": "Πώς διαλέγεις σέγα: λαβή πάνω ή σώματος, παλινδρόμηση, διαδρομές/λεπτό, βάθος κοπής, κλίση 45°, λάμες T. Οδηγός για σέγα μπαταρίας με λίστα ελέγχου.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "σέγα, σέγα μπαταρίας, σέγα για ξύλα, πώς διαλέγω σέγα, σέγα με λαβή ή χωρίς λαβή, παλινδρόμηση σέγας τι είναι, σέγα ρεύματος ή μπαταρίας, σεγα μπαταριας, sega, σέγα Milwaukee, σέγα Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Σέγα"
+        },
+        {
+          "@type": "Thing",
+          "name": "Λάμες σέγας"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FJS"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FBJS"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FJS"
+        },
+        {
+          "@type": "Thing",
+          "name": "FIXTEC"
+        },
+        {
+          "@type": "Thing",
+          "name": "POWERSTATE"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-top-handle-jigsaw/m18-fjs/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-body-grip-jigsaw/m18-fbjs/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-bodygrip-jigsaw/m12-fjs/",
+        "https://www.milwaukeetool.eu/systems/m18/"
+      ],
+      "wordCount": 1029
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/sega-pos-dialego#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/sega-pos-dialego#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Ποια είναι η διαφορά σέγας με λαβή και σέγας σώματος;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Η σέγα με λαβή (top handle) κρατιέται από πάνω και είναι πιο εύκολη για αρχάριους και για ίσιες κοπές. Η σέγα σώματος (body grip) κρατιέται χαμηλά, κοντά στη λάμα, και δίνει καλύτερο έλεγχο στις καμπύλες και στις κοπές ακριβείας. Είναι θέμα συνήθειας και είδους δουλειάς."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι η παλινδρόμηση στη σέγα;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι μια ρύθμιση που, εκτός από την πάνω-κάτω κίνηση, σπρώχνει τη λάμα λίγο προς τα εμπρός στη διαδρομή κοπής. Κόβει γρηγορότερα σε ξύλο, αλλά αφήνει πιο τραχιά κοπή. Για καθαρές κοπές, μέταλλο και καμπύλες, κλείσε την παλινδρόμηση ή βάλε τη χαμηλά."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Μπορώ να κόψω μέταλλο με σέγα;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ναι, λαμαρίνες, προφίλ αλουμινίου και λεπτούς σωλήνες, με λάμα μετάλλου με πυκνά δόντια, χαμηλές στροφές και χωρίς παλινδρόμηση. Για χοντρά σίδερα και σωλήνες η σπαθόσεγα ή το δισκοπρίονο μετάλλου είναι πιο κατάλληλα."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι λάμες παίρνει μια σέγα;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Οι περισσότερες σύγχρονες σέγες παίρνουν λάμες με στέλεχος τύπου T, που είναι το πιο διαδεδομένο πρότυπο. Διάλεξε λάμα ανάλογα με το υλικό και το φινίρισμα: αραιά δόντια για γρήγορη κοπή ξύλου, πυκνά για μέταλλο και για καθαρές κοπές σε μελαμίνη."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Γιατί η σέγα μου δεν κόβει ίσια;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Συνήθως φταίει στραβή ή φθαρμένη λάμα, υπερβολική πίεση, πολύ γρήγορη πρόωση ή υψηλή παλινδρόμηση σε χοντρό υλικό. Βάλε καινούργια λάμα, μείωσε την παλινδρόμηση, άφησε το εργαλείο να κόψει μόνο του και χρησιμοποίησε οδηγό για μεγάλες ίσιες κοπές."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Σέγα ή δισκοπρίονο για ίσιες κοπές;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Για μεγάλες ίσιες κοπές σε σανίδες και φύλλα, το δισκοπρίονο είναι γρηγορότερο και πιο ίσιο. Η σέγα κερδίζει στις καμπύλες, στα ανοίγματα μέσα σε φύλλο, π.χ. για νεροχύτη, και στις μικρές κοπές όπου το δισκοπρίονο δεν χωράει."
+          }
+        }
+      ]
+    }
+  ]
+}
