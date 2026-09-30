@@ -170,7 +170,7 @@ const article = (over: Record<string, unknown> = {}) => ({
     { q: "Σκέτο;", a: "Το M18 FPD3-0X." },
     { q: "Μπαταρίες;", a: "Όλες οι M18." },
   ],
-  keywords: ["m18 fpd3", "milwaukee m18 fpd3"],
+  keywords: ["m18 fpd3", "milwaukee m18 fpd3", "κρουστικό δραπανοκατσάβιδο m18", "δραπανοκατσάβιδο μπαταρίας milwaukee"],
   entities: ["Milwaukee", "M18 FUEL", "M18 FPD3"],
   heroProductCode: "4933479859",
   heroImageAlt: "Κρουστικό δραπανοκατσάβιδο Milwaukee M18 FPD3-0X",
@@ -254,6 +254,57 @@ describe("executeRun", () => {
     expect(out.failedGates).toEqual(expect.arrayContaining(["numbers", "forbidden", "lengths", "verifier"]));
     expect(db.articleWrites[0].data).toMatchObject({ status: "DRAFT" });
     expect(db.topicUpdates[0]).toMatchObject({ status: "FAILED", attempts: 1 });
+  });
+
+  it("sends a failing draft back ONCE with its exact failures, and publishes the clean revision", async () => {
+    setRun("manual-publish");
+    const bad = article({ answer: "Κοστίζει 199 € και δίνει 135 Nm." });
+    const writes: string[] = [];
+    const chat = vi.fn<Chat>(async ({ temperature, user }) => {
+      if (temperature === 0) return { text: JSON.stringify({ unsupported: [] }), usage: { promptTokens: 100, completionTokens: 50 } };
+      writes.push(user);
+      return { text: JSON.stringify(writes.length === 1 ? bad : article()), usage: { promptTokens: 1000, completionTokens: 500 } };
+    });
+    const out = await executeRun("run1", { chat });
+    expect(out.outcome).toBe("PUBLISHED");
+    expect(writes).toHaveLength(2);
+    expect(writes[1]).toContain("ΤΟ ΠΡΟΗΓΟΥΜΕΝΟ ΣΟΥ JSON");
+    expect(writes[1]).toContain("135 Nm");
+    expect(writes[1]).toMatch(/ΜΗΝ προσθέσεις κανένα νέο στοιχείο/);
+    const detail = db.runUpdates[0].detail as { attempts: Array<{ failedGates: string[]; writerTokens: number; verifierTokens: number }> };
+    expect(detail.attempts.map((a) => a.failedGates)).toEqual([expect.arrayContaining(["numbers", "forbidden"]), []]);
+    expect(detail.attempts[0]).toMatchObject({ writerTokens: 1500, verifierTokens: 150 });
+    expect(db.runUpdates[0]).toMatchObject({ tokens: 3300 });
+  });
+
+  it("stops after two revisions and fails closed", async () => {
+    setRun("manual-publish");
+    const chat = chatWith(article(), [{ claim: "κάτι χωρίς στήριξη" }]);
+    const out = await executeRun("run1", { chat });
+    expect(out.outcome).toBe("DRAFT");
+    expect(out.failedGates).toEqual(["verifier"]);
+    expect(chat).toHaveBeenCalledTimes(6); // 3 writes, 3 verifications
+    expect((db.runUpdates[0].detail as { attempts: unknown[] }).attempts).toHaveLength(3);
+    expect(db.articleWrites[0].data).toMatchObject({ status: "DRAFT" });
+  });
+
+  it("drops a keyword or entity with «τιμή» instead of failing, and logs it", async () => {
+    setRun("manual-publish");
+    const keywords = [...(article().keywords as string[]), "milwaukee m18 fpd3 τιμη", "m18 fpd3 προσφορα"];
+    const out = await executeRun("run1", { chat: chatWith(article({ keywords, entities: ["Milwaukee", "Makita"] })) });
+    expect(out.outcome).toBe("PUBLISHED");
+    const saved = db.articleWrites[0].data;
+    expect(saved.keywords).not.toContain("milwaukee m18 fpd3 τιμη");
+    expect(saved.entities).toEqual(["Milwaukee"]);
+    const dropped = (db.runUpdates[0].detail as { droppedMetadata: Array<{ value: string }> }).droppedMetadata.map((d) => d.value);
+    expect(dropped).toEqual(["milwaukee m18 fpd3 τιμη", "m18 fpd3 προσφορα", "Makita"]);
+  });
+
+  it("still fails with fewer than four keywords left", async () => {
+    setRun("manual-publish");
+    const out = await executeRun("run1", { chat: chatWith(article({ keywords: ["m18 fpd3", "m18 fpd3 τιμη", "φθηνό m18 fpd3"] })) });
+    expect(out.outcome).toBe("DRAFT");
+    expect(out.failedGates).toEqual(["lengths"]);
   });
 
   it("C1: a colliding title never touches the existing slug's hero, and uploads nothing", async () => {

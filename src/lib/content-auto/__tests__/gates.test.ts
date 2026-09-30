@@ -13,7 +13,9 @@ import {
   linksGate,
   namesFrom,
   numbersGate,
+  metadataProblem,
   runGates,
+  sanitizeMetadata,
   uniqueGate,
   verifierGate,
   type Catalogue,
@@ -48,7 +50,7 @@ function goodDraft(): Draft {
       { q: "Ποιες μπαταρίες παίρνει;", a: "Όλες τις μπαταρίες M18." },
       { q: "Τι περιέχει το κιτ M18 FPD3-502X;", a: "Δύο μπαταρίες 5,0 Ah, φορτιστή και βαλίτσα." },
     ],
-    keywords: ["m18 fpd3", "κρουστικό δραπανοκατσάβιδο milwaukee"],
+    keywords: ["m18 fpd3", "κρουστικό δραπανοκατσάβιδο milwaukee", "δραπανοκατσάβιδο μπαταρίας", "m18 fpd3 milwaukee"],
     entities: ["Milwaukee", "M18 FUEL", "M18 FPD3"],
   };
 }
@@ -115,6 +117,35 @@ describe("gate · codes and models", () => {
     expect(r.problems.join(" ")).toMatch(/4933000000/);
     expect(r.problems.join(" ")).toMatch(/M18 FPD2-502X/);
     expect(codesGate(goodDraft(), catalogue, ["Milwaukee M18 FID9-0X"]).ok).toBe(false);
+  });
+});
+
+describe("gate · codes accepts what the pack names verbatim", () => {
+  it("a kit's battery named in the pack, not sold on its own", () => {
+    const d = { ...goodDraft(), answer: "Το κιτ έχει δύο M18 HB8 και ο κωδικός 4932471070 της μπαταρίας." };
+    expect(codesGate(d, catalogue).ok).toBe(false);
+    expect(codesGate(d, catalogue, [], '{"κιτ":"2 x M18 HB8","κωδικός":"4932471070"}').problems).toEqual([]);
+  });
+  it("still refuses what is in neither", () => {
+    expect(codesGate({ ...goodDraft(), answer: "Το M18 HB12." }, catalogue, [], "M18 HB8").ok).toBe(false);
+  });
+});
+
+describe("keywords and entities are metadata", () => {
+  it("drops the ones that would trip a gate, and says why", () => {
+    const d = {
+      ...goodDraft(),
+      keywords: ["m18 fpd3", "m18 fpd3 τιμη", "φθηνό δραπανοκατσάβιδο", "προσφορά milwaukee", "αγορά online m18", "κρουστικό m18"],
+      entities: ["Milwaukee", "Makita", "Αντιπρόσωπος Milwaukee"],
+    };
+    const { draft, dropped } = sanitizeMetadata(d);
+    expect(draft.keywords).toEqual(["m18 fpd3", "κρουστικό m18"]);
+    expect(draft.entities).toEqual(["Milwaukee"]);
+    expect(dropped.map((x) => x.why)).toEqual(["τιμή", "εμπορικός όρος", "εμπορικός όρος", "εμπορικός όρος", "άλλη μάρκα", "αντιπρόσωπος"]);
+    expect(metadataProblem("m18 fpd3")).toBeNull();
+  });
+  it("fewer than four keywords left fails the lengths gate", () => {
+    expect(lengthsGate({ ...goodDraft(), keywords: ["a", "b", "c"] }).problems).toEqual(["3 λέξεις-κλειδιά (τουλάχιστον 4)"]);
   });
 });
 

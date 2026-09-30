@@ -90,7 +90,7 @@ const FORMAT = [
   '- "answer": η σύντομη απάντηση, 45–55 λέξεις, μία παράγραφος.',
   '- "body": Markdown, ΤΟΥΛΑΧΙΣΤΟΝ 850 λέξεις, 4–6 ενότητες «## …» διατυπωμένες ως ερωτήσεις, παράγραφοι και λίστες, προαιρετικά ένας πίνακας. ΧΩΡΙΣ H1, χωρίς την απάντηση στην αρχή, χωρίς ενότητα «Συχνές ερωτήσεις».',
   '- "faq": 5–6 αντικείμενα {"q","a"}, απαντήσεις 1–3 προτάσεων.',
-  '- "keywords": 6–10 φράσεις αναζήτησης, η κύρια πρώτη (όπως τη γράφει ο κόσμος), μία χωρίς τόνους, μία «… milwaukee».',
+  '- "keywords": 6–10 φράσεις αναζήτησης, η κύρια πρώτη (όπως τη γράφει ο κόσμος), μία χωρίς τόνους, μία «… milwaukee». Οι λέξεις-κλειδιά είναι φράσεις αναζήτησης για το προϊόν/θέμα — ποτέ με "τιμή", "φθηνό", "προσφορά", "αγορά online".',
   '- "entities": ονόματα και τεχνολογίες που αναφέρονται (Milwaukee, M18 FUEL, μοντέλα).',
   '- "heroProductCode": ο κωδικός του προϊόντος του πακέτου που ταιριάζει ως κεντρική φωτογραφία.',
   '- "heroImageAlt": φυσική ελληνική περιγραφή της φωτογραφίας εκείνου του προϊόντος, με το μοντέλο και το «Milwaukee».',
@@ -250,6 +250,49 @@ export async function writeArticle(
 ): Promise<WriterOutput & { tokens: number; promptTokens: number; completionTokens: number; attempts: number }> {
   const { system, user } = writerPrompt(pack, style);
   const { value, ...usage } = await withRetry(chat, { system, user, maxTokens: 8000, temperature: 0.5 }, parseWriterReply);
+  return { ...value, ...usage };
+}
+
+/** What the writer gets back when a draft fails: its own JSON, and exactly what to fix. */
+export function revisionPrompt(
+  pack: FactPack,
+  style: StyleExample | null,
+  previous: WriterOutput,
+  failures: string[],
+): { system: string; user: string } {
+  const { system, user } = writerPrompt(pack, style);
+  const json = {
+    ...previous.draft,
+    heroProductCode: previous.heroProductCode,
+    heroImageAlt: previous.heroImageAlt,
+    imageAlts: Object.entries(previous.imageAlts).map(([code, alt]) => ({ code, alt })),
+  };
+  return {
+    system,
+    user: [
+      user.replace(/\n\n---\n\nΓράψε το JSON\.$/, ""),
+      `ΤΟ ΠΡΟΗΓΟΥΜΕΝΟ ΣΟΥ JSON:\n${JSON.stringify(json)}`,
+      [
+        "Ο αυτόματος έλεγχος το απέρριψε για τα εξής, ακριβώς:",
+        ...failures.map((f) => `- ${f}`),
+        "",
+        "ΔΙΟΡΘΩΣΗ: επίστρεψε ΟΛΟ το JSON ξανά, με τα ίδια πεδία. Αφαίρεσε ή αναδιατύπωσε ΜΟΝΟ τα σημεία που αναφέρονται παραπάνω.",
+        "ΜΗΝ προσθέσεις κανένα νέο στοιχείο, αριθμό, χαρακτηριστικό ή ισχυρισμό. Ό,τι δεν μπορεί να στηριχτεί στο πακέτο, το βγάζεις.",
+        "Κράτησε το υπόλοιπο κείμενο όπως είναι, και τα μήκη μέσα στα όρια (answer 45–55 λέξεις, body τουλάχιστον 850).",
+      ].join("\n"),
+    ].join("\n\n---\n\n"),
+  };
+}
+
+export async function reviseArticle(
+  pack: FactPack,
+  style: StyleExample | null,
+  previous: WriterOutput,
+  failures: string[],
+  chat: Chat,
+): Promise<WriterOutput & { tokens: number; promptTokens: number; completionTokens: number; attempts: number }> {
+  const { system, user } = revisionPrompt(pack, style, previous, failures);
+  const { value, ...usage } = await withRetry(chat, { system, user, maxTokens: 8000, temperature: 0.3 }, parseWriterReply);
   return { ...value, ...usage };
 }
 

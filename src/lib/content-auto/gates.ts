@@ -98,16 +98,21 @@ export type Catalogue = {
   fullCodes: Set<string>;
 };
 
-export function codesGate(draft: Draft, catalogue: Catalogue, alts: string[] = []): GateResult {
+/**
+ * `packText`: the fact pack as text. A code or model the pack names verbatim
+ * (a kit's battery «M18 HB8» in its contents) is as good as a catalogue one.
+ */
+export function codesGate(draft: Draft, catalogue: Catalogue, alts: string[] = [], packText = ""): GateResult {
   const text = readable(allText(draft, alts));
+  const packCodes = new Set(codeMentions(packText));
+  const packModels = new Set(modelMentions(packText).flatMap((m) => (m.full ? [m.full, m.root] : [m.root])));
   const problems: string[] = [];
   for (const code of codeMentions(text)) {
-    if (!catalogue.codes.has(code)) problems.push(`Ο κωδικός ${code} δεν υπάρχει στον κατάλογο`);
+    if (!catalogue.codes.has(code) && !packCodes.has(code)) problems.push(`Ο κωδικός ${code} δεν υπάρχει στον κατάλογο ούτε στο πακέτο`);
   }
   for (const m of modelMentions(text)) {
-    if (m.full ? !catalogue.fullCodes.has(m.full) : !catalogue.roots.has(m.root)) {
-      problems.push(`Το μοντέλο ${m.full ?? m.root} δεν υπάρχει στον κατάλογο`);
-    }
+    const known = m.full ? catalogue.fullCodes.has(m.full) || packModels.has(m.full) : catalogue.roots.has(m.root) || packModels.has(m.root);
+    if (!known) problems.push(`Το μοντέλο ${m.full ?? m.root} δεν υπάρχει στον κατάλογο ούτε στο πακέτο`);
   }
   return gate("codes", problems);
 }
@@ -221,6 +226,39 @@ export function aiTellsGate(draft: Draft, alts: string[] = []): GateResult {
   return gate("aiTells", problems);
 }
 
+// ── Keywords and entities are metadata, not claims ──────────────────────────
+
+/** Why a keyword or entity may not stay: a price, stock, dealer, wholesale, brand or AI-tell word. */
+export function metadataProblem(value: string): string | null {
+  const text = searchKey(value);
+  for (const [re, what] of [
+    [PRICE, "τιμή"],
+    [STOCK, "απόθεμα"],
+    [DEALER_WORDING, "αντιπρόσωπος"],
+    [WHOLESALE, "χονδρική"],
+    [OTHER_BRANDS, "άλλη μάρκα"],
+  ] as const) {
+    if (re.test(text) || (re === DEALER_WORDING && re.test(value))) return what;
+  }
+  if (/(?<!\p{L})(φθην|προσφορ|εκπτωσ|αγορα\s+online|online\s+αγορα)/u.test(text)) return "εμπορικός όρος";
+  if (AI_TELLS.some((p) => text.includes(searchKey(p))) || EMOJI.test(value)) return "κλισέ";
+  return null;
+}
+
+export type Sanitized = { draft: Draft; dropped: Array<{ field: "keywords" | "entities"; value: string; why: string }> };
+
+/** Drops the keywords and entities that would trip a gate, and says which. */
+export function sanitizeMetadata(draft: Draft): Sanitized {
+  const dropped: Sanitized["dropped"] = [];
+  const keep = (field: "keywords" | "entities") =>
+    draft[field].filter((value) => {
+      const why = metadataProblem(value);
+      if (why) dropped.push({ field, value, why });
+      return !why;
+    });
+  return { draft: { ...draft, keywords: keep("keywords"), entities: keep("entities") }, dropped };
+}
+
 // 6. Links ───────────────────────────────────────────────────────────────────
 
 /** Every Markdown link target of the text (not images). */
@@ -265,6 +303,7 @@ export function linksGate(draft: Draft, rules: LinkRules, alts: string[] = []): 
 export const BODY_MIN_WORDS = 700;
 export const BODY_MIN_H2 = 3;
 export const FAQ_MIN = 4;
+export const KEYWORDS_MIN = 4;
 
 /** Words of a Markdown body as read: no link targets, images, table rules or markup. */
 export function bodyWords(markdown: string): number {
@@ -296,6 +335,8 @@ export function lengthsGate(draft: Draft): GateResult {
   if (h2 < BODY_MIN_H2) problems.push(`${h2} ενότητες H2 (τουλάχιστον ${BODY_MIN_H2})`);
   const faq = draft.faq.filter((p) => p.q.trim() && p.a.trim()).length;
   if (faq < FAQ_MIN) problems.push(`${faq} ερωτήσεις FAQ (τουλάχιστον ${FAQ_MIN})`);
+  const keywords = draft.keywords.filter((k) => k.trim()).length;
+  if (keywords < KEYWORDS_MIN) problems.push(`${keywords} λέξεις-κλειδιά (τουλάχιστον ${KEYWORDS_MIN})`);
   return gate("lengths", problems);
 }
 
@@ -389,6 +430,8 @@ export type GateInput = {
   slug: string;
   supported: Set<string>;
   catalogue: Catalogue;
+  /** The fact pack as text: what it names verbatim counts as known (codes gate). */
+  packText?: string;
   links: LinkRules;
   names: Set<string>;
   existing: Existing[];
@@ -402,7 +445,7 @@ export function textGates(input: Omit<GateInput, "heroImageUrl" | "imageProblem"
   const { draft, alts } = input;
   return [
     numbersGate(draft, input.supported, alts),
-    codesGate(draft, input.catalogue, alts),
+    codesGate(draft, input.catalogue, alts, input.packText ?? ""),
     forbiddenGate(draft, alts),
     bareKitGate(draft, alts),
     aiTellsGate(draft, alts),

@@ -11,13 +11,14 @@ import { siteOrigin } from "@/lib/seo/urls";
 import { getSetting } from "@/lib/settings/settings";
 import { contentAdminUrl, sendContentRunEmail } from "@/lib/mail/content-auto-email";
 import { athensTime } from "@/lib/content-auto/cadence";
-import { STORE_FACTS, loadFactPack, packNumbers, type FactPack, type PackProduct } from "@/lib/content-auto/fact-pack";
+import { STORE_FACTS, loadFactPack, packNumbers, promptPack, type FactPack, type PackProduct } from "@/lib/content-auto/fact-pack";
 import {
   GATE_LABELS,
   failedGates,
   imageGate,
   linkTargets,
   namesFrom,
+  sanitizeMetadata,
   textGates,
   visibleText,
   type Catalogue,
@@ -27,7 +28,7 @@ import {
 import { insertInlineImages, pickHeroPhoto, uploadHero, type InlineCandidate } from "@/lib/content-auto/images";
 import { eligibleTopic, topicOrder, type TopicPayload } from "@/lib/content-auto/planner";
 import { articleSlug, modelMentions } from "@/lib/content-auto/text";
-import { verifyArticle, writeArticle, type Chat, type StyleExample } from "@/lib/content-auto/writer";
+import { reviseArticle, verifyArticle, writeArticle, type Chat, type StyleExample } from "@/lib/content-auto/writer";
 
 /**
  * One run of the automatic writer (spec §2):
@@ -53,6 +54,8 @@ export const STALE_MS = 30 * 60_000;
 export const RUN_DEADLINE_MS = 20 * 60_000;
 /** Three failed runs on one topic and it is skipped (spec §7). */
 export const MAX_ATTEMPTS = 3;
+/** Revisions the writer gets in one run when a gate or the verifier fails. */
+export const MAX_REVISIONS = 2;
 /** Hard caps on automatic publications, whatever started the run (spec §7). */
 export const PUBLISH_CAPS = { perDay: 1, perWeek: 3 } as const;
 /** Any constant; the writer slot's Postgres advisory lock. */
@@ -338,71 +341,118 @@ async function doRun(run: Run, options: ExecuteOptions, state: State): Promise<R
   if (pack.products.length === 0) throw new Error("Κανένα ενεργό προϊόν για το θέμα.");
   check();
 
-  // 2. The text.
-  const written = await writeArticle(pack, await loadStyleExample(), chat);
-  state.tokens += written.tokens;
-  detail.writer = { tokens: written.tokens, promptTokens: written.promptTokens, completionTokens: written.completionTokens, attempts: written.attempts };
-  check();
-
-  // 3. Photos: the hero's source, then the inline ones into the body.
-  const byCode = new Map(pack.products.map((p) => [p.code, p]));
-  // The writer's choice first, then the representative, then the rest; a packshot on white wins.
-  const order = [written.heroProductCode, pack.representative, ...pack.products.map((p) => p.code)];
-  const candidates = [...new Set(order.filter((c): c is string => !!c))]
-    .map((code) => byCode.get(code))
-    .filter((p): p is PackProduct => !!p?.image && allowedImage(p.image))
-    .map((p) => ({ code: p.code, url: p.image! }));
-  const hero = await pickHeroPhoto(candidates);
-  const heroProduct = hero ? byCode.get(hero.code) : undefined;
-  const heroAlt = heroProduct
-    ? (heroProduct.code === written.heroProductCode && written.heroImageAlt ? written.heroImageAlt : altFor(heroProduct, written.imageAlts))
-    : null;
-  const inlineOffer = inlineCandidates(pack, heroProduct?.code ?? null, written.imageAlts);
-  const inline = insertInlineImages(written.draft.body, inlineOffer);
-  const placed = inlineOffer.filter((c) => inline.placed.includes(c.code));
-  const draft = { ...written.draft, body: inline.body };
-  const alts = [heroAlt, ...placed.map((c) => c.alt)].filter((a): a is string => !!a);
-  detail.images = { hero: heroProduct?.code ?? null, inline: inline.placed };
-  check();
-
-  // 4. The verifier: everything the article carries, the alts included.
-  let unsupported: Awaited<ReturnType<typeof verifyArticle>>["unsupported"] | null = null;
-  try {
-    const verified = await verifyArticle(pack, draft, chat, alts);
-    state.tokens += verified.tokens;
-    unsupported = verified.unsupported;
-    detail.verifier = { tokens: verified.tokens, promptTokens: verified.promptTokens, completionTokens: verified.completionTokens };
-  } catch (error) {
-    state.tokens += (error as { tokens?: number }).tokens ?? 0;
-    if (isTransient(error)) throw error;
-    detail.verifierError = error instanceof Error ? error.message : String(error);
-  }
-  check();
-
-  // 5. The text gates.
-  const slug = own?.slug ?? articleSlug(draft.title);
-  const [catalogue, existing, broken] = await Promise.all([
-    loadCatalogue(),
-    loadExisting(own?.id ?? null),
-    brokenLinks(internalPaths(visibleText(draft))),
-  ]);
+  // 2. The text, and up to MAX_REVISIONS revisions: each attempt is photographed,
+  // cleaned of bad metadata, verified and gated in full; a failing attempt goes
+  // back to the writer with exactly what failed. The last attempt is what is
+  // judged — it fails closed.
+  const style = await loadStyleExample();
+  const [catalogue, existing] = await Promise.all([loadCatalogue(), loadExisting(own?.id ?? null)]);
   const names = namesFrom([
     ...pack.products.flatMap((p) => [p.name, p.model ?? "", p.code, p.platform ?? ""]),
     ...STORE_FACTS,
     ...catalogue.roots,
     ...catalogue.fullCodes,
   ]);
-  const gates = textGates({
-    draft,
-    alts,
-    slug,
-    supported: packNumbers(pack),
-    catalogue,
-    links: { allowed: new Set(pack.links.map((l) => l.href)), placedImages: placed.map((c) => c.url), broken },
-    names,
-    existing,
-    unsupported,
-  });
+  const packText = JSON.stringify(promptPack(pack));
+  const supported = packNumbers(pack);
+  const byCode = new Map(pack.products.map((p) => [p.code, p]));
+  const tries: Array<Record<string, unknown>> = [];
+  detail.attempts = tries;
+
+  let written = await writeArticle(pack, style, chat);
+  state.tokens += written.tokens;
+  let writerTokens = written.tokens;
+  check();
+
+  const evaluate = async (w: typeof written) => {
+    // Photos: the writer's choice first, then the representative, then the rest; a packshot on white wins.
+    const order = [w.heroProductCode, pack.representative, ...pack.products.map((p) => p.code)];
+    const candidates = [...new Set(order.filter((c): c is string => !!c))]
+      .map((code) => byCode.get(code))
+      .filter((p): p is PackProduct => !!p?.image && allowedImage(p.image))
+      .map((p) => ({ code: p.code, url: p.image! }));
+    const hero = await pickHeroPhoto(candidates);
+    const heroProduct = hero ? byCode.get(hero.code) : undefined;
+    const heroAlt = heroProduct
+      ? (heroProduct.code === w.heroProductCode && w.heroImageAlt ? w.heroImageAlt : altFor(heroProduct, w.imageAlts))
+      : null;
+    const inlineOffer = inlineCandidates(pack, heroProduct?.code ?? null, w.imageAlts);
+    const inline = insertInlineImages(w.draft.body, inlineOffer);
+    const placed = inlineOffer.filter((c) => inline.placed.includes(c.code));
+    // Keywords and entities are metadata: the ones that would trip a gate are dropped, not fought over.
+    const { draft, dropped } = sanitizeMetadata({ ...w.draft, body: inline.body });
+    const alts = [heroAlt, ...placed.map((c) => c.alt)].filter((x): x is string => !!x);
+    check();
+
+    // The verifier: everything the article carries, the alts included.
+    let unsupported: Awaited<ReturnType<typeof verifyArticle>>["unsupported"] | null = null;
+    let verifierTokens = 0;
+    let verifierError: string | null = null;
+    try {
+      const verified = await verifyArticle(pack, draft, chat, alts);
+      verifierTokens = verified.tokens;
+      unsupported = verified.unsupported;
+    } catch (error) {
+      verifierTokens = (error as { tokens?: number }).tokens ?? 0;
+      if (isTransient(error)) {
+        state.tokens += verifierTokens;
+        throw error;
+      }
+      verifierError = error instanceof Error ? error.message : String(error);
+    }
+    state.tokens += verifierTokens;
+    check();
+
+    const slug = own?.slug ?? articleSlug(draft.title);
+    const broken = await brokenLinks(internalPaths(visibleText(draft)));
+    const gates = textGates({
+      draft,
+      alts,
+      slug,
+      supported,
+      catalogue,
+      packText,
+      links: { allowed: new Set(pack.links.map((l) => l.href)), placedImages: placed.map((c) => c.url), broken },
+      names,
+      existing,
+      unsupported,
+    });
+    return { hero, heroProduct, heroAlt, placed, draft, dropped, alts, unsupported, verifierTokens, verifierError, slug, gates };
+  };
+
+  let current = await evaluate(written);
+  for (let revision = 0; ; revision++) {
+    const failing = current.gates.filter((g) => !g.ok);
+    tries.push({
+      attempt: revision,
+      title: current.draft.title,
+      writerTokens,
+      verifierTokens: current.verifierTokens,
+      failedGates: failing.map((g) => g.id),
+      problems: failing.map((g) => ({ gate: g.id, problems: g.problems })),
+      droppedMetadata: current.dropped,
+      verifierError: current.verifierError,
+    });
+    if (failing.length === 0 || revision >= MAX_REVISIONS) break;
+    const failures = failing.flatMap((g) => g.problems.map((p) => `${GATE_LABELS[g.id]}: ${p}`));
+    try {
+      const revised = await reviseArticle(pack, style, written, failures, chat);
+      state.tokens += revised.tokens;
+      writerTokens = revised.tokens;
+      written = revised;
+    } catch (error) {
+      // A revision that does not come back leaves the last judged attempt: it fails closed.
+      state.tokens += (error as { tokens?: number }).tokens ?? 0;
+      tries.push({ attempt: revision + 1, error: error instanceof Error ? error.message : String(error) });
+      break;
+    }
+    check();
+    current = await evaluate(written);
+  }
+  const { hero, heroAlt, draft, gates, slug, unsupported } = current;
+  detail.writer = { tokens: tries.reduce((sum, a) => sum + Number(a.writerTokens ?? 0), 0), revisions: tries.filter((a) => !a.error).length - 1 };
+  detail.images = { hero: current.heroProduct?.code ?? null, inline: current.placed.map((c) => c.code) };
+  detail.droppedMetadata = current.dropped;
   const unique = gates.find((g) => g.id === "unique")!.ok;
 
   // 6. The final slug, THEN the hero at that slug — and only for a unique text,
