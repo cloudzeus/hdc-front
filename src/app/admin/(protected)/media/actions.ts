@@ -2,7 +2,7 @@
 
 import { auth } from "@/auth";
 import { assertCan } from "@/lib/rbac";
-import { assetUsage, deleteAsset, listAssets, listBrandLogos, recordAsset } from "@/lib/media/library";
+import { assetUsage, deleteAsset, listAssets, recordAsset } from "@/lib/media/library";
 import { removeBackground } from "@/lib/media/claid";
 import { uploadImage } from "@/lib/media/bunny";
 import type { MediaKind } from "@/lib/media/library-types";
@@ -25,11 +25,6 @@ async function requireEditor(): Promise<string> {
 export async function actionListAssets(input: { kind?: MediaKind; query?: string } = {}) {
   await requireEditor();
   return listAssets(input);
-}
-
-export async function actionListLogos() {
-  await requireEditor();
-  return listBrandLogos();
 }
 
 export async function actionDeleteAsset(id: string, force = false) {

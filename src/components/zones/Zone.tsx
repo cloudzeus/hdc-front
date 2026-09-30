@@ -57,7 +57,9 @@ async function defaultContext(locale: Locale): Promise<WidgetContext> {
   const stats = await getCatalogueStats();
   return {
     products: stats.products.toLocaleString(locale),
-    brands: String(stats.brands),
+    // Το {brands} δεν προσφέρεται πια (μόνο Milwaukee)· σε παλιά ζώνη αποδίδεται
+    // κενό αντί για το κυριολεκτικό «{brands}».
+    brands: "",
     categories: String(stats.categories),
     freeShipping: `${FREE_SHIPPING_THRESHOLD_NET}\u00A0€`,
   };

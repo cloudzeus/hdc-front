@@ -123,24 +123,6 @@ export async function deleteAsset(
 }
 
 /**
- * Brand logos, for dropping straight into a banner.
- *
- * Every one is already on the CDN and already correct — a marketing team should
- * never be hunting for the FACOM logo in a folder, and a wrong or outdated one
- * on a banner is a supplier relations problem rather than a design one.
- */
-export async function listBrandLogos(): Promise<Array<{ slug: string; name: string; logo: string }>> {
-  const rows = await prisma.brand.findMany({
-    where: { logo: { not: null }, isEshop: true },
-    select: { slug: true, nameEl: true, logo: true },
-    orderBy: { productCount: "desc" },
-  });
-  return rows
-    .filter((r): r is typeof r & { logo: string } => Boolean(r.logo))
-    .map((r) => ({ slug: r.slug, name: r.nameEl, logo: r.logo }));
-}
-
-/**
  * Πού χρησιμοποιείται ένα αρχείο.
  *
  * Χωρίς αυτό, η διαγραφή είναι τυφλή: το αρχείο φεύγει από το CDN και το

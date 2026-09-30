@@ -385,10 +385,12 @@ export const WIDGETS: ReadonlyArray<WidgetDef> = [
  * Written as `{products}` in any text field and replaced at render, so a
  * headline can say "5.305 κωδικοί" without somebody typing a number that is
  * wrong the next time the catalogue syncs.
+ *
+ * Χωρίς `{brands}`: το κατάστημα πουλά μόνο Milwaukee. Μια αποθηκευμένη ζώνη που
+ * το έχει ακόμα το αποδίδει ως κενό (βλ. `defaultContext` στο Zone.tsx).
  */
 export const DYNAMIC_TOKENS: ReadonlyArray<{ token: string; label: string }> = [
   { token: "{products}", label: "Πλήθος προϊόντων" },
-  { token: "{brands}", label: "Πλήθος brands" },
   { token: "{categories}", label: "Πλήθος κατηγοριών" },
   { token: "{freeShipping}", label: "Όριο δωρεάν μεταφορικών" },
 ] as const;

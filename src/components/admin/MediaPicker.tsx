@@ -12,7 +12,6 @@ import {
   Play,
   Scissors,
   Search,
-  Tag,
   Trash2,
   Upload,
   X,
@@ -21,7 +20,6 @@ import { toast } from "sonner";
 import {
   actionDeleteAsset,
   actionListAssets,
-  actionListLogos,
   actionRemoveBackground,
 } from "@/app/admin/(protected)/media/actions";
 import { uploadFiles } from "@/lib/media/upload-client";
@@ -55,11 +53,10 @@ import {
  * which belongs to which.
  */
 
-type Mode = "library" | "logos" | "product" | "url";
+type Mode = "library" | "product" | "url";
 
 const TABS: Array<{ id: Mode; label: string; icon: React.ComponentType<{ className?: string }> }> = [
   { id: "library", label: "Βιβλιοθήκη", icon: ImageIcon },
-  { id: "logos", label: "Λογότυπα", icon: Tag },
   { id: "product", label: "Προϊόντα", icon: Package },
   { id: "url", label: "URL", icon: Link2 },
 ];
@@ -84,7 +81,7 @@ export function MediaPicker({
     onOpenChange(false);
   }
 
-  // A video field has no business offering logos or product photography.
+  // A video field has no business offering product photography.
   const tabs = accept === "video" ? TABS.filter((t) => t.id === "library" || t.id === "url") : TABS;
 
   return (
@@ -95,7 +92,7 @@ export function MediaPicker({
           <DialogDescription>
             {accept === "video"
               ? "MP4, WebM ή MOV έως 60MB."
-              : "Ό,τι έχει ανέβει, τα λογότυπα των εταιριών, ή φωτογραφία προϊόντος."}
+              : "Ό,τι έχει ανέβει ή φωτογραφία προϊόντος."}
           </DialogDescription>
         </DialogHeader>
 
@@ -120,7 +117,6 @@ export function MediaPicker({
 
         <div className="min-h-0 flex-1 overflow-y-auto">
           {mode === "library" && <LibraryTab accept={accept} onPick={choose} />}
-          {mode === "logos" && <LogoTab onPick={choose} />}
           {mode === "product" && <ProductTab onPick={choose} />}
           {mode === "url" && <UrlTab onPick={choose} />}
         </div>
@@ -315,66 +311,6 @@ function LibraryTab({
         </ul>
       )}
     </div>
-  );
-}
-
-/* ───────────────────────── Logos ───────────────────────── */
-
-function LogoTab({ onPick }: { onPick: (url: string) => void }) {
-  const [logos, setLogos] = useState<Array<{ slug: string; name: string; logo: string }>>([]);
-  const [loading, start] = useTransition();
-
-  useEffect(() => {
-    start(async () => setLogos(await actionListLogos()));
-  }, []);
-
-  if (loading && logos.length === 0) {
-    return (
-      <p className="flex items-center justify-center gap-2 py-16 text-[12.5px] text-k-text-3">
-        <Loader2 className="size-4 animate-spin" />
-        Φόρτωση…
-      </p>
-    );
-  }
-
-  if (logos.length === 0) {
-    return (
-      <p className="px-6 py-16 text-center text-[12.5px] text-k-text-3">
-        Καμία εταιρία δεν έχει λογότυπο καταχωρημένο.
-      </p>
-    );
-  }
-
-  return (
-    <ul className="grid grid-cols-3 gap-2 p-1 sm:grid-cols-4 lg:grid-cols-6">
-      {logos.map((brand) => (
-        <li key={brand.slug}>
-          <button
-            type="button"
-            onClick={() => onPick(brand.logo)}
-            className="block w-full border border-k-line bg-white transition-colors hover:border-k-ink"
-            title={brand.name}
-          >
-            {/* Logos are drawn for white and are usually transparent, so they
-                get padding and a light field rather than the grey the rest of
-                the grid uses. */}
-            <span className="relative block aspect-[3/2] bg-white">
-              <Image
-                src={brand.logo}
-                alt={brand.name}
-                fill
-                sizes="160px"
-                className="object-contain p-3"
-                unoptimized
-              />
-            </span>
-            <span className="block truncate border-t border-k-line px-1.5 py-1 text-center text-[10.5px] text-k-text-3">
-              {brand.name}
-            </span>
-          </button>
-        </li>
-      ))}
-    </ul>
   );
 }
 
