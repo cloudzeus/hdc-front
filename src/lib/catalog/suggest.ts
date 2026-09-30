@@ -103,7 +103,7 @@ const codeCandidates = (query: string) => [
  * stray space around them, so a padded spelling is accepted too — still an
  * indexed equality, never a LIKE.
  */
-function exactCodeWhere(query: string) {
+export function exactCodeWhere(query: string) {
   const plain = codeCandidates(query);
   const padded = [...plain, ...plain.flatMap((c) => [`${c} `, ` ${c}`])];
   return {

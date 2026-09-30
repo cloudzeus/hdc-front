@@ -1,6 +1,10 @@
 import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
-import { alternatesFor } from "@/lib/seo/urls";
+import { alternatesFor, localisedPath } from "@/lib/seo/urls";
+import { permanentRedirect } from "next/navigation";
+import { Suspense } from "react";
+import SearchSkeleton from "./skeleton";
+import { searchRedirectTarget } from "@/lib/catalog/search-redirect";
 import Image from "next/image";
 import { setRequestLocale } from "next-intl/server";
 import { SiteChrome } from "@/components/chrome/SiteChrome";
@@ -79,7 +83,43 @@ export async function generateMetadata({
  * What is genuinely new here is the exact-code band: someone pasting a part
  * number wants that part, not position nine of 340.
  */
-export default async function SearchPage({ params, searchParams }: PageProps) {
+/** Parameters that say nothing about what was searched: tracking only. */
+const TRACKING = /^(utm_\w+|gclid|fbclid|msclkid)$/;
+
+export default async function SearchPage(props: PageProps) {
+  const { locale } = await props.params;
+  setRequestLocale(locale);
+
+  /*
+   * An article number, EAN or model lands on its page (308): the product with
+   * that code when it is exactly one, the model page for a model. Only for a
+   * bare query — with a category or filters the visitor is browsing results.
+   * Decided before any Suspense boundary, so the redirect is a real HTTP 308;
+   * that is why this route lives outside `(site)` and its loading.tsx.
+   */
+  const raw = await props.searchParams;
+  const query = (Array.isArray(raw.q) ? raw.q[0] : raw.q)?.trim() ?? "";
+  const bare = Object.keys(raw).every((key) => key === "q" || TRACKING.test(key));
+  if (query && bare) {
+    const target = await searchRedirectTarget(query);
+    if (target) {
+      const tracking = new URLSearchParams();
+      for (const [key, value] of Object.entries(raw)) {
+        if (TRACKING.test(key)) tracking.set(key, Array.isArray(value) ? (value[0] ?? "") : (value ?? ""));
+      }
+      const search = tracking.toString();
+      permanentRedirect(`${localisedPath(target, locale)}${search ? `?${search}` : ""}`);
+    }
+  }
+
+  return (
+    <Suspense fallback={<SearchSkeleton />}>
+      <SearchBody {...props} />
+    </Suspense>
+  );
+}
+
+async function SearchBody({ params, searchParams }: PageProps) {
   const t = await getTranslations("anazitisi.page");
   const { locale } = await params;
   setRequestLocale(locale);

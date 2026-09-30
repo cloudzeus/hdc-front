@@ -18,6 +18,8 @@ const DETAIL_ROUTES = [
   "[locale]/montelo/[model]",
   "[locale]/brands/[slug]",
   "[locale]/prosfores/[slug]",
+  // Not a detail page, but its code/model redirect must be a real 308.
+  "[locale]/anazitisi",
 ];
 
 describe("detail routes answer a real 404", () => {
