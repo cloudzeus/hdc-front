@@ -1,0 +1,151 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/faltsopriono-pos-dialego#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/faltsopriono-pos-dialego",
+      "url": "{{SITE_URL}}/blog/faltsopriono-pos-dialego",
+      "headline": "Φαλτσοπρίονο: πώς διαλέγω απλό, συρόμενο ή διπλής κλίσης",
+      "description": "Πώς διαλέγεις φαλτσοπρίονο: απλό, σύνθετο ή συρόμενο, διάμετρος δίσκου 216/254/305 mm, πλάτος κοπής, κλίση, δίσκος, μπαταρίας ή ρεύματος. Οδηγός με πίνακα.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "φαλτσοπρίονο, φαλτσοπρίονο ξύλου, συρόμενο φαλτσοπρίονο, φαλτσοπρίονο πάγκου, φαλτσοπρίονο μπαταρίας, πώς διαλέγω φαλτσοπρίονο, φαλτσοπρίονο 254 ή 305, φαλτσοπριονο, faltsoprono, φαλτσοπρίονο Milwaukee, φαλτσοπρίονο Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Φαλτσοπρίονο"
+        },
+        {
+          "@type": "Thing",
+          "name": "Συρόμενο φαλτσοπρίονο"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FMS254"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FMS305"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 SMS216"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        },
+        {
+          "@type": "Thing",
+          "name": "POWERSTATE"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-254-mm-mitre-saw/m18-fms254/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-one-key-305-mm-mitre-saw/m18-fms305/",
+        "https://www.milwaukeetool.eu/systems/m18/"
+      ],
+      "wordCount": 1004
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/faltsopriono-pos-dialego#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/faltsopriono-pos-dialego#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Ποια είναι η διαφορά απλού και συρόμενου φαλτσοπρίονου;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Στο απλό φαλτσοπρίονο η κεφαλή μόνο κατεβαίνει, οπότε το πλάτος κοπής περιορίζεται από τη διάμετρο του δίσκου. Στο συρόμενο η κεφαλή κινείται και μπρος-πίσω σε ράγες, οπότε κόβει πολύ φαρδύτερα κομμάτια, όπως σανίδες deck, ράφια και πλατιά σοβατεπί."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει φαλτσοπρίονο διπλής κλίσης;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σημαίνει ότι η κεφαλή γέρνει και προς τα αριστερά και προς τα δεξιά για λοξές κοπές. Σε σύνθετες κοπές, όπως κορνίζες και γείσα, δεν χρειάζεται να γυρίζεις το κομμάτι ανάποδα, οπότε δουλεύεις γρηγορότερα και με λιγότερα λάθη."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "254 ή 305 mm δίσκο να πάρω;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ο δίσκος 254 mm είναι η πιο ευέλικτη επιλογή για τις περισσότερες ξυλουργικές και τοποθετήσεις. Ο 305 mm δίνει μεγαλύτερο ύψος και πλάτος κοπής για χοντρή ξυλεία και φαρδιά προφίλ, με περισσότερο βάρος. Οι μικρότεροι δίσκοι είναι για ελαφριά και φορητή δουλειά."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Μπορώ να κόψω αλουμίνιο με φαλτσοπρίονο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Προφίλ αλουμινίου κόβονται σε φαλτσοπρίονο με δίσκο ειδικό για αλουμίνιο και μη σιδηρούχα μέταλλα, και με καλή σύσφιξη του κομματιού. Σιδηρούχα μέταλλα δεν κόβονται με φαλτσοπρίονο ξύλου· θέλουν δισκοπρίονο μετάλλου ή ειδικό κόφτη."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι το φαλτσοπρίονο 2 εργασιών;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι συνδυαστικό μηχάνημα που δουλεύει και ως φαλτσοπρίονο και, αναποδογυρίζοντας την κεφαλή, ως μικρό δισκοπρίονο πάγκου. Εξοικονομεί χώρο σε μικρά εργαστήρια, αλλά σε κάθε ρόλο έχει συμβιβασμούς σε σχέση με ένα αποκλειστικό μηχάνημα."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πώς κόβω με ασφάλεια στο φαλτσοπρίονο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Κράτα το κομμάτι σφιγμένο πάνω στον οδηγό, με το χέρι μακριά από τη γραμμή κοπής. Άφησε τον δίσκο να πάρει πλήρεις στροφές πριν κατέβει, μην κόβεις πολύ μικρά κομμάτια με το χέρι και περίμενε να σταματήσει ο δίσκος πριν σηκώσεις την κεφαλή. Φόρα γυαλιά και ωτοασπίδες."
+          }
+        }
+      ]
+    }
+  ]
+}

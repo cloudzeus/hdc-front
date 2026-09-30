@@ -1,0 +1,143 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/pistoli-silikonis-pos-dialego#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/pistoli-silikonis-pos-dialego",
+      "url": "{{SITE_URL}}/blog/pistoli-silikonis-pos-dialego",
+      "headline": "Πιστόλι σιλικόνης και χημικών: πώς διαλέγω χειρός ή μπαταρίας",
+      "description": "Πώς διαλέγεις πιστόλι σιλικόνης: ανοιχτό ή κλειστό, φύσιγγα 310 ml ή σαλάμι 400/600 ml, δύναμη ώθησης, ταχύτητες, anti-drip. Και για κόλλες, χημικά.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "πιστόλι σιλικόνης, πιστόλι σιλικόνης μπαταρίας, ηλεκτρικό πιστόλι σιλικόνης, πιστόλι σιλικόνης κλειστού τύπου 600ml, πιστόλι για χημικά αγκύρια, πιστόλι για κόλλες, πώς διαλέγω πιστόλι σιλικόνης, πιστολι σιλικονης μπαταριας, pistoli silikonis, πιστόλι σιλικόνης Milwaukee, πιστόλι σιλικόνης Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Πιστόλι σιλικόνης"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πιστόλι σιλικόνης μπαταρίας"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "C18 PCG/600"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 PCG/310"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 PCG/400"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m18-caulk-gun-with-600-ml-tube/c18-pcg/600/",
+        "https://www.milwaukeetool.eu/en-eu/m12-sub-compact-caulk-gun-with-310-ml-cartridge-holder/m12-pcg/310/",
+        "https://www.milwaukeetool.eu/en-eu/m12-sub-compact-caulk-gun-with-400-ml-tube/m12-pcg/400/"
+      ],
+      "wordCount": 1023
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/pistoli-silikonis-pos-dialego#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/pistoli-silikonis-pos-dialego#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Τι είναι το πιστόλι σιλικόνης κλειστού τύπου;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Έχει κλειστό σωλήνα αντί για ανοιχτό σκελετό. Δέχεται υλικά σε μαλακή συσκευασία (σαλάμι), συνήθως 400 ή 600 ml, και συχνά και φύσιγγες. Ο σωλήνας στηρίζει το υλικό, οπότε η ροή είναι πιο σταθερή και μένουν λιγότερα απόβλητα, κάτι σημαντικό σε μεγάλες ποσότητες."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Αξίζει το πιστόλι σιλικόνης μπαταρίας;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Αν βάζεις σιλικόνες, αφρούς ή κόλλες σε καθημερινή βάση, ναι. Δίνει σταθερή ροή χωρίς να πιέζεις τη σκανδάλη ξανά και ξανά, κάνει πιο ομοιόμορφο κορδόνι και δεν κουράζει το χέρι. Για λίγες φύσιγγες τον χρόνο, ένα καλό πιστόλι χειρός αρκεί."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει η δύναμη ώθησης σε Newton;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Δείχνει πόσο δυνατά σπρώχνει το έμβολο το υλικό. Οι απλές σιλικόνες θέλουν λίγη δύναμη, αλλά οι παχύρρευστες κόλλες, τα πολυουρεθανικά και τα υλικά σε κρύο καιρό θέλουν πολύ περισσότερη. Μεγαλύτερη δύναμη σημαίνει ότι βγάζεις παχύρρευστα υλικά χωρίς να ζορίζεται το εργαλείο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Μπορώ να βάλω χημικό αγκύριο με πιστόλι σιλικόνης;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Εξαρτάται από τη συσκευασία. Τα χημικά αγκύρια σε απλή φύσιγγα με ενσωματωμένο αναμικτήρα μπαίνουν συχνά σε ένα δυνατό πιστόλι, ενώ τα διπλά ή ομοαξονικά φυσίγγια θέλουν ειδικό πιστόλι. Ακολούθησε πάντα τις οδηγίες του κατασκευαστή του υλικού για πιστόλι και χρόνο σκλήρυνσης."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι η λειτουργία anti-drip;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Όταν αφήνεις τη σκανδάλη, το έμβολο τραβιέται λίγο πίσω και αποσυμπιέζει το υλικό, ώστε να μη συνεχίσει να τρέχει από τη μύτη. Έτσι δεν λερώνεις την επιφάνεια και δεν χάνεις υλικό ανάμεσα στα κορδόνια."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πώς κόβω σωστά τη μύτη της φύσιγγας;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Κόψε τη μύτη λοξά, περίπου στις 45 μοίρες, και στο πλάτος του κορδονιού που θέλεις. Ξεκίνα με μικρή τρύπα, γιατί μπορείς πάντα να κόψεις λίγο ακόμη. Η λοξή κοπή σε αφήνει να κρατάς το πιστόλι υπό γωνία και να πιέζεις το υλικό μέσα στον αρμό."
+          }
+        }
+      ]
+    }
+  ]
+}

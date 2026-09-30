@@ -1,0 +1,163 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/karfotiko-mpatarias-pos-dialego#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/karfotiko-mpatarias-pos-dialego",
+      "url": "{{SITE_URL}}/blog/karfotiko-mpatarias-pos-dialego",
+      "headline": "Καρφωτικό μπαταρίας: πώς διαλέγω πλαισίων, φινιρίσματος ή καρφάκια",
+      "description": "Πώς διαλέγεις καρφωτικό: πλαισίων, φινιρίσματος 16G ή 18G, συνδετήρων, διπλής κεφαλής. Γεμιστήρας, λειτουργίες βολής, μπαταρία ή αέρας, ασφάλεια.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "καρφωτικό, καρφωτικό μπαταρίας, καρφωτικό φινιρίσματος, καρφωτικό πλαισίων, καρφωτικό πιστόλι, καρφωτικό αέρος ή μπαταρίας, πώς διαλέγω καρφωτικό, καρφωτικο μπαταριας, karfotiko, καρφωτικό Milwaukee, καρφωτικό Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Καρφωτικό μπαταρίας"
+        },
+        {
+          "@type": "Thing",
+          "name": "Καρφωτικό φινιρίσματος"
+        },
+        {
+          "@type": "Thing",
+          "name": "Καρφωτικό πλαισίων"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FFN"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FN18GS"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FN16GA"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FCN18GS"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FDN"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLITHIUM"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-34-176;-framing-nailer-2-mode/m18-ffn/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-18-gs-finish-nailer/m18-fn18gs/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-16-ga-angled-nail-finish-nailer-2-mode/m18-fn16ga/"
+      ],
+      "wordCount": 1029
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/karfotiko-mpatarias-pos-dialego#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/karfotiko-mpatarias-pos-dialego#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνουν τα 16G και 18G στα καρφωτικά;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι το πάχος του καρφιού σε gauge: όσο μεγαλύτερος ο αριθμός, τόσο πιο λεπτό το καρφί. Τα 18G είναι λεπτά καρφάκια για πηχάκια και διακοσμητικά, που αφήνουν σχεδόν αόρατη τρύπα. Τα 16G είναι πιο χοντρά, για κάσες, σοβατεπί και πόρτες, όπου χρειάζεται περισσότερο κράτημα."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Καρφωτικό μπαταρίας, αέρος ή αερίου;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το αέρος είναι ελαφρύ και γρήγορο, αλλά θέλει κομπρεσέρ και σωλήνα. Το αερίου θέλει φύσιγγες και καθάρισμα. Το μπαταρίας πάει παντού χωρίς σωλήνες και αναλώσιμα αερίου, κάτι που το κάνει πρακτικό για τοποθετήσεις και επισκευές. Για μαζική παραγωγή σε εργαστήριο ο αέρας παραμένει δημοφιλής."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι η διαδοχική και η παλμική βολή;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Στη διαδοχική βολή πιέζεις πρώτα τη μύτη στο υλικό και μετά πατάς τη σκανδάλη, για κάθε καρφί. Είναι η πιο ακριβής και ασφαλής. Στην παλμική (bump) κρατάς τη σκανδάλη πατημένη και το καρφί φεύγει κάθε φορά που ακουμπάς τη μύτη. Είναι γρηγορότερη, αλλά θέλει εμπειρία και προσοχή."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι καρφωτικό χρειάζομαι για πέργκολα ή σκελετό;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Καρφωτικό πλαισίων, που βάζει μακριά και χοντρά καρφιά σε δομική ξυλεία. Έλεγξε τη γωνία του γεμιστήρα και τον τύπο κεφαλής καρφιού που δέχεται, ώστε να βρίσκεις εύκολα τα κατάλληλα καρφιά, και ότι τα καρφιά είναι επιτρεπτά για την κατασκευή σου."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Μπορώ να καρφώσω γυψοσανίδα με καρφωτικό;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Η γυψοσανίδα στερεώνεται συνήθως με βίδες γυψοσανίδας σε μεταλλικό ή ξύλινο σκελετό και όχι με καρφιά. Γι' αυτό το εργαλείο που χρειάζεσαι είναι μια κατσαβιδιέρα γυψοσανίδας με στοπ βάθους, που βιδώνει γρήγορα χωρίς να σκίζει το χαρτί."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι μέτρα ασφαλείας χρειάζονται στα καρφωτικά;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Φόρα γυαλιά προστασίας, κράτα τα χέρια μακριά από τη μύτη, μην στρέφεις ποτέ το καρφωτικό σε ανθρώπους και μην παρακάμπτεις την ασφάλεια της μύτης. Βγάλε τη μπαταρία πριν ξεμπλοκάρεις καρφί ή γεμίσεις τον γεμιστήρα. Αν δεν έχεις εμπειρία, δούλευε στη διαδοχική βολή."
+          }
+        }
+      ]
+    }
+  ]
+}

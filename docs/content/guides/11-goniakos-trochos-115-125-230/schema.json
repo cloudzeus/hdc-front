@@ -1,0 +1,168 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/goniakos-trochos-115-125-230#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/goniakos-trochos-115-125-230",
+      "url": "{{SITE_URL}}/blog/goniakos-trochos-115-125-230",
+      "headline": "Γωνιακός τροχός: 115, 125 ή 230 mm; Πώς διαλέγω",
+      "description": "Τροχός 125 ή 230; Πώς διαλέγεις γωνιακό τροχό: διάμετρος δίσκου, βάθος κοπής, διακόπτης, φρένο, ρυθμιζόμενες στροφές, μπαταρίας ή ρεύματος, ασφάλεια.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "γωνιακός τροχός, τροχός 125, τροχός 230, γωνιακός τροχός μπαταρίας, τροχός 115, γωνιακός τροχός 125 ρυθμιζόμενος, πώς διαλέγω γωνιακό τροχό, τροχος 125 μπαταριας, troxos 125, τροχός 125 Milwaukee, τροχός 230 Milwaukee, γωνιακός τροχός Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Γωνιακός τροχός"
+        },
+        {
+          "@type": "Thing",
+          "name": "Δίσκοι κοπής και λείανσης"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FSAG125XB"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FSAGSVO125X"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 ONEFLAG230XPDB"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FCOT"
+        },
+        {
+          "@type": "Thing",
+          "name": "RAPIDSTOP"
+        },
+        {
+          "@type": "Thing",
+          "name": "AUTOSTOP"
+        },
+        {
+          "@type": "Thing",
+          "name": "FIXTEC"
+        },
+        {
+          "@type": "Thing",
+          "name": "ONE-KEY"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-125-160;mm-braking-angle-grinder-with-slide-switch/m18-fsag125xb/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-125-mm-safety-grinder-with-variable-speed-and-one-key/m18-fsagsvo125x/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-one-key-230-160;mm-braking-angle-grinder-with-paddle-switch/m18-oneflag230xpdb/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-sub-compact-multi-material-cut-off-tool/m12-fcot/"
+      ],
+      "wordCount": 1020
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/goniakos-trochos-115-125-230#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/goniakos-trochos-115-125-230#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Τροχός 115 ή 125 mm;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το σώμα είναι συνήθως ίδιο και αλλάζει ο δίσκος. Ο 125 mm είναι το πιο διαδεδομένο μέγεθος, με μεγαλύτερο βάθος κοπής και τη μεγαλύτερη ποικιλία δίσκων. Ο 115 mm είναι λίγο πιο ευέλικτος σε στενά σημεία. Αν διστάζεις, ο 125 mm καλύπτει τις περισσότερες δουλειές."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πότε χρειάζομαι τροχό 230 mm;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Όταν κόβεις χοντρά υλικά: μεγάλους σωλήνες, δοκούς, πλάκες μπετού, κράσπεδα και πέτρα, όπου το βάθος ενός 125 δεν φτάνει. Ο 230 mm είναι βαρύς και κρατιέται με τα δύο χέρια, οπότε δεν είναι εργαλείο για λεπτές δουλειές ή για λείανση ακριβείας."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει τροχός με φρένο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ο δίσκος σταματά γρήγορα όταν αφήνεις τον διακόπτη, αντί να συνεχίζει να γυρίζει για αρκετά δευτερόλεπτα. Έτσι μειώνεται ο κίνδυνος να ακουμπήσει ο δίσκος σε χέρι, ρούχο ή καλώδιο όταν αφήνεις κάτω τον τροχό."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Χρειάζομαι ρυθμιζόμενες στροφές στον τροχό;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Για κοπή και χοντρή λείανση όχι απαραίτητα. Για γυάλισμα, λείανση ανοξείδωτου, φινίρισμα και συρματόβουρτσες οι χαμηλότερες στροφές βοηθούν, γιατί ζεσταίνεται λιγότερο το υλικό και ελέγχεις καλύτερα το αποτέλεσμα."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Μπορώ να βάλω δίσκο 230 σε τροχό 125;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Όχι, ποτέ. Ο δίσκος πρέπει να ταιριάζει στη διάμετρο που προβλέπει ο τροχός και να έχει μέγιστες στροφές τουλάχιστον ίσες με του τροχού. Πάντα με το προστατευτικό στη θέση του. Μεγαλύτερος δίσκος χωρίς προστατευτικό είναι σοβαρός κίνδυνος."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι διακόπτη να προτιμήσω;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ο διακόπτης τύπου πεταλούδας (paddle) που δεν κλειδώνει σβήνει τον τροχό μόλις τον αφήσεις και θεωρείται η ασφαλέστερη επιλογή σε πολλά εργοτάξια. Ο συρόμενος διακόπτης είναι γνώριμος σε πολλούς τεχνίτες. Όποιον κι αν διαλέξεις, προτίμησε προστασία από αθέλητη επανεκκίνηση."
+          }
+        }
+      ]
+    }
+  ]
+}

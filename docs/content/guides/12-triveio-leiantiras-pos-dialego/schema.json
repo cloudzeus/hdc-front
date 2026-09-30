@@ -1,0 +1,159 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/triveio-leiantiras-pos-dialego#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/triveio-leiantiras-pos-dialego",
+      "url": "{{SITE_URL}}/blog/triveio-leiantiras-pos-dialego",
+      "headline": "Τριβείο: έκκεντρο, παλμικό, δέλτα ή ταινιολειαντήρας; Πώς διαλέγω",
+      "description": "Πώς διαλέγεις τριβείο: έκκεντρο 125/150 mm, παλμικό, δέλτα, ταινιολειαντήρας, ευθυλειαντήρας. Διαδρομή, γυαλόχαρτα, απαγωγή σκόνης. Οδηγός με πίνακα.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "τριβείο, έκκεντρο τριβείο, τριβείο ξύλου, τριβείο μπαταρίας, παλμικό τριβείο, λειαντήρας, ταινιολειαντήρας, πώς διαλέγω τριβείο, τριβειο ξυλου, trivio, τριβείο Milwaukee, τριβείο Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Τριβείο"
+        },
+        {
+          "@type": "Thing",
+          "name": "Έκκεντρο τριβείο"
+        },
+        {
+          "@type": "Thing",
+          "name": "Λειαντήρας"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FDSS"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 BQSS"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FROS5"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FBFL13"
+        },
+        {
+          "@type": "Thing",
+          "name": "POWERSTATE"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-sub-compact-spot-sander/m12-fdss/",
+        "https://www.milwaukeetool.eu/en-eu/m18-quarter-sheet-sander/m18-bqss/",
+        "https://www.milwaukeetool.eu/systems/m12/fuel/"
+      ],
+      "wordCount": 1011
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/triveio-leiantiras-pos-dialego#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/triveio-leiantiras-pos-dialego#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Ποια είναι η διαφορά έκκεντρου και παλμικού τριβείου;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το έκκεντρο τριβείο έχει στρογγυλό πέλμα που περιστρέφεται και ταυτόχρονα ταλαντεύεται, οπότε αφαιρεί υλικό γρήγορα χωρίς να αφήνει εμφανή σημάδια. Το παλμικό έχει τετράγωνο ή ορθογώνιο πέλμα που κάνει μικρές παλμικές κινήσεις, φτάνει στις γωνίες και είναι πιο ήπιο, για φινίρισμα."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει διαδρομή 2,5, 3 ή 5 mm σε έκκεντρο τριβείο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι το πλάτος της ταλάντωσης του πέλματος. Μεγαλύτερη διαδρομή αφαιρεί υλικό γρηγορότερα και ταιριάζει σε χοντρό τρίψιμο. Μικρότερη διαδρομή δίνει πιο λείο φινίρισμα, κατάλληλο για τελικό τρίψιμο πριν από βερνίκι ή βαφή."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ποια νούμερα γυαλόχαρτου χρειάζομαι;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Γενικά 40–60 για χοντρό τρίψιμο και αφαίρεση παλιάς βαφής, 80–120 για ισοπέδωση και προετοιμασία, 150–240 για φινίρισμα πριν από βερνίκι. Ξεκίνα από το πιο χοντρό που χρειάζεται και ανέβαινε σταδιακά, χωρίς να πηδάς πολλά νούμερα."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Χρειάζομαι απαγωγή σκόνης στο τριβείο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ναι. Η σκόνη από ξύλο, στόκο και παλιές βαφές δεν είναι αθώα και, επιπλέον, φράζει το γυαλόχαρτο και χαλάει το φινίρισμα. Σύνδεσε το τριβείο σε σκούπα εργοταξίου όπου γίνεται και φόρα μάσκα σκόνης. Σε παλιές βαφές που μπορεί να περιέχουν μόλυβδο χρειάζεται ειδική προσοχή."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι ο ταινιολειαντήρας;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι λειαντήρας με συνεχή ταινία γυαλόχαρτου που κινείται γραμμικά. Αφαιρεί υλικό πολύ γρήγορα σε ξύλο και μέταλλο. Οι στενοί ταινιολειαντήρες (λίμες ταινίας) μπαίνουν σε εσοχές και είναι χρήσιμοι για συγκολλήσεις, γρέζια και δύσκολα σημεία."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Μπορώ να τρίψω τοίχο με έκκεντρο τριβείο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Για μικρά μπαλώματα σε στόκο ναι, με λεπτό γυαλόχαρτο και απαγωγή σκόνης. Για ολόκληρους τοίχους και ταβάνια υπάρχουν ειδικά τριβεία τοίχου με μακρύ βραχίονα, που δουλεύουν πιο γρήγορα και με λιγότερη κούραση."
+          }
+        }
+      ]
+    }
+  ]
+}

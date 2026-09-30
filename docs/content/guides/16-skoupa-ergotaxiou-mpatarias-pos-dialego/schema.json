@@ -1,0 +1,159 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/skoupa-ergotaxiou-mpatarias-pos-dialego#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/skoupa-ergotaxiou-mpatarias-pos-dialego",
+      "url": "{{SITE_URL}}/blog/skoupa-ergotaxiou-mpatarias-pos-dialego",
+      "headline": "Σκούπα εργοταξίου και σκούπα μπαταρίας: πώς διαλέγω κλάση και μέγεθος",
+      "description": "Πώς διαλέγεις σκούπα εργοταξίου ή μπαταρίας: υγρών-στερεών, κλάση σκόνης L, M, H, φίλτρο HEPA, όγκος κάδου, αναρρόφηση, σύνδεση με εργαλεία. Οδηγός.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "σκούπα μπαταρίας, σκούπα υγρών στερεών, σκούπα εργοταξίου, σκούπα αναρρόφησης σκόνης, ηλεκτρική σκούπα εργοταξίου, σκούπα κλάσης L M H, πώς διαλέγω σκούπα εργοταξίου, σκουπα μπαταριας υγρων στερεων, skoupa mpatarias, σκούπα Milwaukee, σκούπα εργοταξίου Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Σκούπα εργοταξίου"
+        },
+        {
+          "@type": "Thing",
+          "name": "Σκούπα υγρών-στερεών"
+        },
+        {
+          "@type": "Thing",
+          "name": "Κλάσεις σκόνης L, M, H"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 F2VC23L"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FPOVCL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FVCL"
+        },
+        {
+          "@type": "Thing",
+          "name": "PACKOUT"
+        },
+        {
+          "@type": "Thing",
+          "name": "HEPA"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-23l-l-class-vacuum/m18-f2vc23l/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-packout-wet-dry-vacuum/m18-fpovcl/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-wet-dry-vacuum/m12-fvcl/"
+      ],
+      "wordCount": 1004
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/skoupa-ergotaxiou-mpatarias-pos-dialego#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/skoupa-ergotaxiou-mpatarias-pos-dialego#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνουν οι κλάσεις σκόνης L, M και H;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι κατηγορίες των σκουπών απαγωγής σκόνης ανάλογα με το πόση σκόνη αφήνουν να περάσει. Η L είναι για γενική, χαμηλού κινδύνου σκόνη. Η M για ξυλόσκονη και ορυκτή σκόνη, όπως από μπετό και κονιάματα. Η H για επικίνδυνες σκόνες. Έλεγξε τι απαιτεί η δουλειά και οι κανόνες του εργοταξίου."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Φίλτρο HEPA σημαίνει σκούπα κλάσης H;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Όχι απαραίτητα. Το φίλτρο HEPA κρατά πολύ λεπτά σωματίδια, αλλά η κλάση H αφορά ολόκληρη τη σκούπα, τη στεγανότητά της και τον τρόπο που αδειάζει, και δίνεται με πιστοποίηση. Κοίτα τη δηλωμένη κλάση του μηχανήματος, όχι μόνο το φίλτρο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Μπορώ να ρουφήξω νερό με σκούπα εργοταξίου;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Μόνο αν είναι σκούπα υγρών-στερεών και ακολουθείς τις οδηγίες της, συνήθως με αφαίρεση ή αλλαγή του φίλτρου σκόνης. Άδειασε και στέγνωσε τον κάδο μετά, για να μη μουχλιάσει. Μη ρουφάς εύφλεκτα υγρά, καυτές στάχτες ή επικίνδυνες ουσίες."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι η αυτόματη εκκίνηση με το εργαλείο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Σε σκούπες που τη διαθέτουν, η σκούπα ξεκινά μόνη της όταν ανάβεις το εργαλείο που είναι συνδεδεμένο σε αυτήν και σταματά λίγο μετά. Έτσι η σκόνη μαζεύεται την ώρα που δημιουργείται, χωρίς να ανάβεις και να σβήνεις δύο μηχανήματα."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Σκούπα μπαταρίας ή ρεύματος για εργοτάξιο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Η σκούπα μπαταρίας πάει παντού, χωρίς καλώδιο, και είναι ιδανική για καθάρισμα μετά από εγκαταστάσεις, για αυτοκίνητα και για χώρους χωρίς ρεύμα. Για ολοήμερη απαγωγή σκόνης από τροχούς αυλακώσεων και πιστολέτα, μια σκούπα ρεύματος ή μεγάλη σκούπα με δύο μπαταρίες είναι πιο κατάλληλη."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πώς καθαρίζω το φίλτρο της σκούπας;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Χτύπησε ελαφρά το φίλτρο ή χρησιμοποίησε τον μηχανισμό καθαρισμού, αν υπάρχει, μακριά από ανθρώπους και φορώντας μάσκα. Μην το πλένεις αν ο κατασκευαστής δεν το επιτρέπει και άλλαξέ το όταν έχει φθορές. Ένα βουλωμένο φίλτρο μειώνει δραστικά την αναρρόφηση."
+          }
+        }
+      ]
+    }
+  ]
+}

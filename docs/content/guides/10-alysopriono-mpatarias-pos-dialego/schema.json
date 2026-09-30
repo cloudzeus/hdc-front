@@ -1,0 +1,164 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/alysopriono-mpatarias-pos-dialego#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/alysopriono-mpatarias-pos-dialego",
+      "url": "{{SITE_URL}}/blog/alysopriono-mpatarias-pos-dialego",
+      "headline": "Αλυσοπρίονο μπαταρίας: πώς διαλέγω μέγεθος λάμας και τύπο",
+      "description": "Πώς διαλέγεις αλυσοπρίονο μπαταρίας: μήκος λάμας, κλαδευτικό ή άνω λαβής, κοντάρι, αλυσίδα, λάδι, φρένο αλυσίδας και εξοπλισμός ασφαλείας. Οδηγός.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "αλυσοπρίονο μπαταρίας, κλαδευτικό μπαταρίας, αλυσοπρίονο κλαδέματος, κονταροαλυσοπρίονο, αλυσοπρίονο άνω λαβής, πώς διαλέγω αλυσοπρίονο, αλυσοπρίονο μπαταρίας ή βενζίνης, αλυσοπριονο μπαταριας, alysoprono mpatarias, αλυσοπρίονο Milwaukee, αλυσοπρίονο Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Αλυσοπρίονο μπαταρίας"
+        },
+        {
+          "@type": "Thing",
+          "name": "Κλαδευτικό αλυσοπρίονο"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FCHS"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 F2CHS50"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FTHCHS"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FTPS30"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FHS"
+        },
+        {
+          "@type": "Thing",
+          "name": "HATCHET"
+        },
+        {
+          "@type": "Thing",
+          "name": "REDLITHIUM"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-chainsaw-with-40-cm-bar/m18-fchs/",
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-dual-battery-chainsaw-50-cm/m18-f2chs50/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-hatchet-pruning-saw-15-cm/m12-fhs/",
+        "https://www.milwaukeetool.eu/systems/mx-fuel/"
+      ],
+      "wordCount": 1030
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/alysopriono-mpatarias-pos-dialego#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/alysopriono-mpatarias-pos-dialego#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Τι μήκος λάμας χρειάζομαι σε αλυσοπρίονο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Γενικά η λάμα πρέπει να είναι λίγο μεγαλύτερη από το πάχος που κόβεις συνήθως. Για κλάδεμα και κλαδιά αρκούν 10–15 cm. Για καυσόξυλα, πεσμένα δέντρα και μέτριους κορμούς, 30–40 cm. Πιο μακριά λάμα σημαίνει περισσότερο βάρος και ανάγκη για περισσότερη εμπειρία."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Αλυσοπρίονο μπαταρίας ή βενζίνης;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το μπαταρίας ξεκινά αμέσως, δεν θέλει μείγμα καυσίμου, κάνει λιγότερο θόρυβο και δεν βγάζει καυσαέρια, οπότε ταιριάζει σε κήπους, αυλές, συντηρήσεις και κατοικημένες περιοχές. Για ολοήμερη υλοτομία μακριά από φόρτιση η βενζίνη μένει πρακτική, εκτός αν έχεις αρκετές μπαταρίες."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι είναι το αλυσοπρίονο άνω λαβής;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι μικρό και ελαφρύ αλυσοπρίονο με τη λαβή πάνω από το σώμα, φτιαγμένο για κλάδεμα πάνω στο δέντρο από εκπαιδευμένους δενδροκόμους. Δεν είναι εργαλείο για αρχάριους: για δουλειά από το έδαφος, ένα κλαδευτικό ή ένα κλασικό αλυσοπρίονο με πίσω λαβή είναι ασφαλέστερο."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πώς αποφεύγω το κλότσημα στο αλυσοπρίονο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το κλότσημα συμβαίνει κυρίως όταν η πάνω άκρη της μύτης της λάμας ακουμπήσει σε ξύλο. Μην κόβεις με τη μύτη, κράτα το εργαλείο με τα δύο χέρια, στάσου στο πλάι της λάμας, κράτα την αλυσίδα τροχισμένη και σωστά τεντωμένη και έλεγξε ότι το φρένο αλυσίδας δουλεύει."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι λάδι βάζω στο αλυσοπρίονο μπαταρίας;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Λάδι αλυσίδας, όπως ορίζει ο κατασκευαστής. Το λάδι λιπαίνει λάμα και αλυσίδα και μειώνει τη φθορά. Έλεγχε τη στάθμη πριν από κάθε χρήση και μη χρησιμοποιείς χρησιμοποιημένα λάδια μηχανής, που βλάπτουν και τον μηχανισμό και το περιβάλλον."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι εξοπλισμό ασφαλείας χρειάζομαι;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Κράνος με προσωπίδα και ωτοασπίδες, γυαλιά, γάντια, παντελόνι ή ποδιές με προστασία από κοπή αλυσοπρίονου και μπότες ασφαλείας. Διάβασε το εγχειρίδιο και, αν δεν έχεις εμπειρία, ξεκίνα από απλές κοπές στο έδαφος. Η κοπή δέντρων θέλει εκπαίδευση."
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,150 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "{{SITE_URL}}/#organization",
+      "name": "Milwaukee Heavy Duty Centre",
+      "url": "{{SITE_URL}}",
+      "telephone": "+302104220239",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Κ. Μαυρομιχάλη 4",
+        "postalCode": "18545",
+        "addressLocality": "Πειραιάς",
+        "addressRegion": "Αττική",
+        "addressCountry": "GR"
+      }
+    },
+    {
+      "@type": "BlogPosting",
+      "@id": "{{SITE_URL}}/blog/polyergaleio-pos-dialego#article",
+      "mainEntityOfPage": "{{SITE_URL}}/blog/polyergaleio-pos-dialego",
+      "url": "{{SITE_URL}}/blog/polyergaleio-pos-dialego",
+      "headline": "Πολυεργαλείο (multi-tool): πώς διαλέγω παλμικό πολυεργαλείο",
+      "description": "Πώς διαλέγεις παλμικό πολυεργαλείο: ταλαντώσεις/λεπτό, γωνία ταλάντωσης, αλλαγή λάμας, υποδοχή, λάμες για ξύλο, μέταλλο και αρμούς. Λίστα ελέγχου.",
+      "inLanguage": "el-GR",
+      "datePublished": "2026-09-30",
+      "dateModified": "2026-09-30",
+      "author": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "publisher": {
+        "@id": "{{SITE_URL}}/#organization"
+      },
+      "articleSection": "Οδηγοί αγοράς",
+      "keywords": "πολυεργαλείο μπαταρίας, πολυεργαλείο, παλμικό πολυεργαλείο, multi tool, λάμες πολυεργαλείου, τι κάνει το πολυεργαλείο, πώς διαλέγω πολυεργαλείο, πολυεργαλειο μπαταριας, polyergaleio, πολυεργαλείο Milwaukee, πολυεργαλείο Πειραιάς",
+      "about": [
+        {
+          "@type": "Thing",
+          "name": "Παλμικό πολυεργαλείο"
+        },
+        {
+          "@type": "Thing",
+          "name": "Λάμες πολυεργαλείου"
+        }
+      ],
+      "mentions": [
+        {
+          "@type": "Brand",
+          "name": "Milwaukee"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FUEL"
+        },
+        {
+          "@type": "Thing",
+          "name": "M18 FMT"
+        },
+        {
+          "@type": "Thing",
+          "name": "M12 FMT"
+        },
+        {
+          "@type": "Thing",
+          "name": "FIXTEC"
+        },
+        {
+          "@type": "Thing",
+          "name": "POWERSTATE"
+        },
+        {
+          "@type": "Thing",
+          "name": "Πειραιάς"
+        }
+      ],
+      "isBasedOn": [
+        "https://www.milwaukeetool.eu/en-eu/m18-fuel-multi-tool/m18-fmt/",
+        "https://www.milwaukeetool.eu/en-eu/m12-fuel-multi-tool/m12-fmt/"
+      ],
+      "wordCount": 1028
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{SITE_URL}}/blog/polyergaleio-pos-dialego#faq",
+      "inLanguage": "el-GR",
+      "isPartOf": {
+        "@id": "{{SITE_URL}}/blog/polyergaleio-pos-dialego#article"
+      },
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Τι κάνει ένα παλμικό πολυεργαλείο;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Κόβει, τρίβει και ξύνει με μια λάμα που ταλαντεύεται πολύ γρήγορα δεξιά-αριστερά. Κάνει κοπές βύθισης σε γυψοσανίδα και ξύλο, κόβει κάσες και σοβατεπί στο ύψος του δαπέδου, αφαιρεί αρμούς πλακιδίων, ξύνει κόλλες και τρίβει γωνίες. Είναι το εργαλείο των δύσκολων σημείων."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Είναι το ίδιο πολυεργαλείο και σουγιάς πολλαπλών χρήσεων;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Όχι. Με τη λέξη «πολυεργαλείο» εννοούμε συχνά και το εργαλείο τσέπης με πένσα, λάμα και κατσαβίδια. Το παλμικό πολυεργαλείο είναι ηλεκτρικό εργαλείο με εναλλασσόμενες λάμες. Ο οδηγός αυτός αφορά το παλμικό· τα εργαλεία τσέπης θα τα βρεις στα εργαλεία χειρός."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Τι σημαίνει η γωνία ταλάντωσης;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Είναι το πόσο «ανοίγει» η λάμα σε κάθε ταλάντωση, συνήθως γύρω στις 1,5 έως 2 μοίρες προς κάθε πλευρά ή περίπου 3–4 μοίρες συνολικά. Μεγαλύτερη γωνία βγάζει γρηγορότερα το υλικό από την κοπή, μικρότερη δίνει πιο ομαλή και ελεγχόμενη κοπή."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ποια λάμα βάζω για ξύλο με καρφιά;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Διμεταλλική λάμα (bi-metal), που αντέχει σε ξύλο με καρφιά, βίδες και μαλακά μέταλλα. Οι λάμες από απλό χάλυβα (HCS) είναι για καθαρό μαλακό ξύλο και πλαστικό, ενώ για αρμούς και σκληρά υλικά υπάρχουν λάμες καρβιδίου ή διαμαντιού."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Ταιριάζουν όλες οι λάμες σε όλα τα πολυεργαλεία;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Όχι πάντα. Υπάρχουν διαφορετικές υποδοχές εξαρτημάτων. Πολλά πολυεργαλεία δέχονται με αντάπτορα και λάμες άλλων συστημάτων, αλλά έλεγξε τη συμβατότητα πριν αγοράσεις σετ λάμες."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Πολυεργαλείο ή σπαθόσεγα;",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Το πολυεργαλείο κάνει μικρές, ακριβείς κοπές σε δύσκολα σημεία, κοπές βύθισης και κοπές στο ύψος της επιφάνειας. Η σπαθόσεγα κόβει γρήγορα χοντρά υλικά, σωλήνες και ξύλα σε κατεδάφιση. Δεν αντικαθιστά το ένα το άλλο."
+          }
+        }
+      ]
+    }
+  ]
+}
