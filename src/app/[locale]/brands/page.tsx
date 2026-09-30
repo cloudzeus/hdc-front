@@ -169,7 +169,7 @@ export default async function BrandsPage({
               <div>
                 <p className="t-eyebrow mb-4 flex items-center gap-[11px] text-k-red">
                   <span className="hidden h-[1.5px] w-[26px] bg-k-red lg:block" />
-                  EXCLUSIVE PARTNERSHIPS
+                  MILWAUKEE HEAVY DUTY CENTRE
                 </p>
                 <h1 className="font-display text-[26px] leading-[1.14] t-display text-white lg:text-[36px]">
                   {upGreek(t("ta_brands_poy"))}
@@ -228,7 +228,7 @@ export default async function BrandsPage({
                *
                * Το λευκό πλακίδιο πίσω από το λογότυπο ήταν το μπάλωμα, και
                * φαινόταν ακριβώς σαν μπάλωμα. Η κάρτα γίνεται λευκή και ο
-               * ρυθμός κρατιέται από το κόκκινο σήμα «ΑΝΤΙΠΡΟΣΩΠΕΙΑ» — κείμενο
+               * ρυθμός κρατιέται από το κόκκινο σήμα πάνω αριστερά — κείμενο
                * δικό μας, που μπορούμε να χρωματίσουμε όπως θέλουμε.
                *
                * Ίδια λογική με το μενού, όπου κάθε κελί είναι λευκό.
