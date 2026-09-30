@@ -43,7 +43,7 @@ const TRIGGER: Record<string, string> = { cron: "Αυτόματη", "manual-draf
 
 const gate = (id: string) => GATE_LABELS[id as GateId] ?? id;
 const when = (iso: string) =>
-  new Date(iso).toLocaleString("el-GR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Athens" });
+  new Date(iso).toLocaleString("el-GR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "Europe/Athens" });
 
 function OutcomeTag({ outcome }: { outcome: string | null }) {
   const [label, tone] =
@@ -458,7 +458,7 @@ function RunSubject({ r }: { r: RunRow }) {
       ) : (
         <p className="font-medium text-k-ink">{r.topic ?? "—"}</p>
       )}
-      {r.article && r.topic && <p className="text-[length:var(--fs-12)] text-k-text-3">{r.topic}</p>}
+      {r.article && r.topic && r.topic !== r.article.title && <p className="text-[length:var(--fs-12)] text-k-text-3">{r.topic}</p>}
       {r.article && <p className="font-mono text-[length:var(--fs-11)] break-all text-k-text-4">{r.article.slug}</p>}
     </div>
   );

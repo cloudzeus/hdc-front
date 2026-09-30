@@ -41,6 +41,8 @@ export function ArticlesList({
   const router = useRouter();
   const [pending, start] = useTransition();
   const drafts = rows.filter((r) => r.status === "DRAFT").length;
+  /* «Δημοσίευση όλων» leaves automatic drafts alone: each one is read first. */
+  const manualDrafts = rows.filter((r) => r.status === "DRAFT" && r.source !== "AUTO").length;
   const kind = filter.kind === "ARTICLE" || filter.kind === "GUIDE" ? filter.kind : null;
 
   const toggle = (row: ArticleRow) =>
@@ -110,18 +112,18 @@ export function ArticlesList({
             </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button type="button" disabled={pending || drafts === 0}>
+                <Button type="button" disabled={pending || manualDrafts === 0}>
                   <Send aria-hidden />
-                  Δημοσίευση όλων ({drafts})
+                  Δημοσίευση όλων ({manualDrafts})
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Δημοσίευση όλων των προχείρων;</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Θα δημοσιευτούν {drafts} {kind === "GUIDE" ? "οδηγοί" : kind === "ARTICLE" ? "άρθρα" : "άρθρα και οδηγοί"} και θα
+                    Θα δημοσιευτούν {manualDrafts} {kind === "GUIDE" ? "οδηγοί" : kind === "ARTICLE" ? "άρθρα" : "άρθρα και οδηγοί"} και θα
                     φανούν αμέσως στο κατάστημα, στο sitemap και στο llms.txt. Όσα γράφουν «αντιπρόσωπος» ή παρόμοιο μένουν
-                    πρόχειρα. Κάθε ένα αποσύρεται αργότερα από τη λίστα.
+                    πρόχειρα, όπως και τα αυτόματα, που δημοσιεύονται ένα ένα. Κάθε ένα αποσύρεται αργότερα από τη λίστα.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

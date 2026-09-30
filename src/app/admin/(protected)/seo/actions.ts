@@ -192,12 +192,16 @@ export async function setArticleStatusAction(id: string, publish: boolean): Prom
   return { ok: true };
 }
 
-/** «Δημοσίευση όλων»: every draft (of one kind, or all), except any that claims to be a dealer. */
+/**
+ * «Δημοσίευση όλων»: every hand-written draft (of one kind, or all), except
+ * any that claims to be a dealer. An automatic draft failed a check by
+ * definition, so it is published one at a time, after a person has read it.
+ */
 export async function publishAllAction(kind: ContentKind | null): Promise<ActionResult<{ published: number; refused: string[] }>> {
   const user = await guard();
   if (!kindSchema.nullable().safeParse(kind).success) return { ok: false, error: "Μη έγκυρα στοιχεία." };
   const drafts = await prisma.contentArticle.findMany({
-    where: { status: "DRAFT", ...(kind ? { kind } : {}) },
+    where: { status: "DRAFT", source: "MANUAL", ...(kind ? { kind } : {}) },
   });
   const refused: string[] = [];
   const now = new Date();
