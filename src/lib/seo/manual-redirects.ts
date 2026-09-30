@@ -70,24 +70,42 @@ export function createManualResolver(rules: ManualRule[]): ManualResolver {
 /**
  * The rules in memory, refreshed at most every `ttlMs`.
  *
- * The first call waits for the load; after that a stale copy is served while
- * one refresh runs in the background. A failed load keeps the last good copy
- * (or none) — a database hiccup must not turn into a 500 on every page.
+ * The first call waits for the load — at most `timeoutMs` — and after that a
+ * stale copy is served while one refresh runs in the background. A failed or
+ * slow load keeps the last good copy (or none): a database hiccup must not
+ * turn into a 500, or a hang, on every page.
  */
 export function createManualRedirectCache(options: {
   load: () => Promise<ManualRule[]>;
   ttlMs?: number;
+  /** A load slower than this counts as failed: the proxy never waits longer. */
+  timeoutMs?: number;
   now?: () => number;
 }): () => Promise<ManualResolver> {
   const ttl = options.ttlMs ?? 60_000;
+  const timeout = options.timeoutMs ?? 3_000;
   const now = options.now ?? Date.now;
   let resolver: ManualResolver | null = null;
   let loadedAt = 0;
   let inflight: Promise<ManualResolver> | null = null;
 
+  const bounded = () =>
+    new Promise<ManualRule[]>((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error(`manual redirects: no answer in ${timeout}ms`)), timeout);
+      options.load().then(
+        (rules) => {
+          clearTimeout(timer);
+          resolve(rules);
+        },
+        (error) => {
+          clearTimeout(timer);
+          reject(error);
+        },
+      );
+    });
+
   const refresh = () => {
-    inflight ??= options
-      .load()
+    inflight ??= bounded()
       .then((rules) => {
         resolver = createManualResolver(rules);
         return resolver;

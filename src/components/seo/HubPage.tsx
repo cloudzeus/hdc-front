@@ -16,6 +16,7 @@ import { renderMarkdown } from "@/lib/seo/markdown";
 import { faqJsonLd } from "@/lib/seo/product-faq";
 import { greekKind } from "@/lib/seo/product-seo";
 import { seoFor } from "@/lib/seo/seo-for";
+import { autoHubSeo } from "@/lib/seo/page-seo";
 import { breadcrumbJsonLd } from "@/lib/seo/structured-data";
 import { absoluteUrl, pageMeta, siteOrigin } from "@/lib/seo/urls";
 
@@ -32,10 +33,7 @@ import { absoluteUrl, pageMeta, siteOrigin } from "@/lib/seo/urls";
 type Props = { params: Promise<{ locale: Locale }> };
 
 async function hubSeo(hub: Hub, locale: Locale) {
-  const t = await getTranslations({ locale, namespace: "seoPages" });
-  const h1 = t(`hub_${hub.msg}_h1`);
-  const lead = t(`hub_${hub.msg}_lead`);
-  return seoFor("PLATFORM", hub.key, locale, { h1, title: h1, description: lead, intro: lead });
+  return seoFor("PLATFORM", hub.key, locale, await autoHubSeo(hub.key, locale));
 }
 
 export function hubRoute(key: HubKey) {

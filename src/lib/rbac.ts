@@ -30,6 +30,9 @@ export const CAPABILITIES = [
   "milwaukee.view", // overview, availability, XML-only products, official data
   "milwaukee.edit", // names, categories, prices, content, activation, spec labels
   "milwaukee.erp", // «Καταχώριση στο SoftOne»
+  // SEO & content (/admin/seo): articles and guides, page SEO, redirects, llms.txt.
+  "seo.view",
+  "seo.edit",
   "users", // admin user management
 ] as const;
 
@@ -75,6 +78,14 @@ export const CAPABILITY_META: Record<Capability, { label: string; description: s
     label: "Milwaukee · SoftOne",
     description: "Καταχώριση προϊόντων μόνο-XML στο SoftOne — γράφει στο ERP",
   },
+  "seo.view": {
+    label: "SEO · προβολή",
+    description: "Άρθρα, οδηγοί, κείμενα SEO σελίδων, ανακατευθύνσεις και έλεγχοι — μόνο ανάγνωση",
+  },
+  "seo.edit": {
+    label: "SEO · αλλαγές",
+    description: "Επεξεργασία και δημοσίευση άρθρων και οδηγών, κείμενα SEO, ανακατευθύνσεις 301, llms.txt",
+  },
   users: { label: "Χρήστες & ρόλοι", description: "Μόνο για διαχειριστές" },
 };
 
@@ -86,7 +97,7 @@ export const ADMIN_ONLY_CAPABILITIES: readonly Capability[] = ["users"];
 
 export const DEFAULT_ROLE_CAPABILITIES: Record<AdminRole, readonly Capability[]> = {
   ADMIN: CAPABILITIES,
-  EDITOR: ["content", "catalogue", "merchandising", "editorial", "engagement"],
+  EDITOR: ["content", "catalogue", "merchandising", "editorial", "engagement", "seo.view", "seo.edit"],
   OPS: ["orders", "customers", "service", "engagement", "sync"],
 };
 
@@ -104,6 +115,7 @@ export function isCapability(value: string): value is Capability {
 export const CAPABILITY_IMPLIES: Partial<Record<Capability, Capability>> = {
   "milwaukee.edit": "milwaukee.view",
   "milwaukee.erp": "milwaukee.view",
+  "seo.edit": "seo.view",
 };
 
 /**

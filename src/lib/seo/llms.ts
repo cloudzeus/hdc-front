@@ -5,6 +5,7 @@ import { STOCK_HOLD_HOURS } from "@/lib/orders/hold";
 import { displayName } from "@/lib/milwaukee/display";
 import { parseModel } from "@/lib/milwaukee/model";
 import { modelPath } from "@/lib/milwaukee/model-slug";
+import { DEALER_WORDING } from "@/lib/seo/dealer-wording";
 
 /**
  * llms.txt and llms-full.txt — what this site is, for something that reads
@@ -26,9 +27,7 @@ import { modelPath } from "@/lib/milwaukee/model-slug";
  * the test that keeps it that way, here and in the FAQ copy.
  */
 
-/** Wording that claims to represent a manufacturer. Never in public copy. */
-export const DEALER_WORDING =
-  /αντιπρ[οό]σωπ|αντιπροσωπε[ίι]|διανομ[εέ]α|επ[ίι]σημη διανομ|εξουσιοδοτημ[εέ]ν|dealer|distribut|authori[sz]ed|official (reseller|partner)|rivenditore autorizzato|concessionari/i;
+export { DEALER_WORDING };
 
 const C = SHOP.contact;
 

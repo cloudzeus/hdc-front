@@ -34,12 +34,9 @@ import { prisma } from "@/lib/prisma";
 import { Zone } from "@/components/zones/Zone";
 import { jsonLdHtml } from "@/lib/seo/json-ld";
 import { FaqSection } from "@/components/blog/ArticleView";
-import { categoryGreekTexts } from "@/lib/catalog/category-names";
-import { getGreekLexicon } from "@/lib/catalog/greek-lexicon";
-import { categoryFaq, categoryIntro } from "@/lib/seo/category-copy";
-import { accentedName, categoryDescription, categoryTitle } from "@/lib/seo/category-seo";
 import { faqJsonLd } from "@/lib/seo/product-faq";
 import { seoFor } from "@/lib/seo/seo-for";
+import { autoCategorySeo } from "@/lib/seo/page-seo";
 import { titleWithSite } from "@/lib/seo/title";
 
 type PageProps = {
@@ -88,28 +85,8 @@ const categorySeo = cache(async (slug: string, locale: Locale) => {
     return { h1: localName, title: localName, description: genericDescription, intro: null, faq: [] };
   }
 
-  const [summary, texts, lexicon] = await Promise.all([
-    getPlpSummary({ categorySlug: slug }, locale),
-    categoryGreekTexts(category.erpType, category.erpCode),
-    getGreekLexicon(),
-  ]);
-  const name = accentedName(category.nameEl, texts, lexicon);
-  const platforms = (["M12", "M18", "MX"] as const)
-    .filter((p) => summary.platforms[p] > 0)
-    .map((p) => (p === "MX" ? "MX FUEL" : p));
-  const children = summary.subcategories
-    .filter((c) => c.count > 0)
-    .map((c) => accentedName(c.label, texts, lexicon))
-    .filter((c) => /\p{Ll}/u.test(c));
-  const total = summary.platforms.all;
-  const copy = { name, total, facets: summary };
-  return seoFor("CATEGORY", slug, locale, {
-    h1: name,
-    title: categoryTitle({ name, platforms }),
-    description: total > 0 ? categoryDescription({ name, total, platforms, children }) : genericDescription,
-    intro: categoryIntro(copy),
-    faq: categoryFaq(copy),
-  });
+  const auto = await autoCategorySeo(slug);
+  return seoFor("CATEGORY", slug, locale, auto ?? { h1: localName, title: localName, description: genericDescription });
 });
 
 export async function generateMetadata({

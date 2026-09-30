@@ -6,28 +6,18 @@ import { HdcContentPage } from "@/components/content/HdcContentPage";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { availabilityLabelKey, availabilityOf } from "@/lib/catalog/availability";
-import { getGreekLexicon } from "@/lib/catalog/greek-lexicon";
-import { getModelProducts, type ModelProduct } from "@/lib/catalog/models";
+
 import { formatMoney, grossAmount } from "@/lib/format";
-import { parseModel } from "@/lib/milwaukee/model";
 import { modelPath, modelRootFromSlug, modelSlug } from "@/lib/milwaukee/model-slug";
-import { ahLabel, boxFacts, keyNumbers, specTable } from "@/lib/milwaukee/pdp";
+import { specTable } from "@/lib/milwaukee/pdp";
 import { parseTechBlock } from "@/lib/milwaukee/tech-block";
 import { discountedNet, offerBadgeFor } from "@/lib/offers/badges";
 import { hubForPlatform } from "@/lib/seo/hubs";
 import { renderMarkdown } from "@/lib/seo/markdown";
-import {
-  modelAnswer,
-  modelDescription,
-  modelFaq,
-  modelH1,
-  modelTitle,
-  type ModelCopyInput,
-} from "@/lib/seo/model-copy";
 import { faqJsonLd } from "@/lib/seo/product-faq";
 import { modelGroupJsonLd } from "@/lib/seo/product-schema";
-import { greekKind } from "@/lib/seo/product-seo";
 import { seoFor } from "@/lib/seo/seo-for";
+import { autoModelSeo } from "@/lib/seo/page-seo";
 import { breadcrumbJsonLd } from "@/lib/seo/structured-data";
 import { absoluteUrl, pageMeta, siteOrigin } from "@/lib/seo/urls";
 
@@ -43,59 +33,15 @@ import { absoluteUrl, pageMeta, siteOrigin } from "@/lib/seo/urls";
 
 type PageProps = { params: Promise<{ locale: Locale; model: string }> };
 
-/** What a kit holds, in the words of its own «Τεχνικά χαρακτηριστικά» block. */
-function kitContents(product: ModelProduct): string | null {
-  if (product.content !== "kit") return null;
-  const facts = boxFacts(parseTechBlock(product.longDescriptionEl));
-  const kit = facts.batteries ?? parseModel(product.name)?.kit ?? null;
-  const parts: string[] = [];
-  if (kit) {
-    const count = "count" in kit ? kit.count : kit.batteries;
-    parts.push(`${count} ${count === 1 ? "μπαταρία" : "μπαταρίες"} ${ahLabel(kit.ah)} Ah`);
-  }
-  if (facts.charger != null) parts.push(facts.charger ? `φορτιστή ${facts.charger}` : "φορτιστή");
-  if (facts.case) parts.push(facts.case);
-  if (parts.length === 0) return null;
-  return parts.length === 1 ? parts[0] : `${parts.slice(0, -1).join(", ")} και ${parts.at(-1)}`;
-}
-
 async function loadModel(slug: string, locale: Locale) {
   const root = modelRootFromSlug(slug);
   if (!root) return null;
-  const products = await getModelProducts(root);
-  if (products.length === 0) return null;
-
+  const model = await autoModelSeo(root);
+  if (!model) return null;
+  const { input, products, auto } = model;
   const lead = products.find((p) => p.content === "bare") ?? products[0];
-  const parsed = parseModel(lead.name);
-  const platform = lead.platform ?? parsed?.platform ?? "M18";
-  const techRows = parseTechBlock(lead.longDescriptionEl);
-  const input: ModelCopyInput = {
-    root,
-    kind: greekKind({
-      erpName: lead.name,
-      code2: lead.code2,
-      greekTexts: [lead.shortDescriptionEl, lead.longDescriptionEl],
-      lexicon: await getGreekLexicon(),
-    }),
-    platform,
-    fuel: parsed?.fuel ?? false,
-    keySpec: keyNumbers(techRows, "el")[0] ?? null,
-    versions: products.map((p) => ({
-      code: parseModel(p.name)?.code ?? p.code2,
-      code2: p.code2,
-      content: p.content,
-      contents: kitContents(p),
-      availability: availabilityOf(p),
-    })),
-  };
-  const seo = await seoFor("MODEL", root, locale, {
-    h1: modelH1(input),
-    title: modelTitle(input),
-    description: modelDescription(input),
-    intro: modelAnswer(input),
-    faq: modelFaq(input),
-  });
-  return { root, products, lead, input, seo, techRows };
+  const seo = await seoFor("MODEL", root, locale, auto);
+  return { root, products, lead, input, seo, techRows: parseTechBlock(lead.longDescriptionEl) };
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

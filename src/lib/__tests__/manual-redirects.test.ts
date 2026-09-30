@@ -71,3 +71,14 @@ describe("createManualRedirectCache", () => {
     error.mockRestore();
   });
 });
+
+describe("createManualRedirectCache: a slow database", () => {
+  it("does not wait longer than the timeout", async () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    const get = createManualRedirectCache({ load: () => new Promise(() => {}), timeoutMs: 20 });
+    const started = Date.now();
+    expect((await get())("/a")).toBeNull();
+    expect(Date.now() - started).toBeLessThan(1000);
+    error.mockRestore();
+  });
+});
