@@ -1,4 +1,5 @@
 import { routing, type Locale } from "@/i18n/routing";
+import { SHOP } from "@/config/shop";
 
 /**
  * Canonical and alternate addresses for a page.
@@ -208,7 +209,7 @@ export function pageMeta(input: {
     alternates: alternatesFor(input.path, input.locale),
     openGraph: {
       type: input.type ?? "website",
-      siteName: "Kolleris",
+      siteName: SHOP.name,
       locale:
         input.locale === "el"
           ? "el_GR"

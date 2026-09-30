@@ -7,6 +7,7 @@ import {
 } from "@/lib/catalog/availability";
 import { prisma } from "@/lib/prisma";
 import { absoluteUrl } from "@/lib/seo/urls";
+import { SHOP } from "@/config/shop";
 import { isPlausibleWeightKg } from "@/lib/shipping/acs-tariff";
 import type { Locale } from "@/i18n/routing";
 
@@ -230,7 +231,7 @@ export async function buildMerchantFeed(locale: Locale = "el"): Promise<string> 
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">',
     "<channel>",
-    "<title>Kolleris</title>",
+    `<title>${xml(SHOP.name)}</title>`,
     `<link>${xml(absoluteUrl("/", locale))}</link>`,
     "<description>Επαγγελματικά εργαλεία και εξοπλισμός</description>",
     ...items,

@@ -1,5 +1,5 @@
 import Script from "next/script";
-import { MERCHANT_ID } from "@/lib/seo/google-reviews";
+import { merchantCenterAccount } from "@/lib/seo/google-reviews";
 import { jsonLdHtml } from "@/lib/seo/json-ld";
 
 /**
@@ -34,8 +34,12 @@ export function GoogleReviewsOptIn({
   /** Valid GTINs only — see `isValidGtin`. Optional in Google's schema. */
   gtins: string[];
 }) {
+  // No Merchant Center account configured: no opt-in at all.
+  const merchant = merchantCenterAccount();
+  if (merchant === undefined) return null;
+
   const config = {
-    merchant_id: MERCHANT_ID,
+    merchant_id: merchant,
     order_id: orderId,
     email,
     delivery_country: deliveryCountry,

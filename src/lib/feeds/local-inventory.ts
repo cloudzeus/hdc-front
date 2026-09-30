@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
 import { merchantId } from "@/lib/feeds/google-merchant";
+import { siteId } from "@/lib/seo/site-ids";
 
 /**
  * The local inventory feed — a second, small feed alongside the main product
@@ -25,23 +26,19 @@ import { merchantId } from "@/lib/feeds/google-merchant";
 
 /**
  * Ο κωδικός καταστήματος, όπως τον έχει το Επιχειρηματικό Προφίλ — ΟΧΙ όπως
- * θα τον διαλέγαμε εμείς.
+ * θα τον διαλέγαμε εμείς. Ο Google τον αντιστοιχεί με το Επιχειρηματικό
+ * Προφίλ, και ό,τι δεν υπάρχει εκεί δεν αντιστοιχεί σε κανένα κατάστημα:
+ * ένας λάθος κωδικός απορρίπτει ολόκληρο το αρχείο («Μη έγκυρος κωδικός
+ * καταστήματος»).
  *
- * Ήταν `peiraias`, και το Merchant Center το απέρριψε ολόκληρο το αρχείο:
- * «Μη έγκυρος κωδικός καταστήματος». Ο κωδικός ΔΕΝ επιλέγεται από εδώ. Ο
- * Google τον αντιστοιχεί με το Επιχειρηματικό Προφίλ, και ό,τι δεν υπάρχει
- * εκεί δεν αντιστοιχεί σε κανένα κατάστημα — οπότε και οι 9.522 γραμμές πάνε
- * χαμένες μαζί, χωρίς ούτε μία να περάσει.
- *
- * Το `om-` δεν είναι όνομα που έδωσε άνθρωπος· είναι ο κωδικός που παράγει ο
- * ίδιος ο Google για τοποθεσία που δεν έχει δικό της. Άσχημος να τον διαβάσεις,
- * αλλά αυτός είναι που ταιριάζει.
- *
- * Παραμένει σε env var: αν κάποια στιγμή δοθεί στο Επιχειρηματικό Προφίλ
- * κανονικός κωδικός, αλλάζει χωρίς deploy.
+ * Μόνο από το LOCAL_INVENTORY_STORE_CODE. Η προεπιλογή που υπήρχε εδώ
+ * (`om-8281…`) ήταν της τοποθεσίας της Kolleris· το προφίλ είναι κοινό, αλλά ο
+ * κωδικός δηλώνεται ρητά στο deploy, όχι στον κώδικα. Χωρίς αυτόν ο feed δεν
+ * σερβίρεται (404) — βλ. `app/feeds/local-inventory.txt/route.ts`.
  */
-const STORE_CODE =
-  process.env.GOOGLE_LOCAL_STORE_CODE?.trim() || "om-8281271752754963088";
+export function localStoreCode(): string | undefined {
+  return siteId("localStoreCode");
+}
 
 /** Ready in about two hours during opening hours — see `SHOP` and the pickup shipping method. */
 const PICKUP_SLA = "same_day";
@@ -88,7 +85,7 @@ export function availabilityFor(inStock: boolean, quantity: number): "in stock" 
   return inStock && quantity > 0 ? "in stock" : "out of stock";
 }
 
-export async function buildLocalInventoryFeed(): Promise<string> {
+export async function buildLocalInventoryFeed(storeCode: string): Promise<string> {
   const products = await prisma.product.findMany({
     where: { isActive: true, priceNet: { gt: 0 }, images: { some: {} } },
     select: { mtrl: true, xmlCode: true, qty: true, inStock: true },
@@ -104,7 +101,7 @@ export async function buildLocalInventoryFeed(): Promise<string> {
     const available = availability === "in stock";
 
     return [
-      STORE_CODE,
+      storeCode,
       // Same id as the Merchant feed, or Google cannot join the two.
       merchantId(product),
       String(quantity),

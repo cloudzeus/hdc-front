@@ -1,5 +1,6 @@
 import Script from "next/script";
 import { CookieConsent } from "@/components/analytics/CookieConsent";
+import { siteId } from "@/lib/seo/site-ids";
 
 /**
  * Google Analytics 4, με Consent Mode v2.
@@ -28,21 +29,25 @@ import { CookieConsent } from "@/components/analytics/CookieConsent";
  * προγραμματιστή μπαίνει στα ίδια σύνολα με τους πελάτες — αλλοιώνει ποσοστά
  * μετατροπής για πάντα, χωρίς να καθαρίζεται εκ των υστέρων.
  *
- * ── Το αναγνωριστικό ρυθμίζεται ────────────────────────────────────────────
+ * ── Το αναγνωριστικό ρυθμίζεται, χωρίς προεπιλογή ──────────────────────────
  *
- * Προεπιλογή η ιδιοκτησία που δόθηκε· το `NEXT_PUBLIC_GA_MEASUREMENT_ID` την
- * παρακάμπτει, και κενή τιμή σβήνει τη μέτρηση — για staging που δεν πρέπει να
- * γράφει στα ίδια δεδομένα.
+ * Από το `NEXT_PUBLIC_GA_ID` και μόνο (βλ. `src/lib/seo/site-ids.ts`). Η
+ * προεπιλογή που υπήρχε ήταν η ιδιοκτησία GA4 της Kolleris· χωρίς τιμή δεν
+ * φορτώνει τίποτα.
  */
-
-const MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ?? "G-EGS1JNM4EC";
 
 /** Το κλειδί που κρατά την απάντηση του επισκέπτη. Ίδιο και στο banner. */
 export const CONSENT_STORAGE_KEY = "kolleris-consent-v1";
 
 export function GoogleAnalytics() {
   if (process.env.NODE_ENV !== "production") return null;
-  if (!MEASUREMENT_ID) return null;
+  const MEASUREMENT_ID = siteId("gaId");
+  /*
+   * The consent default and the banner are needed by Tag Manager too: with GA4
+   * moved into the container and no direct id, the container would otherwise
+   * load with no consent state at all. So they stay whenever either is on.
+   */
+  if (!MEASUREMENT_ID && !siteId("gtmId")) return null;
 
   /*
    * Η αποθηκευμένη απάντηση διαβάζεται ΜΕΣΑ στο inline script, όχι στον
@@ -63,19 +68,22 @@ gtag('consent', 'default', {
   security_storage: 'granted',
   wait_for_update: 500
 });
-gtag('js', new Date());
-gtag('config', ${JSON.stringify(MEASUREMENT_ID)});`;
+gtag('js', new Date());${
+    MEASUREMENT_ID ? `\ngtag('config', ${JSON.stringify(MEASUREMENT_ID)});` : ""
+  }`;
 
   return (
     <>
       <Script id="ga4-consent-init" strategy="beforeInteractive">
         {init}
       </Script>
-      <Script
-        id="ga4-src"
-        src={`https://www.googletagmanager.com/gtag/js?id=${MEASUREMENT_ID}`}
-        strategy="afterInteractive"
-      />
+      {MEASUREMENT_ID && (
+        <Script
+          id="ga4-src"
+          src={`https://www.googletagmanager.com/gtag/js?id=${MEASUREMENT_ID}`}
+          strategy="afterInteractive"
+        />
+      )}
       <CookieConsent />
     </>
   );

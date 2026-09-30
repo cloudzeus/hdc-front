@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { authConfig } from "@/auth.config";
 import { routing } from "@/i18n/routing";
 import { indexingAllowed, NOINDEX_HEADER } from "@/lib/seo/indexing";
+import { isAliasHost } from "@/lib/seo/canonical-host";
 
 // Edge-safe: authConfig carries no providers and no database access.
 const { auth } = NextAuth(authConfig);
@@ -27,15 +28,12 @@ const CANONICAL_HOST = (() => {
 /**
  * Ένα κατάστημα, ένα όνομα.
  *
- * Το `kolleris.com`, το `www.` και το `web.` δείχνουν στον ίδιο container, και
- * μέχρι τη μετακόμιση και τα τρία απαντούσαν 200 με το ίδιο περιεχόμενο. Για
- * μια μηχανή αναζήτησης αυτό είναι τρία αντίγραφα που ανταγωνίζονται μεταξύ
- * τους· για έναν πελάτη είναι τρία καλάθια και τρεις συνδέσεις, αφού τα cookies
- * ανήκουν στο host.
- *
- * Ο κανόνας ζει ΚΑΙ στο Cloudflare, που πιάνει και το `/api` και τα αρχεία. Εδώ
- * είναι το δίχτυ: αν κάποιος σβήσει τον κανόνα, το κατάστημα δεν ξαναγίνεται
- * σιωπηλά διπλό.
+ * Το apex και το `www.` δείχνουν στον ίδιο container. Για μια μηχανή
+ * αναζήτησης δύο ονόματα με το ίδιο περιεχόμενο είναι δύο αντίγραφα που
+ * ανταγωνίζονται· για έναν πελάτη δύο καλάθια και δύο συνδέσεις, αφού τα
+ * cookies ανήκουν στο host. Ποια ονόματα διπλώνονται το αποφασίζει το
+ * `isAliasHost` από το ίδιο το κανονικό host — όχι μια λίστα (ο κανόνας που
+ * αντιγράφηκε από την Kolleris έπιανε το `*.kolleris.com`).
  *
  * 301 και όχι 307: η ανακατεύθυνση είναι μόνιμη και θέλουμε οι μηχανές να
  * μεταφέρουν την αξία της παλιάς διεύθυνσης στη νέα.
@@ -43,13 +41,7 @@ const CANONICAL_HOST = (() => {
 function canonicalHostRedirect(request: NextRequest): NextResponse | null {
   if (!CANONICAL_HOST) return null;
   const host = request.headers.get("host");
-  if (!host || host === CANONICAL_HOST) return null;
-  /*
-   * Μόνο τα δικά μας ονόματα. Ένα άγνωστο host (έλεγχος υγείας σε IP, δοκιμαστικό
-   * domain του Coolify) δεν πρέπει να στέλνει τον επισκέπτη αλλού — και μια
-   * ανακατεύθυνση σε βρόχο είναι χειρότερη από διπλό περιεχόμενο.
-   */
-  if (!/(^|\.)kolleris\.com$/i.test(host.split(":")[0])) return null;
+  if (!host || !isAliasHost(host, CANONICAL_HOST)) return null;
 
   const url = new URL(request.nextUrl);
   url.host = CANONICAL_HOST;

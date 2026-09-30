@@ -1,3 +1,5 @@
+import { siteId } from "@/lib/seo/site-ids";
+
 /**
  * Google Customer Reviews.
  *
@@ -18,25 +20,17 @@
  */
 
 /**
- * Ο λογαριασμός Merchant Center του καταστήματος: 5834747829.
+ * The Merchant Center account the survey opt-in reports to, or `undefined`.
  *
- * Ήταν `522915672` — αριθμός που ΔΕΝ ανήκει σε αυτό το κατάστημα. Δεν υπήρχε
- * ούτε env override, οπότε κάθε σελίδα επιβεβαίωσης ζητούσε από το Google να
- * στείλει έρευνα ικανοποίησης εκ μέρους ξένου λογαριασμού. Το Google δεν
- * επιστρέφει σφάλμα σε αυτό — απλώς δεν εμφανίζει ποτέ τη συμμετοχή, οπότε το
- * σύμπτωμα ήταν «δεν μαζεύουμε αξιολογήσεις» χωρίς κανένα ίχνος αιτίας.
- *
- * Ο αριθμός δεν είναι μυστικό: δημοσιεύεται στον πηγαίο κώδικα κάθε σελίδας
- * και ταυτοποιεί έναν λογαριασμό Merchant Center. Ίδιο σκεπτικό με το token
- * επαλήθευσης του Search Console — το να γίνει υποχρεωτική ρύθμιση deployment
- * απλώς προσθέτει ένα βήμα σε αλυσίδα που ήδη έχασε ένα.
- *
- * `||`, όχι `??` — μια δηλωμένη αλλά κενή γραμμή .env είναι `""`, και το
- * `"" ?? x` δίνει `""`.
+ * From NEXT_PUBLIC_MERCHANT_ID only. The fallback that used to be here
+ * (5834747829) is the Kolleris account: on this shop it would have asked Google
+ * to survey HDC customers on another merchant's behalf. Unset means no opt-in
+ * is rendered. See src/lib/seo/site-ids.ts.
  */
-export const MERCHANT_ID = Number(
-  process.env.NEXT_PUBLIC_GOOGLE_MERCHANT_ID || "5834747829",
-);
+export function merchantCenterAccount(): number | undefined {
+  const id = siteId("merchantId");
+  return id ? Number(id) : undefined;
+}
 
 /**
  * When the parcel should be with the customer, as `YYYY-MM-DD`.

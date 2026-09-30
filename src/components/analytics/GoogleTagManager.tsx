@@ -1,4 +1,5 @@
 import Script from "next/script";
+import { siteId } from "@/lib/seo/site-ids";
 
 /**
  * Google Tag Manager.
@@ -12,14 +13,14 @@ import Script from "next/script";
  *
  * ── ΠΡΟΣΟΧΗ: το GA4 μετριέται ΗΔΗ, απευθείας ──────────────────────────────
  *
- * Το `GoogleAnalytics` φορτώνει το `G-EGS1JNM4EC` με το δικό του gtag. Αν
+ * Το `GoogleAnalytics` φορτώνει το `NEXT_PUBLIC_GA_ID` με το δικό του gtag. Αν
  * κάποια μέρα προστεθεί ΚΑΙ μέσα στο GTM ετικέτα GA4 με το ίδιο αναγνωριστικό,
  * κάθε προβολή θα μετρηθεί δύο φορές — και τα ποσοστά μετατροπής θα πέσουν στο
  * μισό χωρίς να αλλάξει τίποτα στο κατάστημα.
  *
  * Τότε διάλεξε ΕΝΑ από τα δύο:
  *   - κράτα το GA4 εδώ και σβήσε την ετικέτα μέσα στον container, ή
- *   - βάλε το GA4 στον container και μηδένισε το `NEXT_PUBLIC_GA_MEASUREMENT_ID`,
+ *   - βάλε το GA4 στον container και άφησε κενό το `NEXT_PUBLIC_GA_ID`,
  *     που σβήνει το απευθείας tag.
  *
  * ── Συγκατάθεση ───────────────────────────────────────────────────────────
@@ -35,15 +36,19 @@ import Script from "next/script";
  * σύνολα με των πελατών.
  */
 
-const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID ?? "GTM-NXJCLBQT";
-
-function enabled(): boolean {
-  return process.env.NODE_ENV === "production" && Boolean(GTM_ID);
+/**
+ * Ο container, από το `NEXT_PUBLIC_GTM_ID` και μόνο (βλ. `site-ids.ts`). Η
+ * προεπιλογή που υπήρχε ήταν ο container της Kolleris· το ID του HDC θα δοθεί,
+ * και μέχρι τότε δεν φορτώνει τίποτα.
+ */
+function containerId(): string | undefined {
+  return process.env.NODE_ENV === "production" ? siteId("gtmId") : undefined;
 }
 
 /** Ο container. Μπαίνει στο <body>, μετά τη συγκατάθεση που ήδη έχει δηλωθεί. */
 export function GoogleTagManager() {
-  if (!enabled()) return null;
+  const GTM_ID = containerId();
+  if (!GTM_ID) return null;
 
   return (
     <Script id="gtm" strategy="afterInteractive">
@@ -63,7 +68,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
  * και θέλει να υπάρχει στο έγγραφο ακόμη κι όταν δεν τρέχει κανένα script.
  */
 export function GoogleTagManagerNoScript() {
-  if (!enabled()) return null;
+  const GTM_ID = containerId();
+  if (!GTM_ID) return null;
 
   return (
     <noscript>

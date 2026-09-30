@@ -57,11 +57,25 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Baked into the JavaScript the browser downloads, so it has to be present now.
-# The public site address, and nothing else: everything secret is read at
+# The public site address, and nothing secret: everything secret is read at
 # runtime by the server, and a secret passed as a build argument is a secret
 # recorded in the image's layer history.
-ARG NEXT_PUBLIC_SITE_URL=https://web.kolleris.com
+ARG NEXT_PUBLIC_SITE_URL=https://milwaukeetoolshdc.gr
 ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
+
+# Public Google ids (Search Console token, Merchant Center, GA4, Tag Manager).
+# Not secrets — each is printed in the page source. Read at runtime on the
+# server (src/lib/seo/site-ids.ts); passed here as well so pages prerendered
+# during the build carry them. Empty by default: no Kolleris id may ride along,
+# and an unset id means the tag is simply left out.
+ARG NEXT_PUBLIC_GSC_VERIFICATION=
+ARG NEXT_PUBLIC_MERCHANT_ID=
+ARG NEXT_PUBLIC_GA_ID=
+ARG NEXT_PUBLIC_GTM_ID=
+ENV NEXT_PUBLIC_GSC_VERIFICATION=${NEXT_PUBLIC_GSC_VERIFICATION} \
+    NEXT_PUBLIC_MERCHANT_ID=${NEXT_PUBLIC_MERCHANT_ID} \
+    NEXT_PUBLIC_GA_ID=${NEXT_PUBLIC_GA_ID} \
+    NEXT_PUBLIC_GTM_ID=${NEXT_PUBLIC_GTM_ID}
 
 # A placeholder, and deliberately an obviously fake one.
 #

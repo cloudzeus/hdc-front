@@ -22,6 +22,7 @@ import { GoogleTagManager, GoogleTagManagerNoScript } from "@/components/analyti
 import type { Locale } from "@/i18n/routing";
 import { jsonLdHtml } from "@/lib/seo/json-ld";
 import { indexingAllowed } from "@/lib/seo/indexing";
+import { siteId } from "@/lib/seo/site-ids";
 
 /*
  * Root layout owns <html>/<body> for BOTH trees — the localised storefront
@@ -40,6 +41,7 @@ import { indexingAllowed } from "@/lib/seo/indexing";
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   const t = await getTranslations({ locale, namespace: "layout" });
+  const gscToken = siteId("gscVerification");
   return {
     /*
      * What every relative URL in metadata resolves against — canonical links,
@@ -66,24 +68,11 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: alternatesFor("/", locale as Locale),
     /*
      * Search Console's HTML-tag verification, which is also what claims the
-     * site for Merchant Center.
-     *
-     * The token is in the source rather than only in an environment variable,
-     * because it is not a secret: it is published in this very tag for anyone
-     * to read, and it identifies one property of one site — this one, whose
-     * domain is already written into the Dockerfile. Making it a required
-     * setting only added a step to a deployment chain that has already dropped
-     * it three times. The variable still overrides, for a second property or a
-     * staging domain.
+     * site for Merchant Center. From NEXT_PUBLIC_GSC_VERIFICATION only — no
+     * fallback token, because the one that used to be here verified the
+     * Kolleris property. Unset means no tag. See src/lib/seo/site-ids.ts.
      */
-    verification: {
-      // `||`, not `??`. A variable declared and left blank is the normal state
-      // of a .env line, and `"" ?? fallback` is `""` — which shipped a page with
-      // no verification tag at all while looking like it was configured.
-      google:
-        process.env.GOOGLE_SITE_VERIFICATION ||
-        "KQ3VCyEKM40wz6J0F86WUhuE8kOmtOLKo0K7_aW6jl4",
-    },
+    ...(gscToken ? { verification: { google: gscToken } } : {}),
     /*
      * Not on the final domain yet: `noindex, nofollow` on every page that does
      * not set its own. The proxy sends the same as an `X-Robots-Tag` header,
