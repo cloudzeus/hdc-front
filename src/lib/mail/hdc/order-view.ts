@@ -1,7 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
 import { routing, type Locale } from "@/i18n/routing";
-import { formatMoney } from "@/lib/format";
+import { formatMoney, grossAmount } from "@/lib/format";
 import { siteOrigin } from "@/lib/seo/urls";
 import { SHOP } from "@/config/shop";
 import { availabilityLabelKey, lineAvailability } from "@/lib/catalog/availability";
@@ -16,13 +16,20 @@ import { localeUrl } from "@/lib/mail/hdc/render";
  * emails, so the figures in them cannot disagree: two emails that say different
  * totals for the same order are worse than one that says nothing.
  *
- * ── The lines are net, the totals read like an invoice ─────────────────────
+ * ── Gross, like the storefront ─────────────────────────────────────────────
  *
- *     subtotal − discount + shipping + VAT = total, and the lines sum to the subtotal.
+ * The HDC sells to individuals and shows VAT-inclusive prices everywhere
+ * (lib/format.ts). The figures are the ones the cart computed and the order
+ * froze (lib/cart/cart.ts `computeTotals`): each line `grossAmount(net × qty,
+ * its VAT rate)`, shipping and fees at 24%, and
  *
- * The line shows the price BEFORE an offer's discount and the discount is taken
- * off once in the totals; the order's `savingsGross` is already inside the line
- * prices and would count twice.
+ *     subtotal − discount + shipping = total      (VAT included, stated once)
+ *
+ * The total is the stored `totalGross` exactly and the VAT line the stored
+ * `vatAmount`. A line under an offer shows its price BEFORE the discount, and
+ * the discount is taken off once in the totals; any cent of rounding between
+ * the per-line figures and the stored totals is absorbed there, so what the
+ * reader adds up is what was charged.
  */
 
 function findOrder(orderNumber: string) {
@@ -140,9 +147,13 @@ export async function buildOrderView(
 
   const priced = order.lines.map((line) => {
     const d = Number(line.discountPercent) || 0;
-    const unitNet = Number(line.unitNet);
-    const unitBefore = d > 0 ? round2(unitNet / (1 - d / 100)) : unitNet;
-    return { line, unitBefore, lineBefore: round2(unitBefore * line.quantity) };
+    const vatRate = Number(line.vatRate);
+    // The stored gross when there is no offer — exactly what the cart charged.
+    const lineBefore =
+      d > 0
+        ? grossAmount(round2(Number(line.unitNet) / (1 - d / 100)) * line.quantity, { vatRate })
+        : round2(Number(line.lineGross));
+    return { line, unitBefore: round2(lineBefore / line.quantity), lineBefore };
   });
 
   const items: OrderItemView[] = priced.map(({ line, unitBefore, lineBefore }) => {
@@ -170,31 +181,25 @@ export async function buildOrderView(
     };
   });
 
-  const sumLineNet = round2(priced.reduce((sum, p) => sum + Number(p.line.lineNet), 0));
-  const sumLineBefore = round2(priced.reduce((sum, p) => sum + p.lineBefore, 0));
-  const discountNet = round2(sumLineBefore - sumLineNet);
-  const discounted = discountNet > 0.004;
-
-  const feeNet = Number(order.paymentFeeNet);
-  const shippingNet = Number(order.shippingNet) + feeNet;
+  const totals = grossTotals(order, priced.map((p) => ({ lineBefore: p.lineBefore, discounted: Number(p.line.discountPercent) > 0 })));
   const method = shippingLabel(locale, order.shippingMethod);
   const rates = [...new Set(order.lines.map((l) => Number(l.vatRate)))];
 
-  const totals = [
-    { label: t(locale, "order.subtotal"), value: money(discounted ? sumLineBefore : sumLineNet) },
-    ...(discounted ? [{ label: t(locale, "order.discount"), value: `−${money(discountNet)}` }] : []),
+  const totalRows = [
+    { label: t(locale, "order.subtotal"), value: money(totals.subtotal) },
+    ...(totals.discount > 0 ? [{ label: t(locale, "order.discount"), value: `−${money(totals.discount)}` }] : []),
     {
       label: t(locale, "order.shipping", {
-        method: feeNet > 0 ? t(locale, "order.payment_fee", { method }) : method,
+        method: totals.fee > 0 ? t(locale, "order.payment_fee", { method }) : method,
       }),
-      value: shippingNet > 0 ? money(shippingNet) : t(locale, "order.free"),
-    },
-    {
-      // The rate only when there is one: a mixed basket has no single «24%».
-      label: rates.length === 1 ? t(locale, "order.vat", { rate: `${rates[0]}%` }) : t(locale, "order.vat_plain"),
-      value: money(order.vatAmount),
+      value: totals.shipping > 0 ? money(totals.shipping) : t(locale, "order.free"),
     },
   ];
+  // The rate only when there is one: a mixed basket has no single «24%».
+  const vatLine =
+    rates.length === 1
+      ? t(locale, "order.vat_included", { rate: `${rates[0]}%`, amount: money(order.vatAmount) })
+      : t(locale, "order.vat_included_plain", { amount: money(order.vatAmount) });
 
   const fullName = `${order.firstName} ${order.lastName}`.trim();
   const shipAddress = order.shipLine1 + (order.shipLine2 ? `, ${order.shipLine2}` : "");
@@ -245,9 +250,32 @@ export async function buildOrderView(
       ? { label: t(locale, "state.paid"), tone: "ok" }
       : { label: t(locale, "state.pending"), tone: "wait" },
     items,
-    totals,
+    totals: totalRows,
     total: money(order.totalGross),
+    vat_line: vatLine,
     cols,
   };
 }
 
+/**
+ * The gross totals rows of an order, adding up to the stored `totalGross`.
+ *
+ * Shipping and fees are the stored gross figures; the subtotal is the lines
+ * before any offer; the discount is whatever takes that subtotal to the
+ * stored total minus shipping — so the rounding of individual lines can never
+ * make the rows disagree with what was charged.
+ */
+export function grossTotals(
+  order: { subtotalGross: unknown; shippingGross: unknown; paymentFeeGross: unknown; totalGross: unknown },
+  lines: Array<{ lineBefore: number; discounted: boolean }>,
+) {
+  const total = round2(Number(order.totalGross));
+  const fee = round2(Number(order.paymentFeeGross));
+  const shipping = round2(Number(order.shippingGross) + fee);
+  const goods = round2(total - shipping);
+  const anyOffer = lines.some((l) => l.discounted);
+  const before = round2(lines.reduce((sum, l) => sum + l.lineBefore, 0));
+  const discount = anyOffer ? Math.max(0, round2(before - goods)) : 0;
+  const subtotal = discount > 0 ? round2(goods + discount) : goods;
+  return { subtotal, discount, shipping, fee, total };
+}

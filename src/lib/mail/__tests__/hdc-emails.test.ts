@@ -31,18 +31,24 @@ const ORDER = {
   billLine1: "Ηρώων Πολυτεχνείου 45",
   billCity: "Πειραιάς",
   billPostcode: "18536",
-  shippingMethod: "courier",
+  shippingMethod: "express",
   paymentMethod: "card",
   notes: "Κουδούνι 3ος όροφος",
   supplierOrder: true,
+  /*
+   * A three-line order with ACS Express, figured as the cart does
+   * (lib/cart/cart.ts computeTotals): each line grossAmount(net × qty, 24%),
+   * shipping 5,20 × 1,9 = 9,88 net → 12,25 gross; total 1.092,89 + 12,25;
+   * VAT = total gross − total net (891,24).
+   */
   subtotalNet: 881.36,
   subtotalGross: 1092.89,
-  shippingNet: 0,
-  shippingGross: 0,
+  shippingNet: 9.88,
+  shippingGross: 12.25,
   paymentFeeNet: 0,
   paymentFeeGross: 0,
-  vatAmount: 211.53,
-  totalGross: 1092.89,
+  vatAmount: 213.9,
+  totalGross: 1105.14,
   savingsGross: 0,
   shippingQuote: { etaDays: 2, locale: "el" } as Record<string, unknown>,
   vivaOrderCode: "1234567890123456",
@@ -60,6 +66,7 @@ const ORDER = {
       imageUrl: `${CDN}/4933478449/primary-0-1751218037359.webp`,
       quantity: 1,
       unitNet: 321.08,
+      unitGross: 398.14,
       discountPercent: 0,
       offerTitle: null,
       vatRate: 24,
@@ -75,6 +82,7 @@ const ORDER = {
       imageUrl: `${CDN}/4932430483/primary-0-1751214102874.webp`,
       quantity: 2,
       unitNet: 133.4,
+      unitGross: 165.42,
       discountPercent: 0,
       offerTitle: null,
       vatRate: 24,
@@ -90,6 +98,7 @@ const ORDER = {
       imageUrl: `${CDN}/4933492800/primary-0-1751222368563.webp`,
       quantity: 1,
       unitNet: 293.48,
+      unitGross: 363.92,
       discountPercent: 0,
       offerTitle: null,
       vatRate: 24,
@@ -242,11 +251,59 @@ describe("HDC email templates", () => {
     expect(result.ok && result.email.text).toMatch(/ΠΑΡΑΔΟΣΗ ΣΕ 3–5 ΕΡΓΑΣΙΜΕΣ/);
   });
 
+  /** The plain text with non-breaking spaces (inside amounts) as spaces. */
+  const plain = (text: string) => text.replace(/\u00a0/g, " ");
+  /** The totals block of the plain-text part. */
+  const totalsOf = (text: string) => plain(text.slice(text.indexOf("Υποσύνολο"))).split("\n").slice(0, 8).join("\n");
+
   it("amounts keep the thousands separator", async () => {
     const el = await previewEmail("order-confirmation", { locale: "el", realOrders: true, admin: { email: "a@example.gr" } });
     const en = await previewEmail("order-confirmation", { locale: "en", realOrders: true, admin: { email: "a@example.gr" } });
-    expect(el.ok && el.email.text).toContain("1.092,89 €");
-    expect(en.ok && en.email.text).toContain("€1,092.89");
+    expect(el.ok && plain(el.email.text)).toContain("1.105,14 €");
+    expect(en.ok && plain(en.email.text)).toContain("€1,105.14");
+  });
+
+  it("prices are gross, like the storefront, and add up to the stored total", async () => {
+    const r = await previewEmail("order-confirmation", { locale: "el", realOrders: true, admin: { email: "a@example.gr" } });
+    if (!r.ok) throw new Error(r.error);
+    const text = plain(r.email.text);
+    // Lines: gross unit and gross line total.
+    expect(text).toContain("1 × 398,14 €");
+    expect(text).toContain("2 × 165,42 €");
+    expect(text).toContain("330,83 €");
+    expect(text).toContain("363,92 €");
+    expect(text).toContain("Τιμές με ΦΠΑ");
+    expect(text).not.toMatch(/χωρίς ΦΠΑ|321,08/);
+    // Totals: 1.092,89 + 12,25 = 1.105,14, VAT stated once, from vatAmount.
+    const totals = totalsOf(r.email.text);
+    expect(totals).toMatch(/Υποσύνολο 1\.092,89 €/);
+    expect(totals).toMatch(/Μεταφορικά · ACS Express 12,25 €/);
+    expect(totals).toMatch(/ΣΥΝΟΛΟ 1\.105,14 €/);
+    expect(totals).toContain("Περιλαμβάνεται ΦΠΑ 24%: 213,90 €");
+    expect(totals).not.toMatch(/Έκπτωση/);
+
+    const en = await previewEmail("order-confirmation", { locale: "en", realOrders: true, admin: { email: "a@example.gr" } });
+    expect(en.ok && plain(en.email.text)).toContain("Includes VAT 24%: €213.90");
+  });
+
+  it("an offer is shown once, as a gross discount that lands on the stored total", async () => {
+    // Line 1 at −15%: 321,08 → 272,92 net, 338,42 gross (was 398,14). Total net 820,08.
+    const saved = { ...ORDER, lines: ORDER.lines.map((l) => ({ ...l })) };
+    Object.assign(ORDER.lines[0], { unitNet: 272.92, unitGross: 338.42, lineNet: 272.92, lineGross: 338.42, discountPercent: 15 });
+    Object.assign(ORDER, { subtotalNet: 810.2, subtotalGross: 1033.17, vatAmount: 225.34, totalGross: 1045.42 });
+    try {
+      const r = await previewEmail("order-confirmation", { locale: "el", realOrders: true, admin: { email: "a@example.gr" } });
+      if (!r.ok) throw new Error(r.error);
+      const totals = totalsOf(r.email.text);
+      expect(plain(r.email.text)).toContain("1 × 398,14 €");
+      expect(totals).toMatch(/Υποσύνολο 1\.092,89 €/);
+      expect(totals).toMatch(/Έκπτωση −59,72 €/);
+      expect(totals).toMatch(/Μεταφορικά · ACS Express 12,25 €/);
+      expect(totals).toMatch(/ΣΥΝΟΛΟ 1\.045,42 €/);
+      expect(totals).toContain("Περιλαμβάνεται ΦΠΑ 24%: 225,34 €");
+    } finally {
+      Object.assign(ORDER, saved);
+    }
   });
 
   it("without the orders permission the preview uses a sample order, no customer data", async () => {

@@ -54,6 +54,8 @@ export function htmlToText(html: string): string {
     return label ? `${label} (${url})` : url;
   });
 
+  // Line breaks in the source are layout of the template, not of the text.
+  s = s.replace(/[ \t\r\n]+/g, " ");
   s = s.replace(/<br\s*\/?>/gi, "\n");
   s = s.replace(/<\/(p|tr|h[1-6]|div|table|li)>/gi, "\n");
   s = s.replace(/<\/td>/gi, "  ");
