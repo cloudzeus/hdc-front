@@ -88,7 +88,23 @@ export const SHOP = {
     vat: "099095556",
     gemi: "44598907000",
   },
+
+  /**
+   * The HDC's own social profiles, and only those: the footer, the emails and
+   * the JSON-LD `sameAs` all read this. The Kolleris accounts belong to another
+   * business and are never linked from here. No TikTok: the HDC has none.
+   */
+  social: {
+    facebook: "https://www.facebook.com/profile.php?id=61585656644198",
+    instagram: "https://www.instagram.com/hdc.kolleris_piraeus/",
+  },
 } as const;
+
+/** The social profiles in print order, with the name each one is shown by. */
+export const SOCIAL_LINKS = [
+  { id: "facebook", label: "Facebook", href: SHOP.social.facebook },
+  { id: "instagram", label: "Instagram", href: SHOP.social.instagram },
+] as const;
 
 /** The line printed first and dialled from every "call us" button. */
 export const PRIMARY_PHONE = SHOP.contact.phones[0];
