@@ -151,7 +151,8 @@
   </td></tr>
 </table>
 
-<!-- ===== B2B BANNER (ink) ===== -->
+{{!-- ===== B2B BANNER (ink): αποσύρθηκε, το HDC πουλά μόνο σε ιδιώτες. Αποδίδεται μόνο αν δοθεί κουμπί. ===== --}}
+{{#if copy.b2b_button}}
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
   <tr><td class="k-pad" style="padding:40px 32px 40px 32px;">
     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" bgcolor="#1F1F1F" style="background-color:#1F1F1F;background-image:linear-gradient(225deg,#FFFFFF 22px,#1F1F1F 22px),linear-gradient(45deg,#FFFFFF 22px,#1F1F1F 22px);background-position:top right,bottom left;background-size:51% 100%,51% 100%;background-repeat:no-repeat;">
@@ -171,6 +172,7 @@
     </table>
   </td></tr>
 </table>
+{{/if}}
 
   </td></tr>
   <!-- footer -->
@@ -190,7 +192,6 @@
           <td class="k-col k-col-gap k-mob-left" valign="top" width="50%" align="right" style="vertical-align:top;text-align:right;padding-top:2px;">
             <p style="margin:0 0 10px 0;"><a href="{{urls.shop}}" class="mono" style="font-family:'JetBrains Mono',Consolas,'Courier New',monospace;font-size:10px;line-height:16px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#BDBDBE;text-decoration:none;">Το e-shop</a></p>
             <p style="margin:0 0 10px 0;"><a href="{{urls.account}}" class="mono" style="font-family:'JetBrains Mono',Consolas,'Courier New',monospace;font-size:10px;line-height:16px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#BDBDBE;text-decoration:none;">Ο λογαριασμός μου</a></p>
-            <p style="margin:0 0 10px 0;"><a href="{{urls.b2b}}" class="mono" style="font-family:'JetBrains Mono',Consolas,'Courier New',monospace;font-size:10px;line-height:16px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#BDBDBE;text-decoration:none;">Λογαριασμός B2B</a></p>
             <p style="margin:0 0 10px 0;"><a href="{{urls.contact}}" class="mono" style="font-family:'JetBrains Mono',Consolas,'Courier New',monospace;font-size:10px;line-height:16px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#BDBDBE;text-decoration:none;">Επικοινωνία</a></p>
             <p style="margin:0;"><a href="{{urls.terms}}" class="mono" style="font-family:'JetBrains Mono',Consolas,'Courier New',monospace;font-size:10px;line-height:16px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#BDBDBE;text-decoration:none;">Όροι</a> <span style="color:#EA3E39;">/</span> <a href="{{urls.privacy}}" class="mono" style="font-family:'JetBrains Mono',Consolas,'Courier New',monospace;font-size:10px;line-height:16px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#BDBDBE;text-decoration:none;">Απόρρητο</a></p>
           </td>

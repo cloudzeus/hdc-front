@@ -52,7 +52,8 @@
   </td></tr>
 </table>
 
-<!-- ===== B2B BANNER (ink) ===== -->
+{{!-- ===== B2B BANNER (ink): αποσύρθηκε, το HDC πουλά μόνο σε ιδιώτες. Αποδίδεται μόνο αν δοθεί κουμπί. ===== --}}
+{{#if copy.b2b_button}}
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
   <tr><td class="k-pad" style="padding:40px 32px 40px 32px;">
     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" bgcolor="#1F1F1F" style="$chamfer-ink$">
@@ -72,3 +73,4 @@
     </table>
   </td></tr>
 </table>
+{{/if}}

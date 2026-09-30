@@ -245,6 +245,9 @@ export async function renderCampaign(
    */
   const copy = { ...DEFAULT_COPY } as Record<string, string>;
   for (const [k, v] of Object.entries(payload.copy ?? {})) {
+    // Τα κείμενα του αποσυρμένου μπάνερ B2B μιας παλιάς καμπάνιας αγνοούνται,
+    // αλλιώς θα το ξανάφερναν στο email.
+    if (k.startsWith("b2b_")) continue;
     if (typeof v === "string" && v.trim()) copy[k] = v;
   }
 
