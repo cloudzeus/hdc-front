@@ -4,7 +4,7 @@
  * It starts the shop's schedules: the nightly catalogue reconcile — the
  * backstop under HDCtool's change feed, which is a push and therefore lossy —
  * and the recurring jobs in `src/lib/cron/schedule.ts` (catalog changes every
- * 5 minutes, the order sweep every 30). See `src/lib/sync/reconcile-schedule.ts`
+ * 5 minutes, the order sweep every 30, the automatic articles hourly). See `src/lib/sync/reconcile-schedule.ts`
  * for why they live in the server rather than in a platform scheduled task.
  *
  * `register` blocks the server from accepting requests until it resolves, so

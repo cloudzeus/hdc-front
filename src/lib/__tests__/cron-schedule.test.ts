@@ -5,7 +5,7 @@ const prod = { NODE_ENV: "production", HDCTOOL_API_KEY: "key" };
 
 describe("plannedJobs", () => {
   it("runs every job in production", () => {
-    expect(plannedJobs(prod)).toEqual(["catalog", "orders"]);
+    expect(plannedJobs(prod)).toEqual(["catalog", "orders", "content"]);
   });
 
   it("runs nothing in development unless asked", () => {
@@ -13,6 +13,7 @@ describe("plannedJobs", () => {
     expect(plannedJobs({ ...prod, NODE_ENV: "development", IN_PROCESS_CRON: "1" })).toEqual([
       "catalog",
       "orders",
+      "content",
     ]);
   });
 
@@ -21,11 +22,11 @@ describe("plannedJobs", () => {
   });
 
   it("CRON_DISABLED turns off single jobs, case and spaces aside", () => {
-    expect(plannedJobs({ ...prod, CRON_DISABLED: " Orders " })).toEqual(["catalog"]);
-    expect(plannedJobs({ ...prod, CRON_DISABLED: "catalog,orders" })).toEqual([]);
+    expect(plannedJobs({ ...prod, CRON_DISABLED: " Orders " })).toEqual(["catalog", "content"]);
+    expect(plannedJobs({ ...prod, CRON_DISABLED: "catalog,orders,content" })).toEqual([]);
   });
 
   it("skips the catalog job without an HDCtool key", () => {
-    expect(plannedJobs({ NODE_ENV: "production" })).toEqual(["orders"]);
+    expect(plannedJobs({ NODE_ENV: "production" })).toEqual(["orders", "content"]);
   });
 });

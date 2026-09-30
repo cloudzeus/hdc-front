@@ -11,7 +11,7 @@
  * interval. The routes under /api/cron stay, for running a job by hand.
  */
 
-export type CronJobName = "catalog" | "orders";
+export type CronJobName = "catalog" | "orders" | "content";
 
 type CronJob = {
   name: CronJobName;
@@ -57,6 +57,17 @@ const JOBS: readonly CronJob[] = [
         `παραστατικά ${report.documentsIssued} · ελέγχθηκαν ${report.checked} · ` +
         `παραδόθηκαν ${report.delivered} · αιτήσεις αξιολόγησης ${report.reviewsRequested}`
       );
+    },
+  },
+  {
+    // Automatic articles (src/lib/content-auto): the topic queue once a day,
+    // and — only when «Αυτόματα άρθρα» is on, on weekdays 09:00–19:00 Athens
+    // time — at most one article when the adaptive cadence says so.
+    name: "content",
+    everyMs: 60 * 60_000,
+    run: async () => {
+      const { contentTick } = await import("@/lib/content-auto/cron");
+      return contentTick();
     },
   },
 ];
