@@ -3,11 +3,11 @@ import { randomBytes } from "node:crypto";
 import { hash } from "@node-rs/argon2";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
-import { sendMail, mailConfigured } from "@/lib/mail/client";
-import { renderTemplate } from "@/lib/mail/templates";
+import { mailConfigured } from "@/lib/mail/client";
 import { requestFingerprint, stampNow } from "@/lib/mail/request-context";
-import { sendPasswordChangedEmail } from "@/lib/mail/account-emails";
-import { siteOrigin } from "@/lib/seo/urls";
+import { sendPasswordChangedEmail, sendPasswordResetEmail } from "@/lib/mail/account-emails";
+import { requestLocale } from "@/lib/mail/hdc/locale";
+import { localeUrl } from "@/lib/mail/hdc/render";
 
 /**
  * Forgotten passwords.
@@ -70,7 +70,8 @@ export async function requestPasswordReset(rawEmail: string): Promise<ResetOutco
     },
   });
 
-  const link = `${siteOrigin()}/eisodos/neos-kodikos/${token}`;
+  const locale = await requestLocale();
+  const link = localeUrl(locale, `/eisodos/neos-kodikos/${token}`);
 
   /*
    * Ποιος ζήτησε την επαναφορά, από πού.
@@ -84,32 +85,13 @@ export async function requestPasswordReset(rawEmail: string): Promise<ResetOutco
    */
   const fingerprint = await requestFingerprint(await headers());
 
-  const html = await renderTemplate("account-password-reset", {
-    preheader: `Ο σύνδεσμος ισχύει για ${TOKEN_TTL_HOURS} ώρες.`,
-    recipient: { first_name: customer.firstName ?? "", email },
-    reset: {
-      url: link,
-      expires_in: `${TOKEN_TTL_HOURS} ώρες`,
-      requested_at: stampNow(),
-      device: fingerprint.device,
-      location: fingerprint.location,
-      ip: fingerprint.ip,
-    },
-  });
-
-  const result = await sendMail({
-    to: email,
-    subject: "Επαναφορά κωδικού πρόσβασης",
-    html,
-    text: [
-      "Επαναφορά κωδικού πρόσβασης — Kolleris",
-      "",
-      `Ορισμός νέου κωδικού: ${link}`,
-      "",
-      `Ισχύει για ${TOKEN_TTL_HOURS} ώρες και χρησιμοποιείται μία φορά.`,
-      "Αν δεν τον ζητήσατε εσείς, αγνοήστε το μήνυμα — ο κωδικός σας δεν άλλαξε.",
-    ].join("\n"),
-  });
+  const result = await sendPasswordResetEmail({
+    to: { firstName: customer.firstName ?? "", email },
+    url: link,
+    hours: TOKEN_TTL_HOURS,
+    requestedAt: stampNow(),
+    fingerprint,
+  }, { locale });
 
   if (!result.ok) {
     console.error(`[password-reset] ${email}: ${result.error}`);

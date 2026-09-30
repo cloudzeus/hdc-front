@@ -1,35 +1,25 @@
 import "server-only";
-import { prisma } from "@/lib/prisma";
-import { sendTemplateMail } from "@/lib/mail/send-template";
 import { paymentPageUrl } from "@/lib/payment/viva";
-import { PAYMENT_METHODS } from "@/lib/cart/options";
-import { PRIMARY_PHONE, SHOP } from "@/config/shop";
-
-const { weekdays, saturday } = SHOP.contact.hours;
-/** "Δευ–Παρ 08:00–16:00, Σάβ 09:00–14:00", from the shop config. */
-const HOURS_LINE = `Δευ–Παρ ${weekdays.open}–${weekdays.close}, Σάβ ${saturday.open}–${saturday.close}`;
+import { formatMoney } from "@/lib/format";
+import { renderEmail } from "@/lib/mail/hdc/render";
+import { t } from "@/lib/mail/hdc/strings";
+import { renderAndDeliver } from "@/lib/mail/hdc/deliver";
+import { loadOrder, orderLocale, paymentLabel } from "@/lib/mail/hdc/order-view";
+import type { MailOptions } from "@/lib/mail/order-email";
 
 /**
- * «Η πληρωμή δεν ολοκληρώθηκε».
+ * «Your payment did not go through.»
  *
- * Μια απορριφθείσα κάρτα άφηνε την παραγγελία σε FAILED και τον πελάτη χωρίς
- * τίποτα: ούτε ότι δεν χρεώθηκε, ούτε τι να κάνει. Όποιος έκλεινε την καρτέλα
- * της Viva νομίζοντας ότι πέρασε, το μάθαινε όταν δεν ερχόταν το δέμα.
+ * No promise of a reservation: the shop keeps no stock after a declined card
+ * (`reservedUntil` is only written for bank transfer), and a deadline nothing
+ * enforces makes the customer wait thinking they have time.
  *
- * ── Καμία υπόσχεση κράτησης ────────────────────────────────────────────────
+ * What is true stays: nothing was charged; Viva's payment link (a successful
+ * retry turns the order CONFIRMED through the same webhook); the bank account,
+ * with the order number as the reference; the phone.
  *
- * Το κατάστημα ΔΕΝ κρατά απόθεμα μετά από απορριφθείσα κάρτα — το
- * `reservedUntil` γράφεται μόνο για τραπεζική κατάθεση, και καμία σάρωση δεν
- * ελευθερώνει τίποτα ούτως ή άλλως. Η πρόταση της κράτησης αφαιρέθηκε από το
- * template: μια προθεσμία που δεν την τηρεί κανένας μηχανισμός κάνει τον
- * πελάτη να καθυστερήσει νομίζοντας ότι έχει χρόνο.
- *
- * ── Τι μένει, και είναι αληθές ─────────────────────────────────────────────
- *
- * Δεν έγινε χρέωση. Ο σύνδεσμος πληρωμής της Viva (το email φεύγει δευτερόλεπτα
- * μετά, μέσα στο παράθυρο ισχύος του — και μια επιτυχής επανάληψη γυρίζει την
- * παραγγελία σε CONFIRMED από το ίδιο webhook). Ο λογαριασμός για κατάθεση με
- * αιτιολογία τον αριθμό παραγγελίας. Και το τηλέφωνο.
+ * Which card was tried is unknown — Viva sends no masked number on a failed
+ * transaction — and none is invented.
  */
 
 const BANK = {
@@ -38,85 +28,56 @@ const BANK = {
   bank: process.env.BANK_TRANSFER_BANK ?? "",
 };
 
-const money = (value: unknown) => `${Number(value).toFixed(2).replace(".", ",")} €`;
-
-function stamp(date: Date): string {
-  const parts = new Intl.DateTimeFormat("el-GR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "Europe/Athens",
-    hourCycle: "h23",
-  }).formatToParts(date);
-  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
-  return `${get("day")}.${get("month")}.${get("year")}, ${get("hour")}:${get("minute")}`;
-}
-
-export async function sendPaymentFailedEmail(
+export async function buildPaymentFailedEmail(
   orderNumber: string,
   detail: { statusId?: string | null },
+  options: MailOptions = {},
 ) {
-  const order = await prisma.order.findUnique({ where: { orderNumber } });
-  if (!order) return { ok: false as const, error: "Η παραγγελία δεν βρέθηκε." };
+  const order = await loadOrder(orderNumber);
+  if (!order) return null;
+  const locale = options.locale ?? orderLocale(order);
+  const amount = formatMoney(Number(order.totalGross), locale);
 
-  const retryUrl = order.vivaOrderCode ? paymentPageUrl(order.vivaOrderCode) : "";
-
-  return sendTemplateMail({
-    to: order.email,
-    templateId: "payment-failed",
-    subject: `Η πληρωμή δεν ολοκληρώθηκε — παραγγελία ${order.orderNumber}`,
-    preheader: "Δεν έγινε καμία χρέωση. Δοκιμάστε ξανά ή επιλέξτε κατάθεση.",
-    context: order.orderNumber,
+  const email = renderEmail({
+    template: "payment-failed",
+    locale,
+    kind: "order",
+    subject: t(locale, "failed.subject", { number: order.orderNumber }),
+    preheader: t(locale, "failed.pre"),
+    topline: { left: t(locale, "failed.topline"), right: order.orderNumber },
+    assetOrigin: options.assetOrigin,
     data: {
-      recipient: {
-        first_name: order.firstName,
-        last_name: order.lastName,
-        email: order.email,
-      },
-      order: {
-        number: order.orderNumber,
-        date: stamp(order.createdAt),
-      },
+      order: { number: order.orderNumber },
       payment: {
-        amount: money(order.totalGross),
-        /*
-         * Τι επέλεξε ο πελάτης στο ΔΙΚΟ ΜΑΣ ταμείο. Ποια κάρτα δοκιμάστηκε
-         * δεν το ξέρουμε — η Viva δεν στέλνει μασκαρισμένο αριθμό σε
-         * αποτυχημένη συναλλαγή, και ένα επινοημένο «****1234» σε μήνυμα για
-         * χρήματα είναι το χειρότερο είδος συμπλήρωσης κενού.
-         */
-        method:
-          PAYMENT_METHODS.find((m) => m.id === order.paymentMethod)?.label ?? order.paymentMethod,
-        card: "",
-        reason: "Η συναλλαγή δεν εγκρίθηκε από την τράπεζα",
-        error_code: detail.statusId ? `Viva ${detail.statusId}` : "—",
-        retry_url: retryUrl,
+        retry_url: order.vivaOrderCode ? paymentPageUrl(order.vivaOrderCode) : "",
+        rows: [
+          { label: t(locale, "order.number"), value: order.orderNumber, strong: true },
+          { label: t(locale, "paid.amount"), value: amount, strong: true },
+          { label: t(locale, "paid.method"), value: paymentLabel(locale, order.paymentMethod) },
+          { label: t(locale, "failed.reason"), value: t(locale, "failed.reason_text") },
+          ...(detail.statusId ? [{ label: t(locale, "failed.code"), value: `Viva ${detail.statusId}` }] : []),
+        ],
       },
-      /* Ο λογαριασμός κατάθεσης ως εναλλακτική — με αιτιολογία τον αριθμό
-         παραγγελίας, γιατί εδώ η ταυτοποίηση γίνεται με το χέρι. */
-      banks: BANK.iban.trim()
-        ? [{ name: BANK.bank || BANK.holder || "Δικαιούχος", iban: BANK.iban }]
-        : [],
+      bank: BANK.iban.trim()
+        ? {
+            text: t(locale, "failed.bank_text", { amount, number: order.orderNumber }),
+            rows: [
+              ...(BANK.bank ? [{ label: t(locale, "bank.bank"), value: BANK.bank }] : []),
+              ...(BANK.holder ? [{ label: t(locale, "bank.holder"), value: BANK.holder }] : []),
+              { label: t(locale, "bank.iban"), value: BANK.iban, strong: true },
+              { label: t(locale, "bank.reference"), value: order.orderNumber, strong: true },
+            ],
+          }
+        : null,
     },
-    text: [
-      `Η πληρωμή για την παραγγελία ${order.orderNumber} δεν ολοκληρώθηκε`,
-      "",
-      "Δεν έγινε καμία χρέωση.",
-      `Ποσό: ${money(order.totalGross)}`,
-      ...(retryUrl ? ["", `Δοκιμάστε ξανά: ${retryUrl}`] : []),
-      ...(BANK.iban.trim()
-        ? [
-            "",
-            "Εναλλακτικά, κατάθεση σε τράπεζα:",
-            BANK.bank ? `Τράπεζα: ${BANK.bank}` : "",
-            `IBAN: ${BANK.iban}`,
-            `Αιτιολογία: ${order.orderNumber}`,
-          ].filter(Boolean)
-        : []),
-      "",
-      `Χρειάζεστε βοήθεια; ${PRIMARY_PHONE.display} (${HOURS_LINE}).`,
-    ].join("\n"),
   });
+  return { to: order.email, email };
+}
+
+export async function sendPaymentFailedEmail(orderNumber: string, detail: { statusId?: string | null }) {
+  return renderAndDeliver(
+    () => buildPaymentFailedEmail(orderNumber, detail),
+    `payment-failed ${orderNumber}`,
+    "Η παραγγελία δεν βρέθηκε.",
+  );
 }

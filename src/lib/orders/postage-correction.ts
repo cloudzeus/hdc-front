@@ -181,6 +181,8 @@ export async function applyPostageCorrection(
       shippingQuote: JSON.parse(
         JSON.stringify({
           ...quote,
+          // The customer's language, frozen at checkout: the re-priced quote must keep it.
+          locale: (order.shippingQuote as { locale?: string } | null)?.locale,
           correction: {
             at: correctedAt.toISOString(),
             by: actor.email,

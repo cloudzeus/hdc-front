@@ -224,7 +224,14 @@ export async function placeOrder(
       vatAmount: totals.vatAmount,
       totalGross: totals.totalGross,
       savingsGross: totals.savingsGross,
-      shippingQuote: quote ? JSON.parse(JSON.stringify(quote)) : undefined,
+      /* The customer's language rides on the frozen checkout snapshot, so every
+         later email (payment, shipping, status) is written in it. A column
+         would need a migration on the live database (lib/mail/hdc/order-view). */
+      shippingQuote: quote
+        ? JSON.parse(JSON.stringify({ ...quote, locale }))
+        : locale === "el"
+          ? undefined
+          : { locale },
 
       lines: {
         create: cart.lines.map((line) => ({

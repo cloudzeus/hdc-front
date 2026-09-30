@@ -230,7 +230,9 @@ async function handleTransaction(payload: Body, event: VivaEventName) {
      * Viva the webhook failed — which makes it retry — because a mail server
      * was slow would turn a sent receipt into a duplicate one.
      */
-    const mail = await sendOrderEmail(orderNumber);
+    // «payment»: an order already confirmed by email (bank transfer, postage
+    // correction) gets the payment receipt instead of the whole order again.
+    const mail = await sendOrderEmail(orderNumber, { trigger: "payment" });
     if (!mail.ok) console.error(`[viva] ${orderNumber} receipt not sent: ${mail.error}`);
 
     /* Και στο κατάστημα. Ίδιος κανόνας με την απόδειξη: περιμένουμε, γράφουμε

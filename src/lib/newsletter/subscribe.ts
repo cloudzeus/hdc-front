@@ -1,9 +1,9 @@
 import "server-only";
 import { randomBytes } from "node:crypto";
 import { prisma } from "@/lib/prisma";
-import { renderTemplate } from "@/lib/mail/templates";
-import { sendMail } from "@/lib/mail/client";
-import { siteOrigin } from "@/lib/seo/urls";
+import { buildNewsletterConfirmEmail } from "@/lib/mail/account-emails";
+import { deliver } from "@/lib/mail/hdc/deliver";
+import { localeUrl } from "@/lib/mail/hdc/render";
 import type { Locale } from "@/i18n/routing";
 
 /**
@@ -20,25 +20,6 @@ import type { Locale } from "@/i18n/routing";
  */
 
 const TOKEN_HOURS = 48;
-
-/** Το κείμενο που εξηγεί τι θα λαμβάνει. Ίδιο με το δείγμα του template. */
-const WHAT = [
-  {
-    index: "01",
-    title: "Προσφορες",
-    text: "Εκπτώσεις ανά brand και κατηγορία, με ημερομηνία λήξης και πραγματικό απόθεμα.",
-  },
-  {
-    index: "02",
-    title: "Νεα",
-    text: "Νέα brands, νέοι κωδικοί, αλλαγές σε παραδόσεις και υπηρεσίες. Μία φορά τον μήνα.",
-  },
-  {
-    index: "03",
-    title: "Ανακοινωσεις",
-    text: "Ωράριο, τιμοκατάλογοι, αργίες. Μόνο όταν χρειάζεται.",
-  },
-];
 
 export type SubscribeResult =
   | { ok: true; state: "sent" | "already" }
@@ -98,25 +79,16 @@ export async function subscribeNewsletter(input: {
     },
   });
 
-  const html = await renderTemplate("newsletter-confirm", {
-    recipient: { email: subscriber.email, first_name: subscriber.name ?? "", last_name: "" },
-    subscribe: {
-      confirm_url: `${siteOrigin()}/newsletter/epibebaiosi/${token}`,
-      expires_in: `${TOKEN_HOURS} ώρες`,
+  const locale = input.locale ?? subscriber.locale ?? "el";
+  const message = await buildNewsletterConfirmEmail(
+    {
+      to: subscriber.email,
+      url: localeUrl(locale, `/newsletter/epibebaiosi/${token}`),
+      hours: TOKEN_HOURS,
     },
-    what: WHAT,
-    preheader: "Ένα κλικ και τελειώσαμε. Χωρίς επιβεβαίωση δεν στέλνουμε τίποτα.",
-  });
-
-  const sent = await sendMail({
-    to: subscriber.email,
-    subject: "Επιβεβαιώστε την εγγραφή σας στο newsletter",
-    html,
-    text:
-      "Επιβεβαιώστε την εγγραφή σας στο newsletter του Milwaukee Heavy Duty Centre:\n" +
-      `${siteOrigin()}/newsletter/epibebaiosi/${token}\n\n` +
-      `Ο σύνδεσμος ισχύει για ${TOKEN_HOURS} ώρες. Αν δεν ζητήσατε εγγραφή, αγνοήστε το μήνυμα.`,
-  });
+    { locale },
+  );
+  const sent = await deliver(message, { to: subscriber.email }, `newsletter-confirm ${subscriber.email}`);
 
   if (!sent.ok) {
     console.error("[newsletter] confirm mail failed", sent.error);

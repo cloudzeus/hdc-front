@@ -1,9 +1,10 @@
 import "server-only";
 import { randomBytes } from "node:crypto";
 import { prisma } from "@/lib/prisma";
-import { sendMail, mailConfigured } from "@/lib/mail/client";
-import { renderTemplate } from "@/lib/mail/templates";
-import { siteOrigin } from "@/lib/seo/urls";
+import { mailConfigured } from "@/lib/mail/client";
+import { sendVerifyEmail } from "@/lib/mail/account-emails";
+import { requestLocale } from "@/lib/mail/hdc/locale";
+import { localeUrl } from "@/lib/mail/hdc/render";
 
 /**
  * Claiming an account after you have already bought.
@@ -111,59 +112,21 @@ export async function requestRegistrationLink(input: InviteRequest): Promise<Inv
     data: { email, token, orderNumber: order.orderNumber, accountType, expiresAt, sentAt: new Date() },
   });
 
-  const link = `${siteOrigin()}/eggrafi/${token}`;
-  const name = `${order.firstName} ${order.lastName}`.trim();
+  const locale = await requestLocale();
+  const link = localeUrl(locale, `/eggrafi/${token}`);
 
   /*
-   * Το `account-verify` του design system, με τα δικά μας λόγια.
-   * ───────────────────────────────────────────────────────────────────────────
-   * Η σχεδίαση είναι σωστή όπως είναι — σύνδεσμος μίας χρήσης που ανοίγει τον
-   * λογαριασμό — αλλά η προεπιλεγμένη διατύπωσή της («δημιουργήσατε λογαριασμό
-   * … ένα κλικ και ενεργοποιείται») δεν ισχύει εδώ: αυτός ο άνθρωπος ΔΕΝ έφτιαξε
-   * λογαριασμό, αγόρασε ως επισκέπτης και τώρα τον διεκδικεί πάνω στην
-   * παραγγελία του. Και το κουμπί δεν επιβεβαιώνει email — ορίζει κωδικό.
-   *
-   * Γι' αυτό το template δέχεται `verify.lead` και `verify.cta` με προεπιλογές
-   * τα σχεδιασμένα κείμενα: η σχεδίαση μένει ακέραιη, και το μήνυμα λέει το
-   * αληθές.
-   *
-   * Κωδικός 6 ψηφίων δεν στέλνεται — δεν υπάρχει σελίδα που να τον δέχεται.
-   * Το template πέφτει μόνο του στην αντιγραφή του συνδέσμου.
+   * The verification email in its «claim» form: this person did NOT create an
+   * account, they bought as a guest and now claim one on their order, and the
+   * button sets a password rather than confirming an address.
    */
-  const html = await renderTemplate("account-verify", {
-    preheader: `Ορίστε κωδικό και δείτε όλες τις παραγγελίες σας. Ο σύνδεσμος ισχύει ${TOKEN_TTL_HOURS} ώρες.`,
-    recipient: { first_name: order.firstName, last_name: order.lastName, email: order.email },
-    verify: {
-      url: link,
-      expires_in: `${TOKEN_TTL_HOURS} ώρες`,
-      cta: "Ορισμος κωδικου",
-      lead:
-        `${name ? `${name}, ζ` : "Ζ"}ητήσατε πρόσβαση στον λογαριασμό σας με βάση την ` +
-        `παραγγελία ${order.orderNumber}. Επιλέξτε κωδικό και θα βρείτε εκεί όλες τις ` +
-        "παραγγελίες που έχετε κάνει με αυτό το email — όχι μόνο αυτή που δηλώσατε.",
-      /* Η προεπιλογή του template μιλά για λογαριασμό που «διαγράφεται σε 7
-         ημέρες». Εδώ δεν έχει δημιουργηθεί λογαριασμός — ο σύνδεσμος είναι που
-         τον δημιουργεί — οπότε η προεπιλογή θα ήταν αναληθής. */
-      note:
-        "Αγνοήστε αυτό το email — δεν δημιουργήθηκε λογαριασμός και δεν άλλαξε " +
-        "τίποτα στις παραγγελίες σας. Ο σύνδεσμος λήγει από μόνος του.",
-    },
-  });
-
-  const result = await sendMail({
-    to: order.email,
-    subject: "Ολοκληρώστε την εγγραφή σας — Kolleris",
-    html,
-    text: [
-      "Ολοκληρώστε την εγγραφή σας — Kolleris",
-      "",
-      `Παραγγελία: ${order.orderNumber}`,
-      "",
-      `Ορισμός κωδικού: ${link}`,
-      "",
-      `Ο σύνδεσμος ισχύει για ${TOKEN_TTL_HOURS} ώρες. Αν δεν τον ζητήσατε, αγνοήστε το μήνυμα.`,
-    ].join("\n"),
-  });
+  const result = await sendVerifyEmail({
+    to: { firstName: order.firstName, lastName: order.lastName, email: order.email },
+    url: link,
+    hours: TOKEN_TTL_HOURS,
+    mode: "claim",
+    orderNumber: order.orderNumber,
+  }, { locale });
 
   if (!result.ok) {
     console.error(`[registration-invite] ${email}: ${result.error}`);

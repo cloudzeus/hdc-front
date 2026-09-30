@@ -1,93 +1,68 @@
-import { mailProductImage } from "@/lib/mail/product-image";
 import "server-only";
-import { prisma } from "@/lib/prisma";
-import { sendTemplateMail } from "@/lib/mail/send-template";
-import { siteOrigin } from "@/lib/seo/urls";
+import { renderEmail, localeUrl } from "@/lib/mail/hdc/render";
+import { t } from "@/lib/mail/hdc/strings";
+import { renderAndDeliver } from "@/lib/mail/hdc/deliver";
+import { buildOrderView, loadOrder, orderLocale } from "@/lib/mail/hdc/order-view";
+import type { MailOptions } from "@/lib/mail/order-email";
 
 /**
- * «Πώς δούλεψαν;» — επτά ημέρες μετά την παράδοση, μία φορά.
+ * «How did they work?» — seven days after delivery, once.
  *
- * ── Μόνο σε όποιον μπορεί όντως να αξιολογήσει ────────────────────────────
+ * Only to someone who can actually review: the review form needs a login, so a
+ * guest order gets nothing — every link would end at a sign-in form. And only
+ * for products still in the catalogue, once per product: two sizes of the same
+ * code are two lines and one review.
  *
- * Η φόρμα αξιολόγησης ζητά σύνδεση: το `reviewableItems` ξεκινά από
- * `customerId`. Μια παραγγελία επισκέπτη δεν έχει λογαριασμό, οπότε κάθε
- * σύνδεσμος του email θα κατέληγε σε φόρμα εισόδου — ζητάμε χάρη και δίνουμε
- * εμπόδιο. Αυτές οι παραγγελίες απλώς δεν λαμβάνουν το μήνυμα.
- *
- * ── Και μόνο για είδη που υπάρχουν ακόμη ──────────────────────────────────
- *
- * Οι γραμμές παραγγελίας είναι στιγμιότυπο και κρατούν το όνομα ακόμη κι όταν
- * το προϊόν έχει φύγει από τον κατάλογο. Χωρίς `productId` δεν υπάρχει τι να
- * αξιολογηθεί, και ένα «Αξιολόγηση →» δίπλα σε κάτι που δεν πωλείται πια
- * είναι σύνδεσμος προς το πουθενά.
- *
- * ── Χωρίς κλίμακα 1–5 ─────────────────────────────────────────────────────
- *
- * Το template προσφέρει πέντε κουμπιά ενός κλικ για τη συνολική εμπειρία.
- * Δεν υπάρχει σημείο που να καταγράφει τέτοια βαθμολογία — πέντε κουμπιά που
- * δεν κάνουν τίποτα είναι χειρότερα από κανένα, γιατί ο παραλήπτης νομίζει
- * ότι βαθμολόγησε. Το `review.scale` μένει κενό και το μπλοκ δεν αποδίδεται.
+ * No one-click 1–5 scale: nothing would record it, and five buttons that do
+ * nothing make the reader believe they rated.
  */
 
-export async function sendReviewRequestEmail(orderNumber: string) {
-  const order = await prisma.order.findUnique({
-    where: { orderNumber },
-    include: { lines: true },
-  });
-  if (!order) return { ok: false as const, error: "Η παραγγελία δεν βρέθηκε." };
-  if (!order.customerId) {
-    return { ok: false as const, error: "Παραγγελία χωρίς λογαριασμό — δεν μπορεί να αξιολογήσει." };
-  }
+export async function buildReviewRequestEmail(
+  orderNumber: string,
+  options: MailOptions & { preview?: boolean } = {},
+) {
+  const order = await loadOrder(orderNumber);
+  if (!order) return null;
+  // The admin preview may show it for a guest order; a real send never goes to one.
+  if (!order.customerId && !options.preview) return null;
+  const locale = options.locale ?? orderLocale(order);
+  const view = await buildOrderView(order, locale, { prices: false });
+  const reviewsUrl = localeUrl(locale, "/logariasmos/axiologiseis");
 
-  const reviewsUrl = `${siteOrigin()}/logariasmos/axiologiseis`;
-
-  /*
-   * Ένα είδος ανά προϊόν. Δύο μεγέθη του ίδιου κωδικού είναι δύο γραμμές
-   * παραγγελίας και μία αξιολόγηση — το ίδιο προϊόν δύο φορές στη λίστα
-   * μοιάζει με σφάλμα.
-   */
   const seen = new Set<string>();
   const items = order.lines
-    .filter((line) => {
+    .map((line, i) => ({ line, item: view.items[i] }))
+    .filter(({ line }) => {
       if (!line.productId || seen.has(line.productId)) return false;
       seen.add(line.productId);
       return true;
     })
-    .map((line) => ({
-      brand: line.brand ?? "",
-      sku: line.sku,
-      name: line.name,
-      image: mailProductImage(line.imageUrl),
-      review_url: reviewsUrl,
+    .map(({ item }) => ({
+      ...item,
+      qty: item.qty,
+      availability: null,
+      total: "",
+      action: { label: t(locale, "review.action"), href: reviewsUrl },
     }));
+  if (items.length === 0) return null;
 
-  if (items.length === 0) {
-    return { ok: false as const, error: "Καμία γραμμή με προϊόν που να αξιολογείται." };
-  }
-
-  return sendTemplateMail({
-    to: order.email,
-    templateId: "review-request",
-    subject: `Πώς δούλεψαν; Αξιολογήστε την παραγγελία ${order.orderNumber}`,
-    preheader: "60 δευτερόλεπτα. Βοηθάτε άλλους επαγγελματίες να επιλέξουν σωστά.",
-    context: order.orderNumber,
-    data: {
-      recipient: {
-        first_name: order.firstName,
-        last_name: order.lastName,
-        email: order.email,
-      },
-      order: { number: order.orderNumber, items },
-      review: { scale: [] },
-    },
-    text: [
-      `Πώς δούλεψαν; Αξιολογήστε την παραγγελία ${order.orderNumber}`,
-      "",
-      ...items.map((i) => `· ${i.name}`),
-      "",
-      `Αξιολογήστε: ${reviewsUrl}`,
-      "",
-      "Κάτι δεν πήγε καλά; Μη γράψετε αξιολόγηση — απαντήστε σε αυτό το email.",
-    ].join("\n"),
+  const email = renderEmail({
+    template: "review-request",
+    locale,
+    kind: "order",
+    subject: t(locale, "review.subject", { number: order.orderNumber }),
+    preheader: t(locale, "review.pre"),
+    topline: { left: t(locale, "review.topline"), right: order.orderNumber },
+    assetOrigin: options.assetOrigin,
+    data: { order: { number: order.orderNumber, items }, review: { url: reviewsUrl } },
   });
+  return { to: order.email, email };
+}
+
+export async function sendReviewRequestEmail(orderNumber: string) {
+  return renderAndDeliver(
+    () => buildReviewRequestEmail(orderNumber),
+    `review-request ${orderNumber}`,
+    "Παραγγελία χωρίς λογαριασμό ή χωρίς προϊόν που να αξιολογείται.",
+  );
 }

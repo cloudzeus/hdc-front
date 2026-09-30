@@ -17,9 +17,9 @@ import {
   resetLinkOrigin,
   resetTokenState,
 } from "@/lib/admin/password-reset-core";
-import { mailConfigured, sendMail } from "@/lib/mail/client";
-import { renderTemplate } from "@/lib/mail/templates";
-import { mailUrls } from "@/lib/mail/urls";
+import { mailConfigured } from "@/lib/mail/client";
+import { buildAdminResetEmail } from "@/lib/mail/account-emails";
+import { deliver } from "@/lib/mail/hdc/deliver";
 import { requestFingerprint, stampNow } from "@/lib/mail/request-context";
 import { siteOrigin, siteOriginConfigured } from "@/lib/seo/urls";
 
@@ -118,34 +118,14 @@ export async function requestAdminPasswordReset(rawEmail: string): Promise<Forgo
       console.error("[admin-reset] mail is not configured — reset link not sent");
       return;
     }
-    const html = await renderTemplate("account-password-reset", {
-      preheader: `Ο σύνδεσμος ισχύει για ${RESET_TTL_MINUTES} λεπτά.`,
-      recipient: { first_name: user.name ?? "", email: user.email },
-      reset: {
-        url: link,
-        expires_in: `${RESET_TTL_MINUTES} λεπτά`,
-        requested_at: requestedAt,
-        device: fingerprint.device,
-        location: fingerprint.location,
-        ip: fingerprint.ip,
-      },
-      // «Ο λογαριασμός μου» in the header leads an operator to /admin, not the shop account.
-      urls: { ...mailUrls(), account: `${origin}/admin/login` },
-    });
-    const result = await sendMail({
+    const email = buildAdminResetEmail({
       to: user.email,
-      subject: "Επαναφορά κωδικού διαχείρισης — Milwaukee Heavy Duty Centre",
-      html,
-      text: [
-        "Επαναφορά κωδικού διαχείρισης — Milwaukee Heavy Duty Centre",
-        "",
-        `Ορισμός νέου κωδικού: ${link}`,
-        "",
-        `Ισχύει για ${RESET_TTL_MINUTES} λεπτά και χρησιμοποιείται μία φορά.`,
-        `Αίτημα: ${requestedAt} · ${fingerprint.device} · IP ${fingerprint.ip}`,
-        "Αν δεν τον ζητήσατε εσείς, αγνοήστε το μήνυμα — ο κωδικός σας δεν άλλαξε.",
-      ].join("\n"),
+      url: link,
+      minutes: RESET_TTL_MINUTES,
+      requestedAt,
+      fingerprint,
     });
+    const result = await deliver(email, { to: user.email }, "admin-reset");
     if (!result.ok) console.error(`[admin-reset] send failed: ${result.error}`);
   });
 

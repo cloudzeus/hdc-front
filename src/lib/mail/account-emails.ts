@@ -1,203 +1,246 @@
 import "server-only";
-import { sendTemplateMail } from "@/lib/mail/send-template";
-import { mailUrls } from "@/lib/mail/urls";
-import { stampNow } from "@/lib/mail/request-context";
-import type { RequestFingerprint } from "@/lib/mail/request-context";
-import { PRIMARY_PHONE } from "@/config/shop";
+import type { Locale } from "@/i18n/routing";
+import { renderEmail } from "@/lib/mail/hdc/render";
+import { t } from "@/lib/mail/hdc/strings";
+import { deliver, type DeliverOutcome } from "@/lib/mail/hdc/deliver";
+import { requestLocale } from "@/lib/mail/hdc/locale";
+import { stampNow, type RequestFingerprint } from "@/lib/mail/request-context";
 
 /**
- * Τα email του κύκλου ζωής ενός λογαριασμού.
+ * The emails of an account's life, and the newsletter double opt-in: welcome,
+ * email verification (and its «claim your orders» form), password reset,
+ * password changed, and the admin password reset.
  *
- * Τέσσερα γεγονότα που συνέβαιναν ήδη και δεν έλεγαν τίποτα σε κανέναν:
- * δημιουργία λογαριασμού, αλλαγή κωδικού, αίτημα B2B, έγκριση B2B. Ο πελάτης
- * υπέβαλλε αίτηση για λογαριασμό συνεργάτη και περίμενε — χωρίς επιβεβαίωση
- * ότι ελήφθη, χωρίς προθεσμία, και χωρίς ειδοποίηση όταν εγκρινόταν. Η έγκριση
- * φαινόταν μόνο σε όποιον ξαναδοκίμαζε να συνδεθεί.
+ * Each has a `build…` (what the admin preview shows) and a `send…` (what the
+ * event calls). None blocks its event: `deliver` logs and returns instead of
+ * throwing, so an account that was created stays created with Mailgun down.
  *
- * ── Κανένα δεν μπλοκάρει το γεγονός του ────────────────────────────────────
- *
- * Όλα περνούν από το `sendTemplateMail`, που καταγράφει και επιστρέφει αντί να
- * πετάξει. Ένας λογαριασμός που εγκρίθηκε παραμένει εγκεκριμένος ακόμη κι αν
- * το Mailgun είναι κάτω.
+ * In the language of the page that asked (`requestLocale`), except the admin
+ * reset, which is Greek like the admin.
  */
 
-type Recipient = { firstName: string; lastName?: string; email: string };
+type Recipient = { firstName?: string | null; lastName?: string | null; email: string };
+type Options = { locale?: Locale; assetOrigin?: string };
 
-const recipientOf = (r: Recipient) => ({
-  first_name: r.firstName,
-  last_name: r.lastName ?? "",
-  email: r.email,
-});
+async function localeOf(options: Options): Promise<Locale> {
+  return options.locale ?? (await requestLocale());
+}
 
-/**
- * «Ο λογαριασμός σας είναι έτοιμος» — μετά τη δημιουργία.
- *
- * Απαγορεύεται το «Καλώς ήρθατε!»: το ίδιο το design system το ορίζει, και ο
- * τίτλος είναι δήλωση κατάστασης, όχι χαιρετισμός.
- */
-export async function sendWelcomeEmail(
-  to: Recipient,
-  account: { type: "individual" | "company"; customerCode?: string | null },
-) {
-  const urls = mailUrls();
-  return sendTemplateMail({
-    to: to.email,
-    templateId: "account-welcome",
-    subject: "Ο λογαριασμός σας είναι έτοιμος",
-    preheader: "Γρήγορη παραγγελία με κωδικό, ιστορικό, αποθηκευμένες διευθύνσεις.",
-    context: to.email,
-    data: {
-      recipient: recipientOf(to),
-      account: {
-        /*
-         * Ο κωδικός πελάτη έρχεται από το ERP και δεν υπάρχει για ιδιώτες.
-         * Παύλα αντί για κενό: το template τον δείχνει σε γραμμή στοιχείων,
-         * και μια άδεια γραμμή διαβάζεται ως σφάλμα.
-         */
-        customer_code: account.customerCode || "—",
-        type: account.type === "company" ? "Εταιρικός" : "Ιδιώτης",
-      },
-      steps: [
-        {
-          index: "01",
-          title: "Παραγγειλτε με κωδικο",
-          text: "Γράψτε κωδικούς και ποσότητες και το καλάθι γεμίζει χωρίς αναζήτηση.",
-          cta: "Γρηγορη παραγγελια",
-          url: urls.quick_order,
-        },
-        {
-          index: "02",
-          title: "Δειτε τις παραγγελιες σας",
-          text: "Ιστορικό, κατάσταση αποστολής και επανάληψη παραγγελίας με ένα κλικ.",
-          cta: "Οι παραγγελιες μου",
-          url: urls.orders,
-        },
-        {
-          index: "03",
-          title: "Αποθηκευστε αγαπημενα",
-          text: "Ό,τι παραγγέλνετε συχνά, σε ένα σημείο, από οποιαδήποτε συσκευή.",
-          cta: "Ο λογαριασμος μου",
-          url: urls.account,
-        },
-      ],
-    },
-    text: [
-      "Ο λογαριασμός σας είναι έτοιμος",
-      "",
-      `Γρήγορη παραγγελία με κωδικό: ${urls.quick_order}`,
-      `Οι παραγγελίες μου: ${urls.orders}`,
-      `Ο λογαριασμός μου: ${urls.account}`,
-    ].join("\n"),
+/* ── Welcome ─────────────────────────────────────────────────────────────── */
+
+export async function buildWelcomeEmail(to: Recipient, options: Options = {}) {
+  const locale = await localeOf(options);
+  return renderEmail({
+    template: "account-welcome",
+    locale,
+    kind: "account",
+    subject: t(locale, "welcome.subject"),
+    preheader: t(locale, "welcome.pre"),
+    topline: { left: t(locale, "welcome.topline"), right: to.email },
+    assetOrigin: options.assetOrigin,
+    data: {},
   });
 }
 
-/**
- * «Ο κωδικός σας άλλαξε» — ειδοποίηση ασφαλείας, όχι επιβεβαίωση.
- *
- * Στέλνεται ΠΑΝΤΑ, ακόμη κι όταν την αλλαγή την έκανε ο ίδιος ο κάτοχος: το
- * νόημά της είναι να φτάσει στον άνθρωπο που ΔΕΝ την έκανε. Ένα email που
- * παραλείπεται «επειδή το ξέρει ήδη» δεν προστατεύει κανέναν.
- */
-export async function sendPasswordChangedEmail(
+/** «Your account is ready» — after sign-up. A statement, not a «Welcome!». */
+export async function sendWelcomeEmail(to: Recipient): Promise<DeliverOutcome> {
+  try {
+    return deliver(await buildWelcomeEmail(to), { to: to.email }, `welcome ${to.email}`);
+  } catch (error) {
+    console.error("[mail] welcome:", error);
+    return { ok: false, error: String(error) };
+  }
+}
+
+/* ── Password changed ───────────────────────────────────────────────────── */
+
+export async function buildPasswordChangedEmail(
   to: Recipient,
   fingerprint: RequestFingerprint,
+  options: Options = {},
 ) {
-  return sendTemplateMail({
-    to: to.email,
-    templateId: "account-password-changed",
-    subject: "Ο κωδικός πρόσβασής σας άλλαξε",
-    preheader: "Αν δεν το κάνατε εσείς, επικοινωνήστε άμεσα μαζί μας.",
-    context: to.email,
+  const locale = await localeOf(options);
+  return renderEmail({
+    template: "account-password-changed",
+    locale,
+    kind: "account",
+    subject: t(locale, "changed.subject"),
+    preheader: t(locale, "changed.pre"),
+    topline: { left: t(locale, "changed.topline"), right: to.email },
+    assetOrigin: options.assetOrigin,
     data: {
-      recipient: recipientOf(to),
       change: {
-        at: stampNow(),
-        device: fingerprint.device,
-        location: fingerprint.location,
-        ip: fingerprint.ip,
-        /*
-         * Δεν υπάρχει σελίδα κλειδώματος λογαριασμού, οπότε δεν στέλνεται
-         * `lock_url`: το template πέφτει στο «καλέστε μας αμέσως», που είναι
-         * αυτό που όντως συμβαίνει. Ένα κουμπί «Κλείδωμα λογαριασμού» που
-         * βγάζει σε φόρμα επικοινωνίας κάνει τον παραλήπτη να νομίζει ότι ο
-         * λογαριασμός κλείδωσε — τη στιγμή που δεν έχει κλειδώσει.
-         *
-         * Ούτε `security_email`: το γραμματοκιβώτιο δεν υπάρχει, και μια
-         * αναφορά παραβίασης που πάει στο πουθενά είναι η χειρότερη εκδοχή.
-         */
+        rows: [
+          { label: t(locale, "changed.when"), value: stampNow(), strong: true },
+          { label: t(locale, "reset.device"), value: fingerprint.device },
+          { label: t(locale, "reset.ip"), value: fingerprint.ip },
+        ],
       },
     },
-    text: [
-      "Ο κωδικός πρόσβασής σας άλλαξε",
-      "",
-      `Ημερομηνία: ${stampNow()}`,
-      `Συσκευή: ${fingerprint.device}`,
-      `IP: ${fingerprint.ip}`,
-      "",
-      `Αν δεν το κάνατε εσείς, καλέστε μας άμεσα στο ${PRIMARY_PHONE.display}.`,
-    ].join("\n"),
   });
 }
 
-/** «Λάβαμε το αίτημά σας για λογαριασμό B2B» — με προσδοκία χρόνου. */
-export async function sendB2bPendingEmail(
-  to: Recipient,
-  company: {
-    id: string;
-    name: string;
-    afm: string;
-    doy?: string | null;
-    profession?: string | null;
-    address?: string | null;
-    city?: string | null;
-    postcode?: string | null;
-    phone?: string | null;
-  },
-) {
-  const sla = "1–2 εργάσιμες ημέρες";
-  const address = [company.address, [company.postcode, company.city].filter(Boolean).join(" ")]
-    .filter(Boolean)
-    .join(", ");
+/**
+ * «Your password was changed» — a security notice, sent ALWAYS: its point is
+ * to reach the person who did NOT make the change. No «lock account» button:
+ * there is no such page, and a button that does not lock is worse than none.
+ */
+export async function sendPasswordChangedEmail(to: Recipient, fingerprint: RequestFingerprint) {
+  try {
+    return deliver(await buildPasswordChangedEmail(to, fingerprint), { to: to.email }, `password-changed ${to.email}`);
+  } catch (error) {
+    console.error("[mail] password-changed:", error);
+    return { ok: false as const, error: String(error) };
+  }
+}
 
-  return sendTemplateMail({
-    to: to.email,
-    templateId: "account-b2b-pending",
-    subject: "Λάβαμε το αίτημά σας για λογαριασμό B2B",
-    preheader: `Έλεγχος στοιχείων εντός ${sla}.`,
-    context: `${company.afm} · ${to.email}`,
+/* ── Email verification / claim ─────────────────────────────────────────── */
+
+export type VerifyInput = {
+  to: Recipient;
+  url: string;
+  hours: number;
+  /** `claim`: a guest buyer asking for an account on an order — the button sets a password. */
+  mode: "verify" | "claim";
+  orderNumber?: string;
+};
+
+export async function buildVerifyEmail(input: VerifyInput, options: Options = {}) {
+  const locale = await localeOf(options);
+  const claim = input.mode === "claim";
+  return renderEmail({
+    template: "account-verify",
+    locale,
+    kind: "account",
+    subject: t(locale, claim ? "claim.subject" : "verify.subject"),
+    preheader: t(locale, claim ? "claim.pre" : "verify.pre", { hours: input.hours }),
+    topline: { left: t(locale, "verify.topline"), right: input.to.email },
+    assetOrigin: options.assetOrigin,
     data: {
-      recipient: recipientOf(to),
-      b2b: {
-        /*
-         * Αριθμός αιτήματος: τα οκτώ τελευταία του cuid της εταιρείας, κεφαλαία.
-         * Δεν υπάρχει ξεχωριστός μετρητής αιτημάτων, και το να επινοηθεί ένας
-         * θα σήμαινε νούμερο που δεν βρίσκει κανείς όταν το αναφέρει ο πελάτης
-         * στο τηλέφωνο. Αυτό οδηγεί στην πραγματική εγγραφή.
-         */
-        request_number: `B2B-${company.id.slice(-8).toUpperCase()}`,
-        company_name: company.name,
-        sla,
-        vat: company.afm,
-        doy: company.doy || "—",
-        activity: company.profession || "—",
-        address: address || "—",
-        contact_name: `${to.firstName} ${to.lastName ?? ""}`.trim(),
-        contact_phone: company.phone || "—",
+      verify: {
+        url: input.url,
+        hours: input.hours,
+        eyebrowKey: claim ? "claim.eyebrow" : "verify.eyebrow",
+        titleKey: claim ? "claim.title" : "verify.title",
+        ctaKey: claim ? "claim.cta" : "verify.cta",
+        ignoreKey: claim ? "claim.ignore" : "verify.ignore",
+        lead: claim
+          ? t(locale, "claim.lead", { number: input.orderNumber || "—" })
+          : t(locale, "verify.lead"),
       },
-      next_steps: [
-        { index: "01", text: "Ελέγχουμε το ΑΦΜ και τα στοιχεία της εταιρείας στο μητρώο." },
-        { index: "02", text: "Αντιστοιχίζουμε τον λογαριασμό με τον τιμοκατάλογο συνεργάτη." },
-        { index: "03", text: "Λαμβάνετε email έγκρισης και συνδέεστε με τις τιμές σας." },
-      ],
     },
-    text: [
-      "Λάβαμε το αίτημά σας για λογαριασμό B2B",
-      "",
-      `Επωνυμία: ${company.name}`,
-      `ΑΦΜ: ${company.afm}`,
-      "",
-      `Έλεγχος στοιχείων εντός ${sla}. Θα σας ενημερώσουμε με email.`,
-    ].join("\n"),
   });
 }
 
+export async function sendVerifyEmail(input: VerifyInput, options: Options = {}): Promise<DeliverOutcome> {
+  try {
+    return deliver(await buildVerifyEmail(input, options), { to: input.to.email }, `verify ${input.to.email}`);
+  } catch (error) {
+    console.error("[mail] verify:", error);
+    return { ok: false, error: String(error) };
+  }
+}
+
+/* ── Customer password reset ────────────────────────────────────────────── */
+
+export type ResetInput = {
+  to: Recipient;
+  url: string;
+  hours: number;
+  requestedAt: string;
+  fingerprint: RequestFingerprint;
+};
+
+export async function buildPasswordResetEmail(input: ResetInput, options: Options = {}) {
+  const locale = await localeOf(options);
+  const time = t(locale, "time.hours", { n: input.hours });
+  return renderEmail({
+    template: "account-password-reset",
+    locale,
+    kind: "account",
+    subject: t(locale, "reset.subject"),
+    preheader: t(locale, "reset.pre", { time }),
+    topline: { left: t(locale, "reset.topline"), right: input.to.email },
+    assetOrigin: options.assetOrigin,
+    data: {
+      reset: {
+        url: input.url,
+        expires_in: time,
+        /* Who asked, from where: the only facts that let someone see it was not them. */
+        rows: [
+          { label: t(locale, "reset.requested"), value: input.requestedAt, strong: true },
+          { label: t(locale, "reset.device"), value: input.fingerprint.device },
+          { label: t(locale, "reset.ip"), value: input.fingerprint.ip },
+        ],
+      },
+    },
+  });
+}
+
+export async function sendPasswordResetEmail(input: ResetInput, options: Options = {}): Promise<DeliverOutcome> {
+  try {
+    return deliver(await buildPasswordResetEmail(input, options), { to: input.to.email }, `password-reset ${input.to.email}`);
+  } catch (error) {
+    console.error("[mail] password-reset:", error);
+    return { ok: false, error: String(error) };
+  }
+}
+
+/* ── Newsletter double opt-in ───────────────────────────────────────────── */
+
+export async function buildNewsletterConfirmEmail(
+  input: { to: string; url: string; hours: number },
+  options: Options = {},
+) {
+  const locale = await localeOf(options);
+  return renderEmail({
+    template: "newsletter-confirm",
+    locale,
+    kind: "subscribe",
+    subject: t(locale, "subscribe.subject"),
+    preheader: t(locale, "subscribe.pre"),
+    topline: { left: t(locale, "subscribe.topline"), right: input.to },
+    assetOrigin: options.assetOrigin,
+    data: {
+      subscribe: {
+        url: input.url,
+        hours: input.hours,
+        what: [t(locale, "subscribe.what_offers"), t(locale, "subscribe.what_new"), t(locale, "subscribe.what_news")],
+      },
+    },
+  });
+}
+
+/* ── Admin password reset (Greek) ───────────────────────────────────────── */
+
+export type AdminResetInput = {
+  to: string;
+  url: string;
+  minutes: number;
+  requestedAt: string;
+  fingerprint: RequestFingerprint;
+};
+
+export function buildAdminResetEmail(input: AdminResetInput, options: { assetOrigin?: string } = {}) {
+  return renderEmail({
+    template: "admin-password-reset",
+    locale: "el",
+    kind: "admin",
+    subject: t("el", "admin.subject"),
+    preheader: t("el", "admin.pre", { minutes: input.minutes }),
+    topline: { left: t("el", "admin.eyebrow"), right: input.to },
+    assetOrigin: options.assetOrigin,
+    data: {
+      reset: {
+        url: input.url,
+        email: input.to,
+        minutes: input.minutes,
+        rows: [
+          { label: t("el", "reset.requested"), value: input.requestedAt, strong: true },
+          { label: t("el", "reset.device"), value: input.fingerprint.device },
+          { label: t("el", "reset.ip"), value: input.fingerprint.ip },
+        ],
+      },
+    },
+  });
+}

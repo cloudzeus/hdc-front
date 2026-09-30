@@ -1,9 +1,10 @@
 import "server-only";
 import { randomBytes } from "node:crypto";
 import { prisma } from "@/lib/prisma";
-import { sendMail, mailConfigured } from "@/lib/mail/client";
-import { renderTemplate } from "@/lib/mail/templates";
-import { siteOrigin } from "@/lib/seo/urls";
+import { mailConfigured } from "@/lib/mail/client";
+import { sendVerifyEmail } from "@/lib/mail/account-emails";
+import { requestLocale } from "@/lib/mail/hdc/locale";
+import { localeUrl } from "@/lib/mail/hdc/render";
 
 /**
  * Has this account shown that it controls its email address?
@@ -86,35 +87,15 @@ export async function requestEmailProof(customerId: string): Promise<ProofReques
     },
   });
 
-  const link = `${siteOrigin()}/logariasmos/epivevaiosi-email/${token}`;
-  const html = await renderTemplate("account-verify", {
-    preheader: `Επιβεβαιώστε το email σας. Ο σύνδεσμος ισχύει ${TOKEN_TTL_HOURS} ώρες.`,
-    recipient: { first_name: customer.firstName, last_name: customer.lastName, email },
-    verify: {
-      url: link,
-      expires_in: `${TOKEN_TTL_HOURS} ώρες`,
-      cta: "Επιβεβαιωση email",
-      lead:
-        "Επιβεβαιώστε ότι αυτό το email είναι δικό σας. Μετά θα βρείτε στον λογαριασμό " +
-        "σας και τις παραγγελίες που κάνατε ως επισκέπτης με αυτό το email.",
-      note:
-        "Αν δεν το ζητήσατε εσείς, αγνοήστε αυτό το email — δεν αλλάζει τίποτα στον " +
-        "λογαριασμό σας και ο σύνδεσμος λήγει από μόνος του.",
-    },
-  });
-
-  const result = await sendMail({
-    to: email,
-    subject: "Επιβεβαίωση email — Kolleris",
-    html,
-    text: [
-      "Επιβεβαίωση email — Kolleris",
-      "",
-      `Επιβεβαίωση: ${link}`,
-      "",
-      `Ο σύνδεσμος ισχύει για ${TOKEN_TTL_HOURS} ώρες. Αν δεν τον ζητήσατε, αγνοήστε το μήνυμα.`,
-    ].join("\n"),
-  });
+  // In the language of the page that asked, and the email says it in that language too.
+  const locale = await requestLocale();
+  const link = localeUrl(locale, `/logariasmos/epivevaiosi-email/${token}`);
+  const result = await sendVerifyEmail({
+    to: { firstName: customer.firstName, lastName: customer.lastName, email },
+    url: link,
+    hours: TOKEN_TTL_HOURS,
+    mode: "verify",
+  }, { locale });
 
   if (!result.ok) {
     console.error(`[email-proof] ${email}: ${result.error}`);

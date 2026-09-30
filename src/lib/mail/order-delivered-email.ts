@@ -1,102 +1,56 @@
-import { mailProductImage } from "@/lib/mail/product-image";
 import "server-only";
-import { prisma } from "@/lib/prisma";
-import { sendTemplateMail } from "@/lib/mail/send-template";
-import { mailUrls } from "@/lib/mail/urls";
-import { siteOrigin } from "@/lib/seo/urls";
-import { PRIMARY_PHONE } from "@/config/shop";
+import { renderEmail } from "@/lib/mail/hdc/render";
+import { t } from "@/lib/mail/hdc/strings";
+import { renderAndDeliver } from "@/lib/mail/hdc/deliver";
+import { buildOrderView, loadOrder, orderLocale, stamp } from "@/lib/mail/hdc/order-view";
+import type { MailOptions } from "@/lib/mail/order-email";
 
 /**
- * «Η παραγγελία παραδόθηκε».
+ * «Your order has been delivered.»
  *
- * Κλείνει τον ιχνηλάτη — το τέταρτο βήμα που έμενε σβηστό για πάντα — και
- * ζητά έλεγχο των ειδών όσο η προθεσμία αλλαγής τρέχει ακόμη. Ένα δέμα που
- * ανοίγεται τρεις βδομάδες αργότερα με λάθος κωδικό μέσα είναι πρόβλημα που
- * θα μπορούσε να είχε λυθεί την πρώτη μέρα.
+ * Asks for the items to be checked while returns are still easy, and promises
+ * no PDF document: there is none anywhere in the shop or in HDCtool, and a
+ * «download your receipt» button that ends in a 404 is worse than none. The
+ * buttons go to the order page, where everything we keep is.
  *
- * Δεν υπόσχεται παραστατικό PDF: δεν υπάρχει τέτοιο αρχείο πουθενά στο
- * κατάστημα ούτε στο HDCtool, και ένα κουμπί «κατεβάστε την απόδειξη» που
- * βγάζει σε 404 είναι χειρότερο από την απουσία του. Τα κουμπιά δείχνουν στη
- * σελίδα της παραγγελίας, όπου υπάρχουν όλα όσα κρατάμε.
+ * ACS also returns who signed for the parcel; it is not written here — it is
+ * a third person's name, often a neighbour's.
  */
 
-const money = (value: unknown) => `${Number(value).toFixed(2).replace(".", ",")} €`;
+export async function buildDeliveredEmail(orderNumber: string, options: MailOptions = {}) {
+  const order = await loadOrder(orderNumber);
+  if (!order) return null;
+  const locale = options.locale ?? orderLocale(order);
+  const view = await buildOrderView(order, locale, { prices: false });
 
-function stamp(date: Date): string {
-  const parts = new Intl.DateTimeFormat("el-GR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "Europe/Athens",
-    hourCycle: "h23",
-  }).formatToParts(date);
-  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
-  return `${get("day")}.${get("month")}.${get("year")}, ${get("hour")}:${get("minute")}`;
+  const email = renderEmail({
+    template: "order-delivered",
+    locale,
+    kind: "order",
+    subject: t(locale, "delivered.subject", { number: order.orderNumber }),
+    preheader: t(locale, "delivered.pre"),
+    topline: { left: t(locale, "delivered.topline"), right: order.orderNumber },
+    assetOrigin: options.assetOrigin,
+    data: {
+      order: view,
+      delivery: {
+        rows: [
+          { label: t(locale, "delivered.at"), value: stamp(order.deliveredAt ?? new Date()), strong: true },
+          {
+            label: t(locale, "delivered.where"),
+            value: `${order.shipLine1}, ${order.shipPostcode} ${order.shipCity}`,
+          },
+        ],
+      },
+    },
+  });
+  return { to: order.email, email };
 }
 
 export async function sendDeliveredEmail(orderNumber: string) {
-  const order = await prisma.order.findUnique({
-    where: { orderNumber },
-    include: { lines: true },
-  });
-  if (!order) return { ok: false as const, error: "Η παραγγελία δεν βρέθηκε." };
-
-  const link = `${siteOrigin()}/checkout/epibebaiosi/${encodeURIComponent(order.orderNumber)}?t=${encodeURIComponent(order.guestToken)}`;
-  const urls = mailUrls();
-
-  return sendTemplateMail({
-    to: order.email,
-    templateId: "order-delivered",
-    subject: `Η παραγγελία ${order.orderNumber} παραδόθηκε`,
-    preheader: "Ελέγξτε τα είδη σας. Πρόβλημα; Απαντήστε σε αυτό το email.",
-    context: order.orderNumber,
-    data: {
-      recipient: {
-        first_name: order.firstName,
-        last_name: order.lastName,
-        email: order.email,
-      },
-      order: {
-        number: order.orderNumber,
-        date: stamp(order.createdAt),
-        url: link,
-        items: order.lines.map((line) => ({
-          brand: line.brand ?? "",
-          sku: line.sku,
-          name: line.name,
-          qty: String(line.quantity),
-          unit_price: money(line.unitNet),
-          line_total: money(line.lineNet),
-          image: mailProductImage(line.imageUrl),
-        })),
-      },
-      delivery: {
-        at: order.deliveredAt ? stamp(order.deliveredAt) : stamp(new Date()),
-        /*
-         * Πού παραδόθηκε: η διεύθυνση που δηλώθηκε. Η ACS επιστρέφει και
-         * `delivery_info` (ποιος παρέλαβε), αλλά δεν το γράφουμε σε email —
-         * είναι όνομα τρίτου προσώπου, συχνά γείτονα ή θυρωρού.
-         */
-        where: `${order.shipLine1}, ${order.shipPostcode} ${order.shipCity}`,
-        /* Δεν υπάρχει PDF παραστατικού· ο σύνδεσμος πάει στην παραγγελία. */
-        invoice_url: link,
-        reorder_url: link,
-        returns_url: urls.support,
-        warranty_url: urls.support,
-      },
-    },
-    text: [
-      `Η παραγγελία ${order.orderNumber} παραδόθηκε`,
-      "",
-      `Παράδοση: ${order.deliveredAt ? stamp(order.deliveredAt) : stamp(new Date())}`,
-      `Διεύθυνση: ${order.shipLine1}, ${order.shipPostcode} ${order.shipCity}`,
-      "",
-      "Ελέγξτε τα είδη σας. Αν κάτι δεν είναι σωστό, απαντήστε σε αυτό το email",
-      `ή καλέστε στο ${PRIMARY_PHONE.display}.`,
-      "",
-      `Η παραγγελία σας: ${link}`,
-    ].join("\n"),
-  });
+  return renderAndDeliver(
+    () => buildDeliveredEmail(orderNumber),
+    `order-delivered ${orderNumber}`,
+    "Η παραγγελία δεν βρέθηκε.",
+  );
 }
