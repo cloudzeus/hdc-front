@@ -71,6 +71,12 @@ describe("robots.txt once live", () => {
     expect(allowed(rulesOf(), url)).toBe(false);
   });
 
+  it("writes no character Next would escape in robots.txt", () => {
+    // `&` comes out as `&amp;`, and a rule with it then matches nothing.
+    const { allow, disallow } = rulesOf();
+    for (const rule of [...allow, ...disallow]) expect(rule, rule).not.toMatch(/[&<>"']/);
+  });
+
   it("still lists the sitemap", () => {
     expect(robots().sitemap).toMatch(/\/sitemap\.xml$/);
   });

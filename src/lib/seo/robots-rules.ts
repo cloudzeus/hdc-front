@@ -24,7 +24,12 @@ const LISTINGS = ["/katalogos/*", "/brands/*", "/proionta", "/prosfores/*"];
  *
  *   Disallow /katalogos/*?           any query …
  *   Allow    /katalogos/*?page=       … except one that starts with page= …
- *   Disallow /katalogos/*?page=*&     … and has nothing after it.
+ *   Disallow /katalogos/*?page=*=     … and has no second parameter.
+ *
+ * A second parameter always brings its own `=`, so `*=` is how a rule says
+ * "and then another parameter". Never `&`: Next writes robots.txt with `&`
+ * escaped as `&amp;`, and a rule containing it matches nothing (found on the
+ * Kolleris shop). No rule here contains `&`, `<`, `>`, `"` or `'`.
  */
 export function facetRules(): { allow: string[]; disallow: string[] } {
   const allow: string[] = [];
@@ -32,7 +37,7 @@ export function facetRules(): { allow: string[]; disallow: string[] } {
   for (const prefix of LOCALE_PREFIXES) {
     for (const listing of LISTINGS) {
       const base = `${prefix}${listing}`;
-      disallow.push(`${base}?`, `${base}?page=*&`);
+      disallow.push(`${base}?`, `${base}?page=*=`);
       allow.push(`${base}?page=`);
     }
   }
