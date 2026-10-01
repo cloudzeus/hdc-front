@@ -105,6 +105,10 @@ vi.mock("@/lib/prisma", () => {
 
 vi.mock("@/lib/catalog/variant-lead", () => ({ refreshVariantLeads: async () => undefined }));
 
+/* The in-process listing grids: every catalogue write must clear them. */
+const listingCache = vi.hoisted(() => ({ clear: vi.fn() }));
+vi.mock("@/lib/catalog/listing-cache", () => ({ clearListingCache: listingCache.clear }));
+
 const hdc = vi.hoisted(() => ({ products: vi.fn(), catalogDelta: vi.fn() }));
 vi.mock("@/lib/hdctool/client", () => ({ hdctool: hdc, HDCTOOL_MAX_LIMIT: 200 }));
 
@@ -334,5 +338,33 @@ describe("reconcileCatalog with XML-only ids", () => {
     const result = await reconcileCatalog();
     expect(result.removed).toBe(0);
     expect(db.rows.map((r) => [r.mtrl, r.isActive])).toEqual([[812, true], [-4, true], [-3, true]]);
+  });
+});
+
+describe("the listing cache follows the catalogue", () => {
+  beforeEach(() => listingCache.clear.mockClear());
+
+  it("is cleared when a webhook delivery writes products", async () => {
+    serve([product(812)]);
+    await syncProductsByMtrl([812]);
+    expect(listingCache.clear).toHaveBeenCalled();
+  });
+
+  it("is cleared when a delivery de-lists a product", async () => {
+    db.rows.push(row("row1", -3, "P1", "slug"));
+    serve([]);
+    await syncProductsByMtrl([-3]);
+    expect(listingCache.clear).toHaveBeenCalled();
+  });
+
+  it("is left alone when a delivery names nothing", async () => {
+    await syncProductsByMtrl([]);
+    expect(listingCache.clear).not.toHaveBeenCalled();
+  });
+
+  it("is cleared by a full sync run", async () => {
+    hdc.products.mockImplementation(async () => page([product(812)]));
+    await syncProducts({ maxPages: 1 });
+    expect(listingCache.clear).toHaveBeenCalled();
   });
 });

@@ -27,6 +27,7 @@ import {
 } from "@/lib/catalog/hdc-filters";
 import type { ProductCardData } from "@/lib/catalog/queries";
 import { LISTING_LIMITS, capFacetValues } from "@/lib/catalog/listing-query";
+import { listingCache, type CachedListing } from "@/lib/catalog/listing-cache";
 import {
   PER_PAGE_OPTIONS,
   SORT_OPTIONS,
@@ -516,22 +517,40 @@ export type PlpResult = {
   facets: PlpFacets;
 };
 
-export async function getPlpData(
+/**
+ * The listing cache key: the normalised facet key plus what selects the page.
+ * Exported for the test — two spellings of one listing must be one key.
+ */
+export function listingKeyOf(
   params: PlpParams,
   locale: Locale,
-  /** See `buildWhere`: the campaign scope, when this listing has one. */
   extraWhere?: Prisma.ProductWhereInput | null,
-): Promise<PlpResult | null> {
+): string {
+  return JSON.stringify([
+    facetKeyOf(params),
+    params.page ?? 1,
+    params.perPage ?? 24,
+    params.sort ?? "relevance",
+    Boolean(params.cumulative),
+    locale,
+    extraWhere ?? null,
+  ]);
+}
+
+/** The grid itself: products and total. Read through `listingCache` (listing-cache.ts). */
+async function loadListing(
+  params: PlpParams,
+  locale: Locale,
+  extraWhere: Prisma.ProductWhereInput | null | undefined,
+  page: number,
+  perPage: number,
+): Promise<CachedListing> {
   const filters = await resolveFilters(params);
-  if (filters === null) return null; // unknown category slug → 404
+  // `getPlpData` has already 404'd an unknown category; this only guards one
+  // deleted in between.
+  if (filters === null) return { products: [], total: 0 };
 
   const where = buildWhere(params, filters, undefined, extraWhere);
-  const perPage = params.perPage ?? 24;
-  // Load-more renders pages 1..N at once; 60 pages (1.440 cards) is the most
-  // one request will draw, whatever the URL says.
-  const page = params.cumulative
-    ? Math.min(params.page ?? 1, LISTING_LIMITS.maxCumulativePage)
-    : (params.page ?? 1);
 
   const [rows, total, linkedBrands] = await Promise.all([
     prisma.product.findMany({
@@ -576,6 +595,31 @@ export async function getPlpData(
     };
   });
   const products = await withFamilies(cards, (i) => rows[i].variantGroup);
+
+  return { products, total };
+}
+
+export async function getPlpData(
+  params: PlpParams,
+  locale: Locale,
+  /** See `buildWhere`: the campaign scope, when this listing has one. */
+  extraWhere?: Prisma.ProductWhereInput | null,
+): Promise<PlpResult | null> {
+  // Outside the cache: an unknown category must stay a 404, not a cached
+  // empty grid. One `findUnique`, memoised for the render.
+  if ((await resolveCategoryScope(params.categorySlug)) === null) return null;
+
+  const perPage = params.perPage ?? 24;
+  // Load-more renders pages 1..N at once; 60 pages (1.440 cards) is the most
+  // one request will draw, whatever the URL says.
+  const page = params.cumulative
+    ? Math.min(params.page ?? 1, LISTING_LIMITS.maxCumulativePage)
+    : (params.page ?? 1);
+
+  const { products, total } = await listingCache().getOrLoad(
+    listingKeyOf(params, locale, extraWhere),
+    () => loadListing(params, locale, extraWhere, page, perPage),
+  );
 
   const facets = await getFacets(facetKeyOf(params), locale, extraWhere ?? null);
 
@@ -683,7 +727,8 @@ const NO_FACETS: PlpFacets = {
  *
  * Counts may trail the catalogue by up to five minutes after a sync, and the
  * "με προσφορά" count by as long after a campaign starts or stops. The grid
- * itself is never cached, so the products shown are always current.
+ * has its own in-process cache, cleared by every catalogue write
+ * (listing-cache.ts).
  */
 const getFacets = sharedCatalogue(
   "plp-facets",

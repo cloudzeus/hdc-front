@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
 import { refreshVariantLeads } from "@/lib/catalog/variant-lead";
+import { clearListingCache } from "@/lib/catalog/listing-cache";
 import {
   changedChildTables,
   pickFreeSlug,
@@ -69,6 +70,10 @@ async function withRun<T extends SyncResult>(
 
   try {
     const result = await work();
+    // The listing grids this process cached describe the catalogue before the
+    // run (listing-cache.ts). Cleared on success here, and on failure below: a
+    // run that failed midway may still have written.
+    clearListingCache();
     const status = result.failed > 0 ? "PARTIAL" : "SUCCESS";
     await prisma.$transaction([
       prisma.syncRun.update({
@@ -93,6 +98,7 @@ async function withRun<T extends SyncResult>(
     ]);
     return result;
   } catch (error) {
+    clearListingCache();
     const message = error instanceof Error ? error.message : String(error);
     await prisma.$transaction([
       prisma.syncRun.update({
@@ -1376,6 +1382,10 @@ export async function syncProductsByMtrl(mtrls: number[]): Promise<TargetedSyncR
       console.error("[catalog-sync] variant leads refresh failed", error);
     }
   }
+
+  /* Prices, stock and listings just changed: the next listing view in this
+     process reads them fresh instead of from the five-minute grid cache. */
+  if (processed > 0 || removed > 0) clearListingCache();
 
   return {
     processed, created, updated, removed,
