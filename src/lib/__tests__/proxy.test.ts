@@ -207,3 +207,44 @@ describe("proxy: listing query strings", () => {
     expect(pdp.headers.get("location")).toBeNull();
   });
 });
+
+describe("proxy: per-IP rate limit", () => {
+  const from = (ip: string, path: string, method = "GET") =>
+    proxy(
+      new NextRequest(`https://milwaukeetoolshdc.gr${path}`, {
+        method,
+        headers: { host: "milwaukeetoolshdc.gr", "cf-connecting-ip": ip },
+      }),
+    );
+
+  it("lets a burst of filtered views through, then answers 429 with Retry-After", async () => {
+    for (let i = 0; i < 10; i++) {
+      expect((await from("203.0.113.10", "/katalogos/drapana?platform=M18")).status).toBe(200);
+    }
+    const refused = await from("203.0.113.10", "/katalogos/drapana?platform=M12");
+    expect(refused.status).toBe(429);
+    expect(refused.headers.get("retry-after")).toBe("3");
+    expect(await refused.text()).toContain('name="robots" content="noindex"');
+    // Another client is not affected, and neither is the same client's bare listing.
+    expect((await from("203.0.113.11", "/katalogos/drapana?platform=M18")).status).toBe(200);
+    expect((await from("203.0.113.10", "/katalogos/drapana")).status).toBe(200);
+  });
+
+  it("limits the suggest API with a JSON 429, without localising it", async () => {
+    for (let i = 0; i < 30; i++) {
+      const ok = await from("203.0.113.20", "/api/suggest?q=m18");
+      expect(ok.status).toBe(200);
+      expect(ok.headers.get("x-middleware-next")).toBe("1");
+      expect(ok.headers.get("x-middleware-rewrite")).toBeNull();
+    }
+    const refused = await from("203.0.113.20", "/api/suggest?q=m18");
+    expect(refused.status).toBe(429);
+    expect(await refused.json()).toMatchObject({ error: "rate_limited" });
+  });
+
+  it("never limits a POST (Server Actions, the cart)", async () => {
+    for (let i = 0; i < 15; i++) {
+      expect((await from("203.0.113.30", "/katalogos/drapana?platform=M18", "POST")).status).not.toBe(429);
+    }
+  });
+});

@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import createIntlMiddleware from "next-intl/middleware";
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
 import { authConfig } from "@/auth.config";
 import { routing } from "@/i18n/routing";
 import {
@@ -8,6 +8,13 @@ import {
   canonicalizeListingQuery,
   listingKindOf,
 } from "@/lib/catalog/listing-query";
+import {
+  POLICIES,
+  TokenBucketLimiter,
+  clientIp,
+  policyFor,
+} from "@/lib/security/rate-limit";
+import { tinyPage } from "@/lib/security/tiny-response";
 import { indexingAllowed, NOINDEX_HEADER } from "@/lib/seo/indexing";
 import { isAliasHost } from "@/lib/seo/canonical-host";
 import {
@@ -210,12 +217,93 @@ function listingCanonicalRedirect(request: NextRequest): NextResponse | null {
 }
 
 /**
+ * Per-IP rate limit on the routes that cost a render (see `rate-limit.ts` for
+ * the policies). One limiter per process: the proxy runs in the server's Node
+ * runtime and its module lives as long as the server does.
+ */
+const limiter = new TokenBucketLimiter();
+
+/*
+ * What was refused, summarised once a minute. Logging every 429 during an
+ * attack would be its own load; a count and the top offenders is what someone
+ * reading the log needs.
+ */
+const refused = new Map<string, number>();
+let refusedSince = Date.now();
+
+function noteRefused(ip: string): void {
+  refused.set(ip, (refused.get(ip) ?? 0) + 1);
+  const now = Date.now();
+  if (now - refusedSince < 60_000) return;
+  const total = [...refused.values()].reduce((a, b) => a + b, 0);
+  const top = [...refused]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([who, n]) => `${who}=${n}`)
+    .join(" ");
+  console.warn(
+    `[rate-limit] refused ${total} requests from ${refused.size} clients in ${Math.round((now - refusedSince) / 1000)}s; top: ${top}`,
+  );
+  refused.clear();
+  refusedSince = now;
+}
+
+/**
+ * Over the limit: 429 with `Retry-After` and a few hundred static bytes
+ * (`noindex`), before auth, i18n, the redirect tables or any render. Requests
+ * that carry no client address (the container's own health check) and
+ * anything but GET/HEAD (Server Actions, the cart) are never limited.
+ */
+function rateLimit(request: NextRequest): NextResponse | null {
+  const policy = policyFor({
+    method: request.method,
+    pathname: request.nextUrl.pathname,
+    searchParams: request.nextUrl.searchParams,
+    headers: request.headers,
+  });
+  if (!policy) return null;
+  const ip = clientIp(request.headers);
+  if (!ip) return null;
+
+  const verdict = limiter.take(`${policy}:${ip}`, POLICIES[policy]);
+  if (verdict.ok) return null;
+
+  noteRefused(ip);
+  const headers = { "Retry-After": String(verdict.retryAfterSeconds) };
+  if (policy === "api") {
+    return NextResponse.json(
+      { error: "rate_limited", retry_after_seconds: verdict.retryAfterSeconds },
+      { status: 429, headers: { ...headers, "Cache-Control": "no-store" } },
+    );
+  }
+  return tinyPage(429, {
+    title: "Too many requests",
+    message:
+      "Πάρα πολλά αιτήματα σε λίγο χρόνο — δοκιμάστε ξανά σε λίγα δευτερόλεπτα. / Too many requests — please try again in a few seconds.",
+    headers,
+  });
+}
+
+/**
+ * The rate limit first, on its own: a refused request costs a Map lookup,
+ * not a session decode, a redirect-table lookup or a locale negotiation. The
+ * two product APIs are matched only for it; they are not localised and carry
+ * their own auth.
+ */
+export default async function proxy(request: NextRequest, event: NextFetchEvent) {
+  const limited = rateLimit(request);
+  if (limited) return limited;
+  if (request.nextUrl.pathname.startsWith("/api/")) return NextResponse.next();
+  return authProxy(request, event as never);
+}
+
+/**
  * Two middlewares, one matcher.
  *
  * /admin is NOT localised (staff UI is Greek only) and is gated on a valid JWT.
  * Everything else goes through next-intl locale negotiation.
  */
-export default auth(async (request) => {
+const authProxy = auth(async (request) => {
   const response = await route(request);
   /*
    * Not on the final domain yet: every page says so in a header as well as in
@@ -286,5 +374,8 @@ export const config = {
     "/((?!api|_next|_vercel|.*\\..*).*)",
     // …except the old Magento `*.html` pages, which get a 301 (see magentoRedirect).
     "/((?!api|_next|_vercel).*\\.html)",
+    // The product listing APIs, for the rate limit only.
+    "/api/suggest",
+    "/api/acp/products",
   ],
 };
