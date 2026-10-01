@@ -15,7 +15,9 @@ const db = vi.hoisted(() => ({
 }));
 
 vi.mock("@/lib/prisma", () => ({ prisma: db }));
-vi.mock("@/lib/offers/coverage", () => ({ activeCampaignsWhere: async () => null }));
+/* The live campaigns: what `?sale=1` selects. Changed by the tests below. */
+const campaigns = vi.hoisted(() => ({ live: null as unknown }));
+vi.mock("@/lib/offers/coverage", () => ({ activeCampaignsWhere: async () => campaigns.live }));
 // Outside Next there is no incremental cache; the facet cache is not under test.
 vi.mock("@/lib/catalog/shared-cache", () => ({
   sharedCatalogue: (_key: string, _seconds: number, fn: unknown) => fn,
@@ -71,6 +73,24 @@ describe("getPlpData", () => {
     clearListingCache();
     await getPlpData(params, "el");
     expect(db.product.count).toHaveBeenCalledTimes(2);
+  });
+
+  it("follows campaigns starting and stopping on ?sale=1, without waiting for the TTL", async () => {
+    // The grid query is the one findMany with an orderBy (the facets count separately).
+    const gridQueries = () =>
+      db.product.findMany.mock.calls.filter((call) => (call as unknown[])[0] && "orderBy" in ((call as unknown[])[0] as object)).length;
+    const sale = parsePlpParams({ sale: "1" });
+    const before = gridQueries();
+    campaigns.live = { id: { in: ["a"] } };
+    await getPlpData(sale, "el");
+    await getPlpData(sale, "el");
+    expect(gridQueries() - before).toBe(1);
+    campaigns.live = { id: { in: ["a", "b"] } }; // a second campaign starts
+    await getPlpData(sale, "el");
+    expect(gridQueries() - before).toBe(2);
+    campaigns.live = null; // and both end
+    await getPlpData(sale, "el");
+    expect(gridQueries() - before).toBe(3);
   });
 
   it("still 404s an unknown category instead of caching an empty grid", async () => {

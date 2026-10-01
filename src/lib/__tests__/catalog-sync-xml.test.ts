@@ -357,6 +357,25 @@ describe("the listing cache follows the catalogue", () => {
     expect(listingCache.clear).toHaveBeenCalled();
   });
 
+  it("is cleared even when a later chunk fails after an earlier one was written", async () => {
+    const ids = Array.from({ length: 201 }, (_, i) => 1000 + i);
+    let call = 0;
+    hdc.products.mockImplementation(async (params: { mtrl?: number[] }) => {
+      call += 1;
+      if (call === 2) throw new Error("HDCtool timeout");
+      return page((params.mtrl ?? []).map((m) => product(m)));
+    });
+    await expect(syncProductsByMtrl(ids)).rejects.toThrow(/timeout/);
+    expect(db.rows.length).toBeGreaterThan(0);
+    expect(listingCache.clear).toHaveBeenCalled();
+  });
+
+  it("is left alone when the first fetch fails before anything was written", async () => {
+    hdc.products.mockRejectedValue(new Error("HDCtool down"));
+    await expect(syncProductsByMtrl([812])).rejects.toThrow(/down/);
+    expect(listingCache.clear).not.toHaveBeenCalled();
+  });
+
   it("is left alone when a delivery names nothing", async () => {
     await syncProductsByMtrl([]);
     expect(listingCache.clear).not.toHaveBeenCalled();

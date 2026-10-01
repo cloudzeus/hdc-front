@@ -8,6 +8,7 @@ import { searchCategoriesForPicker, searchProductsForPicker } from "@/lib/media/
 import { translateText } from "@/lib/ai/deepseek";
 import { brandScopeProblem, type OfferDraft } from "@/lib/offers/offer-types";
 import { prisma } from "@/lib/prisma";
+import { clearListingCache } from "@/lib/catalog/listing-cache";
 import type { Locale } from "@/i18n/routing";
 
 /**
@@ -38,6 +39,8 @@ export async function actionSaveOffer(draft: OfferDraft) {
 
   const result = await saveOffer(draft, actor);
   if (result.ok) {
+    // The in-process listing grids too (`?sale=1`, the offer pages).
+    clearListingCache();
     revalidatePath("/", "layout");
     revalidatePath("/admin/offers");
   }
@@ -47,6 +50,7 @@ export async function actionSaveOffer(draft: OfferDraft) {
 export async function actionDeleteOffer(id: string) {
   await requireEditor();
   const result = await deleteOffer(id);
+  clearListingCache();
   revalidatePath("/", "layout");
   revalidatePath("/admin/offers");
   return result;
