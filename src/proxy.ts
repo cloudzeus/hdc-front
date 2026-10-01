@@ -272,7 +272,7 @@ function rateLimit(request: NextRequest): NextResponse | null {
 
   noteRefused(ip);
   const headers = { "Retry-After": String(verdict.retryAfterSeconds) };
-  if (policy === "api") {
+  if (request.nextUrl.pathname.startsWith("/api/")) {
     return NextResponse.json(
       { error: "rate_limited", retry_after_seconds: verdict.retryAfterSeconds },
       { status: 429, headers: { ...headers, "Cache-Control": "no-store" } },
@@ -291,8 +291,8 @@ function rateLimit(request: NextRequest): NextResponse | null {
  * not a session decode, a redirect-table lookup or a locale negotiation, and a
  * listing canonicalisation is answered without the session's cookies (a 301
  * that may be cached must not carry a Set-Cookie). The two product APIs are
- * matched only for the rate limit; they are not localised and carry their
- * own auth.
+ * matched only for the rate limit (and /api/ready); they are not localised
+ * and carry their own auth.
  */
 export default async function proxy(request: NextRequest, event: NextFetchEvent) {
   const limited = rateLimit(request);
@@ -377,8 +377,9 @@ export const config = {
     "/((?!api|_next|_vercel|.*\\..*).*)",
     // …except the old Magento `*.html` pages, which get a 301 (see magentoRedirect).
     "/((?!api|_next|_vercel).*\\.html)",
-    // The product listing APIs, for the rate limit only.
+    // The product listing APIs and the database check, for the rate limit only.
     "/api/suggest",
     "/api/acp/products",
+    "/api/ready",
   ],
 };

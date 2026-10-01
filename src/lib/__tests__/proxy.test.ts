@@ -236,8 +236,8 @@ describe("proxy: per-IP rate limit", () => {
     expect((await from("203.0.113.10", "/katalogos/drapana")).status).toBe(200);
   });
 
-  it("limits the suggest API with a JSON 429, without localising it", async () => {
-    for (let i = 0; i < 30; i++) {
+  it("limits the suggest API with a JSON 429 after its own burst, without localising it", async () => {
+    for (let i = 0; i < 60; i++) {
       const ok = await from("203.0.113.20", "/api/suggest?q=m18");
       expect(ok.status).toBe(200);
       expect(ok.headers.get("x-middleware-next")).toBe("1");
@@ -246,6 +246,36 @@ describe("proxy: per-IP rate limit", () => {
     const refused = await from("203.0.113.20", "/api/suggest?q=m18");
     expect(refused.status).toBe(429);
     expect(await refused.json()).toMatchObject({ error: "rate_limited" });
+    // A separate bucket: the same client's agent-API and listing calls are untouched.
+    expect((await from("203.0.113.20", "/api/acp/products?q=x")).status).toBe(200);
+  });
+
+  it("leaves a keyed agent call to the route, and limits keyless ones on their own", async () => {
+    const keyed = (ip: string) =>
+      proxy(
+        new NextRequest("https://milwaukeetoolshdc.gr/api/acp/products?q=x", {
+          headers: { host: "milwaukeetoolshdc.gr", "cf-connecting-ip": ip, authorization: "Bearer k" },
+        }),
+      );
+    for (let i = 0; i < 150; i++) expect((await keyed("203.0.113.50")).status).toBe(200);
+    for (let i = 0; i < 30; i++) expect((await from("203.0.113.51", "/api/acp/products?q=x")).status).toBe(200);
+    expect((await from("203.0.113.51", "/api/acp/products?q=x")).status).toBe(429);
+  });
+
+  it("limits the database check at 30 a minute", async () => {
+    for (let i = 0; i < 10; i++) expect((await from("203.0.113.52", "/api/ready")).status).toBe(200);
+    expect((await from("203.0.113.52", "/api/ready")).status).toBe(429);
+  });
+
+  it("never answers 429 to deep load-more on a bare category", async () => {
+    for (let i = 0; i < 30; i++) {
+      expect((await from("203.0.113.53", `/katalogos/drapana?page=${5 + (i % 40)}`)).status).toBe(200);
+    }
+  });
+
+  it("gives a bare search its own, wider bucket", async () => {
+    for (let i = 0; i < 20; i++) expect((await from("203.0.113.54", "/anazitisi?q=m18")).status).toBe(200);
+    expect((await from("203.0.113.54", "/anazitisi?q=m18")).status).toBe(429);
   });
 
   it("counts a platform landing as an unfiltered listing, not a filtered view", async () => {
