@@ -10,6 +10,7 @@ import {
   isFilteredListing,
   isPassThroughParam,
   listingKindOf,
+  listingLinkRel,
   toggleCappedValue,
   trimToFacetCap,
 } from "@/lib/catalog/listing-query";
@@ -288,8 +289,41 @@ describe("isFilteredListing", () => {
   it("treats any facet or view param as filtered", () => {
     expect(isFilteredListing(new URLSearchParams("sub=a"))).toBe(true);
     expect(isFilteredListing({ sort: "price-asc" })).toBe(true);
-    expect(isFilteredListing({ platform: "M18" })).toBe(true);
+    expect(isFilteredListing({ platform: "M18", series: "fuel" })).toBe(true);
+    expect(isFilteredListing({ platform: "bogus" })).toBe(true);
     expect(isFilteredListing(new URLSearchParams("foo=1"))).toBe(true);
+  });
+});
+
+describe("platform landings", () => {
+  // «M18 δραπανοκατσάβιδα»: a lone ?platform= (with or without paging) is a
+  // landing page, as it was before the facet rules — not a filtered view.
+  it("are not filtered views", () => {
+    expect(isFilteredListing({ platform: "M18" })).toBe(false);
+    expect(isFilteredListing({ platform: ["M12"], page: "2", utm_source: "x" })).toBe(false);
+    expect(isFilteredListing(new URLSearchParams("page=3&platform=MX"))).toBe(false);
+    expect(isFilteredListing({ platform: "all" })).toBe(false);
+  });
+
+  it("keep their indexable metadata", () => {
+    expect(filteredListingMeta({ platform: "M18" })).toEqual({});
+    expect(filteredListingMeta({ platform: "M18", page: "2" })).toEqual({});
+    expect(filteredListingMeta({ platform: "M18", content: "kit" })).toEqual({
+      robots: { index: false, follow: true },
+    });
+  });
+
+  it("are linked without nofollow; multi-facet views with it", () => {
+    expect(listingLinkRel("/katalogos/x?platform=M18")).toBeUndefined();
+    expect(listingLinkRel("/katalogos/x?platform=M18&page=2")).toBeUndefined();
+    expect(listingLinkRel("/katalogos/x")).toBeUndefined();
+    expect(listingLinkRel("/katalogos/x?platform=M18&series=fuel")).toBe("nofollow");
+    expect(listingLinkRel("/katalogos/x?sub=a")).toBe("nofollow");
+  });
+
+  it("cost like an unfiltered listing until deep into load-more", () => {
+    expect(isCostlyListing("category", { platform: "M18", page: "2" })).toBe(false);
+    expect(isCostlyListing("category", { platform: "M18", page: "6" })).toBe(true);
   });
 });
 

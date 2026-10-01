@@ -38,8 +38,10 @@ export const dynamic = "force-dynamic";
  * ── Filtered listings ──────────────────────────────────────────────────────
  *
  * A category, a brand, "all products" and an offer are crawlable, and so is
- * their `?page=`. Every OTHER query on them — facets, platform, price, sort,
- * density — is disallowed, in every locale prefix. They used to be left to
+ * their `?page=`, and so is a category's platform landing (`?platform=M18`,
+ * with or without `page`) — the «M18 …» pages the hubs and product pages link
+ * to, indexable as they always were. Every OTHER query on them — facet
+ * combinations, price, sort, density — is disallowed, in every locale prefix. They used to be left to
  * canonicals alone, on the theory that a canonical can tell a useful filter
  * from an infinite one; but every combination is a full server render, and a
  * crawler that respects robots.txt has no business walking them (the Kolleris

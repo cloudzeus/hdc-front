@@ -225,14 +225,14 @@ describe("proxy: per-IP rate limit", () => {
 
   it("lets a burst of filtered views through, then answers 429 with Retry-After", async () => {
     for (let i = 0; i < 10; i++) {
-      expect((await from("203.0.113.10", "/katalogos/drapana?platform=M18")).status).toBe(200);
+      expect((await from("203.0.113.10", "/katalogos/drapana?platform=M18&avail=in-stock")).status).toBe(200);
     }
-    const refused = await from("203.0.113.10", "/katalogos/drapana?platform=M12");
+    const refused = await from("203.0.113.10", "/katalogos/drapana?platform=M12&avail=in-stock");
     expect(refused.status).toBe(429);
     expect(refused.headers.get("retry-after")).toBe("3");
     expect(await refused.text()).toContain('name="robots" content="noindex"');
     // Another client is not affected, and neither is the same client's bare listing.
-    expect((await from("203.0.113.11", "/katalogos/drapana?platform=M18")).status).toBe(200);
+    expect((await from("203.0.113.11", "/katalogos/drapana?platform=M18&avail=in-stock")).status).toBe(200);
     expect((await from("203.0.113.10", "/katalogos/drapana")).status).toBe(200);
   });
 
@@ -248,9 +248,15 @@ describe("proxy: per-IP rate limit", () => {
     expect(await refused.json()).toMatchObject({ error: "rate_limited" });
   });
 
+  it("counts a platform landing as an unfiltered listing, not a filtered view", async () => {
+    for (let i = 0; i < 15; i++) {
+      expect((await from("203.0.113.40", "/katalogos/drapana?platform=M18")).status).toBe(200);
+    }
+  });
+
   it("never limits a POST (Server Actions, the cart)", async () => {
     for (let i = 0; i < 15; i++) {
-      expect((await from("203.0.113.30", "/katalogos/drapana?platform=M18", "POST")).status).not.toBe(429);
+      expect((await from("203.0.113.30", "/katalogos/drapana?platform=M18&avail=in-stock", "POST")).status).not.toBe(429);
     }
   });
 });

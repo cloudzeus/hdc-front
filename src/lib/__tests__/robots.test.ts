@@ -43,19 +43,32 @@ describe("robots.txt once live", () => {
     "/prosfores/summer",
     "/proion/some-product",
     "/milwaukee-m18",
+    // Platform landings, as crawlable as before the facet rules.
+    "/katalogos/drapana?platform=M18",
+    "/katalogos/drapana?platform=M18&page=2",
+    "/katalogos/drapana?page=2&platform=M18",
+    "/en/katalogos/drapana?platform=M12",
+    "/it/katalogos/drapana?platform=MX&page=3",
   ])("lets crawlers fetch %s", (url) => {
     expect(allowed(rulesOf(), url)).toBe(true);
   });
 
   it.each([
     "/katalogos/drapana?sub=a",
-    "/katalogos/drapana?platform=M18",
     "/en/katalogos/drapana?series=fuel&content=bare&min=100",
     "/katalogos/drapana?page=2&avail=in-stock",
     "/katalogos/drapana?avail=in-stock&page=2",
     "/it/brands/dewalt?avail=in-stock",
     "/proionta?sort=price-asc",
     "/en/prosfores/summer?brand=x",
+    "/katalogos/drapana?platform=M18&series=fuel",
+    "/katalogos/drapana?series=fuel&platform=M18",
+    "/katalogos/drapana?platform=M18&page=2&sub=x",
+    "/katalogos/drapana?platform=M18&sub=x&page=2",
+    "/katalogos/drapana?page=2&platform=M18&sub=x",
+    "/katalogos/drapana?page=2&sub=x&platform=M18",
+    "/katalogos/drapana?platform=M18&utm_source=x",
+    "/brands/dewalt?platform=M18",
     "/kalathi",
     "/en/kalathi",
     "/it/kalathi",

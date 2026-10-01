@@ -494,16 +494,39 @@ export function canonicalizeListingQuery(
 type RawParams = Record<string, string | string[] | undefined>;
 
 /**
- * Whether a listing request is filtered: anything beyond paging and the
- * pass-through parameters. Filtered views are `noindex`, rate-limited harder
- * and gated by the render semaphore; a bare category and its `?page=` are not.
+ * Whether a listing request is filtered: anything beyond paging, the
+ * pass-through parameters and a lone platform. Filtered views are `noindex`,
+ * nofollowed, disallowed in robots.txt, rate-limited harder and gated by the
+ * render semaphore; a bare category and its `?page=` are not.
+ *
+ * Neither is a PLATFORM LANDING — `?platform=M18`, with or without `page`:
+ * «M18 δραπανοκατσάβιδα» is a page people search for, the hubs and the product
+ * pages link to it, and before the facet rules it was crawlable and indexable
+ * (canonical to the category, no robots meta, not in the sitemap). It keeps
+ * exactly that. Only a platform combined with other facets is a filtered view.
  */
 export function isFilteredListing(params: URLSearchParams | RawParams): boolean {
-  const keys =
+  const keys = (
     params instanceof URLSearchParams
       ? [...new Set(params.keys())]
-      : Object.keys(params).filter((k) => params[k] != null);
-  return keys.some((key) => key !== "page" && !isPassThroughParam(key));
+      : Object.keys(params).filter((k) => params[k] != null)
+  ).filter((key) => key !== "page" && !isPassThroughParam(key));
+  if (keys.length === 0) return false;
+  if (keys.length === 1 && keys[0] === "platform") {
+    const value = params instanceof URLSearchParams ? params.get("platform") : [params.platform].flat()[0];
+    return canonicalPlatform(value ?? undefined) == null;
+  }
+  return true;
+}
+
+/**
+ * `rel` for a link to a listing: `nofollow` when it leads into the facet
+ * space, nothing when it leads to a bare listing or a platform landing.
+ */
+export function listingLinkRel(href: string): "nofollow" | undefined {
+  const at = href.indexOf("?");
+  if (at === -1) return undefined;
+  return isFilteredListing(new URLSearchParams(href.slice(at))) ? "nofollow" : undefined;
 }
 
 /**

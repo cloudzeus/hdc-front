@@ -16,20 +16,36 @@ export const LOCALE_PREFIXES = [
 /** Listing paths whose query string is a facet space. `*` is the slug. */
 const LISTINGS = ["/katalogos/*", "/brands/*", "/proionta", "/prosfores/*"];
 
+/** The listing that has platform landings: the category page. */
+const PLATFORM_LISTING = "/katalogos/*";
+
 /**
- * Any query on a listing, except a lone `?page=`.
+ * Any query on a listing, except a lone `?page=` — and on a category, a lone
+ * `?platform=` (a platform landing, see `isFilteredListing`) with or without
+ * its `page`.
  *
  * Google and Bing pick the MOST SPECIFIC (longest) matching rule, and a tie
  * goes to Allow:
  *
- *   Disallow /katalogos/*?           any query …
- *   Allow    /katalogos/*?page=       … except one that starts with page= …
- *   Disallow /katalogos/*?page=*=     … and has no second parameter.
+ *   Disallow /katalogos/*?                 any query …
+ *   Allow    /katalogos/*?page=             … except one that starts with page= …
+ *   Disallow /katalogos/*?page=*=          … and has no second parameter.
  *
  * A second parameter always brings its own `=`, so `*=` is how a rule says
  * "and then another parameter". Never `&`: Next writes robots.txt with `&`
  * escaped as `&amp;`, and a rule containing it matches nothing (found on the
  * Kolleris shop). No rule here contains `&`, `<`, `>`, `"` or `'`.
+ *
+ * The platform landing, in both orders of its two parameters:
+ *
+ *   Allow    ?platform=                     a platform …
+ *   Disallow ?platform=*=                   … alone,
+ *   Allow    ?platform=*page=               … or followed by its page …
+ *   Disallow ?platform=*page=*=             … and nothing after it,
+ *   Disallow ?platform=*=*page=             … and nothing between them;
+ *   Allow    ?page=*platform=               the page first, then the platform …
+ *   Disallow ?page=*platform=*=             … and nothing after it,
+ *   Disallow ?page=*=*platform=             … and nothing between them.
  */
 export function facetRules(): { allow: string[]; disallow: string[] } {
   const allow: string[] = [];
@@ -40,6 +56,15 @@ export function facetRules(): { allow: string[]; disallow: string[] } {
       disallow.push(`${base}?`, `${base}?page=*=`);
       allow.push(`${base}?page=`);
     }
+    const category = `${prefix}${PLATFORM_LISTING}`;
+    allow.push(`${category}?platform=`, `${category}?platform=*page=`, `${category}?page=*platform=`);
+    disallow.push(
+      `${category}?platform=*=`,
+      `${category}?platform=*page=*=`,
+      `${category}?platform=*=*page=`,
+      `${category}?page=*platform=*=`,
+      `${category}?page=*=*platform=`,
+    );
   }
   return { allow, disallow };
 }

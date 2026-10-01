@@ -143,7 +143,7 @@ describe("policyFor", () => {
 
   it("puts filtered listings in the strict bucket, for everyone", () => {
     expect(policyFor(req("/en/katalogos/x?sub=a,b"))).toBe("filtered");
-    expect(policyFor(req("/katalogos/x?platform=M18", googlebot))).toBe("filtered");
+    expect(policyFor(req("/katalogos/x?platform=M18&series=fuel", googlebot))).toBe("filtered");
     expect(policyFor(req("/brands/m?avail=in-stock", googlebot))).toBe("filtered");
     expect(policyFor(req("/anazitisi?q=drill"))).toBe("filtered");
   });
@@ -152,6 +152,11 @@ describe("policyFor", () => {
     expect(policyFor(req("/katalogos/x?page=2"))).toBe("listing");
     expect(policyFor(req("/katalogos/x?page=12"))).toBe("filtered");
     expect(policyFor(req("/brands/m?page=12"))).toBe("listing");
+  });
+
+  it("treats a platform landing like an unfiltered listing", () => {
+    expect(policyFor(req("/katalogos/x?platform=M18"))).toBe("listing");
+    expect(policyFor(req("/katalogos/x?platform=M18&page=2", googlebot))).toBe("listing-bot");
   });
 
   it("gives verified-looking bots a higher rate only on unfiltered listings", () => {

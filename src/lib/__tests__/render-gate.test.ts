@@ -24,12 +24,13 @@ describe("admitListingRender", () => {
     for (let i = 0; i < LISTING_RENDER_SLOTS * 3; i++) {
       expect(await admitListingRender("category", {})).toBe(true);
       expect(await admitListingRender("category", { page: "2", utm_source: "x" })).toBe(true);
+      expect(await admitListingRender("category", { platform: "M18", page: "2" })).toBe(true);
     }
     expect(listingRenderStats().active).toBe(0);
   });
 
   it("holds a slot per filtered render until the response is done", async () => {
-    expect(await admitListingRender("category", { platform: "M18" })).toBe(true);
+    expect(await admitListingRender("category", { platform: "M18", series: "fuel" })).toBe(true);
     expect(await admitListingRender("search", { q: "m18" })).toBe(true);
     expect(listingRenderStats().active).toBe(2);
     finishResponses();
