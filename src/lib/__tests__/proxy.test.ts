@@ -165,6 +165,12 @@ describe("proxy: listing query strings", () => {
     expect(new URL(res.headers.get("location")!).host).toBe("milwaukeetoolshdc.gr");
   });
 
+  it("goes straight to the canonical host from www., in one hop", async () => {
+    const res = await get("/katalogos/drapana?sub=b,a", "www.milwaukeetoolshdc.gr");
+    expect(res.status).toBe(301);
+    expect(res.headers.get("location")).toBe("https://milwaukeetoolshdc.gr/katalogos/drapana?sub=a,b");
+  });
+
   it("keeps the locale prefix", async () => {
     const res = await get("/en/brands/dewalt?sort=relevance&sub=b,a");
     expect(res.status).toBe(301);

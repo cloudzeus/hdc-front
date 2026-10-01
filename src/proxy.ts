@@ -165,7 +165,7 @@ async function magentoRedirect(request: NextRequest): Promise<NextResponse | nul
 }
 
 /**
- * One spelling per listing URL — before i18n and before any render.
+ * One spelling per listing URL — before auth, i18n and any render.
  *
  * The facet space used to be infinite: every random `sub`/`brand`/`min`/`max`/
  * `perPage`/`series`/`content` combination was a cache miss and a full render
@@ -200,6 +200,8 @@ function listingCanonicalRedirect(request: NextRequest): NextResponse | null {
   const target = new URL(request.nextUrl);
   target.search = result.search;
   if (target.search === request.nextUrl.search && result.perRow == null) return null;
+  // On `www.` straight to the canonical host: one hop, not two.
+  onCanonicalHost(target, request);
 
   if (result.perRow != null) {
     const response = NextResponse.redirect(target, 307);
@@ -285,15 +287,19 @@ function rateLimit(request: NextRequest): NextResponse | null {
 }
 
 /**
- * The rate limit first, on its own: a refused request costs a Map lookup,
- * not a session decode, a redirect-table lookup or a locale negotiation. The
- * two product APIs are matched only for it; they are not localised and carry
- * their own auth.
+ * The cheap checks first, on their own: a refused request costs a Map lookup,
+ * not a session decode, a redirect-table lookup or a locale negotiation, and a
+ * listing canonicalisation is answered without the session's cookies (a 301
+ * that may be cached must not carry a Set-Cookie). The two product APIs are
+ * matched only for the rate limit; they are not localised and carry their
+ * own auth.
  */
 export default async function proxy(request: NextRequest, event: NextFetchEvent) {
   const limited = rateLimit(request);
   if (limited) return limited;
   if (request.nextUrl.pathname.startsWith("/api/")) return NextResponse.next();
+  const listing = listingCanonicalRedirect(request);
+  if (listing) return listing;
   return authProxy(request, event as never);
 }
 
@@ -337,9 +343,6 @@ async function route(request: NextRequest & { auth: { user?: unknown } | null })
 
   const canonical = canonicalHostRedirect(request);
   if (canonical) return canonical;
-
-  const listing = listingCanonicalRedirect(request);
-  if (listing) return listing;
 
   /*
    * An `.html` that is not an old Magento page is a real file in public/ — a
