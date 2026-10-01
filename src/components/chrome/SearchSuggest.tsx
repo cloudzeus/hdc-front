@@ -699,7 +699,7 @@ function Panel({
       <h4 className="hdc-sg-h">{upGreek(t("katigories"))}</h4>
       <div>
         {data.categories.map((c) => (
-          <Link
+          <Link prefetch={false}
             key={c.slug}
             href={`/katalogos/${c.slug}`}
             className="hdc-sg-row"

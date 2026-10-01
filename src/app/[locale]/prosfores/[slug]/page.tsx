@@ -33,6 +33,7 @@ import { offerDescription, offerTitle } from "@/lib/offers/offers";
 import { prisma } from "@/lib/prisma";
 import { upGreek } from "@/lib/greek";
 import { Zone } from "@/components/zones/Zone";
+import { filteredListingMeta } from "@/lib/catalog/listing-query";
 
 /**
  * One campaign, and the products in it.
@@ -86,6 +87,7 @@ const getOffer = cache(async (slug: string) =>
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: PageProps): Promise<Metadata> {
   const { slug, locale } = await params;
   const offer = await getOffer(slug);
@@ -98,6 +100,8 @@ export async function generateMetadata({
     ...pageMeta({ path: `/prosfores/${slug}`, locale, title, description }),
     title,
     description: description || undefined,
+    // Filtered views: noindex, follow — the canonical above is the bare listing.
+    ...filteredListingMeta(await searchParams),
   };
 }
 

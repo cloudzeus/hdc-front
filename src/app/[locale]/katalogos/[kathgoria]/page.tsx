@@ -38,6 +38,7 @@ import { faqJsonLd } from "@/lib/seo/product-faq";
 import { seoFor } from "@/lib/seo/seo-for";
 import { autoCategorySeo } from "@/lib/seo/page-seo";
 import { titleWithSite } from "@/lib/seo/title";
+import { filteredListingMeta } from "@/lib/catalog/listing-query";
 
 type PageProps = {
   params: Promise<{ locale: Locale; kathgoria: string }>;
@@ -91,6 +92,7 @@ const categorySeo = cache(async (slug: string, locale: Locale) => {
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: PageProps): Promise<Metadata> {
   const { kathgoria, locale } = await params;
   const seo = await categorySeo(kathgoria, locale);
@@ -107,6 +109,8 @@ export async function generateMetadata({
     }),
     title: titleWithSite(seo.title),
     description: seo.description,
+    // Filtered views: noindex, follow — the canonical above is the bare listing.
+    ...filteredListingMeta(await searchParams),
   };
 }
 

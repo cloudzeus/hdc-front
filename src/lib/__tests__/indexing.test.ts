@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { AI_CRAWLERS, indexingAllowed } from "@/lib/seo/indexing";
 import robots from "@/app/robots";
 import { siteOrigin } from "@/lib/seo/urls";
+import { facetRules } from "@/lib/seo/robots-rules";
 
 /**
  * The one switch between "staging copy nobody may index" and "the shop".
@@ -78,14 +79,24 @@ describe("robots()", () => {
     );
   });
 
-  it("keeps the storefront rules unchanged once indexing is on", () => {
+  it("keeps the storefront rules, plus the facet rules, once indexing is on", () => {
     vi.stubEnv("SITE_INDEXING", "on");
+    const facets = facetRules();
     expect(robots()).toEqual({
       rules: [
         {
           userAgent: "*",
-          allow: "/",
-          disallow: ["/admin", "/api", "/kalathi", "/checkout", "/logariasmos", "/eisodos", "/eggrafi"],
+          allow: ["/", ...facets.allow],
+          disallow: [
+            "/admin",
+            "/api",
+            "/kalathi",
+            "/checkout",
+            "/logariasmos",
+            "/eisodos",
+            "/eggrafi",
+            ...facets.disallow,
+          ],
         },
       ],
       // The origin is resolved once at module load; whatever it is, both lines use it.

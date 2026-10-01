@@ -31,6 +31,7 @@ import {
 import { upGreek } from "@/lib/greek";
 import { Zone } from "@/components/zones/Zone";
 import { jsonLdHtml } from "@/lib/seo/json-ld";
+import { filteredListingMeta } from "@/lib/catalog/listing-query";
 
 /**
  * Every product, in one list.
@@ -60,6 +61,7 @@ type PageProps = {
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "katalogos.page" });
@@ -72,6 +74,8 @@ export async function generateMetadata({
     ...pageMeta({ path: "/proionta", locale, title, description }),
     title,
     description,
+    // Filtered views: noindex, follow — the canonical above is the bare listing.
+    ...filteredListingMeta(await searchParams),
   };
 }
 
@@ -227,7 +231,7 @@ export default async function AllProductsPage({
           <div className="shell-x sticky top-[var(--header-h)] z-30 border-t border-white/10 bg-k-ink-deep/97 backdrop-blur-sm">
             <div className="flex flex-wrap gap-1.5 py-3.5">
               {data.facets.subcategories.map((sub) => (
-                <Link
+                <Link rel="nofollow" prefetch={false}
                   key={sub.slug}
                   href={`/proionta?sub=${sub.slug}`}
                   scroll={false}

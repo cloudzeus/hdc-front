@@ -40,6 +40,7 @@ import {
 import { upGreek } from "@/lib/greek";
 import { Zone } from "@/components/zones/Zone";
 import { jsonLdHtml } from "@/lib/seo/json-ld";
+import { filteredListingMeta } from "@/lib/catalog/listing-query";
 
 type PageProps = {
   params: Promise<{ locale: Locale; slug: string }>;
@@ -48,6 +49,7 @@ type PageProps = {
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: PageProps): Promise<Metadata> {
   const { slug, locale } = await params;
   // Explicit locale: `setRequestLocale` belongs to the render pass, and metadata
@@ -67,6 +69,8 @@ export async function generateMetadata({
     ...pageMeta({ path: `/brands/${slug}`, locale, title, description }),
     title,
     description,
+    // Filtered views: noindex, follow — the canonical above is the bare listing.
+    ...filteredListingMeta(await searchParams),
   };
 }
 
@@ -297,7 +301,7 @@ async function BrandBody({ params, searchParams }: PageProps) {
           {data.facets.subcategories.length > 0 && (
             <div className="flex flex-wrap gap-1.5 border-t border-white/10 py-5">
               {data.facets.subcategories.map((sub) => (
-                <Link
+                <Link rel="nofollow" prefetch={false}
                   key={sub.slug}
                   href={`/brands/${slug}?sub=${sub.slug}`}
                   scroll={false}

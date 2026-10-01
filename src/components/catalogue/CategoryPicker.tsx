@@ -165,7 +165,7 @@ export function CategoryPicker({
                     <div key={group.name} className="break-inside-avoid">
                       <p className="flex items-baseline justify-between gap-3 border-b border-k-line pb-2">
                         {group.self ? (
-                          <Link
+                          <Link prefetch={false}
                             href={`/katalogos/${group.self.slug}`}
                             onClick={() => setOpen(false)}
                             className="t-eyebrow min-w-0 truncate text-k-ink transition-colors hover:text-k-red"
@@ -185,7 +185,7 @@ export function CategoryPicker({
                       <ul className="mt-1.5">
                         {group.items.map((item) => (
                           <li key={item.slug}>
-                            <Link
+                            <Link prefetch={false}
                               href={`/katalogos/${item.slug}`}
                               onClick={() => setOpen(false)}
                               className="flex items-baseline justify-between gap-3 py-1.5 transition-colors hover:text-k-red"
