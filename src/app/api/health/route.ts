@@ -1,7 +1,8 @@
-import { prisma } from "@/lib/prisma";
+import { listingRenderStats } from "@/lib/server/render-gate";
 
 /**
- * Ο έλεγχος υγείας του container.
+ * Ο έλεγχος υγείας του container — liveness: μπορεί αυτή η διεργασία να
+ * απαντήσει σε ένα αίτημα HTTP;
  *
  * ── Γιατί όχι η αρχική σελίδα ─────────────────────────────────────────────
  *
@@ -15,28 +16,39 @@ import { prisma } from "@/lib/prisma";
  * Έτσι έπεσε στις 22/9/2026 — Traefik «no available server», ενώ το container
  * άνοιγε διαρκώς νέες συνδέσεις στη βάση (25 σε 4 λεπτά).
  *
- * ── Τι ελέγχει ───────────────────────────────────────────────────────────
+ * ── Γιατί ούτε η βάση ─────────────────────────────────────────────────────
  *
- * Περνά από τον χειριστή αιτημάτων του Next — όπως ήθελε και ο παλιός έλεγχος,
- * γιατί ένας server που έχει σπάσει μέσα στον χειριστή δέχεται ακόμη συνδέσεις
- * — και κάνει ένα `SELECT 1`: η βάση απαντά, ο server απαντά. Τίποτα βαρύ, και
- * τίποτα που να εξαρτάται από ζεστή cache.
+ * Έκανε `SELECT 1`. Την 1/10/2026 ένα scraper κράτησε 140+ φιλτραρισμένα
+ * renders καταλόγου σε εξέλιξη στο Kolleris eshop, από το οποίο αντιγράφηκε
+ * αυτό: το event loop και το pool συνδέσεων ήταν πίσω τους στην ουρά, το
+ * `SELECT 1` περίμενε τη σειρά του, ο έλεγχος των 10″ έληξε και το Traefik
+ * έβγαλε το container από την κυκλοφορία — «no available server» για όλους,
+ * ενώ η βάση καθόταν άεργη. Ένας έλεγχος ζωής που εξαρτάται από κοινόχρηστο
+ * πόρο κάνει την ουρά εκείνου του πόρου διακοπή λειτουργίας.
+ *
+ * Οπότε απαντά από τη μνήμη και μόνο: αν η διεργασία μπορεί να τρέξει αυτόν
+ * τον χειριστή, ζει. Αν απαντά η βάση είναι άλλη ερώτηση, του `/api/ready` —
+ * για ανθρώπους και monitoring, όχι για τον βρόχο επανεκκίνησης.
+ *
+ * ── Γιατί παραμένει route ─────────────────────────────────────────────────
+ *
+ * Περνά από τον χειριστή αιτημάτων του Next, γιατί ένας server που έχει σπάσει
+ * μέσα στον χειριστή δέχεται ακόμη συνδέσεις. Το σώμα δίνει την πύλη των
+ * renders καταλόγου και τη μνήμη heap: οι δύο αριθμοί που θα εξηγούσαν ένα
+ * τέτοιο περιστατικό με μια ματιά.
  */
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
-  const started = Date.now();
-  try {
-    await prisma.$queryRaw`SELECT 1`;
-    return Response.json(
-      { ok: true, db: "up", ms: Date.now() - started },
-      { headers: { "Cache-Control": "no-store" } },
-    );
-  } catch (error) {
-    return Response.json(
-      { ok: false, db: "down", error: error instanceof Error ? error.message : String(error) },
-      { status: 503, headers: { "Cache-Control": "no-store" } },
-    );
-  }
+export function GET() {
+  const memory = process.memoryUsage();
+  return Response.json(
+    {
+      ok: true,
+      uptimeS: Math.round(process.uptime()),
+      heapUsedMb: Math.round(memory.heapUsed / 1_048_576),
+      listingRenders: listingRenderStats(),
+    },
+    { headers: { "Cache-Control": "no-store" } },
+  );
 }
