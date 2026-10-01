@@ -79,7 +79,7 @@ describe("robots()", () => {
     );
   });
 
-  it("keeps the storefront rules, plus the facet rules, once indexing is on", () => {
+  it("keeps the storefront rules, in every locale, plus the facet rules, once indexing is on", () => {
     vi.stubEnv("SITE_INDEXING", "on");
     const facets = facetRules();
     expect(robots()).toEqual({
@@ -95,6 +95,16 @@ describe("robots()", () => {
             "/logariasmos",
             "/eisodos",
             "/eggrafi",
+            "/en/kalathi",
+            "/en/checkout",
+            "/en/logariasmos",
+            "/en/eisodos",
+            "/en/eggrafi",
+            "/it/kalathi",
+            "/it/checkout",
+            "/it/logariasmos",
+            "/it/eisodos",
+            "/it/eggrafi",
             ...facets.disallow,
           ],
         },

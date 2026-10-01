@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { siteOrigin } from "@/lib/seo/urls";
 import { AI_CRAWLERS, indexingAllowed } from "@/lib/seo/indexing";
-import { facetRules } from "@/lib/seo/robots-rules";
+import { facetRules, privateRules } from "@/lib/seo/robots-rules";
 
 /*
  * Built per request, not at build time: the switch below is a runtime variable,
@@ -27,6 +27,9 @@ export const dynamic = "force-dynamic";
  *   /kalathi      a basket is one visitor's, and every crawl of it is a session
  *   /checkout     the same, plus it would index a form
  *   /logariasmos  somebody's orders and addresses
+ *
+ * Each of them under /en and /it as well: a basket one prefix away is still a
+ * basket (`privateRules`).
  *
  * The confirmation page is excluded through /checkout. It carries a guest token
  * in the query string, so an indexed copy would be a stranger's order with the
@@ -61,16 +64,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: ["/", ...facets.allow],
-        disallow: [
-          "/admin",
-          "/api",
-          "/kalathi",
-          "/checkout",
-          "/logariasmos",
-          "/eisodos",
-          "/eggrafi",
-          ...facets.disallow,
-        ],
+        disallow: [...privateRules().disallow, ...facets.disallow],
       },
     ],
     sitemap: `${siteOrigin()}/sitemap.xml`,
