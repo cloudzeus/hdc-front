@@ -8,12 +8,8 @@ import {
   canonicalizeListingQuery,
   listingKindOf,
 } from "@/lib/catalog/listing-query";
-import {
-  POLICIES,
-  TokenBucketLimiter,
-  clientIp,
-  policyFor,
-} from "@/lib/security/rate-limit";
+import { clientIp } from "@/lib/security/client-ip";
+import { POLICIES, TokenBucketLimiter, policyFor } from "@/lib/security/rate-limit";
 import { tinyPage } from "@/lib/security/tiny-response";
 import { indexingAllowed, NOINDEX_HEADER } from "@/lib/seo/indexing";
 import { isAliasHost } from "@/lib/seo/canonical-host";

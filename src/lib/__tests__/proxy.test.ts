@@ -224,11 +224,13 @@ describe("proxy: listing query strings", () => {
 });
 
 describe("proxy: per-IP rate limit", () => {
+  const CF_EDGE = "173.245.48.1";
   const from = (ip: string, path: string, method = "GET") =>
     proxy(
       new NextRequest(`https://milwaukeetoolshdc.gr${path}`, {
         method,
-        headers: { host: "milwaukeetoolshdc.gr", "cf-connecting-ip": ip },
+        // As production sees it: Traefik's peer is a Cloudflare edge, which names the visitor.
+        headers: { host: "milwaukeetoolshdc.gr", "x-real-ip": CF_EDGE, "cf-connecting-ip": ip },
       }),
     );
 
@@ -263,7 +265,7 @@ describe("proxy: per-IP rate limit", () => {
     const keyed = (ip: string) =>
       proxy(
         new NextRequest("https://milwaukeetoolshdc.gr/api/acp/products?q=x", {
-          headers: { host: "milwaukeetoolshdc.gr", "cf-connecting-ip": ip, authorization: "Bearer k" },
+          headers: { host: "milwaukeetoolshdc.gr", "x-real-ip": CF_EDGE, "cf-connecting-ip": ip, authorization: "Bearer k" },
         }),
       );
     for (let i = 0; i < 150; i++) expect((await keyed("203.0.113.50")).status).toBe(200);
@@ -297,5 +299,16 @@ describe("proxy: per-IP rate limit", () => {
     for (let i = 0; i < 15; i++) {
       expect((await from("203.0.113.30", "/katalogos/drapana?platform=M18&avail=in-stock", "POST")).status).not.toBe(429);
     }
+  });
+
+  it("buckets a direct-to-origin client by its peer, whatever cf-connecting-ip it claims", async () => {
+    const direct = (claimed: string) =>
+      proxy(
+        new NextRequest("https://milwaukeetoolshdc.gr/api/ready", {
+          headers: { host: "milwaukeetoolshdc.gr", "x-real-ip": "198.51.100.66", "cf-connecting-ip": claimed },
+        }),
+      );
+    for (let i = 0; i < 10; i++) expect((await direct(`43.0.0.${i}`)).status).toBe(200);
+    expect((await direct("43.0.0.99")).status).toBe(429);
   });
 });
