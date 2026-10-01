@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { after } from "next/server";
 import { isCostlyListing, type ListingKind } from "@/lib/catalog/listing-query";
 import { Semaphore, type SemaphoreStats } from "@/lib/server/semaphore";
@@ -60,16 +61,13 @@ export function listingRenderStats(): SemaphoreStats {
 }
 
 /**
- * True when this render may proceed. Cheap listings always may; a costly one
- * waits for a slot and holds it until the response is done. `params` are the
- * URL's own search params (a platform remembered in a cookie is one of three
- * cached views, not a walk through the facet space).
+ * The admission itself, ONCE per request: `generateMetadata` and the page body
+ * both ask, and React's `cache` is shared between them for one request, so
+ * they get the same answer and one slot (released in `after()`). Keyed by a
+ * string so the memo works across the two calls' separate param objects.
  */
-export async function admitListingRender(
-  kind: ListingKind,
-  params: Record<string, string | string[] | undefined>,
-): Promise<boolean> {
-  if (!isCostlyListing(kind, params)) return true;
+const admitOnce = cache(async (kind: ListingKind, query: string): Promise<boolean> => {
+  if (!isCostlyListing(kind, new URLSearchParams(query))) return true;
 
   const release = await gate().acquire(LISTING_RENDER_WAIT_MS);
   if (!release) return false;
@@ -81,4 +79,45 @@ export async function admitListingRender(
     release();
   });
   return true;
+});
+
+function queryOf(params: Record<string, string | string[] | undefined>): string {
+  const pairs: Array<[string, string]> = [];
+  for (const [key, value] of Object.entries(params)) {
+    if (value == null) continue;
+    for (const v of Array.isArray(value) ? value : [value]) pairs.push([key, v]);
+  }
+  pairs.sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+  return new URLSearchParams(pairs).toString();
+}
+
+/**
+ * True when this render may proceed. Cheap listings always may; a costly one
+ * waits for a slot and holds it until the response is done. `params` are the
+ * URL's own search params (a platform remembered in a cookie is one of three
+ * cached views, not a walk through the facet space).
+ */
+export async function admitListingRender(
+  kind: ListingKind,
+  params: Record<string, string | string[] | undefined>,
+): Promise<boolean> {
+  return admitOnce(kind, queryOf(params));
+}
+
+/**
+ * `noindex, follow` in the metadata of a render the gate refused, nothing
+ * otherwise — for the listing pages' `generateMetadata`.
+ *
+ * Why not a header: the listing body streams inside Suspense, so the status
+ * and headers are already sent when the gate decides; an `X-Robots-Tag`
+ * cannot be added any more. The metadata is the robust path: it is decided by
+ * the same per-request admission as the body, it lands in `<head>` for the
+ * crawlers Next serves blocking metadata to, and in the streamed metadata for
+ * the rest. `ListingBusy` also renders its own robots meta tag.
+ */
+export async function listingBusyMeta(
+  kind: ListingKind,
+  params: Record<string, string | string[] | undefined>,
+): Promise<{ robots: { index: false; follow: true } } | Record<string, never>> {
+  return (await admitListingRender(kind, params)) ? {} : { robots: { index: false, follow: true } };
 }

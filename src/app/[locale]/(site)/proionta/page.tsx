@@ -32,7 +32,7 @@ import { upGreek } from "@/lib/greek";
 import { Zone } from "@/components/zones/Zone";
 import { jsonLdHtml } from "@/lib/seo/json-ld";
 import { filteredListingMeta } from "@/lib/catalog/listing-query";
-import { admitListingRender } from "@/lib/server/render-gate";
+import { admitListingRender, listingBusyMeta } from "@/lib/server/render-gate";
 import { ListingBusy } from "@/components/plp/ListingBusy";
 
 /**
@@ -78,6 +78,9 @@ export async function generateMetadata({
     description,
     // Filtered views: noindex, follow — the canonical above is the bare listing.
     ...filteredListingMeta(await searchParams),
+    // A render the gate turned away (the busy view): noindex too. Same
+    // per-request admission as the body; see render-gate.ts.
+    ...(await listingBusyMeta("products", await searchParams)),
   };
 }
 

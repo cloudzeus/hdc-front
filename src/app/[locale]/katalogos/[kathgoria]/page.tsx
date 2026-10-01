@@ -39,7 +39,7 @@ import { seoFor } from "@/lib/seo/seo-for";
 import { autoCategorySeo } from "@/lib/seo/page-seo";
 import { titleWithSite } from "@/lib/seo/title";
 import { filteredListingMeta } from "@/lib/catalog/listing-query";
-import { admitListingRender } from "@/lib/server/render-gate";
+import { admitListingRender, listingBusyMeta } from "@/lib/server/render-gate";
 import { ListingBusy } from "@/components/plp/ListingBusy";
 
 type PageProps = {
@@ -113,6 +113,9 @@ export async function generateMetadata({
     description: seo.description,
     // Filtered views: noindex, follow — the canonical above is the bare listing.
     ...filteredListingMeta(await searchParams),
+    // A render the gate turned away (the busy view): noindex too. Same
+    // per-request admission as the body; see render-gate.ts.
+    ...(await listingBusyMeta("category", await searchParams)),
   };
 }
 

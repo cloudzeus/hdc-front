@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 const afterCallbacks: Array<() => void> = [];
 vi.mock("next/server", () => ({ after: (fn: () => void) => afterCallbacks.push(fn) }));
 
-const { LISTING_RENDER_SLOTS, admitListingRender, listingRenderStats } = await import(
+const { LISTING_RENDER_SLOTS, admitListingRender, listingBusyMeta, listingRenderStats } = await import(
   "@/lib/server/render-gate"
 );
 
@@ -53,5 +53,22 @@ describe("admitListingRender", () => {
 
     afterCallbacks.shift()!();
     expect(await admitListingRender("brand", { sub: "next" })).toBe(true);
+  });
+});
+
+describe("listingBusyMeta", () => {
+  it("says nothing for a render that got its slot, or never needed one", async () => {
+    expect(await listingBusyMeta("category", {})).toEqual({});
+    expect(await listingBusyMeta("category", { platform: "M18", sub: "a" })).toEqual({});
+  });
+
+  it("puts noindex in the metadata of a render the gate refused", async () => {
+    vi.useFakeTimers();
+    for (let i = 0; i < LISTING_RENDER_SLOTS; i++) {
+      expect(await admitListingRender("brand", { sub: `m${i}` })).toBe(true);
+    }
+    const meta = listingBusyMeta("category", { page: "9" });
+    await vi.advanceTimersByTimeAsync(2_000);
+    expect(await meta).toEqual({ robots: { index: false, follow: true } });
   });
 });
