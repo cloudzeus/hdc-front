@@ -3,6 +3,11 @@ import createIntlMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 import { authConfig } from "@/auth.config";
 import { routing } from "@/i18n/routing";
+import {
+  PER_ROW_COOKIE,
+  canonicalizeListingQuery,
+  listingKindOf,
+} from "@/lib/catalog/listing-query";
 import { indexingAllowed, NOINDEX_HEADER } from "@/lib/seo/indexing";
 import { isAliasHost } from "@/lib/seo/canonical-host";
 import {
@@ -153,6 +158,58 @@ async function magentoRedirect(request: NextRequest): Promise<NextResponse | nul
 }
 
 /**
+ * One spelling per listing URL — before i18n and before any render.
+ *
+ * The facet space used to be infinite: every random `sub`/`brand`/`min`/`max`/
+ * `perPage`/`series`/`content` combination was a cache miss and a full render
+ * (the Kolleris shop this one was copied from was taken down that way on
+ * 1/10/2026). `canonicalizeListingQuery` reduces the query to the parameters
+ * the page reads, in one order, within limits; here the answer is turned into
+ * a 301 to the canonical URL that costs nothing (307 when it carries a
+ * `perRow` preference — that one sets a cookie and must not be cached). There
+ * is no refusal: over-cap filters are trimmed, a page past the end is clamped,
+ * an over-long search is cut; the page renders the nearest real listing.
+ *
+ * GET and HEAD only: a Server Action is a POST to the page's own URL, and
+ * redirecting it would turn the action into a page load.
+ *
+ * The target is built on `request.nextUrl`, so it is same-origin by
+ * construction; Next writes a same-origin redirect out as a relative Location,
+ * so the host the platform hands the server never leaks into it. (A raw
+ * relative `Location` header is rejected by the proxy adapter: it parses it
+ * with `new URL()`.) A canonical query that equals the request's is never
+ * redirected, so no listing URL can redirect to itself.
+ */
+function listingCanonicalRedirect(request: NextRequest): NextResponse | null {
+  if (request.method !== "GET" && request.method !== "HEAD") return null;
+  const { pathname, search } = request.nextUrl;
+  if (!search) return null;
+  const kind = listingKindOf(pathname);
+  if (!kind) return null;
+
+  const result = canonicalizeListingQuery(kind, request.nextUrl.searchParams);
+  if (result.action === "ok") return null;
+
+  const target = new URL(request.nextUrl);
+  target.search = result.search;
+  if (target.search === request.nextUrl.search && result.perRow == null) return null;
+
+  if (result.perRow != null) {
+    const response = NextResponse.redirect(target, 307);
+    response.headers.set("Cache-Control", "no-store");
+    response.cookies.set(PER_ROW_COOKIE, String(result.perRow), {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: "lax",
+    });
+    return response;
+  }
+  const response = NextResponse.redirect(target, 301);
+  response.headers.set("Cache-Control", "public, max-age=3600");
+  return response;
+}
+
+/**
  * Two middlewares, one matcher.
  *
  * /admin is NOT localised (staff UI is Greek only) and is gated on a valid JWT.
@@ -192,6 +249,9 @@ async function route(request: NextRequest & { auth: { user?: unknown } | null })
 
   const canonical = canonicalHostRedirect(request);
   if (canonical) return canonical;
+
+  const listing = listingCanonicalRedirect(request);
+  if (listing) return listing;
 
   /*
    * An `.html` that is not an old Magento page is a real file in public/ — a

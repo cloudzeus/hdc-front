@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "@/i18n/navigation";
+import { ceilPrice, floorPrice } from "@/lib/catalog/listing-query";
 
 /**
  * ΤΙΜΗ (plp.html `.range` + `.bar`): two boxes in euros with VAT and a bar with
@@ -10,6 +11,12 @@ import { useRouter } from "@/i18n/navigation";
  * Dragging or typing only moves the local values; the listing reloads when a
  * handle is let go, or on Enter / leaving a box — not on every pixel. The URL
  * gets `min`/`max` in euros with VAT, the numbers the cards print.
+ *
+ * Snapped onto the same coarse grid the proxy canonicalises to (10 € steps
+ * below 100, then 50, 100, 1.000 — listing-query.ts), the lower bound down and
+ * the upper one up, so the range only widens and the URL it pushes is already
+ * the canonical one: no redirect, and a few hundred possible prices instead of
+ * every integer.
  */
 export function HdcPriceRange({
   bounds,
@@ -34,8 +41,8 @@ export function HdcPriceRange({
   const pct = (v: number) => ((v - bounds.min) / span) * 100;
 
   const commit = (nextLo = lo, nextHi = hi) => {
-    const a = clamp(Math.min(nextLo, nextHi));
-    const b = clamp(Math.max(nextLo, nextHi));
+    const a = clamp(floorPrice(Math.min(nextLo, nextHi)));
+    const b = clamp(ceilPrice(Math.max(nextLo, nextHi)));
     setLo(a);
     setHi(b);
     const url = new URL(baseHref, "http://x");

@@ -27,6 +27,7 @@ import {
 import { formatPrice } from "@/lib/format";
 import { upGreek } from "@/lib/greek";
 import { displayName } from "@/lib/milwaukee/display";
+import { LISTING_LIMITS } from "@/lib/catalog/listing-query";
 
 /**
  * Search-as-you-type (search.html §1 and the phone frames).
@@ -279,6 +280,7 @@ export function SearchSuggest({
         id={`q-${variant}`}
         name="q"
         type="search"
+        maxLength={LISTING_LIMITS.maxQueryLength}
         enterKeyHint="search"
         data-search-input
         role="combobox"

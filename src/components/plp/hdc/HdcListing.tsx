@@ -29,6 +29,7 @@ import {
   platformLabel,
   type Platform,
 } from "@/lib/catalog/hdc-filters";
+import { LISTING_LIMITS } from "@/lib/catalog/listing-query";
 import type { PlpResult } from "@/lib/catalog/plp";
 import { SORT_OPTIONS, type PlpFacets, type SortValue } from "@/lib/catalog/plp-options";
 import { DEFAULT_VAT_RATE } from "@/lib/format";
@@ -232,7 +233,8 @@ export async function HdcListing({
                       }}
                     />
                   </div>
-                  {shown < data.total && (
+                  {/* Load-more stops where one request stops drawing (60 pages). */}
+                  {shown < data.total && data.page < LISTING_LIMITS.maxCumulativePage && (
                     <Link
                       href={setParamKeepingPage(
                         basePath,

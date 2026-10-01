@@ -137,3 +137,73 @@ describe("proxy: Greek-only indexing once live", () => {
     }
   });
 });
+
+describe("proxy: listing query strings", () => {
+  const location = (res: Response) => {
+    const to = new URL(res.headers.get("location")!);
+    return `${to.pathname}${to.search}`;
+  };
+
+  it("leaves a canonical listing to the page, attribution and router params included", async () => {
+    for (const path of [
+      "/katalogos/drapana",
+      "/katalogos/drapana?page=3",
+      "/katalogos/drapana?platform=M18&series=fuel,onekey&utm_source=x",
+      "/katalogos/drapana?sub=x&_rsc=abc",
+      "/anazitisi?q=m18&platform=all",
+    ]) {
+      const res = await get(path);
+      expect(res.headers.get("location"), path).toBeNull();
+      expect(res.status, path).toBe(200);
+    }
+  });
+
+  it("301s a non-canonical spelling to the canonical one, on the same host", async () => {
+    const res = await get("/katalogos/drapana?series=onekey,fuel&platform=m18&min=137&max=1234&foo=1");
+    expect(res.status).toBe(301);
+    expect(location(res)).toBe("/katalogos/drapana?series=fuel,onekey&platform=M18&min=100&max=1300");
+    expect(new URL(res.headers.get("location")!).host).toBe("milwaukeetoolshdc.gr");
+  });
+
+  it("keeps the locale prefix", async () => {
+    const res = await get("/en/brands/dewalt?sort=relevance&sub=b,a");
+    expect(res.status).toBe(301);
+    expect(location(res)).toBe("/en/brands/dewalt?sub=a,b");
+  });
+
+  it("moves perRow into a cookie with an uncached 307", async () => {
+    const res = await get("/proionta?perRow=3&sub=a");
+    expect(res.status).toBe(307);
+    expect(location(res)).toBe("/proionta?sub=a");
+    expect(res.headers.get("cache-control")).toBe("no-store");
+    expect(res.headers.get("set-cookie")).toMatch(/^HDC_PER_ROW=3;/);
+  });
+
+  it("never refuses: an over-long search is cut and a silly page clamped, through a 301", async () => {
+    const long = await get(`/anazitisi?q=${"a".repeat(300)}&platform=M18`);
+    expect(long.status).toBe(301);
+    expect(location(long)).toBe(`/anazitisi?q=${"a".repeat(200)}&platform=M18`);
+
+    const deep = await get("/katalogos/drapana?page=99999");
+    expect(deep.status).toBe(301);
+    expect(location(deep)).toBe("/katalogos/drapana?page=60");
+
+    const all = await get(
+      "/anazitisi?q=m18&platform=M18&avail=in-stock&content=bare&series=fuel,onekey&sub=a,b,c&min=100",
+    );
+    expect(all.status).toBe(200);
+    expect(all.headers.get("location")).toBeNull();
+  });
+
+  it("never touches a POST (Server Actions) or a non-listing page", async () => {
+    const post = await proxy(
+      new NextRequest("https://milwaukeetoolshdc.gr/katalogos/drapana?sub=b,a&foo=1", {
+        method: "POST",
+        headers: { host: "milwaukeetoolshdc.gr" },
+      }),
+    );
+    expect(post.headers.get("location")).toBeNull();
+    const pdp = await get("/proion/x?foo=1&sub=b,a");
+    expect(pdp.headers.get("location")).toBeNull();
+  });
+});

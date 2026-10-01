@@ -7,6 +7,8 @@
  * would otherwise need `router.push` and a hydrated component.
  */
 
+import { toggleCappedValue, trimToFacetCap } from "@/lib/catalog/listing-query";
+
 export type RawParams = Record<string, string | string[] | undefined>;
 
 function toSearchParams(raw: RawParams): URLSearchParams {
@@ -18,12 +20,26 @@ function toSearchParams(raw: RawParams): URLSearchParams {
   return next;
 }
 
+/**
+ * Defaults are not spelled out: the canonical URL is the one without them
+ * (listing-query.ts), and a link that spelled them would cost a redirect.
+ */
+function withoutDefaults(basePath: string, next: URLSearchParams): string {
+  if (next.get("page") === "1") next.delete("page");
+  if (next.get("perPage") === "24") next.delete("perPage");
+  if (next.get("sort") === "relevance") next.delete("sort");
+  /* The combined facet cap, trimmed the way the proxy trims it. The cap is the
+     most the filters can produce, so this only ever bites on a link built
+     from a legacy URL — but then the link is canonical too. */
+  const query = new URLSearchParams(trimToFacetCap([...next.entries()])).toString();
+  return query ? `${basePath}?${query}` : basePath;
+}
+
 function finish(basePath: string, next: URLSearchParams): string {
   // Any filter change returns to page 1 — staying on page 7 of a result set
   // that just shrank to 2 pages is how people land on an empty grid.
   next.delete("page");
-  const query = next.toString();
-  return query ? `${basePath}?${query}` : basePath;
+  return withoutDefaults(basePath, next);
 }
 
 /** Toggles one value inside a comma-separated multi-select param. */
@@ -40,15 +56,26 @@ export function toggleMultiHref(
   all?: readonly string[],
 ): string {
   const next = toSearchParams(raw);
-  const current = new Set((next.get(key) ?? "").split(",").filter(Boolean));
-  if (current.has(slug)) current.delete(slug);
-  else current.add(slug);
+  const values = (next.get(key) ?? "").split(",").filter(Boolean);
 
-  const everything = all != null && all.every((value) => current.has(value));
-  if (current.size && !everything) {
-    const ordered = all ? all.filter((value) => current.has(value)) : [...current];
-    next.set(key, ordered.join(","));
-  } else next.delete(key);
+  if (all) {
+    // A closed list (availability, content, series): its own order, no cap
+    // needed — two or three values, and all of them is no filter at all.
+    const current = new Set(values);
+    if (current.has(slug)) current.delete(slug);
+    else current.add(slug);
+    const everything = all.every((value) => current.has(value));
+    if (current.size && !everything) next.set(key, all.filter((v) => current.has(v)).join(","));
+    else next.delete(key);
+    return finish(basePath, next);
+  }
+
+  /* Slugs: sorted and capped exactly as the proxy would canonicalise them, so
+     a click never costs a redirect. At the cap the new value stays and the
+     oldest goes: that is what the person who just ticked it meant. */
+  const toggled = toggleCappedValue(values, slug);
+  if (toggled.length) next.set(key, toggled.join(","));
+  else next.delete(key);
   return finish(basePath, next);
 }
 
@@ -104,8 +131,7 @@ export function setParamKeepingPage(
 ): string {
   const next = toSearchParams(raw);
   next.set(key, value);
-  const query = next.toString();
-  return query ? `${basePath}?${query}` : basePath;
+  return withoutDefaults(basePath, next);
 }
 
 export function clearAllHref(basePath: string): string {

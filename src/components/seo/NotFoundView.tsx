@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { hasLocale } from "next-intl";
 import { routing, type Locale } from "@/i18n/routing";
 import { HUBS } from "@/lib/seo/hubs";
+import { LISTING_LIMITS } from "@/lib/catalog/listing-query";
 
 /**
  * The shop's own 404: what happened, a search box that takes an article
@@ -30,7 +31,7 @@ export async function NotFoundView() {
       <form action={locale === "el" ? "/anazitisi" : `/${locale}/anazitisi`} method="get" role="search" className="hdc-404-search">
         <label htmlFor="hdc-404-q">{t("anazitisi_label")}</label>
         <div>
-          <input id="hdc-404-q" name="q" type="search" placeholder={t("anazitisi_placeholder")} autoComplete="off" />
+          <input id="hdc-404-q" name="q" type="search" maxLength={LISTING_LIMITS.maxQueryLength} placeholder={t("anazitisi_placeholder")} autoComplete="off" />
           <button type="submit" className="hdc-btn hdc-btn-red">
             {t("anazitisi")}
           </button>

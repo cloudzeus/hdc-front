@@ -26,6 +26,7 @@ import {
   type Series,
 } from "@/lib/catalog/hdc-filters";
 import type { ProductCardData } from "@/lib/catalog/queries";
+import { LISTING_LIMITS, capFacetValues } from "@/lib/catalog/listing-query";
 import {
   PER_PAGE_OPTIONS,
   SORT_OPTIONS,
@@ -102,9 +103,14 @@ export function parsePlpParams(
     : "relevance";
 
   const perPageRaw = num(raw.perPage);
-  const perPage = PER_PAGE_OPTIONS.includes(perPageRaw as (typeof PER_PAGE_OPTIONS)[number])
-    ? (perPageRaw as number)
-    : 24;
+  /* Load-more draws pages 1..N at once, so its page size stays at 24: a
+     `perPage=96` there would make one request draw four times as many cards,
+     and the HDC listing offers no page-size control anyway. */
+  const perPage =
+    !scope.cumulative &&
+    PER_PAGE_OPTIONS.includes(perPageRaw as (typeof PER_PAGE_OPTIONS)[number])
+      ? (perPageRaw as number)
+      : 24;
 
   const price = (v: number | undefined) =>
     v == null ? undefined : scope.grossPrices ? grossToNet(v, DEFAULT_VAT_RATE) : v;
@@ -112,8 +118,10 @@ export function parsePlpParams(
   return {
     categorySlug: scope.categorySlug,
     brandScopeSlug: scope.brandScopeSlug,
-    sub: list(raw.sub),
-    brand: list(raw.brand),
+    /* Capped here as well as in the proxy: the proxy is the gate, this is the
+       guarantee that no path into the page can ask for an unbounded IN list. */
+    sub: capFacetValues(list(raw.sub)),
+    brand: capFacetValues(list(raw.brand)),
     min: price(num(raw.min)),
     max: price(num(raw.max)),
     avail: parseAvail(raw.avail),
@@ -521,7 +529,9 @@ export async function getPlpData(
   const perPage = params.perPage ?? 24;
   // Load-more renders pages 1..N at once; 60 pages (1.440 cards) is the most
   // one request will draw, whatever the URL says.
-  const page = params.cumulative ? Math.min(params.page ?? 1, 60) : (params.page ?? 1);
+  const page = params.cumulative
+    ? Math.min(params.page ?? 1, LISTING_LIMITS.maxCumulativePage)
+    : (params.page ?? 1);
 
   const [rows, total, linkedBrands] = await Promise.all([
     prisma.product.findMany({

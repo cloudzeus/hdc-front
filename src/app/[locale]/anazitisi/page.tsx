@@ -41,6 +41,7 @@ import { HdcProductCard } from "@/components/product/HdcProductCard";
 import type { ProductCardData } from "@/lib/catalog/queries";
 import { availabilityLabelKey, availabilityOf } from "@/lib/catalog/availability";
 import { Zone } from "@/components/zones/Zone";
+import { isPassThroughParam } from "@/lib/catalog/listing-query";
 
 type PageProps = {
   params: Promise<{ locale: Locale }>;
@@ -83,8 +84,9 @@ export async function generateMetadata({
  * What is genuinely new here is the exact-code band: someone pasting a part
  * number wants that part, not position nine of 340.
  */
-/** Parameters that say nothing about what was searched: tracking only. */
-const TRACKING = /^(utm_\w+|gclid|fbclid|msclkid)$/;
+/** Parameters that say nothing about what was searched: tracking only — the
+    same list the proxy passes through untouched (listing-query.ts). */
+const isTracking = isPassThroughParam;
 
 export default async function SearchPage(props: PageProps) {
   const { locale } = await props.params;
@@ -99,13 +101,13 @@ export default async function SearchPage(props: PageProps) {
    */
   const raw = await props.searchParams;
   const query = (Array.isArray(raw.q) ? raw.q[0] : raw.q)?.trim() ?? "";
-  const bare = Object.keys(raw).every((key) => key === "q" || TRACKING.test(key));
+  const bare = Object.keys(raw).every((key) => key === "q" || isTracking(key));
   if (query && bare) {
     const target = await searchRedirectTarget(query);
     if (target) {
       const tracking = new URLSearchParams();
       for (const [key, value] of Object.entries(raw)) {
-        if (TRACKING.test(key)) tracking.set(key, Array.isArray(value) ? (value[0] ?? "") : (value ?? ""));
+        if (isTracking(key)) tracking.set(key, Array.isArray(value) ? (value[0] ?? "") : (value ?? ""));
       }
       const search = tracking.toString();
       permanentRedirect(`${localisedPath(target, locale)}${search ? `?${search}` : ""}`);
