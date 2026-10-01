@@ -162,6 +162,11 @@
       "apotelesmata": "Search results",
       "montela": "{count, plural, one {# model} other {# models}}",
       "kai": "and"
+    },
+    "ListingBusy": {
+      "titlos": "Very busy right now",
+      "minima": "This list could not be loaded because the server is busy. The page will try again in a few seconds.",
+      "choris_filtra": "View the list without filters"
     }
   },
   "pdp": {

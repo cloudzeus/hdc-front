@@ -34,6 +34,8 @@ import { prisma } from "@/lib/prisma";
 import { upGreek } from "@/lib/greek";
 import { Zone } from "@/components/zones/Zone";
 import { filteredListingMeta } from "@/lib/catalog/listing-query";
+import { admitListingRender } from "@/lib/server/render-gate";
+import { ListingBusy } from "@/components/plp/ListingBusy";
 
 /**
  * One campaign, and the products in it.
@@ -134,6 +136,8 @@ async function OfferBody({ params, searchParams }: PageProps) {
   if (!offer || !offer.isActive) notFound();
 
   const raw = await searchParams;
+  // Costly views queue for one of a few render slots; see render-gate.ts.
+  if (!(await admitListingRender("offers", raw))) return <ListingBusy basePath={`/prosfores/${slug}`} />;
   const plpParams = parsePlpParams(raw);
   const where = await campaignWhere(offer);
 

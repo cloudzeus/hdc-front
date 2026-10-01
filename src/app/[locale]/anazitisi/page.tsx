@@ -42,6 +42,8 @@ import type { ProductCardData } from "@/lib/catalog/queries";
 import { availabilityLabelKey, availabilityOf } from "@/lib/catalog/availability";
 import { Zone } from "@/components/zones/Zone";
 import { isPassThroughParam } from "@/lib/catalog/listing-query";
+import { admitListingRender } from "@/lib/server/render-gate";
+import { ListingBusy } from "@/components/plp/ListingBusy";
 
 type PageProps = {
   params: Promise<{ locale: Locale }>;
@@ -128,6 +130,15 @@ async function SearchBody({ params, searchParams }: PageProps) {
 
   const raw = await searchParams;
   const query = (Array.isArray(raw.q) ? raw.q[0] : raw.q)?.trim() ?? "";
+  // Costly views queue for one of a few render slots; see render-gate.ts. The
+  // way out keeps the query and drops the filters.
+  if (!(await admitListingRender("search", raw))) {
+    return (
+      <ListingBusy
+        basePath={query ? `/anazitisi?${new URLSearchParams({ q: query }).toString()}` : "/anazitisi"}
+      />
+    );
+  }
   const scopeSlug =
     (Array.isArray(raw.cat) ? raw.cat[0] : raw.cat)?.trim() || undefined;
 

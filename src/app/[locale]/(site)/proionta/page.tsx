@@ -32,6 +32,8 @@ import { upGreek } from "@/lib/greek";
 import { Zone } from "@/components/zones/Zone";
 import { jsonLdHtml } from "@/lib/seo/json-ld";
 import { filteredListingMeta } from "@/lib/catalog/listing-query";
+import { admitListingRender } from "@/lib/server/render-gate";
+import { ListingBusy } from "@/components/plp/ListingBusy";
 
 /**
  * Every product, in one list.
@@ -88,6 +90,8 @@ export default async function AllProductsPage({
   setRequestLocale(locale);
 
   const raw = await searchParams;
+  // Costly views queue for one of a few render slots; see render-gate.ts.
+  if (!(await admitListingRender("products", raw))) return <ListingBusy basePath={"/proionta"} />;
   // No `categorySlug`: the scope is the whole catalogue.
   const plpParams = parsePlpParams(raw);
 

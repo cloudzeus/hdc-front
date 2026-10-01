@@ -162,6 +162,11 @@
       "apotelesmata": "Risultati della ricerca",
       "montela": "{count, plural, one {# modello} other {# modelli}}",
       "kai": "e"
+    },
+    "ListingBusy": {
+      "titlos": "Molto traffico in questo momento",
+      "minima": "Questo elenco non è stato caricato perché il server è occupato. La pagina riproverà tra qualche secondo.",
+      "choris_filtra": "Vedi l'elenco senza filtri"
     }
   },
   "pdp": {

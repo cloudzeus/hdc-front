@@ -39,6 +39,8 @@ import { seoFor } from "@/lib/seo/seo-for";
 import { autoCategorySeo } from "@/lib/seo/page-seo";
 import { titleWithSite } from "@/lib/seo/title";
 import { filteredListingMeta } from "@/lib/catalog/listing-query";
+import { admitListingRender } from "@/lib/server/render-gate";
+import { ListingBusy } from "@/components/plp/ListingBusy";
 
 type PageProps = {
   params: Promise<{ locale: Locale; kathgoria: string }>;
@@ -142,6 +144,8 @@ async function CategoryBody({
   const t = await getTranslations("katalogos.page");
 
   const asked = await searchParams;
+  // Costly views queue for one of a few render slots; see render-gate.ts.
+  if (!(await admitListingRender("category", asked))) return <ListingBusy basePath={`/katalogos/${kathgoria}`} />;
 
   /*
    * The platform the visitor picked in the mega menu (or on another category
