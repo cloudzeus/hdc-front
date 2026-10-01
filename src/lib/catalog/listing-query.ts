@@ -25,7 +25,9 @@ import {
  * facet space was just as infinite. This module makes it finite and small:
  *
  *   - only the parameters a listing actually reads survive;
- *   - multi-value facets are deduplicated, put in one order and capped, and
+ *   - multi-value facets are deduplicated, their values put in one order and
+ *     capped (the order of the parameters themselves is left as it came: a
+ *     redirect for a mere reordering would cost more than it saves), and
  *     the facet values together are capped at what the filter UI can produce;
  *   - prices are snapped onto a coarse grid (HDC listings) or must be one of
  *     the offered bands (the classic listings);
@@ -131,6 +133,10 @@ const PASS_THROUGH = new Set([
   "gad_campaignid",
   "dclid",
   "_gl",
+  "_ga",
+  "irclickid",
+  "awc",
+  "cjevent",
   "fbclid",
   "msclkid",
   "mc_cid",
@@ -146,9 +152,12 @@ const PASS_THROUGH = new Set([
   "srsltid",
 ]);
 
-/** Attribution and router parameters: every `utm_*`, and the click ids above. */
+/** Campaign parameter families, by prefix: Google/UTM, Matomo and Piwik. */
+const PASS_THROUGH_PREFIXES = ["utm_", "mtm_", "matomo_", "pk_"];
+
+/** Attribution and router parameters: the prefixed families and the click ids above. */
 export function isPassThroughParam(key: string): boolean {
-  return PASS_THROUGH.has(key) || key.startsWith("utm_");
+  return PASS_THROUGH.has(key) || PASS_THROUGH_PREFIXES.some((prefix) => key.startsWith(prefix));
 }
 
 /** Slugs are produced by `slugify` — kept permissive so no real slug is lost. */

@@ -163,6 +163,8 @@ describe("proxy: listing query strings", () => {
     expect(res.status).toBe(301);
     expect(location(res)).toBe("/katalogos/drapana?series=fuel,onekey&platform=M18&min=100&max=1300");
     expect(new URL(res.headers.get("location")!).host).toBe("milwaukeetoolshdc.gr");
+    // Short-lived when cached: the rules may still change.
+    expect(res.headers.get("cache-control")).toBe("public, max-age=600");
   });
 
   it("goes straight to the canonical host from www., in one hop", async () => {
@@ -175,6 +177,13 @@ describe("proxy: listing query strings", () => {
     const res = await get("/en/brands/dewalt?sort=relevance&sub=b,a");
     expect(res.status).toBe(301);
     expect(location(res)).toBe("/en/brands/dewalt?sub=a,b");
+  });
+
+  it("on www., sends perRow to the apex first, where the cookie can be set for the right host", async () => {
+    const res = await get("/proionta?perRow=3&sub=b,a", "www.milwaukeetoolshdc.gr");
+    expect(res.status).toBe(301);
+    expect(res.headers.get("location")).toBe("https://milwaukeetoolshdc.gr/proionta?perRow=3&sub=b,a");
+    expect(res.headers.get("set-cookie")).toBeNull();
   });
 
   it("moves perRow into a cookie with an uncached 307", async () => {

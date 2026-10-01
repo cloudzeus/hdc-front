@@ -171,7 +171,8 @@ async function magentoRedirect(request: NextRequest): Promise<NextResponse | nul
  * `perPage`/`series`/`content` combination was a cache miss and a full render
  * (the Kolleris shop this one was copied from was taken down that way on
  * 1/10/2026). `canonicalizeListingQuery` reduces the query to the parameters
- * the page reads, in one order, within limits; here the answer is turned into
+ * the page reads, with their values in one order and within limits (the
+ * parameters' own order is left alone); here the answer is turned into
  * a 301 to the canonical URL that costs nothing (307 when it carries a
  * `perRow` preference — that one sets a cookie and must not be cached). There
  * is no refusal: over-cap filters are trimmed, a page past the end is clamped,
@@ -197,6 +198,13 @@ function listingCanonicalRedirect(request: NextRequest): NextResponse | null {
   const result = canonicalizeListingQuery(kind, request.nextUrl.searchParams);
   if (result.action === "ok") return null;
 
+  /* A density preference on www.: the apex first, query untouched, so the
+     cookie is set on the host the visitor will actually stay on. */
+  if (result.perRow != null) {
+    const toApex = canonicalHostRedirect(request);
+    if (toApex) return toApex;
+  }
+
   const target = new URL(request.nextUrl);
   target.search = result.search;
   if (target.search === request.nextUrl.search && result.perRow == null) return null;
@@ -214,7 +222,8 @@ function listingCanonicalRedirect(request: NextRequest): NextResponse | null {
     return response;
   }
   const response = NextResponse.redirect(target, 301);
-  response.headers.set("Cache-Control", "public, max-age=3600");
+  // Cacheable, briefly: the rules are new and may still be tuned.
+  response.headers.set("Cache-Control", "public, max-age=600");
   return response;
 }
 

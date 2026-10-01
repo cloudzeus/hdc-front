@@ -33,22 +33,39 @@ import { listingRenderStats } from "@/lib/server/render-gate";
  * ── Γιατί παραμένει route ─────────────────────────────────────────────────
  *
  * Περνά από τον χειριστή αιτημάτων του Next, γιατί ένας server που έχει σπάσει
- * μέσα στον χειριστή δέχεται ακόμη συνδέσεις. Το σώμα δίνει την πύλη των
- * renders καταλόγου και τη μνήμη heap: οι δύο αριθμοί που θα εξηγούσαν ένα
- * τέτοιο περιστατικό με μια ματιά.
+ * μέσα στον χειριστή δέχεται ακόμη συνδέσεις. Δημόσια λέει μόνο ότι ζει· τη
+ * μνήμη heap και την πύλη των renders καταλόγου — τους δύο αριθμούς που θα
+ * εξηγούσαν ένα τέτοιο περιστατικό με μια ματιά — τους γράφει στο log.
  */
 
 export const dynamic = "force-dynamic";
 
+/*
+ * Heap and render-gate numbers go to the log, not the public body: at most
+ * once every five minutes, and at once when the gate has refused renders since
+ * the last line. The check runs every 30 s; a line each time would be noise.
+ */
+const LOG_EVERY_MS = 5 * 60_000;
+let lastLogAt = 0;
+let lastRefused = -1;
+
+function logVitals(): void {
+  const gate = listingRenderStats();
+  const now = Date.now();
+  if (now - lastLogAt < LOG_EVERY_MS && gate.refused === lastRefused) return;
+  lastLogAt = now;
+  lastRefused = gate.refused;
+  const heapMb = Math.round(process.memoryUsage().heapUsed / 1_048_576);
+  console.log(
+    `[health] heap ${heapMb} MB; listing renders active ${gate.active}/${gate.max}, ` +
+      `waiting ${gate.waiting}, refused ${gate.refused}`,
+  );
+}
+
 export function GET() {
-  const memory = process.memoryUsage();
+  logVitals();
   return Response.json(
-    {
-      ok: true,
-      uptimeS: Math.round(process.uptime()),
-      heapUsedMb: Math.round(memory.heapUsed / 1_048_576),
-      listingRenders: listingRenderStats(),
-    },
+    { ok: true, uptimeS: Math.round(process.uptime()) },
     { headers: { "Cache-Control": "no-store" } },
   );
 }

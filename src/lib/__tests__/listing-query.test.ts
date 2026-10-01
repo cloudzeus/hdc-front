@@ -61,6 +61,10 @@ describe("canonicalizeListingQuery: shared rules", () => {
       ),
     ).toEqual({ action: "ok" });
     expect(isPassThroughParam("utm_anything_new")).toBe(true);
+    for (const key of ["_ga", "_gl", "irclickid", "awc", "cjevent", "pk_campaign", "pk_kwd", "mtm_source", "matomo_campaign"]) {
+      expect(isPassThroughParam(key), key).toBe(true);
+    }
+    expect(canon("?sub=a&irclickid=1&awc=2&cjevent=3&pk_source=x&mtm_medium=y&_ga=z")).toEqual({ action: "ok" });
     expect(isPassThroughParam("foo")).toBe(false);
   });
 
