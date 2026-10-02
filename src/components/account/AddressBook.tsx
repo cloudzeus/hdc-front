@@ -54,12 +54,14 @@ export function AddressBook({ addresses }: { addresses: Address[] }) {
    * the address twice: saved in the list, and still sitting in the fields as
    * though it had not been. `state.ok` is set only by a successful action.
    *
-   * Adjusted during render when `state.ok` changes rather than in an effect,
-   * so the collapsed form is what the first paint after the save shows.
+   * Keyed on the state object, not on `state.ok`: every submission returns a
+   * new object, while `ok` stays `true` across two successful saves in a row,
+   * which left the form open after the second one. Adjusted during render
+   * rather than in an effect, so the first paint after the save is collapsed.
    */
-  const [prevOk, setPrevOk] = useState(state.ok);
-  if (state.ok !== prevOk) {
-    setPrevOk(state.ok);
+  const [handled, setHandled] = useState(state);
+  if (state !== handled) {
+    setHandled(state);
     if (state.ok) {
       setEditing(null);
       setOpen(false);
