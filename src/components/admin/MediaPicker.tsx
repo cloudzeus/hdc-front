@@ -322,11 +322,15 @@ function ProductTab({ onPick }: { onPick: (url: string) => void }) {
   const [selected, setSelected] = useState<PickerProduct | null>(null);
   const [searching, start] = useTransition();
 
+  // Below two characters there is nothing to search: the list empties as the
+  // user types, and the effect below only runs the debounced search.
+  const changeQuery = (value: string) => {
+    setQuery(value);
+    if (value.trim().length < 2) setResults([]);
+  };
+
   useEffect(() => {
-    if (query.trim().length < 2) {
-      setResults([]);
-      return;
-    }
+    if (query.trim().length < 2) return;
     const timer = setTimeout(() => {
       start(async () => setResults(await actionSearchProducts(query, "el")));
     }, 250);
@@ -378,7 +382,7 @@ function ProductTab({ onPick }: { onPick: (url: string) => void }) {
         <Input
           autoFocus
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => changeQuery(e.target.value)}
           placeholder="Όνομα ή κωδικός προϊόντος…"
           className="pl-8"
         />
