@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState, useTransition } from "react";
+import { useActionState, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { AddressAutocomplete } from "@/components/checkout/AddressAutocomplete";
 import { deleteAddress, makeDefault, saveAddress, type AddressState } from "@/lib/account/addresses";
@@ -53,12 +53,18 @@ export function AddressBook({ addresses }: { addresses: Address[] }) {
    * The list above re-renders from the server, so leaving the form open showed
    * the address twice: saved in the list, and still sitting in the fields as
    * though it had not been. `state.ok` is set only by a successful action.
+   *
+   * Adjusted during render when `state.ok` changes rather than in an effect,
+   * so the collapsed form is what the first paint after the save shows.
    */
-  useEffect(() => {
-    if (!state.ok) return;
-    setEditing(null);
-    setOpen(false);
-  }, [state.ok]);
+  const [prevOk, setPrevOk] = useState(state.ok);
+  if (state.ok !== prevOk) {
+    setPrevOk(state.ok);
+    if (state.ok) {
+      setEditing(null);
+      setOpen(false);
+    }
+  }
 
   const edit = (address: Address) => {
     setEditing(address);
