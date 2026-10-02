@@ -100,7 +100,6 @@ export function CompareMatrix({
                   </th>
 
                   {row.cells.map((cell, index) => {
-  const t = useTranslations("compare.CompareMatrix");
                     const isBest = highlightBest && row.bestIndex === index;
                     return (
                       <td
