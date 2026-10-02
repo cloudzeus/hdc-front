@@ -126,6 +126,15 @@ function cellAspect(
   );
 }
 
+/** The first cell, in template order, whose media has been measured. */
+function firstMeasuredCell(cells: GridCell[], compositions: BannerContent["cells"]) {
+  for (const cell of cells) {
+    const aspect = compositions[cell.id]?.background?.mediaAspect;
+    if (aspect) return { cell, aspect };
+  }
+  return null;
+}
+
 const STATE: Record<string, { label: string; className: string }> = {
   empty: { label: "Κενό", className: "bg-k-surface-3 text-k-text-3" },
   draft: { label: "Πρόχειρο", className: "bg-k-amber text-white" },
@@ -210,13 +219,7 @@ export function BannerEditor({
    * hero το μεγάλο κελί είναι σχεδόν πάντα το πρώτο. Το όνομά του γράφεται
    * δίπλα στην επιλογή, ώστε να μη μαντεύει κανείς ποιο μέτρησε.
    */
-  const mediaCell = useMemo(() => {
-    for (const cell of template.cells) {
-      const aspect = content.cells[cell.id]?.background?.mediaAspect;
-      if (aspect) return { cell, aspect };
-    }
-    return null;
-  }, [template.cells, content.cells]);
+  const mediaCell = firstMeasuredCell(template.cells, content.cells);
 
   /*
    * Μέτρηση όλων των κελιών, μία φορά, με ρητή εντολή.
