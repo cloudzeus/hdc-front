@@ -10,6 +10,7 @@ import { articleNumber } from "@/lib/account/order-view";
 import { formatMoney } from "@/lib/format";
 import { displayName } from "@/lib/milwaukee/display";
 import { parseModel } from "@/lib/milwaukee/model";
+import { localityLine } from "@/lib/shipping/countries";
 
 /**
  * One order — account.html, screen 3: everything a question or a return
@@ -115,7 +116,7 @@ export async function HdcOrderDetail({ order, locale }: { order: AccountOrderDet
             <br />
             {pickup
               ? `${SHOP.contact.street}, ${SHOP.contact.postcode} ${SHOP.contact.city}`
-              : `${order.shipLine1}${order.shipLine2 ? `, ${order.shipLine2}` : ""}, ${order.shipPostcode} ${order.shipCity}`}
+              : `${order.shipLine1}${order.shipLine2 ? `, ${order.shipLine2}` : ""}, ${localityLine(order.shipPostcode, order.shipCity, order.shipCountry, locale)}`}
             {order.acsVoucherNo && (
               <>
                 <br />

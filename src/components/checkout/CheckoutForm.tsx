@@ -5,11 +5,12 @@ import { useActionState, useRef, useState, useTransition } from "react";
 import { CompanyVatFields } from "@/components/account/CompanyVatFields";
 import { AddressAutocomplete } from "@/components/checkout/AddressAutocomplete";
 import { Link } from "@/i18n/navigation";
-import { setCartOptions, setDeliveryPostcode } from "@/lib/cart/actions";
-import { PAYMENT_METHODS, SHIPPING_METHODS } from "@/lib/cart/options";
+import { setCartOptions, setDeliveryDestination, setDeliveryPostcode } from "@/lib/cart/actions";
+import { PAYMENT_METHODS, SHIPPING_METHODS, shippingMethodsFor } from "@/lib/cart/options";
 import { placeOrder, type CheckoutState } from "@/lib/checkout/actions";
 import { STOCK_HOLD_HOURS } from "@/lib/orders/hold";
 import { foreignCountryIn, validatePostcode } from "@/lib/shipping/destination";
+import { countryOptions, postcodeExample, validateCountryPostcode } from "@/lib/shipping/countries";
 import type { CartSplitKind, RequestMode } from "@/lib/requests/model";
 
 /**
@@ -45,6 +46,21 @@ export type ShippingOption = {
   free: boolean;
 };
 
+/**
+ * How the page's quote for the remembered destination abroad came out
+ * (docs/dhl-express.md §1): priced, waiting for a Τ.Κ., refused (422 code, or
+ * ACS «no station» for Cyprus), or nobody could price it.
+ */
+export type DestinationQuoteStatus =
+  | "ok"
+  | "pending"
+  | "unavailable"
+  | "unserviceable"
+  | "unserviceable_postcode"
+  | "unsupported_country"
+  | "invalid_postcode"
+  | "invalid_address";
+
 type Prefill = {
   firstName: string;
   lastName: string;
@@ -69,6 +85,9 @@ export function CheckoutForm({
   shippingOptions,
   total,
   requestKind = "none",
+  international = false,
+  destination = null,
+  quoteStatus = null,
 }: {
   locale: string;
   /** The postcode the quotes were priced for (cookie or saved address). */
@@ -92,6 +111,15 @@ export function CheckoutForm({
    * re-reads the stock and decides again — this only shapes the form.
    */
   requestKind?: CartSplitKind;
+  /**
+   * INTERNATIONAL_SHIPPING_ENABLED, read by the page (docs/dhl-express.md §4).
+   * Off: no country field, Greece only — the form exactly as it was.
+   */
+  international?: boolean;
+  /** The destination abroad the page priced (`destination-cookie`); null at home. */
+  destination?: { country: string; postcode: string; city: string } | null;
+  /** How that price came out. */
+  quoteStatus?: DestinationQuoteStatus | null;
 }) {
   const t = useTranslations("checkout.Hdc");
   const [state, action, pending] = useActionState<CheckoutState, FormData>(placeOrder, {});
@@ -104,7 +132,30 @@ export function CheckoutForm({
   const lastPostcode = useRef(postcode);
   const postcodeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const pickup = shipping === "pickup";
+  /*
+   * The delivery country (flag on only). Greece and Cyprus: ACS, as before.
+   * The rest of the EU: DHL Express. The choice, Τ.Κ. and city go to the
+   * server (`setDeliveryDestination`), which re-renders the tiles and the
+   * summary priced by HDCtool; the action asks again and charges its answer.
+   */
+  const [country, setCountry] = useState<string>(
+    international && destination ? destination.country : "GR",
+  );
+  const abroad = international && country !== "GR";
+  const methods = international ? shippingMethodsFor(country) : SHIPPING_METHODS;
+  /* A choice that does not fit the country (ACS Express to Italy) falls to the first that does. */
+  const chosen = methods.some((m) => m.id === shipping) ? shipping : methods[0].id;
+  const destinationTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const sendDestination = (fields: { country: string; postcode: string; city: string }, delay = 500) => {
+    if (destinationTimer.current) clearTimeout(destinationTimer.current);
+    destinationTimer.current = setTimeout(() => {
+      startTransition(async () => {
+        await setDeliveryDestination(fields);
+      });
+    }, delay);
+  };
+
+  const pickup = chosen === "pickup";
   const isOnline = payment === "card" || payment === "iris";
   const [requestMode, setRequestMode] = useState<RequestMode | null>(null);
   /* Nothing is paid now: the whole cart, or everything by choice, is a request. */
@@ -154,6 +205,7 @@ export function CheckoutForm({
 
   /* A complete Τ.Κ. re-prices the tiles and the summary for its ACS zone. */
   const onPostcode = (value: string) => {
+    if (abroad) return;
     const clean = value.replace(/\s/g, "");
     if (!/^\d{5}$/.test(clean) || clean === lastPostcode.current) return;
     if (postcodeTimer.current) clearTimeout(postcodeTimer.current);
@@ -215,25 +267,49 @@ export function CheckoutForm({
    */
   const addressValue = (name: string): string => {
     if (values[name] !== undefined) return values[name];
-    if (name === "shipPostcode") return prefill?.shipPostcode || postcode;
+    if (name === "shipPostcode") return (abroad && destination?.postcode) || prefill?.shipPostcode || postcode;
+    if (name === "shipCity" && abroad && destination?.city) return destination.city;
     return (prefill?.[name as keyof Prefill] as string | undefined) ?? "";
   };
   const addressErrors: Record<string, string> = {};
-  if (!pickup) {
+  let quoteBlocked = false;
+  if (!pickup && !abroad) {
     const zip = addressValue("shipPostcode").trim();
     const checked = validatePostcode(zip);
     const complete = zip.replace(/\s/g, "").length >= 5 || /[^\d\s]/.test(zip);
     if ((!checked.ok && complete) || (checked.ok && checked.postcode === unserviceablePostcode)) {
-      addressErrors.shipPostcode = t("tk_unserviceable");
+      addressErrors.shipPostcode = international ? t("tk_unserviceable_eu") : t("tk_unserviceable");
     }
     for (const name of ["shipLine1", "shipLine2", "shipCity", "shipRegion", "shipAdminRegion"]) {
-      if (foreignCountryIn(addressValue(name))) addressErrors[name] = t("address_foreign");
+      if (foreignCountryIn(addressValue(name))) {
+        addressErrors[name] = international ? t("address_foreign_eu") : t("address_foreign");
+      }
     }
+  }
+  if (!pickup && abroad) {
+    const zip = addressValue("shipPostcode").trim();
+    const example = postcodeExample(country);
+    const checked = validateCountryPostcode(country, zip);
+    // The page's price holds for the place it was asked for, until another is typed.
+    const priced =
+      checked.ok &&
+      destination?.country === country &&
+      destination.postcode === checked.postcode &&
+      destination.city === addressValue("shipCity").trim();
+    if (!checked.ok && zip.replace(/[\s-]/g, "").length >= example.replace(/[\s-]/g, "").length) {
+      addressErrors.shipPostcode = t("postcode_format", { example });
+    } else if (priced && quoteStatus === "unavailable") {
+      addressErrors.quote = t("quote_unavailable");
+    } else if (priced && quoteStatus && quoteStatus !== "ok" && quoteStatus !== "pending") {
+      addressErrors.shipPostcode = t(`refused_${quoteStatus}`);
+    }
+    // Nothing is placed abroad without a price HDCtool gave for this very place.
+    quoteBlocked = !(priced && quoteStatus === "ok");
   }
   const blocked = Object.values(addressErrors)[0] ?? null;
   const fieldError = (name: string) => addressErrors[name] ?? state.fieldErrors?.[name];
 
-  const shipTitle = shippingOptions.find((o) => o.id === shipping);
+  const shipTitle = shippingOptions.find((o) => o.id === chosen);
   const payLabel = (id: string) =>
     id === "card" ? t("pay_card") : id === "iris" ? "IRIS" : t("pay_bank");
   const payLabelShort = (id: string) =>
@@ -303,6 +379,14 @@ export function CheckoutForm({
       onChange={(e) => {
         const target = e.target as unknown as HTMLInputElement;
         if (target.name === "shipPostcode") onPostcode(target.value);
+        if (abroad && (target.name === "shipPostcode" || target.name === "shipCity") && form.current) {
+          const data = new FormData(form.current);
+          sendDestination({
+            country,
+            postcode: String(data.get("shipPostcode") ?? ""),
+            city: String(data.get("shipCity") ?? ""),
+          });
+        }
         readValues();
       }}
     >
@@ -366,7 +450,7 @@ export function CheckoutForm({
           <Field label={t("onoma")} name="firstName" autoComplete="given-name" placeholder={t("onoma_ph")} defaultValue={prefill?.firstName} error={state.fieldErrors?.firstName} required />
           <Field label={t("eponymo")} name="lastName" autoComplete="family-name" placeholder={t("eponymo_ph")} defaultValue={prefill?.lastName} error={state.fieldErrors?.lastName} required />
           <Field label="EMAIL" name="email" type="email" autoComplete="email" placeholder={t("email_ph")} defaultValue={prefill?.email} error={state.fieldErrors?.email} required />
-          <Field label={t("kinito")} name="phone" type="tel" autoComplete="tel" placeholder="69…" defaultValue={prefill?.phone} error={state.fieldErrors?.phone} required help={t("kinito_help")} />
+          <Field label={t("kinito")} name="phone" type="tel" autoComplete="tel" placeholder={abroad ? "+39 …" : "69…"} defaultValue={prefill?.phone} error={state.fieldErrors?.phone} required help={abroad ? t("phone_intl_help") : t("kinito_help")} />
         </div>
       </Step>
 
@@ -379,10 +463,49 @@ export function CheckoutForm({
         onEdit={() => setOpen("shipping")}
         changeLabel={t("allagi")}
       >
+        {international && (
+          <label className="hdc-fld hdc-co-country">
+            <span className="lbl">
+              {t("chora")}
+              <em> *</em>
+            </span>
+            <select
+              name="shipCountry"
+              value={country}
+              autoComplete="country"
+              onChange={(e) => {
+                const next = e.target.value;
+                setCountry(next);
+                const offered = shippingMethodsFor(next);
+                if (!offered.some((m) => m.id === shipping)) {
+                  setShipping(offered[0].id);
+                  remember({ shippingMethod: offered[0].id });
+                }
+                const data = form.current ? new FormData(form.current) : null;
+                sendDestination(
+                  {
+                    country: next,
+                    postcode: String(data?.get("shipPostcode") ?? ""),
+                    city: String(data?.get("shipCity") ?? ""),
+                  },
+                  0,
+                );
+              }}
+              aria-invalid={state.fieldErrors?.shipCountry ? true : undefined}
+            >
+              {countryOptions(locale).map((option) => (
+                <option key={option.code} value={option.code}>
+                  {option.name}
+                </option>
+              ))}
+            </select>
+            {state.fieldErrors?.shipCountry && <span className="err">{state.fieldErrors.shipCountry}</span>}
+          </label>
+        )}
         <div className="hdc-ship" role="radiogroup" aria-label={t("s_shipping")}>
-          {SHIPPING_METHODS.map((method) => {
+          {methods.map((method) => {
             const option = shippingOptions.find((o) => o.id === method.id);
-            const on = shipping === method.id;
+            const on = chosen === method.id;
             return (
               <label key={method.id} className={on ? "on" : undefined}>
                 <input
@@ -400,7 +523,7 @@ export function CheckoutForm({
                 {option?.price ? (
                   <strong className={option.free ? "fr" : undefined}>{option.price}</strong>
                 ) : (
-                  <strong className="ask">{t("timi_apo_acs")}</strong>
+                  <strong className="ask">{method.id === "dhl" ? t("timi_apo_dhl") : t("timi_apo_acs")}</strong>
                 )}
               </label>
             );
@@ -441,17 +564,19 @@ export function CheckoutForm({
               label={t("tk")}
               name="shipPostcode"
               autoComplete="postal-code"
-              inputMode="numeric"
-              defaultValue={prefill?.shipPostcode || postcode}
+              inputMode={abroad ? "text" : "numeric"}
+              placeholder={abroad ? postcodeExample(country) : undefined}
+              help={abroad ? t("postcode_help_abroad", { example: postcodeExample(country) }) : undefined}
+              defaultValue={addressValue("shipPostcode")}
               error={fieldError("shipPostcode")}
               invalid={addressErrors.shipPostcode}
               required
             />
-            <Field label={t("poli")} name="shipCity" autoComplete="address-level2" placeholder={t("poli_ph")} defaultValue={prefill?.shipCity} error={fieldError("shipCity")} invalid={addressErrors.shipCity} required />
+            <Field label={t("poli")} name="shipCity" autoComplete="address-level2" placeholder={t("poli_ph")} defaultValue={addressValue("shipCity")} error={fieldError("shipCity")} invalid={addressErrors.shipCity} required />
             <Field label={t("nomos")} name="shipRegion" autoComplete="address-level1" defaultValue={prefill?.shipRegion} error={fieldError("shipRegion")} invalid={addressErrors.shipRegion} />
             <Field label={t("perifereia")} name="shipAdminRegion" defaultValue={prefill?.shipAdminRegion} error={fieldError("shipAdminRegion")} invalid={addressErrors.shipAdminRegion} />
           </div>
-          <p className="hdc-info">{t("ship_zone")}</p>
+          <p className="hdc-info">{international ? t("ship_zone_eu") : t("ship_zone")}</p>
         </fieldset>
         {!pickup && invoiceBlock}
       </Step>
@@ -566,7 +691,7 @@ export function CheckoutForm({
 
         <button
           type="submit"
-          disabled={!terms || pending || blocked != null || modeMissing}
+          disabled={!terms || pending || blocked != null || modeMissing || quoteBlocked}
           onClick={guardSubmit}
           className="hdc-btn hdc-btn-red hdc-btn-lg hdc-co-submit"
         >
@@ -591,7 +716,7 @@ export function CheckoutForm({
           <button
             type="submit"
             className="go"
-            disabled={!terms || pending || blocked != null || modeMissing}
+            disabled={!terms || pending || blocked != null || modeMissing || quoteBlocked}
             onClick={guardSubmit}
           >
             {submitLabel}

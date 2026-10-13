@@ -54,7 +54,13 @@ export async function StatusChip({ status, shippingMethod }: { status: string; s
 /** «ACS Courier», «ACS Express», «Παραλαβή από το κατάστημα». */
 export async function shippingLabel(method: string): Promise<string> {
   const t = await getTranslations("account.Hdc");
-  return method === "pickup" ? t("paralavi_katastima") : method === "express" ? "ACS Express" : "ACS Courier";
+  return method === "pickup"
+    ? t("paralavi_katastima")
+    : method === "dhl"
+      ? "DHL Express"
+      : method === "express"
+        ? "ACS Express"
+        : "ACS Courier";
 }
 
 /** The rows of «ΠΡΟΣΦΑΤΕΣ ΠΑΡΑΓΓΕΛΙΕΣ» and of the orders page. */
@@ -113,7 +119,13 @@ export async function TrackStrip({
   tracking,
   locale,
 }: {
-  tracking: { orderNumber: string; voucherNo: string; stages: TrackStage[] };
+  tracking: {
+    orderNumber: string;
+    voucherNo: string;
+    stages: TrackStage[];
+    carrier?: "ACS" | "DHL";
+    url?: string;
+  };
   locale: Locale;
 }) {
   const t = await getTranslations("account.Hdc");
@@ -138,15 +150,18 @@ export async function TrackStrip({
         <div>
           <b>{t("to_dema_sas")}</b>
           <span>
-            {tracking.orderNumber} · ACS {tracking.voucherNo}
+            {tracking.orderNumber} · {tracking.carrier === "DHL" ? "DHL" : "ACS"} {tracking.voucherNo}
           </span>
         </div>
         <a
-          href={`https://www.acscourier.net/el/track-and-trace/?paramtracknr=${encodeURIComponent(tracking.voucherNo)}`}
+          href={
+            tracking.url ??
+            `https://www.acscourier.net/el/track-and-trace/?paramtracknr=${encodeURIComponent(tracking.voucherNo)}`
+          }
           target="_blank"
           rel="noopener noreferrer"
         >
-          {t("parakolouthisi_acs")}
+          {tracking.carrier === "DHL" ? t("parakolouthisi_dhl") : t("parakolouthisi_acs")}
         </a>
       </div>
       <ol className="hdc-steps">

@@ -354,7 +354,9 @@
       "arithmos_apostolis_acs": "Numero spedizione ACS",
       "parakoloythisi_stin_acs": "Tracciamento su ACS",
       "kati_den_paei_kala": "Qualcosa non va?",
-      "alli_paraggelia": "Altro ordine"
+      "alli_paraggelia": "Altro ordine",
+      "arithmos_apostolis_dhl": "Numero di spedizione DHL",
+      "parakoloythisi_stin_dhl": "Traccia con DHL"
     }
   },
   "home": {
@@ -771,7 +773,24 @@
       "request_all_note": "I prodotti del carrello sono su ordinazione: non paghi ora. Ti invieremo un'offerta con prezzo finale, spedizione e tempi entro 24 ore, e paghi solo se la accetti.",
       "apostoli_aitimatos": "Invia richiesta",
       "katopin_badge": "Su ordinazione",
-      "request_totals_note": "I prodotti su ordinazione sono prezzati nell'offerta che riceverai entro 24 ore; gli importi qui sono indicativi."
+      "request_totals_note": "I prodotti su ordinazione sono prezzati nell'offerta che riceverai entro 24 ore; gli importi qui sono indicativi.",
+      "chora": "PAESE",
+      "ship_zone_eu": "Spediamo in Grecia, a Cipro e nei paesi dell'UE.",
+      "address_foreign_eu": "L'indirizzo è fuori dalla Grecia. Scegli il paese di consegna.",
+      "tk_unserviceable_eu": "Questo CAP non rientra in una zona che serviamo. Per la consegna fuori dalla Grecia, scegli il paese.",
+      "postcode_format": "Il CAP non corrisponde al formato del paese — es. {example}",
+      "postcode_help_abroad": "Il CAP del paese di consegna, es. {example}.",
+      "phone_intl_help": "Con il prefisso internazionale, es. +39 …",
+      "ship_dhl_meta": "DHL Express · consegna in {eta} giorni lavorativi",
+      "ship_dhl_meta_plain": "Unione Europea · consegna in 2–4 giorni lavorativi",
+      "timi_apo_dhl": "prezzo DHL con CAP e città",
+      "quote_unavailable": "Non è stato possibile calcolare la spedizione — riprova",
+      "quote_unavailable_short": "Non disponibile — riprova",
+      "refused_unserviceable_postcode": "DHL non consegna a questo CAP.",
+      "refused_unsupported_country": "Non spediamo in questo paese.",
+      "refused_invalid_postcode": "Questo CAP non è valido per il paese scelto.",
+      "refused_unserviceable": "Questo CAP non rientra in una zona che serviamo.",
+      "refused_invalid_address": "Controlla il CAP e la città dell'indirizzo."
     }
   },
   "catalogue": {
@@ -910,7 +929,17 @@
       "overstock_request": "Parte della quantità non è disponibile · la riga diventa una richiesta, conferma entro 24 ore",
       "request_all": "Nessun prodotto del carrello è disponibile ora. Invierai una richiesta senza pagare; rispondiamo entro 24 ore con prezzo finale, spedizione e tempi, e paghi solo se accetti.",
       "request_mixed": "Alcuni prodotti sono su ordinazione. Al checkout scegli: spedire ora ciò che è disponibile e richiedere il resto, oppure richiedere tutto insieme. Rispondiamo entro 24 ore.",
-      "synecheia_aitima": "Continua con la richiesta"
+      "synecheia_aitima": "Continua con la richiesta",
+      "chora": "Paese",
+      "poli": "Città",
+      "ship_dhl": "DHL Express",
+      "ship_needs_postcode": "con il CAP",
+      "quote_unavailable_short": "Non disponibile — riprova",
+      "quote_unavailable": "Non è stato possibile calcolare la spedizione — riprova",
+      "tk_format_country": "Il CAP non corrisponde al formato del paese — es. {example}",
+      "tk_unserviceable_eu": "Questo CAP non rientra in una zona che serviamo.",
+      "tk_hint_abroad": "Fuori da Grecia e Cipro con DHL Express — prezzo in base a paese, CAP e città.",
+      "ship_zone_eu": "Spediamo in Grecia, a Cipro e nei paesi dell'UE."
     }
   },
   "brands": {
@@ -1174,7 +1203,8 @@
       "meta_register_desc": "Crea un account Milwaukee Heavy Duty Centre: tracciamento del pacco, riacquisto, indirizzi salvati.",
       "meta_tools": "I miei utensili",
       "meta_favourites": "Preferiti",
-      "meta_reviews": "Recensioni"
+      "meta_reviews": "Recensioni",
+      "parakolouthisi_dhl": "TRACCIA CON DHL"
     }
   },
   "ui": {

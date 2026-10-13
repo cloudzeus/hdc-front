@@ -59,6 +59,8 @@ export type AccountOrderDetail = {
   shipLine2: string | null;
   shipPostcode: string;
   shipCity: string;
+  /** ISO-2; "GR" for every Greek order. */
+  shipCountry: string;
   acsVoucherNo: string | null;
   wantsInvoice: boolean;
   companyName: string | null;
@@ -111,6 +113,7 @@ export async function getCustomerOrder(
     shipLine2: order.shipLine2,
     shipPostcode: order.shipPostcode,
     shipCity: order.shipCity,
+    shipCountry: order.shipCountry,
     acsVoucherNo: order.acsVoucherNo,
     wantsInvoice: order.wantsInvoice,
     companyName: order.companyName,

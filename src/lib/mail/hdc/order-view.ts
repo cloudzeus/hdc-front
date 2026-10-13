@@ -8,6 +8,7 @@ import { availabilityLabelKey, lineAvailability } from "@/lib/catalog/availabili
 import { displayName } from "@/lib/milwaukee/display";
 import { t } from "@/lib/mail/hdc/strings";
 import { localeUrl } from "@/lib/mail/hdc/render";
+import { localityLine } from "@/lib/shipping/countries";
 
 /**
  * An order, as every HDC order email shows it.
@@ -74,7 +75,9 @@ export function stamp(date: Date, withTime = true): string {
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
 export function shippingLabel(locale: Locale, id: string): string {
-  return id === "courier" || id === "express" || id === "pickup" ? t(locale, `method.${id}`) : id;
+  return id === "courier" || id === "express" || id === "pickup" || id === "dhl"
+    ? t(locale, `method.${id}`)
+    : id;
 }
 
 export function paymentLabel(locale: Locale, id: string): string {
@@ -96,7 +99,12 @@ export function adminOrderUrl(orderNumber: string): string {
 function etaLine(locale: Locale, order: OrderWithLines): string {
   if (order.shippingMethod === "pickup") return t(locale, "eta.pickup");
   if (order.supplierOrder) return t(locale, "eta.supplier");
-  const days = Number((order.shippingQuote as { etaDays?: unknown } | null)?.etaDays);
+  const stored = order.shippingQuote as { etaDays?: unknown; carrier?: unknown } | null;
+  // DHL abroad: «2–3», the range the customer was shown at checkout.
+  if (stored?.carrier === "DHL" && typeof stored.etaDays === "string") {
+    return t(locale, "eta.range", { range: stored.etaDays });
+  }
+  const days = Number(stored?.etaDays);
   if (!Number.isFinite(days) || days <= 0) return "";
   return days === 1 ? t(locale, "eta.day") : t(locale, "eta.days", { n: days });
 }
@@ -203,7 +211,7 @@ export async function buildOrderView(
 
   const fullName = `${order.firstName} ${order.lastName}`.trim();
   const shipAddress = order.shipLine1 + (order.shipLine2 ? `, ${order.shipLine2}` : "");
-  const shipCity = `${order.shipPostcode} ${order.shipCity}`;
+  const shipCity = localityLine(order.shipPostcode, order.shipCity, order.shipCountry, locale);
   const eta = etaLine(locale, order);
   const pickup = order.shippingMethod === "pickup";
 

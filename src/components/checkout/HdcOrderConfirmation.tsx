@@ -8,6 +8,7 @@ import { displayName } from "@/lib/milwaukee/display";
 import { parseModel } from "@/lib/milwaukee/model";
 import { holdHours } from "@/lib/orders/hold";
 import { orderTimeline } from "@/lib/orders/timeline";
+import { localityLine } from "@/lib/shipping/countries";
 
 /**
  * The order confirmation — checkout.html, screen 3.
@@ -36,6 +37,8 @@ export type ConfirmationOrder = {
   shipLine2: string | null;
   shipPostcode: string;
   shipCity: string;
+  /** ISO-2; "GR" for every Greek order. */
+  shipCountry?: string;
   wantsInvoice: boolean;
   companyName: string | null;
   vatNumber: string | null;
@@ -204,7 +207,13 @@ export async function HdcOrderConfirmation({
           <div>
             <h2>{t("apostoli")}</h2>
             <p>
-              {pickup ? t("paralavi_katastima") : order.shippingMethod === "express" ? "ACS Express" : "ACS Courier"}
+              {pickup
+                ? t("paralavi_katastima")
+                : order.shippingMethod === "dhl"
+                  ? "DHL Express"
+                  : order.shippingMethod === "express"
+                    ? "ACS Express"
+                    : "ACS Courier"}
               {" — "}
               {shipCost}
               <br />
@@ -213,7 +222,7 @@ export async function HdcOrderConfirmation({
               <br />
               {pickup
                 ? `${SHOP.contact.postcode} ${SHOP.contact.city}`
-                : `${order.shipPostcode} ${order.shipCity}`}
+                : localityLine(order.shipPostcode, order.shipCity, order.shipCountry, locale)}
             </p>
           </div>
           <div>

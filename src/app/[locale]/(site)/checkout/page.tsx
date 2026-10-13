@@ -3,20 +3,31 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
-import { CheckoutForm, type ShippingOption } from "@/components/checkout/CheckoutForm";
+import {
+  CheckoutForm,
+  type DestinationQuoteStatus,
+  type ShippingOption,
+} from "@/components/checkout/CheckoutForm";
 import { HdcCheckoutHeader } from "@/components/checkout/HdcCheckoutHeader";
 import { getViewer } from "@/lib/account/session";
 import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
 import type { Locale } from "@/i18n/routing";
 import { computeTotals, getCart, getDeliveryPostcode } from "@/lib/cart/cart";
-import type { CartTotals, ShippingMethodId } from "@/lib/cart/options";
+import {
+  shippingMethodsFor,
+  type AnyShippingMethodId,
+  type CartTotals,
+} from "@/lib/cart/options";
 import { orderAvailability } from "@/lib/catalog/availability";
 import { formatMoney } from "@/lib/format";
 import { displayName } from "@/lib/milwaukee/display";
 import { parseModel } from "@/lib/milwaukee/model";
 import { isVivaConfigured } from "@/lib/payment/viva";
 import { isOnRequest, splitCart } from "@/lib/requests/model";
+import { countryName } from "@/lib/shipping/countries";
+import { readDestination } from "@/lib/shipping/destination-cookie";
+import { isInternationalShippingEnabled } from "@/lib/shipping/flag";
 
 export const dynamic = "force-dynamic";
 
@@ -90,9 +101,19 @@ export default async function CheckoutPage({
   const savedAddressPostcode = /^\d{5}$/.test(prefill?.shipPostcode ?? "")
     ? prefill!.shipPostcode
     : null;
-  const postcode = savedPostcode ?? savedAddressPostcode;
+  /*
+   * Delivery abroad (INTERNATIONAL_SHIPPING_ENABLED only): the country, Τ.Κ.
+   * and city last chosen, so the tiles and the summary are priced for that
+   * place. Null with the flag off or for Greece — the page is then exactly
+   * what it was.
+   */
+  const international = isInternationalShippingEnabled();
+  const destination = international ? await readDestination() : null;
+  const abroadTo = destination ? { country: destination.country, city: destination.city } : undefined;
 
-  const cart = await getCart(locale, postcode);
+  const postcode = destination ? destination.postcode || null : (savedPostcode ?? savedAddressPostcode);
+
+  const cart = await getCart(locale, postcode, abroadTo);
 
   // An empty cart has nothing to check out; bouncing back is kinder than an
   // empty form that fails on submit.
@@ -111,16 +132,39 @@ export default async function CheckoutPage({
    * postcode — never a second formula. Without a postcode the courier figure
    * would only be a guess, so the tile asks for one instead (unless free).
    */
-  const totalsFor = async (id: ShippingMethodId): Promise<CartTotals> =>
+  const totalsFor = async (id: AnyShippingMethodId): Promise<CartTotals> =>
     id === cart.shippingMethod
       ? totals
-      : computeTotals(cart.lines, id, cart.paymentMethod, postcode);
-  const [courier, express] = await Promise.all([totalsFor("courier"), totalsFor("express")]);
+      : computeTotals(cart.lines, id, cart.paymentMethod, postcode, abroadTo);
+  /* Only the methods the destination offers are priced — no ACS call for Italy. */
+  const offered = destination ? shippingMethodsFor(destination.country) : null;
+  const [courier, express, dhl] = await Promise.all([
+    !offered || offered.some((m) => m.id === "courier") ? totalsFor("courier") : null,
+    !offered ? totalsFor("express") : null,
+    offered?.some((m) => m.id === "dhl") ? totalsFor("dhl") : null,
+  ]);
+  /* The delivery quote abroad, as the form needs to judge it. */
+  const abroadTotals = destination ? (dhl ?? courier) : null;
+  const quoteStatus: DestinationQuoteStatus | null = !abroadTotals
+    ? null
+    : abroadTotals.quoteUnavailable
+      ? "unavailable"
+      : abroadTotals.refusal
+        ? abroadTotals.refusal
+        : abroadTotals.unserviceable
+          ? "unserviceable"
+          : abroadTotals.postage
+            ? "ok"
+            : "pending";
 
   // A postcode ACS does not serve gets no price on a courier tile — not even «ΔΩΡΕΑΝ».
   const tilePrice = (method: CartTotals) =>
     method.unserviceable
       ? { price: t("ship_unserviceable"), free: false }
+      : method.quoteUnavailable
+        ? { price: t("quote_unavailable_short"), free: false }
+        : method.quotePending
+          ? { price: null, free: false }
       : method.shippingGross === 0
         ? { price: t("dorean"), free: true }
         : postcode
@@ -128,8 +172,25 @@ export default async function CheckoutPage({
           : { price: null, free: false };
 
   const shippingOptions: ShippingOption[] = [
-    { id: "courier", title: "ACS COURIER", label: "ACS Courier", meta: t(supplierOrder ? "ship_courier_meta_3_5" : "ship_courier_meta"), ...tilePrice(courier) },
-    { id: "express", title: "ACS EXPRESS", label: "ACS Express", meta: t(supplierOrder ? "ship_express_meta_3_5" : "ship_express_meta"), ...tilePrice(express) },
+    ...(courier
+      ? [{ id: "courier", title: "ACS COURIER", label: "ACS Courier", meta: t(supplierOrder ? "ship_courier_meta_3_5" : "ship_courier_meta"), ...tilePrice(courier) }]
+      : []),
+    ...(express
+      ? [{ id: "express", title: "ACS EXPRESS", label: "ACS Express", meta: t(supplierOrder ? "ship_express_meta_3_5" : "ship_express_meta"), ...tilePrice(express) }]
+      : []),
+    ...(dhl
+      ? [
+          {
+            id: "dhl",
+            title: "DHL EXPRESS",
+            label: "DHL Express",
+            meta: dhl.postage
+              ? t("ship_dhl_meta", { eta: dhl.postage.etaDays })
+              : t("ship_dhl_meta_plain"),
+            ...tilePrice(dhl),
+          },
+        ]
+      : []),
     {
       id: "pickup",
       title: t("ship_pickup_title"),
@@ -143,7 +204,9 @@ export default async function CheckoutPage({
   const shippingRowLabel =
     cart.shippingMethod === "pickup"
       ? t("ship_pickup_row")
-      : `${cart.shippingMethod === "express" ? "ACS Express" : "ACS Courier"}${postcode ? ` · ${postcode}` : ""}`;
+      : destination
+        ? `${cart.shippingMethod === "dhl" ? "DHL Express" : "ACS Courier"} · ${countryName(destination.country, locale)}${postcode ? ` ${postcode}` : ""}`
+        : `${cart.shippingMethod === "express" ? "ACS Express" : "ACS Courier"}${postcode ? ` · ${postcode}` : ""}`;
 
   const allAt24 = cart.lines.every((l) => l.vatRate === 24);
   const vatLine = allAt24
@@ -180,10 +243,20 @@ export default async function CheckoutPage({
         </div>
         <div>
           <dt>{shippingRowLabel}</dt>
-          <dd className={!totals.unserviceable && totals.shippingGross === 0 ? "fr" : undefined}>
+          <dd
+            className={
+              !totals.unserviceable && !totals.quoteUnavailable && !totals.quotePending && totals.shippingGross === 0
+                ? "fr"
+                : undefined
+            }
+          >
             {totals.unserviceable
               ? t("ship_unserviceable")
-              : totals.shippingGross === 0
+              : totals.quoteUnavailable
+                ? t("quote_unavailable_short")
+                : totals.quotePending
+                  ? t("timi_apo_dhl")
+                  : totals.shippingGross === 0
                 ? t("dorean")
                 : money(totals.shippingGross)}
           </dd>
@@ -229,7 +302,7 @@ export default async function CheckoutPage({
             <CheckoutForm
               locale={locale}
               postcode={postcode ?? ""}
-              unserviceablePostcode={courier.unserviceable ? postcode : null}
+              unserviceablePostcode={!destination && courier?.unserviceable ? postcode : null}
               prefill={prefill}
               signedIn={viewer.user != null}
               shippingMethod={cart.shippingMethod}
@@ -237,6 +310,9 @@ export default async function CheckoutPage({
               shippingOptions={shippingOptions}
               total={money(totals.totalGross)}
               requestKind={requestKind}
+              international={international}
+              destination={destination}
+              quoteStatus={quoteStatus}
             />
           </div>
 

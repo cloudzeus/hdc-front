@@ -17,6 +17,7 @@ import { internalOrderRecipients } from "@/lib/mail/order-internal-email";
 import type { MailOptions } from "@/lib/mail/order-email";
 import { displayName } from "@/lib/milwaukee/display";
 import { routing } from "@/i18n/routing";
+import { localityLine } from "@/lib/shipping/countries";
 import {
   REQUEST_ANSWER_HOURS,
   compareOffer,
@@ -333,7 +334,7 @@ export async function buildInternalRequestEmail(ref: OrderRef, options: { assetO
           { label: t("el", "internal.phone"), value: order.phone },
           {
             label: t("el", "internal.address"),
-            value: `${order.shipLine1}${order.shipLine2 ? `, ${order.shipLine2}` : ""}, ${order.shipPostcode} ${order.shipCity}`,
+            value: `${order.shipLine1}${order.shipLine2 ? `, ${order.shipLine2}` : ""}, ${localityLine(order.shipPostcode, order.shipCity, order.shipCountry)}`,
           },
           { label: t("el", "internal.shipping"), value: shippingLabel("el", order.shippingMethod) },
           { label: t("el", "internal.document"), value: t("el", order.wantsInvoice ? "doc.invoice" : "doc.receipt") },

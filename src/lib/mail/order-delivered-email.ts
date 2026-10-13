@@ -4,6 +4,7 @@ import { t } from "@/lib/mail/hdc/strings";
 import { renderAndDeliver } from "@/lib/mail/hdc/deliver";
 import { buildOrderView, loadOrder, orderLocale, stamp, type OrderRef } from "@/lib/mail/hdc/order-view";
 import type { MailOptions } from "@/lib/mail/order-email";
+import { localityLine } from "@/lib/shipping/countries";
 
 /**
  * «Your order has been delivered.»
@@ -38,7 +39,7 @@ export async function buildDeliveredEmail(orderNumber: OrderRef, options: MailOp
           { label: t(locale, "delivered.at"), value: stamp(order.deliveredAt ?? new Date()), strong: true },
           {
             label: t(locale, "delivered.where"),
-            value: `${order.shipLine1}, ${order.shipPostcode} ${order.shipCity}`,
+            value: `${order.shipLine1}, ${localityLine(order.shipPostcode, order.shipCity, order.shipCountry, locale)}`,
           },
         ],
       },

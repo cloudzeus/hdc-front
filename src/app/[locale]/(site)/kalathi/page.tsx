@@ -16,6 +16,9 @@ import { getCartLineExtras, getHdcCrossSell } from "@/lib/cart/hdc-cart";
 import { freeShippingProgress } from "@/lib/cart/options";
 import { availabilityLabelKey, orderAvailability } from "@/lib/catalog/availability";
 import { isOnRequest, splitCart } from "@/lib/requests/model";
+import { countryName, isDhlCountry } from "@/lib/shipping/countries";
+import { readDestination } from "@/lib/shipping/destination-cookie";
+import { isInternationalShippingEnabled } from "@/lib/shipping/flag";
 import {
   getCatalogueStats,
   getMenuTree,
@@ -62,8 +65,21 @@ export default async function CartPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const postcode = await getDeliveryPostcode();
-  const cart = await getCart(locale, postcode);
+  /*
+   * Delivery abroad (INTERNATIONAL_SHIPPING_ENABLED only): the country box
+   * beside the postcode. Null with the flag off or for Greece — the cart is
+   * then priced exactly as before, from the Greek postcode cookie.
+   */
+  const international = isInternationalShippingEnabled();
+  const destination = international ? await readDestination() : null;
+  const postcode = destination ? destination.postcode || null : await getDeliveryPostcode();
+  const cart = await getCart(
+    locale,
+    postcode,
+    destination ? { country: destination.country, city: destination.city } : undefined,
+  );
+  /* DHL is never free: no free-shipping bar for a DHL destination. */
+  const dhlDestination = isDhlCountry(destination?.country);
   const lines = cart?.lines ?? [];
   const isEmpty = lines.length === 0;
 
@@ -156,9 +172,13 @@ export default async function CartPage({
   const shippingLabel =
     cart?.shippingMethod === "pickup"
       ? t("ship_pickup")
-      : cart?.shippingMethod === "express"
-        ? t("ship_express")
-        : t("ship_courier");
+      : cart?.shippingMethod === "dhl"
+        ? `${t("ship_dhl")} · ${countryName(destination?.country, locale)}`
+        : cart?.shippingMethod === "express"
+          ? t("ship_express")
+          : destination
+            ? `${t("ship_courier")} · ${countryName(destination.country, locale)}`
+            : t("ship_courier");
 
   const summaryRows = totals
     ? [
@@ -166,7 +186,11 @@ export default async function CartPage({
         // A postcode ACS does not serve has no postage — and must never read «ΔΩΡΕΑΝ».
         totals.unserviceable
           ? { label: shippingLabel, value: t("ship_unserviceable") }
-          : {
+          : totals.quoteUnavailable
+            ? { label: shippingLabel, value: t("quote_unavailable_short") }
+            : totals.quotePending
+              ? { label: shippingLabel, value: t("ship_needs_postcode") }
+              : {
               label: shippingLabel,
               value: totals.shippingGross === 0 ? t("dorean") : money(totals.shippingGross),
               free: totals.shippingGross === 0,
@@ -215,6 +239,7 @@ export default async function CartPage({
                   <small>{t("n_proionta", { count: totals.itemCount })}</small>
                 </h1>
 
+                {!dhlDestination && (
                 <div className="hdc-free" data-reached={progress.reached || undefined}>
                   <div className="row">
                     {progress.reached ? (
@@ -240,6 +265,7 @@ export default async function CartPage({
                     <i style={{ width: `${progress.percent}%` }} />
                   </div>
                 </div>
+                )}
 
                 {supplierOrder && (
                   <p className="hdc-notice" role="status">
@@ -268,6 +294,10 @@ export default async function CartPage({
                 requestKind={splitCart(lines).kind}
                 postcode={postcode}
                 unserviceable={totals.unserviceable}
+                international={international}
+                country={destination?.country ?? "GR"}
+                city={destination?.city ?? ""}
+                quoteUnavailable={totals.quoteUnavailable === true}
                 rows={summaryRows}
                 total={money(totals.totalGross)}
                 vatLine={

@@ -9,6 +9,7 @@ import { trackStages, type TrackStage } from "@/lib/account/track-stages";
 import { getRootCategories } from "@/lib/catalog/queries";
 import { isBattery } from "@/lib/hdc-nav";
 import type { Locale } from "@/i18n/routing";
+import { trackingFor } from "@/lib/shipping/tracking";
 
 /**
  * What the account overview loads (account.html, screen 2), in the order the
@@ -50,7 +51,14 @@ export type AccountDashboard = {
   } | null;
   addressCount: number;
   /** The parcel worth watching: the newest shipped, undelivered courier order. */
-  tracking: { orderNumber: string; voucherNo: string; stages: TrackStage[] } | null;
+  tracking: {
+    orderNumber: string;
+    voucherNo: string;
+    stages: TrackStage[];
+    /** DHL Express abroad: no ACS lookup, DHL's own link. ACS when absent. */
+    carrier?: "ACS" | "DHL";
+    url?: string;
+  } | null;
   tools: PlatformTools[];
 };
 
@@ -203,7 +211,7 @@ export async function getAccountDashboard(
       prisma.order.findFirst({
         where: { ...where, status: "SHIPPED", acsVoucherNo: { not: null }, shippingMethod: { not: "pickup" } },
         orderBy: { createdAt: "desc" },
-        select: { orderNumber: true, acsVoucherNo: true },
+        select: { orderNumber: true, acsVoucherNo: true, shippingMethod: true, shippingQuote: true },
       }),
       getMyTools(customerId, email),
     ]);
@@ -216,7 +224,17 @@ export async function getAccountDashboard(
    * first stage.
    */
   let tracking: AccountDashboard["tracking"] = null;
-  if (transit?.acsVoucherNo) {
+  const dhl = transit?.acsVoucherNo ? trackingFor(transit, transit.acsVoucherNo) : null;
+  if (transit?.acsVoucherNo && dhl?.carrier === "DHL") {
+    // A DHL AWB means nothing to ACS: no lookup, DHL's tracker instead.
+    tracking = {
+      orderNumber: transit.orderNumber,
+      voucherNo: transit.acsVoucherNo,
+      stages: trackStages([]),
+      carrier: "DHL",
+      url: dhl.url,
+    };
+  } else if (transit?.acsVoucherNo) {
     const result = await trackVoucher(transit.acsVoucherNo).catch(() => null);
     const checkpoints =
       result?.ok

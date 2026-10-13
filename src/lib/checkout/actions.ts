@@ -14,10 +14,14 @@ import type { CartLineView } from "@/lib/cart/options";
 import { prisma } from "@/lib/prisma";
 import { STOCK_HOLD_HOURS, holdExpiry } from "@/lib/orders/hold";
 import { computeTotals, getCart, getCartToken } from "@/lib/cart/cart";
-import { PAYMENT_METHODS, SHIPPING_METHODS } from "@/lib/cart/options";
+import { PAYMENT_METHODS, SHIPPING_METHODS, shippingMethodsFor } from "@/lib/cart/options";
 import { orderAvailability } from "@/lib/catalog/availability";
 import { isUnserviceable, quoteLivePostage } from "@/lib/shipping/acs-live";
 import { checkDestination, destinationMessage, shippingCopy } from "@/lib/shipping/destination";
+import { isInternationalShippingEnabled } from "@/lib/shipping/flag";
+import { normalizeCountry, validateCountryPostcode } from "@/lib/shipping/countries";
+import { isQuoteUnavailable, isRefused, quoteDestination } from "@/lib/shipping/courier-quote";
+import { internationalCopy } from "@/lib/shipping/international-copy";
 import { createPaymentOrder, isVivaConfigured } from "@/lib/payment/viva";
 import { routing, type Locale } from "@/i18n/routing";
 import { getCurrentUser } from "@/lib/account/session";
@@ -118,11 +122,40 @@ export async function placeOrder(
    * are what give it away. Checked before anything is priced or written — a
    * pickup order carries the shop's own address and passes.
    */
+  /*
+   * The delivery country (docs/dhl-express.md §4). With the flag off there is
+   * no selector and the posted field is ignored: Greece, and the checks below
+   * are exactly the ones above. With it on: Greece and Cyprus go with ACS, the
+   * rest of the EU with DHL Express, and anything else is refused. A pickup
+   * order carries the shop's own address, so it is Greek whatever was chosen.
+   */
+  const international = isInternationalShippingEnabled();
+  const intl = internationalCopy(locale);
+  const chosenCountry = international ? normalizeCountry(input.shipCountry, true) : "GR";
+  if (!chosenCountry) {
+    return { error: intl.country, fieldErrors: { shipCountry: intl.country } };
+  }
+  const country = input.shippingMethod === "pickup" ? "GR" : chosenCountry;
+  const abroad = country !== "GR";
+
   if (input.shippingMethod !== "pickup") {
-    const destination = checkDestination(address);
-    if (!destination.ok) {
-      const message = destinationMessage(destination, locale);
-      return { error: message, fieldErrors: { [destination.field]: message } };
+    if (!abroad) {
+      const destination = checkDestination(address);
+      if (!destination.ok) {
+        const message = !international
+          ? destinationMessage(destination, locale)
+          : destination.reason === "foreign_address"
+            ? intl.foreign
+            : intl.unserviceable;
+        return { error: message, fieldErrors: { [destination.field]: message } };
+      }
+    } else {
+      const checked = validateCountryPostcode(country, address.shipPostcode);
+      if (!checked.ok) {
+        return { error: intl.postcode, fieldErrors: { shipPostcode: intl.postcode } };
+      }
+      // As the destination country writes it («1012 AB», «00-950»).
+      address.shipPostcode = checked.postcode;
     }
   }
 
@@ -140,7 +173,11 @@ export async function placeOrder(
   const customer = await getCurrentUser();
 
   // Re-priced against the delivery postcode, not the indicative cart quote.
-  const cart = await getCart(locale, address.shipPostcode);
+  const cart = await getCart(
+    locale,
+    address.shipPostcode,
+    abroad ? { country, city: address.shipCity } : undefined,
+  );
   if (!cart || cart.lines.length === 0) return { error: "Το καλάθι σας είναι άδειο." };
 
   /*
@@ -160,8 +197,17 @@ export async function placeOrder(
   const payLines: CartLineView[] = plan.pay;
   const requestLines: CartLineView[] = plan.request;
 
-  const shipping =
-    SHIPPING_METHODS.find((m) => m.id === input.shippingMethod) ?? SHIPPING_METHODS[0];
+  /*
+   * The methods on offer for the destination. Flag off: the three it always
+   * had, with the old fallback to the first. Flag on: a method that does not
+   * fit the country (ACS to Italy, DHL to Athens) is refused, not guessed.
+   */
+  const shipping = international
+    ? shippingMethodsFor(chosenCountry).find((m) => m.id === input.shippingMethod)
+    : (SHIPPING_METHODS.find((m) => m.id === input.shippingMethod) ?? SHIPPING_METHODS[0]);
+  if (!shipping) {
+    return { error: intl.method, fieldErrors: { shippingMethod: intl.method } };
+  }
   const payment =
     PAYMENT_METHODS.find((m) => m.id === input.paymentMethod) ?? PAYMENT_METHODS[0];
 
@@ -175,20 +221,31 @@ export async function placeOrder(
   }
 
 
+  // The lines being shipped now; for a request-only cart, the requested
+  // ones — the address is checked either way.
+  const parcelLines = payLines.length ? payLines : requestLines;
+  const parcel = parcelLines.map((l) => ({
+    quantity: l.quantity,
+    weight: l.weight,
+    width: l.width,
+    length: l.length,
+    height: l.height,
+  }));
+  /*
+   * Abroad the price is asked for again HERE, from HDCtool — whatever the form
+   * showed is not an input. Greece is the original call, unchanged.
+   */
   const quote =
     shipping.expressMultiplier > 0
-      ? await quoteLivePostage({
-          // The lines being shipped now; for a request-only cart, the
-          // requested ones — the address is checked either way.
-          items: (payLines.length ? payLines : requestLines).map((l) => ({
-            quantity: l.quantity,
-            weight: l.weight,
-            width: l.width,
-            length: l.length,
-            height: l.height,
-          })),
-          postcode: address.shipPostcode,
-        })
+      ? abroad
+        ? await quoteDestination({
+            country,
+            postcode: address.shipPostcode,
+            city: address.shipCity,
+            items: parcel,
+            declaredValue: parcelLines.reduce((sum, l) => sum + l.lineGross, 0),
+          })
+        : await quoteLivePostage({ items: parcel, postcode: address.shipPostcode })
       : null;
 
   /*
@@ -198,8 +255,17 @@ export async function placeOrder(
    * the table and the order goes through.
    */
   if (isUnserviceable(quote)) {
-    const message = shippingCopy(locale).unserviceable;
+    const message = international ? intl.unserviceable : shippingCopy(locale).unserviceable;
     return { error: message, fieldErrors: { shipPostcode: message } };
+  }
+  /* DHL said no to the place (422): on the Τ.Κ. field, and no table abroad. */
+  if (isRefused(quote)) {
+    const message = intl.refused[quote.error];
+    return { error: message, fieldErrors: { shipPostcode: message } };
+  }
+  /* Nobody could price it abroad: blocked, «δοκιμάστε ξανά». */
+  if (isQuoteUnavailable(quote)) {
+    return { error: intl.unavailable };
   }
 
   /*
@@ -222,6 +288,7 @@ export async function placeOrder(
     firstName: input.firstName,
     lastName: input.lastName,
     ...address,
+    ...(abroad ? { shipCountry: country } : {}),
     wantsInvoice,
     companyName: wantsInvoice ? input.companyName || null : null,
     vatNumber: wantsInvoice ? input.vatNumber || null : null,
@@ -266,7 +333,17 @@ export async function placeOrder(
    * The form is the last word and the ids above are already validated against
    * the offered list, so the totals are recomputed from them.
    */
-  const totals = await computeTotals(payLines, shipping.id, payment.id, address.shipPostcode);
+  const totals = await computeTotals(
+    payLines,
+    shipping.id,
+    payment.id,
+    address.shipPostcode,
+    abroad ? { country, city: address.shipCity } : undefined,
+  );
+  /* The totals re-quote too; if that answer differs in kind, no order. */
+  if (abroad && shipping.expressMultiplier > 0 && (totals.quoteUnavailable || totals.unserviceable)) {
+    return { error: intl.unavailable };
+  }
 
   const orderNumber = await nextOrderNumber();
   const guestToken = randomBytes(24).toString("base64url");
@@ -288,6 +365,7 @@ export async function placeOrder(
 
       // The shop's own address for a pickup order — see `deliveryAddress`.
       ...address,
+      ...(abroad ? { shipCountry: country } : {}),
 
       wantsInvoice,
       companyName: wantsInvoice ? input.companyName || null : null,

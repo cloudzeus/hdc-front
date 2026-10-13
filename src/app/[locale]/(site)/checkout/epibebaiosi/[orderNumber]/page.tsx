@@ -172,6 +172,7 @@ export default async function ConfirmationPage({ params, searchParams }: PagePro
             shipLine2: order.shipLine2,
             shipPostcode: order.shipPostcode,
             shipCity: order.shipCity,
+            shipCountry: order.shipCountry,
             wantsInvoice: order.wantsInvoice,
             companyName: order.companyName,
             vatNumber: order.vatNumber,

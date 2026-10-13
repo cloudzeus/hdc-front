@@ -15,6 +15,10 @@ import {
   setCartCookie,
 } from "@/lib/cart/cart";
 import { searchKey } from "@/lib/greek";
+import { isInternationalShippingEnabled } from "@/lib/shipping/flag";
+import { normalizeCountry, validateCountryPostcode } from "@/lib/shipping/countries";
+import { validatePostcode } from "@/lib/shipping/destination";
+import { writeDestination } from "@/lib/shipping/destination-cookie";
 
 /**
  * Cart mutations.
@@ -332,6 +336,54 @@ export async function setDeliveryPostcode(input: unknown): Promise<CartActionRes
 
   revalidateCart();
   return { ok: true };
+}
+
+/**
+ * Where the parcel goes, with INTERNATIONAL_SHIPPING_ENABLED (docs/dhl-express.md
+ * §4): the country, the postcode as that country writes it, and the city DHL
+ * prices with. Written by the cart's country box and the checkout's country,
+ * Τ.Κ. and city fields; both pages read it and price the delivery for it.
+ *
+ * Greece goes back to the postcode cookie above and forgets the destination,
+ * so a Greek cart is exactly what it was. A malformed postcode abroad keeps the
+ * country (the page asks for a valid Τ.Κ.) and says so.
+ */
+export async function setDeliveryDestination(input: unknown): Promise<CartActionResult> {
+  if (!isInternationalShippingEnabled()) return { ok: false, error: "disabled" };
+  const parsed = z
+    .object({
+      country: z.string().trim().max(2),
+      postcode: z.string().trim().max(16),
+      city: z.string().trim().max(120).optional(),
+    })
+    .safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid_input" };
+
+  const country = normalizeCountry(parsed.data.country, true);
+  if (!country) return { ok: false, error: "unsupported_country" };
+
+  if (country === "GR") {
+    await writeDestination(null);
+    const checked = parsed.data.postcode ? validatePostcode(parsed.data.postcode) : null;
+    if (checked?.ok) {
+      const store = await cookies();
+      store.set(POSTCODE_COOKIE, checked.postcode, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 30,
+      });
+    }
+    revalidateCart();
+    return { ok: true };
+  }
+
+  const city = parsed.data.city ?? "";
+  const checked = parsed.data.postcode ? validateCountryPostcode(country, parsed.data.postcode) : null;
+  await writeDestination({ country, postcode: checked?.ok ? checked.postcode : "", city });
+  revalidateCart();
+  return checked && !checked.ok ? { ok: false, error: "invalid_postcode" } : { ok: true };
 }
 
 export async function removeCartLine(lineId: string): Promise<CartActionResult> {

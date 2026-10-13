@@ -526,6 +526,27 @@
   .hdc-cart-sum .zip {
     margin-bottom: 6px;
   }
+  /* INTERNATIONAL_SHIPPING_ENABLED: the country (and, for DHL, the city) above the postcode. */
+  .hdc-cart-sum .zip-country {
+    display: grid;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .hdc-cart-sum .zip-country :is(select, input) {
+    min-width: 0;
+    height: 46px;
+    border: 1px solid var(--hdc-g3);
+    border-radius: 0;
+    background: #fff;
+    padding: 0 12px;
+    font-family: inherit;
+    font-size: var(--fs-15);
+    color: var(--hdc-ink);
+    outline: none;
+  }
+  .hdc-cart-sum .zip-country :is(select, input):focus {
+    border-color: var(--hdc-ink);
+  }
   .hdc-cart-sum :is(.zip, .cp) input {
     min-width: 0;
     height: 46px;

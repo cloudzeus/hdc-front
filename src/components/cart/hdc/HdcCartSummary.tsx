@@ -3,8 +3,10 @@
 import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { Link } from "@/i18n/navigation";
-import { applyCoupon, setDeliveryPostcode } from "@/lib/cart/actions";
+import { useLocale } from "next-intl";
+import { applyCoupon, setDeliveryDestination, setDeliveryPostcode } from "@/lib/cart/actions";
 import { validatePostcode } from "@/lib/shipping/destination";
+import { countryOptions, postcodeExample, validateCountryPostcode } from "@/lib/shipping/countries";
 import type { CartSplitKind } from "@/lib/requests/model";
 
 /**
@@ -22,6 +24,10 @@ export function HdcCartSummary({
   rows,
   total,
   vatLine,
+  international = false,
+  country: initialCountry = "GR",
+  city: initialCity = "",
+  quoteUnavailable = false,
 }: {
   /**
    * Back-order requests (docs/backorder-requests.md): «all» — nothing is in
@@ -36,8 +42,24 @@ export function HdcCartSummary({
   rows: Array<{ label: string; value: string; free?: boolean }>;
   total: string;
   vatLine: string;
+  /**
+   * INTERNATIONAL_SHIPPING_ENABLED, read by the page (docs/dhl-express.md §4):
+   * a country select beside the postcode. Off: the Greek postcode box as it was.
+   */
+  international?: boolean;
+  /** The destination the page priced; "GR" at home. */
+  country?: string;
+  city?: string;
+  /** Abroad, nobody could price it (HDCtool/DHL down). */
+  quoteUnavailable?: boolean;
 }) {
   const t = useTranslations("cart.Hdc");
+  const locale = useLocale();
+  const [country, setCountry] = useState(initialCountry);
+  const [city, setCity] = useState(initialCity);
+  const abroad = international && country !== "GR";
+  /* DHL prices with the city; ACS (Greece, Cyprus) does not need it. */
+  const needsCity = abroad && country !== "CY";
   const [pending, startTransition] = useTransition();
   const [zip, setZip] = useState(postcode ?? "");
   const [zipError, setZipError] = useState<"format" | "range" | null>(null);
@@ -50,6 +72,19 @@ export function HdcCartSummary({
 
   const quote = (e: React.FormEvent) => {
     e.preventDefault();
+    if (abroad) {
+      // The selected country's format (lib/shipping/countries).
+      const checked = validateCountryPostcode(country, zip);
+      if (!checked.ok) {
+        setZipError("format");
+        return;
+      }
+      setZipError(null);
+      startTransition(async () => {
+        await setDeliveryDestination({ country, postcode: checked.postcode, city });
+      });
+      return;
+    }
     // Greek postcodes only: five digits, 10xxx–85xxx (see lib/shipping/destination).
     const checked = validatePostcode(zip);
     if (!checked.ok) {
@@ -58,7 +93,18 @@ export function HdcCartSummary({
     }
     setZipError(null);
     startTransition(async () => {
-      await setDeliveryPostcode({ postcode: checked.postcode });
+      // With the flag on, Greece also forgets a destination abroad.
+      if (international) await setDeliveryDestination({ country: "GR", postcode: checked.postcode });
+      else await setDeliveryPostcode({ postcode: checked.postcode });
+    });
+  };
+
+  const chooseCountry = (next: string) => {
+    setCountry(next);
+    setZipError(null);
+    const keep = validateCountryPostcode(next, zip);
+    startTransition(async () => {
+      await setDeliveryDestination({ country: next, postcode: keep.ok ? keep.postcode : "", city });
     });
   };
 
@@ -66,6 +112,41 @@ export function HdcCartSummary({
     <aside className="hdc-sum hdc-cart-sum" data-pending={pending || undefined}>
       <h2 className="hdc-disp">{t("synopsi")}</h2>
       <div className="in">
+        {international && (
+          <div className="zip-country">
+            <label htmlFor="cart-country" className="sr-only">
+              {t("chora")}
+            </label>
+            <select
+              id="cart-country"
+              value={country}
+              onChange={(e) => chooseCountry(e.target.value)}
+              autoComplete="country"
+              disabled={pending}
+            >
+              {countryOptions(locale).map((option) => (
+                <option key={option.code} value={option.code}>
+                  {option.name}
+                </option>
+              ))}
+            </select>
+            {needsCity && (
+              <>
+                <label htmlFor="cart-city" className="sr-only">
+                  {t("poli")}
+                </label>
+                <input
+                  id="cart-city"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  autoComplete="address-level2"
+                  maxLength={120}
+                  placeholder={t("poli")}
+                />
+              </>
+            )}
+          </div>
+        )}
         <form className="zip" onSubmit={quote}>
           <label htmlFor="cart-zip" className="sr-only">
             {t("tk")}
@@ -74,10 +155,10 @@ export function HdcCartSummary({
             id="cart-zip"
             value={zip}
             onChange={(e) => setZip(e.target.value)}
-            inputMode="numeric"
+            inputMode={abroad ? "text" : "numeric"}
             autoComplete="postal-code"
-            maxLength={6}
-            placeholder={t("tk")}
+            maxLength={abroad ? 10 : 6}
+            placeholder={abroad ? postcodeExample(country) : t("tk")}
             aria-invalid={zipError != null || showUnserviceable || undefined}
             aria-describedby="cart-zip-hint"
           />
@@ -87,16 +168,26 @@ export function HdcCartSummary({
         </form>
         <p
           id="cart-zip-hint"
-          className={zipError || showUnserviceable ? "hint err" : "hint"}
-          role={zipError || showUnserviceable ? "alert" : undefined}
+          className={zipError || showUnserviceable || (abroad && quoteUnavailable) ? "hint err" : "hint"}
+          role={zipError || showUnserviceable || (abroad && quoteUnavailable) ? "alert" : undefined}
         >
-          {zipError === "format"
-            ? t("tk_5_psifia")
-            : zipError === "range" || showUnserviceable
-              ? t("tk_unserviceable")
-              : t("tk_hint")}
+          {abroad
+            ? zipError
+              ? t("tk_format_country", { example: postcodeExample(country) })
+              : showUnserviceable
+                ? t("tk_unserviceable_eu")
+                : quoteUnavailable
+                  ? t("quote_unavailable")
+                  : t("tk_hint_abroad")
+            : zipError === "format"
+              ? t("tk_5_psifia")
+              : zipError === "range" || showUnserviceable
+                ? international
+                  ? t("tk_unserviceable_eu")
+                  : t("tk_unserviceable")
+                : t("tk_hint")}
         </p>
-        <p className="hint">{t("ship_zone")}</p>
+        <p className="hint">{international ? t("ship_zone_eu") : t("ship_zone")}</p>
 
         <dl>
           {rows.map((row) => (

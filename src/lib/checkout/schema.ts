@@ -32,6 +32,11 @@ export const checkoutSchema = z
     shipRegion: optionalText(120),
     /** Περιφέρεια. */
     shipAdminRegion: optionalText(120),
+    /**
+     * ISO-2. Only read with INTERNATIONAL_SHIPPING_ENABLED; otherwise ignored and
+     * the order is Greek, as it always was. docs/dhl-express.md §4.
+     */
+    shipCountry: optionalText(2),
 
     wantsInvoice: z.union([z.literal("on"), z.literal("")]).optional(),
     companyName: optionalText(255),

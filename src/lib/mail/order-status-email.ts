@@ -5,6 +5,7 @@ import { deliver, renderAndDeliver } from "@/lib/mail/hdc/deliver";
 import { buildOrderView, loadOrder, orderLocale, type OrderRef } from "@/lib/mail/hdc/order-view";
 import { buildInternalStatusEmail } from "@/lib/mail/order-internal-email";
 import type { MailOptions } from "@/lib/mail/order-email";
+import { trackingFor } from "@/lib/shipping/tracking";
 
 /**
  * «Your order moved on.»
@@ -21,10 +22,6 @@ import type { MailOptions } from "@/lib/mail/order-email";
  */
 
 export type OrderStatusMailOutcome = { ok: true; id: string } | { ok: false; error: string };
-
-function trackingUrl(voucherNo: string): string {
-  return `https://www.acscourier.net/el/track-and-trace/?paramtracknr=${encodeURIComponent(voucherNo)}`;
-}
 
 export async function buildOrderStatusEmail(orderNumber: OrderRef, statusName: string, options: MailOptions = {}) {
   const order = await loadOrder(orderNumber);
@@ -45,7 +42,9 @@ export async function buildOrderStatusEmail(orderNumber: OrderRef, statusName: s
       status: {
         name: statusName,
         tracking: order.acsVoucherNo ?? "",
-        tracking_url: order.acsVoucherNo ? trackingUrl(order.acsVoucherNo) : "",
+        // ACS, or DHL Express for a parcel that went abroad (docs/dhl-express.md §3).
+        tracking_url: order.acsVoucherNo ? trackingFor(order, order.acsVoucherNo).url : "",
+        carrier: order.acsVoucherNo && trackingFor(order, order.acsVoucherNo).carrier === "DHL" ? "DHL Express" : "ACS",
       },
     },
   });

@@ -354,7 +354,9 @@
       "arithmos_apostolis_acs": "ACS tracking number",
       "parakoloythisi_stin_acs": "Track on ACS",
       "kati_den_paei_kala": "Something wrong?",
-      "alli_paraggelia": "Another order"
+      "alli_paraggelia": "Another order",
+      "arithmos_apostolis_dhl": "DHL waybill number",
+      "parakoloythisi_stin_dhl": "Track with DHL"
     }
   },
   "home": {
@@ -771,7 +773,24 @@
       "request_all_note": "The items in your basket are made to order: you do not pay now. We will send you an offer with final price, shipping and lead time within 24 hours, and you pay only if you accept it.",
       "apostoli_aitimatos": "Send request",
       "katopin_badge": "Made to order",
-      "request_totals_note": "Made-to-order items are priced in the offer you will receive within 24 hours; the amounts here are indicative."
+      "request_totals_note": "Made-to-order items are priced in the offer you will receive within 24 hours; the amounts here are indicative.",
+      "chora": "COUNTRY",
+      "ship_zone_eu": "We ship to Greece, Cyprus and the EU.",
+      "address_foreign_eu": "This address is outside Greece. Choose the delivery country.",
+      "tk_unserviceable_eu": "This postcode is not in an area we deliver to. For delivery outside Greece, choose the country.",
+      "postcode_format": "This postcode does not match the country's format — e.g. {example}",
+      "postcode_help_abroad": "The delivery country's postcode, e.g. {example}.",
+      "phone_intl_help": "With the country code, e.g. +39 …",
+      "ship_dhl_meta": "DHL Express · delivery in {eta} working days",
+      "ship_dhl_meta_plain": "European Union · delivery in 2–4 working days",
+      "timi_apo_dhl": "DHL price with postcode and city",
+      "quote_unavailable": "Shipping could not be calculated — please try again",
+      "quote_unavailable_short": "Unavailable — try again",
+      "refused_unserviceable_postcode": "DHL does not deliver to this postcode.",
+      "refused_unsupported_country": "We do not ship to this country.",
+      "refused_invalid_postcode": "This postcode is not valid for the country you chose.",
+      "refused_unserviceable": "This postcode is not in an area we deliver to.",
+      "refused_invalid_address": "Please check the postcode and the city of the address."
     }
   },
   "catalogue": {
@@ -910,7 +929,17 @@
       "overstock_request": "Part of the quantity is not in stock · this line becomes a request, confirmed within 24 hours",
       "request_all": "Nothing in your basket is in stock right now. You will send a request without paying; we reply within 24 hours with the final price, shipping and lead time, and you pay only if you accept.",
       "request_mixed": "Some items are made to order. At checkout you choose: ship what is in stock now and request the rest, or request everything together. We answer within 24 hours.",
-      "synecheia_aitima": "Continue to request"
+      "synecheia_aitima": "Continue to request",
+      "chora": "Country",
+      "poli": "City",
+      "ship_dhl": "DHL Express",
+      "ship_needs_postcode": "with the postcode",
+      "quote_unavailable_short": "Unavailable — try again",
+      "quote_unavailable": "Shipping could not be calculated — please try again",
+      "tk_format_country": "This postcode does not match the country's format — e.g. {example}",
+      "tk_unserviceable_eu": "This postcode is not in an area we deliver to.",
+      "tk_hint_abroad": "Outside Greece and Cyprus by DHL Express — priced from the country, postcode and city.",
+      "ship_zone_eu": "We ship to Greece, Cyprus and the EU."
     }
   },
   "brands": {
@@ -1174,7 +1203,8 @@
       "meta_register_desc": "Create a Milwaukee Heavy Duty Centre account: parcel tracking, buy again, saved addresses.",
       "meta_tools": "My tools",
       "meta_favourites": "Favourites",
-      "meta_reviews": "Reviews"
+      "meta_reviews": "Reviews",
+      "parakolouthisi_dhl": "TRACK WITH DHL"
     }
   },
   "ui": {

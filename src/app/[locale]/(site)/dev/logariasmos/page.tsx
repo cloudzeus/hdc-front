@@ -142,6 +142,7 @@ const DETAIL: AccountOrderDetail = {
   shipLine2: null,
   shipPostcode: "18545",
   shipCity: "Πειραιάς",
+  shipCountry: "GR",
   acsVoucherNo: "7400000001",
   wantsInvoice: false,
   companyName: null,
