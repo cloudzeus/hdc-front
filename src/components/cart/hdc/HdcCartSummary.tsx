@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import { Link } from "@/i18n/navigation";
 import { applyCoupon, setDeliveryPostcode } from "@/lib/cart/actions";
 import { validatePostcode } from "@/lib/shipping/destination";
+import type { CartSplitKind } from "@/lib/requests/model";
 
 /**
  * «ΣΥΝΟΨΗ» beside the cart (checkout.html, screen 1 `.sum`).
@@ -15,12 +16,19 @@ import { validatePostcode } from "@/lib/shipping/destination";
  * here is the one checkout opens with.
  */
 export function HdcCartSummary({
+  requestKind = "none",
   postcode,
   unserviceable = false,
   rows,
   total,
   vatLine,
 }: {
+  /**
+   * Back-order requests (docs/backorder-requests.md): «all» — nothing is in
+   * stock, checkout sends a request; «mixed» — checkout asks. From the server's
+   * cart; checkout decides again on submit.
+   */
+  requestKind?: CartSplitKind;
   postcode: string | null;
   /** ACS has no station for `postcode`: we do not deliver there. */
   unserviceable?: boolean;
@@ -135,8 +143,14 @@ export function HdcCartSummary({
           </p>
         )}
 
+        {requestKind !== "none" && (
+          <p className="hdc-info" role="status">
+            {requestKind === "all" ? t("request_all") : t("request_mixed")}
+          </p>
+        )}
+
         <Link href="/checkout" className="hdc-btn hdc-btn-red hdc-btn-lg go">
-          {t("oloklirosi")} →
+          {requestKind === "all" ? t("synecheia_aitima") : t("oloklirosi")} →
         </Link>
         <div className="pay" aria-label={t("tropoi_pliromis")}>
           <span>VISA</span>

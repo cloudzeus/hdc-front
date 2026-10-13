@@ -10,6 +10,7 @@ import { PAYMENT_METHODS, SHIPPING_METHODS } from "@/lib/cart/options";
 import { placeOrder, type CheckoutState } from "@/lib/checkout/actions";
 import { STOCK_HOLD_HOURS } from "@/lib/orders/hold";
 import { foreignCountryIn, validatePostcode } from "@/lib/shipping/destination";
+import type { CartSplitKind, RequestMode } from "@/lib/requests/model";
 
 /**
  * The HDC checkout form (checkout.html, screen 2 and the second phone frame).
@@ -31,7 +32,7 @@ import { foreignCountryIn, validatePostcode } from "@/lib/shipping/destination";
  * is an affordance, not a control.
  */
 
-type StepKey = "contact" | "shipping" | "address" | "payment" | "account" | "notes";
+type StepKey = "request" | "contact" | "shipping" | "address" | "payment" | "account" | "notes";
 
 export type ShippingOption = {
   id: string;
@@ -67,6 +68,7 @@ export function CheckoutForm({
   paymentMethod,
   shippingOptions,
   total,
+  requestKind = "none",
 }: {
   locale: string;
   /** The postcode the quotes were priced for (cookie or saved address). */
@@ -83,6 +85,13 @@ export function CheckoutForm({
   shippingOptions: ShippingOption[];
   /** VAT-inclusive total, formatted — for the phone's bottom bar. */
   total: string;
+  /**
+   * Back-order requests (docs/backorder-requests.md), from the cart as the page
+   * rendered it. «all»: nothing to pay, the submit sends a request. «mixed»:
+   * the customer must choose split or together (a step of its own). The action
+   * re-reads the stock and decides again — this only shapes the form.
+   */
+  requestKind?: CartSplitKind;
 }) {
   const t = useTranslations("checkout.Hdc");
   const [state, action, pending] = useActionState<CheckoutState, FormData>(placeOrder, {});
@@ -97,19 +106,24 @@ export function CheckoutForm({
 
   const pickup = shipping === "pickup";
   const isOnline = payment === "card" || payment === "iris";
+  const [requestMode, setRequestMode] = useState<RequestMode | null>(null);
+  /* Nothing is paid now: the whole cart, or everything by choice, is a request. */
+  const requestOnly = requestKind === "all" || (requestKind === "mixed" && requestMode === "together");
+  const modeMissing = requestKind === "mixed" && requestMode == null;
 
   const steps: StepKey[] = [
+    ...(requestKind === "mixed" ? (["request"] as const) : []),
     "contact",
     "shipping",
     ...(pickup ? [] : (["address"] as const)),
-    "payment",
+    ...(requestOnly ? [] : (["payment"] as const)),
     ...(signedIn ? [] : (["account"] as const)),
     "notes",
   ];
   const numberOf = (key: StepKey) => steps.indexOf(key) + 1;
 
   // Phones: the one open step. Desktop CSS ignores it.
-  const [open, setOpen] = useState<StepKey>("contact");
+  const [open, setOpen] = useState<StepKey>(requestKind === "mixed" ? "request" : "contact");
   const openIndex = Math.max(0, steps.indexOf(open));
   const stateOf = (key: StepKey) => {
     const i = steps.indexOf(key);
@@ -226,6 +240,7 @@ export function CheckoutForm({
     id === "card" ? t("pay_card") : id === "iris" ? "IRIS" : t("pay_bank_short");
 
   const summaries: Record<StepKey, string> = {
+    request: requestMode === "split" ? t("request_mode_split") : requestMode === "together" ? t("request_mode_together") : "",
     contact: [
       [values.firstName, values.lastName].filter(Boolean).join(" "),
       values.phone,
@@ -274,7 +289,9 @@ export function CheckoutForm({
 
   const submitLabel = pending
     ? t("ginetai_katachorisi")
-    : isOnline
+    : requestOnly
+      ? `${t("apostoli_aitimatos")} →`
+      : isOnline
       ? `${t("pliromi_me_asfaleia")} →`
       : `${t("oloklirosi_paraggelias")} →`;
 
@@ -295,6 +312,38 @@ export function CheckoutForm({
         <p role="alert" className="hdc-co-error">
           {state.error}
         </p>
+      )}
+
+      {requestKind === "mixed" && (
+        <Step
+          k="request"
+          n={numberOf("request")}
+          state={stateOf("request")}
+          title={t("s_request")}
+          summary={summaries.request}
+          onEdit={() => setOpen("request")}
+          changeLabel={t("allagi")}
+        >
+          <p className="hdc-info hdc-req-intro">{t("request_mode_intro")}</p>
+          <div className="hdc-ship two" role="radiogroup" aria-label={t("s_request")}>
+            {(["split", "together"] as const).map((mode) => (
+              <label key={mode} className={requestMode === mode ? "on" : undefined}>
+                <input
+                  type="radio"
+                  name="requestMode"
+                  value={mode}
+                  required
+                  checked={requestMode === mode}
+                  onChange={() => setRequestMode(mode)}
+                />
+                <b>{mode === "split" ? t("request_mode_split") : t("request_mode_together")}</b>
+                <span>{mode === "split" ? t("request_mode_split_help") : t("request_mode_together_help")}</span>
+                <strong className="ask">{t("request_mode_price")}</strong>
+              </label>
+            ))}
+          </div>
+          {state.fieldErrors?.requestMode && <p className="hdc-co-ferr">{t("request_mode_required")}</p>}
+        </Step>
       )}
 
       <Step
@@ -407,6 +456,9 @@ export function CheckoutForm({
         {!pickup && invoiceBlock}
       </Step>
 
+      {requestKind === "all" && <p className="hdc-info">{t("request_all_note")}</p>}
+
+      {!requestOnly && (
       <Step
         k="payment"
         n={numberOf("payment")}
@@ -443,6 +495,7 @@ export function CheckoutForm({
                 t("info_bank", { hours: STOCK_HOLD_HOURS })}
         </p>
       </Step>
+      )}
 
       {!signedIn && (
         <Step
@@ -513,7 +566,7 @@ export function CheckoutForm({
 
         <button
           type="submit"
-          disabled={!terms || pending || blocked != null}
+          disabled={!terms || pending || blocked != null || modeMissing}
           onClick={guardSubmit}
           className="hdc-btn hdc-btn-red hdc-btn-lg hdc-co-submit"
         >
@@ -538,7 +591,7 @@ export function CheckoutForm({
           <button
             type="submit"
             className="go"
-            disabled={!terms || pending || blocked != null}
+            disabled={!terms || pending || blocked != null || modeMissing}
             onClick={guardSubmit}
           >
             {submitLabel}

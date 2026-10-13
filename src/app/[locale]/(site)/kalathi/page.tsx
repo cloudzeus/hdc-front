@@ -15,6 +15,7 @@ import { getCart, getDeliveryPostcode, getMiniCart } from "@/lib/cart/cart";
 import { getCartLineExtras, getHdcCrossSell } from "@/lib/cart/hdc-cart";
 import { freeShippingProgress } from "@/lib/cart/options";
 import { availabilityLabelKey, orderAvailability } from "@/lib/catalog/availability";
+import { isOnRequest, splitCart } from "@/lib/requests/model";
 import {
   getCatalogueStats,
   getMenuTree,
@@ -85,6 +86,9 @@ export default async function CartPage({
 
   const lineViews: HdcCartLineView[] = lines.map((line) => {
     const model = parseModel(line.name);
+    /* «Κατόπιν παραγγελίας»: becomes a back-order request at checkout
+       (docs/backorder-requests.md). Supplier lines stay ordinary 3–5 day lines. */
+    const onRequest = isOnRequest(line);
     const kit = extras.contents[line.id];
     const contents: string[] = [];
     if (kit?.batteries)
@@ -112,12 +116,19 @@ export default async function CartPage({
       tag: platformTag(line.name),
       image: line.image,
       quantity: line.quantity,
-      inStock: line.availability === "stock",
-      availability: t(availabilityLabelKey(line.availability, line.availableQty)),
+      inStock: line.availability === "stock" && !onRequest,
+      availability:
+        onRequest && line.availability !== "stock"
+          ? t("katopin_24h")
+          : t(availabilityLabelKey(line.availability, line.availableQty)),
       /* No number: the shop shows none but the last piece. */
-      overStock: line.overStock
-        ? t(line.availability === "supplier" ? "overstock_3_5" : "overstock")
-        : null,
+      overStock: !line.overStock
+        ? null
+        : line.availability === "supplier"
+          ? t("overstock_3_5")
+          : onRequest
+            ? t("overstock_request")
+            : t("overstock"),
       unitPrice: formatPrice(line.unitNetFinal, locale, { vatRate: line.vatRate }),
       unitWas:
         line.discountPercent > 0
@@ -254,6 +265,7 @@ export default async function CartPage({
               </div>
 
               <HdcCartSummary
+                requestKind={splitCart(lines).kind}
                 postcode={postcode}
                 unserviceable={totals.unserviceable}
                 rows={summaryRows}

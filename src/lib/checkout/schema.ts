@@ -42,7 +42,15 @@ export const checkoutSchema = z
     erpTrdr: z.coerce.number().int().positive().optional().or(z.literal("")),
 
     shippingMethod: z.string().max(32),
-    paymentMethod: z.string().max(32),
+    /* Absent when the whole cart is a back-order request: there is nothing to
+       pay yet, so the form does not ask. Falls back to the first method. */
+    paymentMethod: z.string().max(32).optional(),
+    /**
+     * A cart with some lines in stock and some not: «split» pays and ships the
+     * former now and requests the rest; «together» requests everything.
+     * docs/backorder-requests.md §1. Ignored when the cart is not mixed.
+     */
+    requestMode: z.string().max(16).optional(),
     notes: optionalText(2000),
     terms: z.union([z.literal("on"), z.literal("")]).optional(),
     locale: z.string().max(5).optional(),

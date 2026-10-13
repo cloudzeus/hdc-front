@@ -1880,3 +1880,155 @@
     }
   }
 }
+
+/*
+ * Back-order requests («Κατόπιν παραγγελίας», docs/backorder-requests.md):
+ * the split/together choice at checkout, the badge in the summary, and the
+ * customer's request page /aitima/{token}, which reuses the confirmation
+ * layout (.hdc-ok / .okhead / .hdc-det / .hdc-sum).
+ */
+@layer components {
+  .hdc-ship.two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .hdc-req-intro {
+    margin: 0 0 14px;
+  }
+  .hdc-mini b small.req {
+    display: block;
+    margin-top: 2px;
+    font-stretch: 87.5%;
+    font-weight: 600;
+    font-size: var(--fs-12);
+    color: var(--hdc-wait);
+  }
+  .hdc-req .okhead .sub {
+    margin-top: 8px;
+    font-size: var(--fs-15);
+  }
+  .hdc-req-note {
+    margin-top: 22px;
+    border-left: 4px solid var(--hdc-ink);
+    background: var(--hdc-g1);
+    padding: 12px 14px;
+    font-size: var(--fs-15);
+    line-height: 1.5;
+    white-space: pre-line;
+  }
+  .hdc-req-note.bad {
+    border-left-color: var(--hdc-red);
+  }
+  .hdc-req-note b {
+    display: block;
+    margin-bottom: 4px;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-12);
+    letter-spacing: 0.07em;
+    color: var(--hdc-g5);
+  }
+  .hdc-req-rows {
+    margin-top: 26px;
+    border-top: 3px solid var(--hdc-ink);
+  }
+  .hdc-req-rows > h2 {
+    padding: 12px 0 4px;
+    font-weight: 900;
+    font-stretch: 120%;
+    font-size: var(--fs-16);
+  }
+  .hdc-req-rows li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--hdc-g3);
+  }
+  .hdc-req-rows li[data-changed] {
+    background: linear-gradient(90deg, var(--hdc-g1), transparent);
+  }
+  .hdc-req-rows .tag {
+    display: inline-block;
+    margin-bottom: 4px;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-12);
+    letter-spacing: 0.06em;
+    color: var(--hdc-wait);
+  }
+  .hdc-req-rows li[data-removed] .tag {
+    color: var(--hdc-g5);
+  }
+  .hdc-req-rows .n {
+    display: block;
+    font-weight: 700;
+    font-size: var(--fs-15);
+    overflow-wrap: anywhere;
+  }
+  .hdc-req-rows .c {
+    display: block;
+    margin-top: 3px;
+    font-stretch: 87.5%;
+    font-size: var(--fs-13);
+    color: var(--hdc-g5);
+  }
+  .hdc-req-rows .c mark {
+    background: none;
+    color: var(--hdc-wait);
+    font-weight: 700;
+  }
+  .hdc-req-rows .w {
+    display: block;
+    margin-top: 3px;
+    font-size: var(--fs-13);
+    color: var(--hdc-g7);
+  }
+  .hdc-req-rows .p {
+    font-weight: 900;
+    font-stretch: 120%;
+    font-size: var(--fs-16);
+    white-space: nowrap;
+  }
+  .hdc-req-rows li[data-removed] :is(.n, .p) {
+    color: var(--hdc-g5);
+    text-decoration: line-through;
+  }
+  .hdc-req-acts {
+    display: grid;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .hdc-req-acts .hdc-btn {
+    width: 100%;
+  }
+  .hdc-req-acts .hint {
+    font-stretch: 87.5%;
+    font-size: var(--fs-13);
+    color: var(--hdc-g5);
+  }
+  .hdc-req-acts .err {
+    border-left: 4px solid var(--hdc-red);
+    background: var(--hdc-g1);
+    padding: 10px 12px;
+    font-size: var(--fs-14);
+  }
+  .hdc-req-count {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border: 1px solid var(--hdc-g3);
+    padding: 10px 12px;
+    font-size: var(--fs-14);
+  }
+  .hdc-req-count b {
+    font-weight: 900;
+    font-stretch: 120%;
+    font-size: var(--fs-17);
+    font-variant-numeric: tabular-nums;
+  }
+  @media (max-width: 767px) {
+    .hdc-ship.two {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+}

@@ -12,6 +12,7 @@ import { buildDeliveredEmail } from "@/lib/mail/order-delivered-email";
 import { buildPaymentFailedEmail } from "@/lib/mail/payment-failed-email";
 import { buildPostageCorrectionEmail } from "@/lib/mail/postage-correction-email";
 import { buildReviewRequestEmail } from "@/lib/mail/review-request-email";
+import { buildInternalRequestEmail, buildRequestEmail, type RequestEmailKind } from "@/lib/mail/request-emails";
 import {
   buildAdminResetEmail,
   buildNewsletterConfirmEmail,
@@ -77,6 +78,21 @@ export const EMAIL_TEMPLATES: TemplateEntry[] = [
   { id: "order-price-correction", name: "Διόρθωση μεταφορικών", group: "Παραγγελίες", locales: ALL, needsOrder: true, trigger: "Διόρθωση μεταφορικών από τη διαχείριση" },
   { id: "review-request", name: "Αίτηση αξιολόγησης", group: "Παραγγελίες", locales: ALL, needsOrder: true, trigger: "7 ημέρες μετά την παράδοση, πελάτες με λογαριασμό" },
   {
+    id: "order-request",
+    name: "Αίτημα κατόπιν παραγγελίας",
+    group: "Παραγγελίες",
+    locales: ALL,
+    needsOrder: true,
+    trigger: "Αίτημα στο ταμείο · πρόταση ή απόρριψη από το HDCtool · υπενθύμιση 24 ωρών · λήξη πρότασης",
+    variants: [
+      { id: "received", label: "Λάβαμε το αίτημα" },
+      { id: "offer", label: "Η πρόταση είναι έτοιμη" },
+      { id: "reminder", label: "Υπενθύμιση πρότασης" },
+      { id: "rejected", label: "Απόρριψη" },
+      { id: "expired", label: "Η πρόταση έληξε" },
+    ],
+  },
+  {
     id: "account-verify",
     name: "Επιβεβαίωση email",
     group: "Λογαριασμός",
@@ -93,6 +109,7 @@ export const EMAIL_TEMPLATES: TemplateEntry[] = [
   { id: "account-welcome", name: "Ο λογαριασμός είναι έτοιμος", group: "Λογαριασμός", locales: ALL, needsOrder: false, trigger: "Δημιουργία λογαριασμού" },
   { id: "admin-password-reset", name: "Επαναφορά κωδικού διαχείρισης", group: "Εσωτερικά", locales: EL, needsOrder: false, trigger: "«Ξέχασα τον κωδικό» στη σύνδεση διαχείρισης" },
   { id: "internal-order", name: "Νέα παραγγελία (προς κατάστημα)", group: "Εσωτερικά", locales: EL, needsOrder: true, trigger: "Κάθε νέα παραγγελία · accounts@ και info@" },
+  { id: "internal-request", name: "Νέο αίτημα κατόπιν παραγγελίας (προς κατάστημα)", group: "Εσωτερικά", locales: EL, needsOrder: true, trigger: "Κάθε νέο αίτημα στο ταμείο · accounts@ και info@" },
   { id: "internal-order-status", name: "Αλλαγή κατάστασης (προς κατάστημα)", group: "Εσωτερικά", locales: EL, needsOrder: true, trigger: "Μαζί με το email αλλαγής κατάστασης του πελάτη · info@" },
   {
     id: "internal-content",
@@ -446,6 +463,12 @@ export async function previewEmail(id: string, ctx: PreviewContext): Promise<Pre
       break;
     case "internal-order":
       built = await buildInternalOrderEmail(orderNumber, { assetOrigin: ctx.assetOrigin });
+      break;
+    case "order-request":
+      built = await buildRequestEmail(orderNumber, (ctx.variant ?? "received") as RequestEmailKind, { ...opts, preview: true });
+      break;
+    case "internal-request":
+      built = await buildInternalRequestEmail(orderNumber, { assetOrigin: ctx.assetOrigin, preview: true });
       break;
     case "internal-order-status":
       built = await buildInternalStatusEmail(orderNumber, "Σε προετοιμασία", { assetOrigin: ctx.assetOrigin });

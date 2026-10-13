@@ -16,6 +16,7 @@ import { formatMoney } from "@/lib/format";
 import { displayName } from "@/lib/milwaukee/display";
 import { parseModel } from "@/lib/milwaukee/model";
 import { isVivaConfigured } from "@/lib/payment/viva";
+import { isOnRequest, splitCart } from "@/lib/requests/model";
 
 export const dynamic = "force-dynamic";
 
@@ -100,6 +101,8 @@ export default async function CheckoutPage({
   const supplierOrder = orderAvailability(cart.lines.map((l) => l.availability)) === "supplier";
 
   const totals = cart.totals;
+  /* Back-order requests: shapes the form; the action decides again on submit. */
+  const requestKind = splitCart(cart.lines).kind;
   const money = (n: number) => formatMoney(n, locale);
 
   /*
@@ -162,7 +165,10 @@ export default async function CheckoutPage({
               {line.image && <Image src={line.image} alt="" width={64} height={64} sizes="64px" />}
               <em>{line.quantity}</em>
             </span>
-            <b>{miniName(line.name, line.code2)}</b>
+            <b>
+              {miniName(line.name, line.code2)}
+              {isOnRequest(line) && <small className="req">{t("katopin_badge")}</small>}
+            </b>
             <span className="p">{money(line.lineGross)}</span>
           </li>
         ))}
@@ -194,6 +200,7 @@ export default async function CheckoutPage({
         <span>{money(totals.totalGross)}</span>
       </div>
       <p className="vat">{vatLine}</p>
+      {requestKind !== "none" && <p className="vat">{t("request_totals_note")}</p>}
       <Link href="/kalathi" className="edit">
         {t("epexergasia_kalathiou")}
       </Link>
@@ -229,6 +236,7 @@ export default async function CheckoutPage({
               paymentMethod={cart.paymentMethod}
               shippingOptions={shippingOptions}
               total={money(totals.totalGross)}
+              requestKind={requestKind}
             />
           </div>
 

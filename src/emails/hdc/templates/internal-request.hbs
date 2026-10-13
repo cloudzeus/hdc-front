@@ -1,0 +1,7 @@
+{{> heading eyebrow=(T "internal.req_eyebrow") title=req.number lead=req.lead}}
+{{> facts rows=req.rows}}
+{{#if req.parent}}{{> note tone="wait" title=(T "internal.req_parent_title") text=req.parent}}{{/if}}
+{{#if req.notes}}{{> note tone="red" title=(T "internal.notes") text=req.notes}}{{/if}}
+{{> request-items title=(T "internal.req_items" count=req.items.length) aside=(t "order.prices_gross") items=req.items}}
+{{> request-totals rows=req.totals label=req.total.label value=req.total.value}}
+{{> cta label=(T "internal.admin") href=req.admin_url bottom=40}}
