@@ -152,11 +152,14 @@ export default async function CartPage({
   const summaryRows = totals
     ? [
         { label: t("proionta_n", { count: totals.itemCount }), value: money(totals.subtotalGross) },
-        {
-          label: shippingLabel,
-          value: totals.shippingGross === 0 ? t("dorean") : money(totals.shippingGross),
-          free: totals.shippingGross === 0,
-        },
+        // A postcode ACS does not serve has no postage — and must never read «ΔΩΡΕΑΝ».
+        totals.unserviceable
+          ? { label: shippingLabel, value: t("ship_unserviceable") }
+          : {
+              label: shippingLabel,
+              value: totals.shippingGross === 0 ? t("dorean") : money(totals.shippingGross),
+              free: totals.shippingGross === 0,
+            },
         ...(totals.paymentFeeGross > 0
           ? [{ label: t("epivarynsi"), value: money(totals.paymentFeeGross) }]
           : []),
@@ -252,6 +255,7 @@ export default async function CartPage({
 
               <HdcCartSummary
                 postcode={postcode}
+                unserviceable={totals.unserviceable}
                 rows={summaryRows}
                 total={money(totals.totalGross)}
                 vatLine={

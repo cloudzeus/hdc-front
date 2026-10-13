@@ -114,12 +114,15 @@ export default async function CheckoutPage({
       : computeTotals(cart.lines, id, cart.paymentMethod, postcode);
   const [courier, express] = await Promise.all([totalsFor("courier"), totalsFor("express")]);
 
+  // A postcode ACS does not serve gets no price on a courier tile — not even «ΔΩΡΕΑΝ».
   const tilePrice = (method: CartTotals) =>
-    method.shippingGross === 0
-      ? { price: t("dorean"), free: true }
-      : postcode
-        ? { price: money(method.shippingGross), free: false }
-        : { price: null, free: false };
+    method.unserviceable
+      ? { price: t("ship_unserviceable"), free: false }
+      : method.shippingGross === 0
+        ? { price: t("dorean"), free: true }
+        : postcode
+          ? { price: money(method.shippingGross), free: false }
+          : { price: null, free: false };
 
   const shippingOptions: ShippingOption[] = [
     { id: "courier", title: "ACS COURIER", label: "ACS Courier", meta: t(supplierOrder ? "ship_courier_meta_3_5" : "ship_courier_meta"), ...tilePrice(courier) },
@@ -171,8 +174,12 @@ export default async function CheckoutPage({
         </div>
         <div>
           <dt>{shippingRowLabel}</dt>
-          <dd className={totals.shippingGross === 0 ? "fr" : undefined}>
-            {totals.shippingGross === 0 ? t("dorean") : money(totals.shippingGross)}
+          <dd className={!totals.unserviceable && totals.shippingGross === 0 ? "fr" : undefined}>
+            {totals.unserviceable
+              ? t("ship_unserviceable")
+              : totals.shippingGross === 0
+                ? t("dorean")
+                : money(totals.shippingGross)}
           </dd>
         </div>
         {totals.paymentFeeGross > 0 && (
@@ -215,6 +222,7 @@ export default async function CheckoutPage({
             <CheckoutForm
               locale={locale}
               postcode={postcode ?? ""}
+              unserviceablePostcode={courier.unserviceable ? postcode : null}
               prefill={prefill}
               signedIn={viewer.user != null}
               shippingMethod={cart.shippingMethod}

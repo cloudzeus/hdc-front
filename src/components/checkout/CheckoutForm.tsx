@@ -9,6 +9,7 @@ import { setCartOptions, setDeliveryPostcode } from "@/lib/cart/actions";
 import { PAYMENT_METHODS, SHIPPING_METHODS } from "@/lib/cart/options";
 import { placeOrder, type CheckoutState } from "@/lib/checkout/actions";
 import { STOCK_HOLD_HOURS } from "@/lib/orders/hold";
+import { foreignCountryIn, validatePostcode } from "@/lib/shipping/destination";
 
 /**
  * The HDC checkout form (checkout.html, screen 2 and the second phone frame).
@@ -59,6 +60,7 @@ type Prefill = {
 export function CheckoutForm({
   locale,
   postcode,
+  unserviceablePostcode = null,
   signedIn = false,
   prefill,
   shippingMethod,
@@ -69,6 +71,8 @@ export function CheckoutForm({
   locale: string;
   /** The postcode the quotes were priced for (cookie or saved address). */
   postcode: string;
+  /** `postcode` again when ACS has no station for it — we do not deliver there. */
+  unserviceablePostcode?: string | null;
   /** Somebody with an account is not offered another one. */
   signedIn?: boolean;
   /** What we already know about a signed-in customer — seeds, never locks. */
@@ -188,6 +192,32 @@ export function CheckoutForm({
     if (key) setOpen(key);
     requestAnimationFrame(() => invalid?.reportValidity());
   };
+
+  /*
+   * Greece only — the same checks the action makes (lib/shipping/destination),
+   * run here so the customer hears it while typing rather than after submit.
+   * The postcode is judged once it is complete; the street, city and regions
+   * for a foreign country's name. The server stays the authority.
+   */
+  const addressValue = (name: string): string => {
+    if (values[name] !== undefined) return values[name];
+    if (name === "shipPostcode") return prefill?.shipPostcode || postcode;
+    return (prefill?.[name as keyof Prefill] as string | undefined) ?? "";
+  };
+  const addressErrors: Record<string, string> = {};
+  if (!pickup) {
+    const zip = addressValue("shipPostcode").trim();
+    const checked = validatePostcode(zip);
+    const complete = zip.replace(/\s/g, "").length >= 5 || /[^\d\s]/.test(zip);
+    if ((!checked.ok && complete) || (checked.ok && checked.postcode === unserviceablePostcode)) {
+      addressErrors.shipPostcode = t("tk_unserviceable");
+    }
+    for (const name of ["shipLine1", "shipLine2", "shipCity", "shipRegion", "shipAdminRegion"]) {
+      if (foreignCountryIn(addressValue(name))) addressErrors[name] = t("address_foreign");
+    }
+  }
+  const blocked = Object.values(addressErrors)[0] ?? null;
+  const fieldError = (name: string) => addressErrors[name] ?? state.fieldErrors?.[name];
 
   const shipTitle = shippingOptions.find((o) => o.id === shipping);
   const payLabel = (id: string) =>
@@ -352,10 +382,10 @@ export function CheckoutForm({
               label={t("odos")}
               name="shipLine1"
               defaultValue={prefill?.shipLine1}
-              error={state.fieldErrors?.shipLine1}
+              error={fieldError("shipLine1")}
               required
             />
-            <Field label={t("orofos")} name="shipLine2" defaultValue={prefill?.shipLine2} autoComplete="address-line2" />
+            <Field label={t("orofos")} name="shipLine2" defaultValue={prefill?.shipLine2} autoComplete="address-line2" error={fieldError("shipLine2")} invalid={addressErrors.shipLine2} />
           </div>
           <div className="f4">
             <Field
@@ -364,13 +394,15 @@ export function CheckoutForm({
               autoComplete="postal-code"
               inputMode="numeric"
               defaultValue={prefill?.shipPostcode || postcode}
-              error={state.fieldErrors?.shipPostcode}
+              error={fieldError("shipPostcode")}
+              invalid={addressErrors.shipPostcode}
               required
             />
-            <Field label={t("poli")} name="shipCity" autoComplete="address-level2" placeholder={t("poli_ph")} defaultValue={prefill?.shipCity} error={state.fieldErrors?.shipCity} required />
-            <Field label={t("nomos")} name="shipRegion" autoComplete="address-level1" defaultValue={prefill?.shipRegion} />
-            <Field label={t("perifereia")} name="shipAdminRegion" defaultValue={prefill?.shipAdminRegion} />
+            <Field label={t("poli")} name="shipCity" autoComplete="address-level2" placeholder={t("poli_ph")} defaultValue={prefill?.shipCity} error={fieldError("shipCity")} invalid={addressErrors.shipCity} required />
+            <Field label={t("nomos")} name="shipRegion" autoComplete="address-level1" defaultValue={prefill?.shipRegion} error={fieldError("shipRegion")} invalid={addressErrors.shipRegion} />
+            <Field label={t("perifereia")} name="shipAdminRegion" defaultValue={prefill?.shipAdminRegion} error={fieldError("shipAdminRegion")} invalid={addressErrors.shipAdminRegion} />
           </div>
+          <p className="hdc-info">{t("ship_zone")}</p>
         </fieldset>
         {!pickup && invoiceBlock}
       </Step>
@@ -481,13 +513,19 @@ export function CheckoutForm({
 
         <button
           type="submit"
-          disabled={!terms || pending}
+          disabled={!terms || pending || blocked != null}
           onClick={guardSubmit}
           className="hdc-btn hdc-btn-red hdc-btn-lg hdc-co-submit"
         >
           {submitLabel}
         </button>
-        {!terms && <p className="hdc-co-note">{t("energopoieitai")}</p>}
+        {blocked ? (
+          <p className="hdc-co-ferr" role="alert">
+            {blocked}
+          </p>
+        ) : (
+          !terms && <p className="hdc-co-note">{t("energopoieitai")}</p>
+        )}
       </Step>
 
       {/* Phones: the total and the next step, always under the thumb. */}
@@ -500,7 +538,7 @@ export function CheckoutForm({
           <button
             type="submit"
             className="go"
-            disabled={!terms || pending}
+            disabled={!terms || pending || blocked != null}
             onClick={guardSubmit}
           >
             {submitLabel}
@@ -583,6 +621,7 @@ function Field({
   placeholder,
   inputMode,
   minLength,
+  invalid,
 }: {
   label: string;
   name: string;
@@ -595,6 +634,12 @@ function Field({
   placeholder?: string;
   inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
   minLength?: number;
+  /**
+   * A client-side verdict the browser should enforce as well: set as the
+   * input's custom validity, so the phone's «Συνέχεια» stops on this field
+   * just as it does on an empty required one.
+   */
+  invalid?: string;
 }) {
   return (
     <label className="hdc-fld">
@@ -613,6 +658,7 @@ function Field({
         placeholder={placeholder ?? " "}
         inputMode={inputMode}
         minLength={minLength}
+        ref={(el) => el?.setCustomValidity(invalid ?? "")}
         aria-invalid={error ? true : undefined}
         className={error ? "bad" : undefined}
       />

@@ -12,7 +12,8 @@ import { STOCK_HOLD_HOURS, holdExpiry } from "@/lib/orders/hold";
 import { computeTotals, getCart, getCartToken } from "@/lib/cart/cart";
 import { PAYMENT_METHODS, SHIPPING_METHODS } from "@/lib/cart/options";
 import { orderAvailability } from "@/lib/catalog/availability";
-import { quoteLivePostage } from "@/lib/shipping/acs-live";
+import { isUnserviceable, quoteLivePostage } from "@/lib/shipping/acs-live";
+import { checkDestination, destinationMessage, shippingCopy } from "@/lib/shipping/destination";
 import { createPaymentOrder, isVivaConfigured } from "@/lib/payment/viva";
 import { routing, type Locale } from "@/i18n/routing";
 import { getCurrentUser } from "@/lib/account/session";
@@ -107,6 +108,20 @@ export async function placeOrder(
     ? input.locale
     : routing.defaultLocale) as Locale;
 
+  /*
+   * Greece only (see `lib/shipping/destination`). There is no country field,
+   * so an address abroad arrives looking domestic; its postcode and its words
+   * are what give it away. Checked before anything is priced or written — a
+   * pickup order carries the shop's own address and passes.
+   */
+  if (input.shippingMethod !== "pickup") {
+    const destination = checkDestination(address);
+    if (!destination.ok) {
+      const message = destinationMessage(destination, locale);
+      return { error: message, fieldErrors: { [destination.field]: message } };
+    }
+  }
+
   const cartToken = await getCartToken();
   if (!cartToken) return { error: "Το καλάθι σας είναι άδειο." };
 
@@ -166,6 +181,17 @@ export async function placeOrder(
           postcode: address.shipPostcode,
         })
       : null;
+
+  /*
+   * ACS has no station for this postcode — a foreign postcode that happens to
+   * look Greek (Verona's 37015 did). There is no price to charge and nowhere
+   * to deliver, so no order. An ACS OUTAGE is different: it still prices from
+   * the table and the order goes through.
+   */
+  if (isUnserviceable(quote)) {
+    const message = shippingCopy(locale).unserviceable;
+    return { error: message, fieldErrors: { shipPostcode: message } };
+  }
 
   const orderNumber = await nextOrderNumber();
   const guestToken = randomBytes(24).toString("base64url");

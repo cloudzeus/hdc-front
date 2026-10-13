@@ -755,7 +755,11 @@
       "synecheia": "CONTINUA",
       "ship_courier_meta_3_5": "In tutta la Grecia · 3–5 giorni lavorativi",
       "ship_pickup_meta_3_5": "Heavy Duty Centre · pronto in 3–5 giorni lavorativi",
-      "ship_express_meta_3_5": "Spedito all'arrivo dal fornitore · 3–5 giorni lavorativi"
+      "ship_express_meta_3_5": "Spedito all'arrivo dal fornitore · 3–5 giorni lavorativi",
+      "ship_zone": "Spediamo solo in Grecia.",
+      "tk_unserviceable": "Questo CAP non rientra in una zona che serviamo. Spediamo solo in Grecia.",
+      "address_foreign": "L'indirizzo è fuori dalla Grecia. Spediamo solo in Grecia.",
+      "ship_unserviceable": "Non spedibile"
     }
   },
   "catalogue": {
@@ -886,7 +890,10 @@
       "teleftaio": "Ultimo pezzo",
       "paradosi_1_3": "Consegna in 1–3 giorni lavorativi",
       "olokliri_3_5": "L'ordine parte in 3–5 giorni lavorativi: uno o più articoli arrivano dal fornitore.",
-      "overstock_3_5": "Parte della quantità arriva dal fornitore · 3–5 giorni lavorativi"
+      "overstock_3_5": "Parte della quantità arriva dal fornitore · 3–5 giorni lavorativi",
+      "ship_zone": "Spediamo solo in Grecia.",
+      "tk_unserviceable": "Questo CAP non rientra in una zona che serviamo. Spediamo solo in Grecia.",
+      "ship_unserviceable": "Non spedibile"
     }
   },
   "brands": {
