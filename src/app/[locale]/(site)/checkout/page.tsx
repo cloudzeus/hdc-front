@@ -9,6 +9,12 @@ import {
   type ShippingOption,
 } from "@/components/checkout/CheckoutForm";
 import { HdcCheckoutHeader } from "@/components/checkout/HdcCheckoutHeader";
+import {
+  SplitCheckoutProvider,
+  SplitSummaryBody,
+  SplitSummaryTotal,
+} from "@/components/checkout/SplitCheckout";
+import { checkoutBreakdown } from "@/lib/requests/checkout-breakdown";
 import { getViewer } from "@/lib/account/session";
 import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
@@ -24,7 +30,7 @@ import { formatMoney } from "@/lib/format";
 import { displayName } from "@/lib/milwaukee/display";
 import { parseModel } from "@/lib/milwaukee/model";
 import { isVivaConfigured } from "@/lib/payment/viva";
-import { isOnRequest, splitCart } from "@/lib/requests/model";
+import { splitCart } from "@/lib/requests/model";
 import { countryName } from "@/lib/shipping/countries";
 import { readDestination } from "@/lib/shipping/destination-cookie";
 import { isInternationalShippingEnabled } from "@/lib/shipping/flag";
@@ -123,8 +129,23 @@ export default async function CheckoutPage({
 
   const totals = cart.totals;
   /* Back-order requests: shapes the form; the action decides again on submit. */
-  const requestKind = splitCart(cart.lines).kind;
+  const split = splitCart(cart.lines);
+  const requestKind = split.kind;
   const money = (n: number) => formatMoney(n, locale);
+  /*
+   * A cart with back-order lines: what each choice costs, priced here by the
+   * same `computeTotals` `placeOrder` charges with — the in-stock lines alone
+   * for «split», with their own postage and threshold, for the postcode the
+   * cart remembers. Null for an ordinary cart, whose page is what it was.
+   */
+  const breakdown = await checkoutBreakdown({
+    lines: cart.lines,
+    cartTotals: totals,
+    shippingMethod: cart.shippingMethod,
+    paymentMethod: cart.paymentMethod,
+    postcode,
+    destination: abroadTo,
+  });
 
   /*
    * A price on every tile. The selected method's totals are the cart's own;
@@ -143,6 +164,13 @@ export default async function CheckoutPage({
     !offered ? totalsFor("express") : null,
     offered?.some((m) => m.id === "dhl") ? totalsFor("dhl") : null,
   ]);
+  /* «split»: each tile priced for the in-stock lines alone — what ships now. */
+  const nowFor = (id: AnyShippingMethodId) =>
+    computeTotals(split.ready, id, cart.paymentMethod, postcode, abroadTo);
+  const [courierNow, expressNow, dhlNow] =
+    requestKind === "mixed"
+      ? await Promise.all([courier ? nowFor("courier") : null, express ? nowFor("express") : null, dhl ? nowFor("dhl") : null])
+      : [null, null, null];
   /* The delivery quote abroad, as the form needs to judge it. */
   const abroadTotals = destination ? (dhl ?? courier) : null;
   const quoteStatus: DestinationQuoteStatus | null = !abroadTotals
@@ -171,7 +199,11 @@ export default async function CheckoutPage({
           ? { price: money(method.shippingGross), free: false }
           : { price: null, free: false };
 
-  const shippingOptions: ShippingOption[] = [
+  const tiles = (
+    courier: CartTotals | null,
+    express: CartTotals | null,
+    dhl: CartTotals | null,
+  ): ShippingOption[] => [
     ...(courier
       ? [{ id: "courier", title: "ACS COURIER", label: "ACS Courier", meta: t(supplierOrder ? "ship_courier_meta_3_5" : "ship_courier_meta"), ...tilePrice(courier) }]
       : []),
@@ -200,6 +232,8 @@ export default async function CheckoutPage({
       free: true,
     },
   ];
+  const shippingOptions = tiles(courier, express, dhl);
+  const splitShippingOptions = requestKind === "mixed" ? tiles(courierNow, expressNow, dhlNow) : null;
 
   const shippingRowLabel =
     cart.shippingMethod === "pickup"
@@ -219,7 +253,23 @@ export default async function CheckoutPage({
     return `${model.code} — ${model.content === "kit" ? t("kit") : t("sketo")}`;
   };
 
-  const summaryBody = (
+  /* Back-order lines: grouped, «Πληρωτέο τώρα» apart from «Σε αίτημα (ενδεικτικά)». */
+  const splitBody = breakdown ? (
+    <SplitSummaryBody
+      locale={locale}
+      lines={cart.lines.map((line) => ({
+        id: line.id,
+        name: miniName(line.name, line.code2),
+        image: line.image,
+        quantity: line.quantity,
+        lineGross: line.lineGross,
+      }))}
+      shippingRowLabel={shippingRowLabel}
+      nowAllAt24={split.ready.every((l) => l.vatRate === 24)}
+    />
+  ) : null;
+
+  const summaryBody = splitBody ?? (
     <>
       <ul className="hdc-mini">
         {cart.lines.map((line) => (
@@ -230,7 +280,6 @@ export default async function CheckoutPage({
             </span>
             <b>
               {miniName(line.name, line.code2)}
-              {isOnRequest(line) && <small className="req">{t("katopin_badge")}</small>}
             </b>
             <span className="p">{money(line.lineGross)}</span>
           </li>
@@ -273,7 +322,6 @@ export default async function CheckoutPage({
         <span>{money(totals.totalGross)}</span>
       </div>
       <p className="vat">{vatLine}</p>
-      {requestKind !== "none" && <p className="vat">{t("request_totals_note")}</p>}
       <Link href="/kalathi" className="edit">
         {t("epexergasia_kalathiou")}
       </Link>
@@ -284,6 +332,7 @@ export default async function CheckoutPage({
     <>
       <HdcCheckoutHeader />
 
+      <SplitCheckoutProvider breakdown={breakdown}>
       <main id="main" className="hdc-co-page">
         {/* Phones: the summary folds into one bar above the steps. */}
         <details className="hdc-co-msum">
@@ -291,7 +340,11 @@ export default async function CheckoutPage({
             <span>
               {t("synopsi_n", { count: totals.itemCount })} <span aria-hidden>⌄</span>
             </span>
-            <b>{money(totals.totalGross)}</b>
+            {breakdown ? (
+              <SplitSummaryTotal locale={locale} fallback={totals.totalGross} />
+            ) : (
+              <b>{money(totals.totalGross)}</b>
+            )}
           </summary>
           <div className="hdc-sum-body">{summaryBody}</div>
         </details>
@@ -308,6 +361,7 @@ export default async function CheckoutPage({
               shippingMethod={cart.shippingMethod}
               paymentMethod={cart.paymentMethod}
               shippingOptions={shippingOptions}
+              splitShippingOptions={splitShippingOptions}
               total={money(totals.totalGross)}
               requestKind={requestKind}
               international={international}
@@ -322,6 +376,7 @@ export default async function CheckoutPage({
           </aside>
         </div>
       </main>
+      </SplitCheckoutProvider>
     </>
   );
 }

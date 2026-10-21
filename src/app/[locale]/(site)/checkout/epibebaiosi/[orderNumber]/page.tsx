@@ -20,7 +20,7 @@ import { isValidGtin } from "@/lib/feeds/google-merchant";
 import { GoogleReviewsOptIn } from "@/components/seo/GoogleReviewsOptIn";
 import { estimatedDeliveryDate, orderedProductsWhere } from "@/lib/seo/google-reviews";
 import { prisma } from "@/lib/prisma";
-import { requestPath } from "@/lib/requests/model";
+import { priceLines, readSnapshot, requestPath } from "@/lib/requests/model";
 
 export const dynamic = "force-dynamic";
 
@@ -85,8 +85,10 @@ export default async function ConfirmationPage({ params, searchParams }: PagePro
   /* The other half of a split cart: the lines that went as a request. */
   const childRequest = await prisma.order.findFirst({
     where: { parentOrderNumber: order.orderNumber, requestStatus: { not: null } },
-    select: { orderNumber: true, requestToken: true },
+    select: { orderNumber: true, requestToken: true, requestLines: true },
   });
+  /* Its indicative value: the requested lines as the cart priced them. */
+  const childLines = childRequest ? (readSnapshot(childRequest.requestLines)?.lines ?? []) : [];
 
   const quote = order.shippingQuote as { etaDays?: string } | null;
   const awaitingPayment = order.paymentStatus === "PENDING";
@@ -155,7 +157,12 @@ export default async function ConfirmationPage({ params, searchParams }: PagePro
           locale={locale}
           childRequest={
             childRequest?.requestToken
-              ? { orderNumber: childRequest.orderNumber, href: requestPath(locale, childRequest.requestToken) }
+              ? {
+                  orderNumber: childRequest.orderNumber,
+                  href: requestPath(locale, childRequest.requestToken),
+                  itemCount: childLines.length,
+                  value: priceLines(childLines, 0).subtotalGross,
+                }
               : null
           }
           order={{

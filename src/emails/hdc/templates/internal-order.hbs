@@ -1,5 +1,6 @@
 {{> heading eyebrow=(T "internal.new_eyebrow") title=order.number lead=internal.state_line}}
 {{> facts rows=internal.rows}}
+{{#if split}}{{> note tone="wait" title=(T "internal.split_title") text=split.lead}}{{/if}}
 {{#if order.supplier}}{{> note tone="wait" title=(T "internal.supplier") text=(t "internal.supplier_text")}}{{/if}}
 {{#if internal.notes}}{{> note tone="red" title=(T "internal.notes") text=internal.notes}}{{/if}}
 <!-- ITEMS -->

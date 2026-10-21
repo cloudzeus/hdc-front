@@ -72,8 +72,11 @@ export async function HdcOrderConfirmation({
 }: {
   order: ConfirmationOrder;
   locale: Locale;
-  /** The other half of a split cart: its back-order request and the page for it. */
-  childRequest?: { orderNumber: string; href: string } | null;
+  /**
+   * The other half of a split cart: its back-order request, the page for it,
+   * how many items and their indicative value (no charge yet).
+   */
+  childRequest?: { orderNumber: string; href: string; itemCount?: number; value?: number } | null;
   /** Rendered under the summary (the reorder button on the real page). */
   extra?: React.ReactNode;
 }) {
@@ -157,6 +160,7 @@ export async function HdcOrderConfirmation({
   };
 
   const shipCost = order.shippingGross === 0 ? t("dorean_mikra") : money(order.shippingGross);
+  const items = (count: number) => (count === 1 ? t("items_one") : t("items_other", { count }));
   const allAt24 = order.lines.every((l) => l.vatRate === 24);
 
   return (
@@ -182,11 +186,41 @@ export async function HdcOrderConfirmation({
                 : t("text_courier", { email: order.email })}
           </p>
           {order.supplierOrder && <p className="hdc-notice">{t("olokliri_3_5")}</p>}
+          {/*
+            A split cart: both halves with their numbers — what is paid (or to
+            be paid) and ships now, and what went as a request, with no charge
+            yet and its own shipment and postage in the offer.
+          */}
           {childRequest && (
-            <p className="hdc-notice">
-              {t("child_request", { number: childRequest.orderNumber })}{" "}
-              <a href={childRequest.href}>{t("child_request_link")} →</a>
-            </p>
+            <div className="hdc-split-parts">
+              <p className="hdc-split-h">{t("split_title")}</p>
+              <div data-part="now">
+                <b>{t("split_now_label")}</b>
+                <span>
+                  {t("split_now_line", {
+                    number: order.orderNumber,
+                    items: items(order.lines.length),
+                    total: money(order.totalGross),
+                    shipping: order.shippingGross === 0 ? t("dorean_mikra") : money(order.shippingGross),
+                  })}
+                </span>
+                <small>{order.paymentStatus === "PAID" ? t("split_now_paid") : t("split_now_pending")}</small>
+              </div>
+              <div data-part="request">
+                <b>{t("split_request_label")}</b>
+                <span>
+                  {childRequest.value != null
+                    ? t("split_request_line", {
+                        number: childRequest.orderNumber,
+                        items: items(childRequest.itemCount ?? 0),
+                        value: money(childRequest.value),
+                      })
+                    : t("child_request", { number: childRequest.orderNumber })}
+                </span>
+                <small>{t("split_request_note")}</small>
+                <a href={childRequest.href}>{t("child_request_link")} →</a>
+              </div>
+            </div>
           )}
           <span className="num">{order.orderNumber}</span>
         </div>

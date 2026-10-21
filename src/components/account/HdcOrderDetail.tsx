@@ -78,6 +78,17 @@ export async function HdcOrderDetail({ order, locale }: { order: AccountOrderDet
               {longDate} · <StatusChip status={order.status} shippingMethod={order.shippingMethod} />
               {statusDate && ` ${t("stis", { date: shortDay(statusDate) })}`}
             </p>
+            {/* A split cart: the other half, by number, one click away. */}
+            {order.splitWith && (
+              <p className="hdc-od-split">
+                {order.splitWith.kind === "request"
+                  ? t("split_with_request", { number: order.splitWith.orderNumber })
+                  : t("split_with_paid", { number: order.splitWith.orderNumber })}{" "}
+                <Link href={`/logariasmos/paraggelies/${encodeURIComponent(order.splitWith.orderNumber)}`}>
+                  {t("split_open")} →
+                </Link>
+              </p>
+            )}
           </div>
           <div className="acts">
             <ReorderButton orderNumber={order.orderNumber} token={order.guestToken} locale={locale} />

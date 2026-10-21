@@ -18,6 +18,7 @@ import type { MailOptions } from "@/lib/mail/order-email";
 import { displayName } from "@/lib/milwaukee/display";
 import { routing } from "@/i18n/routing";
 import { localityLine } from "@/lib/shipping/countries";
+import { prisma } from "@/lib/prisma";
 import {
   REQUEST_ANSWER_HOURS,
   compareOffer,
@@ -124,6 +125,53 @@ export function previewRequest(order: OrderWithLines, kind: RequestEmailKind | "
   } as OrderWithLines;
 }
 
+/**
+ * The paid half of a split cart, as the request emails mention it: number,
+ * amount, postage, and whether the money is in yet (the «received» email goes
+ * out at checkout, before the customer reaches Viva).
+ */
+type ParentFacts = {
+  orderNumber: string;
+  totalGross: unknown;
+  shippingGross: unknown;
+  shippingMethod: string;
+  paymentMethod: string;
+  paymentStatus: string;
+};
+
+async function loadParent(order: OrderWithLines, preview?: boolean): Promise<ParentFacts | null> {
+  if (!order.parentOrderNumber || preview) return null;
+  return prisma.order.findUnique({
+    where: { orderNumber: order.parentOrderNumber },
+    select: {
+      orderNumber: true,
+      totalGross: true,
+      shippingGross: true,
+      shippingMethod: true,
+      paymentMethod: true,
+      paymentStatus: true,
+    },
+  });
+}
+
+/** «… HDC-…: 62,00 € μαζί με μεταφορικά 4,96 €» — the paid half, in one sentence. */
+function parentSentence(locale: Locale, parent: ParentFacts): string {
+  const money = (n: unknown) => formatMoney(Number(n), locale);
+  const shipping =
+    parent.shippingMethod === "pickup"
+      ? t(locale, "req.parent_ship_pickup")
+      : Number(parent.shippingGross) === 0
+        ? t(locale, "req.parent_ship_free")
+        : t(locale, "req.parent_ship", { amount: money(parent.shippingGross) });
+  const key =
+    parent.paymentStatus === "PAID"
+      ? "req.parent_paid"
+      : parent.paymentMethod === "bank"
+        ? "req.parent_pending_bank"
+        : "req.parent_pending";
+  return t(locale, key, { number: parent.orderNumber, total: money(parent.totalGross), shipping });
+}
+
 function itemRows(locale: Locale, rows: ComparisonRow[]) {
   const money = (n: number) => formatMoney(n, locale);
   return rows.map((row) => {
@@ -187,6 +235,12 @@ export async function buildRequestEmail(
   const offer = readStoredOffer(order.offerJson);
   const date = (d: Date) => stamp(d);
   const parent = order.parentOrderNumber ? [t(locale, "req.parent", { number: order.parentOrderNumber })] : [];
+  /* A split cart: the paid half, with its amount and postage. */
+  const parentRow = await loadParent(order, options.preview);
+  const shippingRowLabel = (method: string) =>
+    order.parentOrderNumber
+      ? t(locale, "req.shipping_second", { method: shippingLabel(locale, method) })
+      : t(locale, "order.shipping", { method: shippingLabel(locale, method) });
 
   let subject: string;
   let preheader: string;
@@ -200,14 +254,25 @@ export async function buildRequestEmail(
       eyebrow: t(locale, "req.received.eyebrow"),
       title: t(locale, "req.received.title"),
       lead: t(locale, "req.received.lead", { hours: REQUEST_ANSWER_HOURS }),
-      paragraphs: [t(locale, "req.received.no_charge"), ...parent],
+      paragraphs: [
+        t(locale, "req.received.no_charge"),
+        ...(parentRow ? [parentSentence(locale, parentRow), t(locale, "req.separate")] : parent),
+      ],
+      ...(parentRow
+        ? {
+            facts: [
+              { label: t(locale, "req.now_label"), value: `${parentRow.orderNumber} · ${money(Number(parentRow.totalGross))}`, strong: true },
+              { label: t(locale, "req.this_label"), value: t(locale, "req.this_value") },
+            ],
+          }
+        : {}),
       items_title: t(locale, "req.requested_title"),
       items_aside: t(locale, "order.prices_gross"),
       items: itemRows(
         locale,
         requested.map((r) => ({ kind: "same" as const, requested: r, offered: { ...r, kind: "original" as const, replacesLineId: r.lineId, mtrl: r.mtrl ?? 0, leadTimeText: null }, qtyChanged: false, priceChanged: false })),
       ),
-      totals: [{ label: t(locale, "order.shipping", { method: shippingLabel(locale, order.shippingMethod) }), value: t(locale, "req.shipping_later") }],
+      totals: [{ label: shippingRowLabel(order.shippingMethod), value: t(locale, "req.shipping_later") }],
       total: { label: t(locale, "req.indicative"), value: money(priced.subtotalGross), vat_line: "" },
       cta: { label: t(locale, "req.view"), href: link, note: t(locale, "req.private") },
     };
@@ -247,7 +312,9 @@ export async function buildRequestEmail(
       lead: reminder
         ? t(locale, "req.reminder.lead", { number, date: date(expires) })
         : t(locale, "req.offer.lead", { number }),
-      paragraphs: parent,
+      paragraphs: order.parentOrderNumber
+        ? [t(locale, "req.second_shipment", { number: order.parentOrderNumber })]
+        : [],
       ...(offer.note ? { note: offer.note, note_title: t(locale, "req.note_title"), note_tone: "wait" } : {}),
       facts: [
         ...(offer.leadTimeText ? [{ label: t(locale, "req.lead_time"), value: offer.leadTimeText, strong: true }] : []),
@@ -260,7 +327,7 @@ export async function buildRequestEmail(
       totals: [
         { label: t(locale, "order.subtotal"), value: money(totals.subtotalGross) },
         {
-          label: t(locale, "order.shipping", { method: shippingLabel(locale, order.shippingMethod) }),
+          label: shippingRowLabel(order.shippingMethod),
           value: shippingNet == null ? t(locale, "req.shipping_later") : totals.shippingGross === 0 ? t(locale, "order.free") : money(totals.shippingGross),
         },
       ],
@@ -305,6 +372,8 @@ export async function buildInternalRequestEmail(ref: OrderRef, options: { assetO
   const priced = priceLines(requested, 0);
   const total = formatMoney(priced.subtotalGross, "el");
   const name = `${order.firstName} ${order.lastName}`.trim() || order.companyName || "—";
+  const parentRow = await loadParent(order, options.preview);
+  const baseSubject = t("el", "internal.req_subject", { number: order.orderNumber, total });
 
   const items = requested.map((r) => ({
     tag: r.stockAtRequest != null && r.stockAtRequest > 0 ? t("el", "internal.req_stock", { n: r.stockAtRequest }) : t("el", "internal.req_nostock"),
@@ -320,7 +389,9 @@ export async function buildInternalRequestEmail(ref: OrderRef, options: { assetO
     template: "internal-request",
     locale: "el",
     kind: "internal",
-    subject: t("el", "internal.req_subject", { number: order.orderNumber, total }),
+    subject: order.parentOrderNumber
+      ? t("el", "internal.req_subject_parent", { subject: baseSubject, number: order.parentOrderNumber })
+      : baseSubject,
     preheader: `${requested.length} είδη · ${total} · απάντηση εντός ${REQUEST_ANSWER_HOURS} ωρών`,
     topline: { left: t("el", "internal.topline"), right: order.orderNumber },
     assetOrigin: options.assetOrigin,
@@ -342,7 +413,19 @@ export async function buildInternalRequestEmail(ref: OrderRef, options: { assetO
             ? [{ label: t("el", "internal.vat"), value: `${order.companyName || "—"} · ${order.vatNumber || "—"}` }]
             : []),
         ],
-        parent: order.parentOrderNumber ? t("el", "internal.req_parent", { number: order.parentOrderNumber }) : "",
+        parent: parentRow
+          ? t("el", "internal.req_parent_full", {
+              number: parentRow.orderNumber,
+              total: formatMoney(Number(parentRow.totalGross), "el"),
+              shipping:
+                Number(parentRow.shippingGross) === 0
+                  ? t("el", "order.free")
+                  : formatMoney(Number(parentRow.shippingGross), "el"),
+              state: t("el", parentRow.paymentStatus === "PAID" ? "internal.paid" : "internal.unpaid"),
+            })
+          : order.parentOrderNumber
+            ? t("el", "internal.req_parent", { number: order.parentOrderNumber })
+            : "",
         notes: order.notes?.trim() ?? "",
         items,
         totals: [{ label: t("el", "order.shipping", { method: shippingLabel("el", order.shippingMethod) }), value: t("el", "req.shipping_later") }],

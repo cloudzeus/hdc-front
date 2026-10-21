@@ -6,6 +6,7 @@ import { holdHours } from "@/lib/orders/hold";
 import { renderEmail } from "@/lib/mail/hdc/render";
 import { t } from "@/lib/mail/hdc/strings";
 import { renderAndDeliver } from "@/lib/mail/hdc/deliver";
+import { splitView } from "@/lib/mail/hdc/split";
 import {
   buildOrderView,
   loadOrder,
@@ -68,6 +69,13 @@ export async function buildOrderEmail(
   if (options.preview?.supplier) view.supplier = true;
   const count = order.lines.length;
   const total = money(order.totalGross);
+  /*
+   * A split cart: the request with the rest of the basket (or, for an accepted
+   * request, the order that went first). Its link is the request's private
+   * page, so the email goes with Mailgun tracking off.
+   */
+  const split = await splitView(order, locale, "customer");
+  const tracking = split?.secret ? { tracking: false as const } : {};
 
   if (receipt) {
     const method = paymentLabel(locale, order.paymentMethod);
@@ -81,6 +89,7 @@ export async function buildOrderEmail(
       assetOrigin: options.assetOrigin,
       data: {
         order: view,
+        split,
         payment: {
           rows: [
             { label: t(locale, "order.number"), value: order.orderNumber, strong: true },
@@ -91,7 +100,7 @@ export async function buildOrderEmail(
         },
       },
     });
-    return { to: order.email, email, bcc: process.env.MAIL_BCC };
+    return { to: order.email, email, bcc: process.env.MAIL_BCC, ...tracking };
   }
 
   /*
@@ -149,10 +158,10 @@ export async function buildOrderEmail(
       : t(locale, view.paid ? "confirm.pre_paid" : "confirm.pre", { count, total }),
     topline: { left: t(locale, "confirm.topline"), right: order.orderNumber },
     assetOrigin: options.assetOrigin,
-    data: { order: view, leadKey, bank },
+    data: { order: view, leadKey, bank, split },
   });
 
-  return { to: order.email, email, bcc: process.env.MAIL_BCC };
+  return { to: order.email, email, bcc: process.env.MAIL_BCC, ...tracking };
 }
 
 /**

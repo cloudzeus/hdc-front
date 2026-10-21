@@ -1915,6 +1915,139 @@
   .hdc-req-intro {
     margin: 0 0 14px;
   }
+  /* The split choice, priced: what is paid now, what stays a request. */
+  .hdc-ship label .bd {
+    color: var(--hdc-g7);
+    line-height: 1.4;
+  }
+  .hdc-ship label .bd.now {
+    color: var(--hdc-ink);
+    font-weight: 600;
+  }
+  /* The summary of a split cart: two groups, payable now apart from the request. */
+  .hdc-split-group h3 {
+    margin: 0 0 10px;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-12);
+    letter-spacing: 0.07em;
+    color: var(--hdc-ink);
+  }
+  .hdc-split-group[data-part="request"] h3,
+  .hdc-split-group[data-part="together"] h3 {
+    color: var(--hdc-wait);
+  }
+  .hdc-split-group[data-part="request"] .hdc-mini .p {
+    color: var(--hdc-g5);
+    font-weight: 700;
+  }
+  .hdc-split-choose {
+    text-align: left !important;
+  }
+  /* Confirmation of a split cart: the two halves side by side. */
+  .hdc-split-parts {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .hdc-split-parts .hdc-split-h {
+    grid-column: 1 / -1;
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-12);
+    letter-spacing: 0.07em;
+    color: var(--hdc-g5);
+  }
+  .hdc-split-parts > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-left: 4px solid var(--hdc-ink);
+    background: var(--hdc-g1);
+    padding: 12px 14px;
+    font-size: var(--fs-15);
+    line-height: 1.45;
+  }
+  .hdc-split-parts > div[data-part="request"] {
+    border-left-color: var(--hdc-wait);
+  }
+  .hdc-split-parts b {
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-12);
+    letter-spacing: 0.07em;
+  }
+  .hdc-split-parts > div[data-part="request"] b {
+    color: var(--hdc-wait);
+  }
+  .hdc-split-parts small {
+    font-stretch: 87.5%;
+    font-size: var(--fs-13);
+    color: var(--hdc-g7);
+  }
+  .hdc-split-parts a {
+    margin-top: 4px;
+    font-weight: 700;
+    color: var(--hdc-red);
+  }
+  @media (max-width: 767px) {
+    .hdc-split-parts {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  .hdc-split-second {
+    margin: 0 0 14px;
+    border-left: 4px solid var(--hdc-wait);
+    background: var(--hdc-g1);
+    padding: 10px 12px;
+    font-stretch: 87.5%;
+    font-size: var(--fs-13);
+    line-height: 1.45;
+  }
+  .hdc-od-split {
+    margin-top: 6px;
+    font-stretch: 87.5%;
+    font-size: var(--fs-14);
+    color: var(--hdc-wait);
+  }
+  .hdc-od-split a {
+    font-weight: 700;
+    color: var(--hdc-red);
+  }
+  .hdc-split-req {
+    margin: 0 0 16px;
+    border-left: 4px solid var(--hdc-wait);
+    background: var(--hdc-g1);
+    padding: 12px 14px;
+  }
+  .hdc-split-req > div {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .hdc-split-req b {
+    font-stretch: 87.5%;
+    font-weight: 700;
+    font-size: var(--fs-13);
+    letter-spacing: 0.04em;
+    color: var(--hdc-wait);
+  }
+  .hdc-split-req span {
+    font-weight: 900;
+    font-stretch: 120%;
+    font-size: var(--fs-18);
+    white-space: nowrap;
+  }
+  .hdc-split-req small {
+    display: block;
+    margin-top: 4px;
+    font-stretch: 87.5%;
+    font-size: var(--fs-13);
+    line-height: 1.4;
+    color: var(--hdc-g7);
+  }
   .hdc-mini b small.req {
     display: block;
     margin-top: 2px;

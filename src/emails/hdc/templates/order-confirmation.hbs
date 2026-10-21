@@ -18,5 +18,6 @@
 {{> order-items aside=(t "order.prices_gross")}}
 {{> order-totals}}
 {{> two-cols cols=order.cols}}
+{{#if split}}{{> split-section}}{{/if}}
 {{> cta label=(T "order.view") href=order.url}}
 {{> help lead=(t "help.order") reply=true}}

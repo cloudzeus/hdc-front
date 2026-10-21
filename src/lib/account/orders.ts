@@ -72,6 +72,13 @@ export type AccountOrderDetail = {
   paymentFeeGross: number;
   vatAmount: number;
   totalGross: number;
+  /**
+   * A split cart (docs/backorder-requests.md §1): the other half of this one.
+   * «request» — this order is the in-stock half, `orderNumber` its back-order
+   * request; «paid» — this is the request, `orderNumber` the order that went
+   * ahead with the in-stock items. Null for an ordinary order.
+   */
+  splitWith?: { kind: "request" | "paid"; orderNumber: string } | null;
   lines: Array<{
     id: string;
     name: string;
@@ -98,6 +105,12 @@ export async function getCustomerOrder(
     include: { lines: true },
   });
   if (!order) return null;
+  const child = order.parentOrderNumber
+    ? null
+    : await prisma.order.findFirst({
+        where: { parentOrderNumber: order.orderNumber, requestStatus: { not: null } },
+        select: { orderNumber: true },
+      });
   return {
     orderNumber: order.orderNumber,
     guestToken: order.guestToken,
@@ -124,6 +137,11 @@ export async function getCustomerOrder(
     paymentFeeGross: Number(order.paymentFeeGross),
     vatAmount: Number(order.vatAmount),
     totalGross: Number(order.totalGross),
+    splitWith: order.parentOrderNumber
+      ? { kind: "paid", orderNumber: order.parentOrderNumber }
+      : child
+        ? { kind: "request", orderNumber: child.orderNumber }
+        : null,
     lines: order.lines.map((line) => ({
       id: line.id,
       name: line.name,

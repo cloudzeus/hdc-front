@@ -1,0 +1,10 @@
+<!-- SPLIT CART: the other half of the basket -->
+{{> note tone="wait" title=(upper split.title) text=split.lead}}
+{{#each split.paragraphs}}{{> paragraph text=this}}{{/each}}
+{{#if split.items}}{{> request-items title=(upper split.items_title) aside=split.items_aside items=split.items}}
+{{> request-totals rows=split.totals label=split.value_label value=split.value}}{{/if}}
+{{#if split.url}}
+<tr><td class="px dm-body" style="padding:20px 24px 0; background-color:#ffffff;">
+  {{> button label=(upper split.link_label) href=split.url width=300 dark=true}}
+</td></tr>
+{{/if}}

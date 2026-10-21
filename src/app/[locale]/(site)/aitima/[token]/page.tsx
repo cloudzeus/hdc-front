@@ -114,6 +114,28 @@ export default async function RequestPage({ params }: PageProps) {
   }
   const requestedTotals = priceLines(requested, 0);
 
+  /*
+   * A split cart: the in-stock half is its own order, paid and shipped on its
+   * own. Its number, amount and page, so this request reads as the second
+   * shipment it is — with its own postage, shown here and nowhere else.
+   */
+  const parent = order.parentOrderNumber
+    ? await prisma.order.findUnique({
+        where: { orderNumber: order.parentOrderNumber },
+        select: { orderNumber: true, guestToken: true, totalGross: true, shippingGross: true, paymentStatus: true },
+      })
+    : null;
+  const parentHref = parent
+    ? `${locale === "el" ? "" : `/${locale}`}/checkout/epibebaiosi/${encodeURIComponent(parent.orderNumber)}?t=${encodeURIComponent(parent.guestToken)}`
+    : null;
+  const parentFacts = parent
+    ? {
+        number: parent.orderNumber,
+        total: money(Number(parent.totalGross)),
+        shipping: Number(parent.shippingGross) === 0 ? t("dorean") : money(Number(parent.shippingGross)),
+      }
+    : null;
+
   const confirmationHref = `${locale === "el" ? "" : `/${locale}`}/checkout/epibebaiosi/${encodeURIComponent(order.orderNumber)}?t=${encodeURIComponent(order.guestToken)}`;
 
   const tag = (row: ComparisonRow) =>
@@ -138,7 +160,14 @@ export default async function RequestPage({ params }: PageProps) {
               <h1 className="hdc-disp">{t(`headline_${view}`)}</h1>
               <p>{t(`intro_${view}`)}</p>
               {order.parentOrderNumber && (
-                <p className="sub">{t("parent_note", { number: order.parentOrderNumber })}</p>
+                <p className="sub">
+                  {parent && parentFacts
+                    ? parent.paymentStatus === "PAID"
+                      ? t("parent_note_paid", parentFacts)
+                      : t("parent_note_amount", parentFacts)
+                    : t("parent_note", { number: order.parentOrderNumber })}{" "}
+                  {parentHref && <a href={parentHref}>{t("parent_link")} →</a>}
+                </p>
               )}
               <span className="num">{order.orderNumber}</span>
             </div>
@@ -249,6 +278,9 @@ export default async function RequestPage({ params }: PageProps) {
               {view === "OFFERED" || view === "ACCEPTED" || view === "PAID" ? t("offer_title") : t("requested_title")}
             </h2>
             <div className="in hdc-sum-body">
+              {order.parentOrderNumber && view !== "PAID" && (
+                <p className="hdc-split-second">{t("second_shipment", { number: order.parentOrderNumber })}</p>
+              )}
               <ul className="hdc-mini">
                 {(view === "ACCEPTED" || view === "PAID"
                   ? order.lines.map((l) => ({ id: l.id, name: l.name, sku: l.sku, qty: l.quantity, image: l.imageUrl, gross: Number(l.lineGross) }))

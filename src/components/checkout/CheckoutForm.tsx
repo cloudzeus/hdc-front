@@ -12,6 +12,9 @@ import { STOCK_HOLD_HOURS } from "@/lib/orders/hold";
 import { foreignCountryIn, validatePostcode } from "@/lib/shipping/destination";
 import { countryOptions, postcodeExample, validateCountryPostcode } from "@/lib/shipping/countries";
 import type { CartSplitKind, RequestMode } from "@/lib/requests/model";
+import { payableNow, useSplitCheckout } from "@/components/checkout/SplitCheckout";
+import { formatMoney } from "@/lib/format";
+import type { Locale } from "@/i18n/routing";
 
 /**
  * The HDC checkout form (checkout.html, screen 2 and the second phone frame).
@@ -44,6 +47,8 @@ export type ShippingOption = {
   /** Formatted price, «ΔΩΡΕΑΝ», or null when it needs a postcode first. */
   price: string | null;
   free: boolean;
+  /** `price` is words, not a figure («Στην πρόταση»): set quietly. */
+  note?: boolean;
 };
 
 /**
@@ -83,6 +88,7 @@ export function CheckoutForm({
   shippingMethod,
   paymentMethod,
   shippingOptions,
+  splitShippingOptions = null,
   total,
   requestKind = "none",
   international = false,
@@ -102,6 +108,11 @@ export function CheckoutForm({
   shippingMethod: string;
   paymentMethod: string;
   shippingOptions: ShippingOption[];
+  /**
+   * A mixed cart: the same tiles priced for the in-stock lines alone — the
+   * postage of what ships now when the customer chooses «split».
+   */
+  splitShippingOptions?: ShippingOption[] | null;
   /** VAT-inclusive total, formatted — for the phone's bottom bar. */
   total: string;
   /**
@@ -157,7 +168,15 @@ export function CheckoutForm({
 
   const pickup = chosen === "pickup";
   const isOnline = payment === "card" || payment === "iris";
-  const [requestMode, setRequestMode] = useState<RequestMode | null>(null);
+  /*
+   * Shared with the summaries beside and above the form (`SplitCheckoutProvider`),
+   * which follow the choice; a local fallback keeps the form whole without it.
+   */
+  const split = useSplitCheckout();
+  const [localMode, setLocalMode] = useState<RequestMode | null>(null);
+  const requestMode = split ? split.mode : localMode;
+  const setRequestMode = split ? split.setMode : setLocalMode;
+  const breakdown = split?.breakdown ?? null;
   /* Nothing is paid now: the whole cart, or everything by choice, is a request. */
   const requestOnly = requestKind === "all" || (requestKind === "mixed" && requestMode === "together");
   const modeMissing = requestKind === "mixed" && requestMode == null;
@@ -309,14 +328,39 @@ export function CheckoutForm({
   const blocked = Object.values(addressErrors)[0] ?? null;
   const fieldError = (name: string) => addressErrors[name] ?? state.fieldErrors?.[name];
 
-  const shipTitle = shippingOptions.find((o) => o.id === chosen);
+  /*
+   * The tiles' prices follow the choice: «split» shows the postage of what
+   * ships now; a request (all, or by choice) has its postage in the offer.
+   */
+  const tileOptions: ShippingOption[] =
+    requestKind === "mixed" && requestMode === "split" && splitShippingOptions
+      ? splitShippingOptions
+      : requestOnly
+        ? shippingOptions.map((o) =>
+            o.id === "pickup" ? o : { ...o, price: t("ship_in_offer"), free: false, note: true },
+          )
+        : shippingOptions;
+  const shipTitle = tileOptions.find((o) => o.id === chosen);
+
+  /* The split tiles, the bottom bar and the pay button: the server's figures, never re-added here. */
+  const money = (n: number) => formatMoney(n, locale as Locale);
+  const items = (count: number) => (count === 1 ? t("items_one") : t("items_other", { count }));
+  const splitNow = breakdown?.split?.now ?? null;
+  const splitRequest = breakdown?.split?.request ?? null;
+  const together = breakdown?.together ?? null;
+  const nowAmount = payableNow(split);
   const payLabel = (id: string) =>
     id === "card" ? t("pay_card") : id === "iris" ? "IRIS" : t("pay_bank");
   const payLabelShort = (id: string) =>
     id === "card" ? t("pay_card") : id === "iris" ? "IRIS" : t("pay_bank_short");
 
   const summaries: Record<StepKey, string> = {
-    request: requestMode === "split" ? t("request_mode_split") : requestMode === "together" ? t("request_mode_together") : "",
+    request: [
+      requestMode === "split" ? t("request_mode_split") : requestMode === "together" ? t("request_mode_together") : "",
+      nowAmount != null && requestMode ? t("now_short", { amount: money(nowAmount) }) : "",
+    ]
+      .filter(Boolean)
+      .join(" · "),
     contact: [
       [values.firstName, values.lastName].filter(Boolean).join(" "),
       values.phone,
@@ -367,6 +411,10 @@ export function CheckoutForm({
     ? t("ginetai_katachorisi")
     : requestOnly
       ? `${t("apostoli_aitimatos")} →`
+      : requestKind === "mixed" && requestMode === "split" && splitNow
+        ? isOnline
+          ? `${t("pay_now_button", { amount: money(splitNow.totalGross) })} →`
+          : `${t("order_now_button", { amount: money(splitNow.totalGross) })} →`
       : isOnline
       ? `${t("pliromi_me_asfaleia")} →`
       : `${t("oloklirosi_paraggelias")} →`;
@@ -421,8 +469,41 @@ export function CheckoutForm({
                   onChange={() => setRequestMode(mode)}
                 />
                 <b>{mode === "split" ? t("request_mode_split") : t("request_mode_together")}</b>
-                <span>{mode === "split" ? t("request_mode_split_help") : t("request_mode_together_help")}</span>
-                <strong className="ask">{t("request_mode_price")}</strong>
+                {mode === "split" && splitNow && splitRequest ? (
+                  <>
+                    {/* Server-priced: the in-stock lines alone, with their own postage. */}
+                    <span className="bd now">
+                      {breakdown?.shippingMethod === "pickup"
+                        ? t("split_now_pickup", { total: money(splitNow.totalGross), items: items(splitNow.itemCount) })
+                        : splitNow.shippingGross === 0 && !splitNow.unserviceable && !splitNow.pending
+                          ? t("split_now_free", { total: money(splitNow.totalGross), items: items(splitNow.itemCount) })
+                          : splitNow.unserviceable || splitNow.pending
+                            ? t("split_now_unpriced", { total: money(splitNow.totalGross), items: items(splitNow.itemCount) })
+                            : t("split_now", {
+                                total: money(splitNow.totalGross),
+                                items: items(splitNow.itemCount),
+                                shipping: money(splitNow.shippingGross),
+                              })}
+                    </span>
+                    {splitNow.thresholdLost && <span className="bd">{t("split_threshold_lost")}</span>}
+                    <span className="bd">
+                      {t("split_request", { items: items(splitRequest.itemCount), value: money(splitRequest.subtotalGross) })}
+                    </span>
+                    <strong>{t("now_short", { amount: money(splitNow.totalGross) })}</strong>
+                  </>
+                ) : mode === "together" && together ? (
+                  <>
+                    <span className="bd now">
+                      {t("together_line", { items: items(together.itemCount), value: money(together.subtotalGross) })}
+                    </span>
+                    <strong>{t("now_short", { amount: money(0) })}</strong>
+                  </>
+                ) : (
+                  <>
+                    <span>{mode === "split" ? t("request_mode_split_help") : t("request_mode_together_help")}</span>
+                    <strong className="ask">{t("request_mode_price")}</strong>
+                  </>
+                )}
               </label>
             ))}
           </div>
@@ -504,7 +585,7 @@ export function CheckoutForm({
         )}
         <div className="hdc-ship" role="radiogroup" aria-label={t("s_shipping")}>
           {methods.map((method) => {
-            const option = shippingOptions.find((o) => o.id === method.id);
+            const option = tileOptions.find((o) => o.id === method.id);
             const on = chosen === method.id;
             return (
               <label key={method.id} className={on ? "on" : undefined}>
@@ -521,7 +602,7 @@ export function CheckoutForm({
                 <b>{option?.title ?? method.label}</b>
                 <span>{option?.meta ?? method.meta}</span>
                 {option?.price ? (
-                  <strong className={option.free ? "fr" : undefined}>{option.price}</strong>
+                  <strong className={option.note ? "ask" : option.free ? "fr" : undefined}>{option.price}</strong>
                 ) : (
                   <strong className="ask">{method.id === "dhl" ? t("timi_apo_dhl") : t("timi_apo_acs")}</strong>
                 )}
@@ -709,8 +790,8 @@ export function CheckoutForm({
       {/* Phones: the total and the next step, always under the thumb. */}
       <div className="hdc-mbar hdc-co-mbar">
         <div className="tt">
-          <span>{t("synolo_me_fpa")}</span>
-          <b>{total}</b>
+          <span>{nowAmount != null ? t("payable_now") : t("synolo_me_fpa")}</span>
+          <b>{nowAmount != null ? money(nowAmount) : total}</b>
         </div>
         {open === "notes" ? (
           <button

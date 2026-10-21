@@ -790,7 +790,42 @@
       "refused_unsupported_country": "We do not ship to this country.",
       "refused_invalid_postcode": "This postcode is not valid for the country you chose.",
       "refused_unserviceable": "This postcode is not in an area we deliver to.",
-      "refused_invalid_address": "Please check the postcode and the city of the address."
+      "refused_invalid_address": "Please check the postcode and the city of the address.",
+      "items_one": "1 item",
+      "items_other": "{count} items",
+      "split_now": "You pay {total} now — {items} + shipping {shipping} (ships now).",
+      "split_now_free": "You pay {total} now — {items}, with free shipping (ships now).",
+      "split_now_pickup": "You pay {total} now — {items}, collected from the shop with no shipping.",
+      "split_now_unpriced": "You pay {total} now — {items}; shipping is priced with your postcode (ships now).",
+      "split_threshold_lost": "On their own, the in-stock items do not reach the free-shipping threshold.",
+      "split_request": "Made to order: {items}, indicative value {value} — nothing to pay now; you will receive an offer within 24 hours with the final price and the shipping of the second delivery.",
+      "together_line": "Nothing to pay now — the whole basket ({items}, indicative value {value}) as a request, one delivery, shipping in the offer.",
+      "now_short": "Now {amount}",
+      "pay_now_button": "Pay {amount}",
+      "order_now_button": "Place order · {amount}",
+      "payable_now": "Payable now",
+      "ship_in_offer": "In the offer"
+    },
+    "HdcSplit": {
+      "items_one": "1 item",
+      "items_other": "{count} items",
+      "group_now": "Shipping now",
+      "group_request": "Made to order",
+      "group_together": "Everything as a request · one delivery",
+      "choose_mode": "Choose how the order should proceed to see what you pay now and what stays as a request.",
+      "proionta_now": "Products (shipping now)",
+      "timi_me_tk": "with your postcode",
+      "dorean": "FREE",
+      "epivarynsi": "Payment fee",
+      "payable_now": "PAYABLE NOW",
+      "vat_24": "Includes VAT 24% {amount}",
+      "vat": "Includes VAT {amount}",
+      "nothing_now": "Nothing to pay now",
+      "threshold_lost": "On their own, the in-stock items do not reach the free-shipping threshold.",
+      "on_request": "On request (indicative)",
+      "request_shipping_offer": "nothing to pay now; the final price and the shipping of the second delivery come with the offer within 24 hours.",
+      "together_shipping_offer": "one delivery for everything; the final price and shipping come with the offer within 24 hours.",
+      "epexergasia_kalathiou": "Edit cart"
     }
   },
   "catalogue": {
@@ -1204,7 +1239,10 @@
       "meta_tools": "My tools",
       "meta_favourites": "Favourites",
       "meta_reviews": "Reviews",
-      "parakolouthisi_dhl": "TRACK WITH DHL"
+      "parakolouthisi_dhl": "TRACK WITH DHL",
+      "split_with_request": "The rest of the basket: request {number}.",
+      "split_with_paid": "Made to order · in-stock items in order {number}.",
+      "split_open": "Open"
     }
   },
   "ui": {
@@ -1466,7 +1504,17 @@
       "periechei_fpa": "Includes VAT {amount}",
       "olokliri_3_5": "Your order ships in 3–5 working days: one or more items come from our supplier.",
       "child_request": "The made-to-order items were sent as request {number}. You will receive an offer by email within 24 hours.",
-      "child_request_link": "View the request"
+      "child_request_link": "View the request",
+      "items_one": "1 item",
+      "items_other": "{count} items",
+      "split_title": "Your basket goes ahead in two parts",
+      "split_now_label": "Shipping now",
+      "split_now_line": "Order {number} · {items} · {total} (shipping {shipping}).",
+      "split_now_paid": "Paid",
+      "split_now_pending": "Awaiting payment",
+      "split_request_label": "Made to order",
+      "split_request_line": "Request {number} · {items} · indicative value {value}, no charge now.",
+      "split_request_note": "You will receive an offer within 24 hours with the final price and the shipping of the second delivery; you pay only if you accept it."
     }
   },
   "anazitisi": {
@@ -1780,7 +1828,11 @@
       "error_payment_unavailable": "Card payment is unavailable right now — your acceptance is recorded, please try again shortly.",
       "error_payment_failed": "Connecting to the bank failed — your acceptance is recorded, please try again.",
       "declined_done": "Your decision is recorded. Thank you.",
-      "validity": "Offer validity"
+      "validity": "Offer validity",
+      "parent_note_amount": "The in-stock items of your basket are order {number}: {total}, shipping {shipping}.",
+      "parent_note_paid": "The in-stock items of your basket were paid with order {number}: {total}, shipping {shipping}.",
+      "parent_link": "The order",
+      "second_shipment": "Second delivery: these items ship separately from order {number}, with their own shipping — as shown in the offer."
     }
   }
 }

@@ -3,6 +3,7 @@ import { formatMoney } from "@/lib/format";
 import { renderEmail } from "@/lib/mail/hdc/render";
 import { t } from "@/lib/mail/hdc/strings";
 import { renderAndDeliver } from "@/lib/mail/hdc/deliver";
+import { splitView } from "@/lib/mail/hdc/split";
 import {
   adminOrderUrl,
   buildOrderView,
@@ -46,6 +47,12 @@ export async function buildInternalOrderEmail(orderNumber: OrderRef, options: { 
   const total = formatMoney(Number(order.totalGross), "el");
   const paid = view.paid;
   const name = `${order.firstName} ${order.lastName}`.trim() || order.companyName || "—";
+  /* A split cart: the other half by number — never the customer's secret page. */
+  const split = await splitView(order, "el", "internal");
+  const baseSubject = t("el", paid ? "internal.new_subject" : "internal.new_subject_unpaid", {
+    number: order.orderNumber,
+    total,
+  });
 
   const rows = [
     { label: t("el", "internal.customer"), value: name, strong: true },
@@ -74,15 +81,18 @@ export async function buildInternalOrderEmail(orderNumber: OrderRef, options: { 
     template: "internal-order",
     locale: "el",
     kind: "internal",
-    subject: t("el", paid ? "internal.new_subject" : "internal.new_subject_unpaid", {
-      number: order.orderNumber,
-      total,
-    }),
+    subject: split
+      ? t("el", split.parentSide ? "internal.split_subject_child" : "internal.split_subject_parent", {
+          subject: baseSubject,
+          number: split.number,
+        })
+      : baseSubject,
     preheader: `${order.lines.length} είδη · ${total} · ${t("el", paid ? "internal.paid" : "internal.unpaid")}`,
     topline: { left: t("el", "internal.topline"), right: order.orderNumber },
     assetOrigin: options.assetOrigin,
     data: {
       order: view,
+      split,
       internal: {
         state_line: `${view.date} · ${t("el", paid ? "internal.paid" : "internal.unpaid")} · ${t("el", "internal.total")} ${total}`,
         rows,
