@@ -143,7 +143,7 @@
 - **Εκτός ΕΕ (μελλοντικά, όχι σε αυτή τη φάση):** όσα ζήτησε η DHL στα δείγματα:
   - WY Paperless Trade·
   - `documentImages` INV με το **PDF του παραστατικού SoftOne**·
-  - `waybillDoc` με `hideAccountNumber:false`·
+  - **όχι** `waybillDoc`: `isRequested:false`, γιατί η φορτωτική ανεβαίνει ηλεκτρονικά στη DHL (διευκρίνιση DHL, 27/10/2026)·
   - κωδικοί δασμολογίου outbound/inbound.
 
 ## 5. Emails, σελίδες, διαχείριση
