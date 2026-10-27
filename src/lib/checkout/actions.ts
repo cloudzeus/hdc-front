@@ -23,6 +23,14 @@ import { normalizeCountry, validateCountryPostcode } from "@/lib/shipping/countr
 import { isQuoteUnavailable, isRefused, quoteDestination } from "@/lib/shipping/courier-quote";
 import { internationalCopy } from "@/lib/shipping/international-copy";
 import { createPaymentOrder, isVivaConfigured } from "@/lib/payment/viva";
+import { chargeableWeight } from "@/lib/shipping/acs-tariff";
+import { vatRateForDestination } from "@/lib/shipping/vat";
+import { isEuSalesEnabled } from "@/lib/eu-sales/flag";
+import { euSalesShippingMethods, normalizeEuSalesCountry, vatPrefixFor } from "@/lib/eu-sales/countries";
+import { euSalesCopy, vatExample } from "@/lib/eu-sales/copy";
+import { normaliseEuVat } from "@/lib/eu-sales/vat-format";
+import { resolveVatMode, type CustomerType } from "@/lib/eu-sales/vat-mode";
+import { checkEuVat, quoteDhl, type DhlQuoteResult, type EuVatCheck } from "@/lib/eu-sales/hdctool-eu";
 import { routing, type Locale } from "@/i18n/routing";
 import { getCurrentUser } from "@/lib/account/session";
 import { SHOP } from "@/config/shop";
@@ -99,17 +107,6 @@ export async function placeOrder(
     };
   }
 
-  const wantsInvoice = input.wantsInvoice === "on";
-  if (wantsInvoice && (!input.companyName || !input.vatNumber)) {
-    return {
-      error: "Για τιμολόγιο χρειάζονται επωνυμία και ΑΦΜ.",
-      fieldErrors: {
-        ...(input.companyName ? {} : { companyName: "Απαιτείται" }),
-        ...(input.vatNumber ? {} : { vatNumber: "Απαιτείται" }),
-      },
-    };
-  }
-
   const address = deliveryAddress(input);
 
   const locale = (routing.locales.includes(input.locale as Locale)
@@ -131,12 +128,63 @@ export async function placeOrder(
    */
   const international = isInternationalShippingEnabled();
   const intl = internationalCopy(locale);
-  const chosenCountry = international ? normalizeCountry(input.shipCountry, true) : "GR";
+  /*
+   * EU sales (EU_SALES_ENABLED, spec 2026-10-23 §3): Greece, or an EU country
+   * other than Greece and Cyprus with DHL only. Off: exactly the lines below
+   * it had before.
+   */
+  const euSales = isEuSalesEnabled();
+  const eu = euSalesCopy(locale);
+  const chosenCountry = euSales
+    ? normalizeEuSalesCountry(input.shipCountry)
+    : international
+      ? normalizeCountry(input.shipCountry, true)
+      : "GR";
   if (!chosenCountry) {
     return { error: intl.country, fieldErrors: { shipCountry: intl.country } };
   }
   const country = input.shippingMethod === "pickup" ? "GR" : chosenCountry;
   const abroad = country !== "GR";
+  /* A foreign delivery under EU sales: «Ιδιώτης / Εταιρεία», VIES and DHL. */
+  const euAbroad = euSales && abroad;
+
+  /*
+   * Who is buying. In Greece «Θέλω τιμολόγιο», as always. Abroad (EU sales)
+   * the «Ιδιώτης / Εταιρεία» choice replaces it: a company is invoiced, with
+   * its VAT number kept WITH its country prefix.
+   */
+  const postedInvoice = input.wantsInvoice === "on";
+  const customerType: CustomerType = euAbroad
+    ? input.customerType === "company"
+      ? "company"
+      : "individual"
+    : postedInvoice
+      ? "company"
+      : "individual";
+  const wantsInvoice = euAbroad ? customerType === "company" : postedInvoice;
+  if (wantsInvoice && (!input.companyName || !input.vatNumber)) {
+    return {
+      error: euAbroad ? eu.vatRequired : "Για τιμολόγιο χρειάζονται επωνυμία και ΑΦΜ.",
+      fieldErrors: {
+        ...(input.companyName ? {} : { companyName: "Απαιτείται" }),
+        ...(input.vatNumber ? {} : { vatNumber: "Απαιτείται" }),
+      },
+    };
+  }
+  /*
+   * The format first, in the shop: a prefix that is not the selected
+   * country's is a wrong format, and VIES is not asked (Review Focus 1).
+   * Greece never comes here — its ΑΦΜ stays on the AADE path (Focus 5).
+   */
+  let euVat: string | null = null;
+  if (euAbroad && wantsInvoice) {
+    const format = normaliseEuVat(input.vatNumber, country);
+    if (!format.ok) {
+      const message = eu.vatFormat.replace("{example}", vatExample(vatPrefixFor(country)));
+      return { error: message, fieldErrors: { vatNumber: message } };
+    }
+    euVat = format.vat;
+  }
 
   if (input.shippingMethod !== "pickup") {
     if (!abroad) {
@@ -202,9 +250,11 @@ export async function placeOrder(
    * had, with the old fallback to the first. Flag on: a method that does not
    * fit the country (ACS to Italy, DHL to Athens) is refused, not guessed.
    */
-  const shipping = international
-    ? shippingMethodsFor(chosenCountry).find((m) => m.id === input.shippingMethod)
-    : (SHIPPING_METHODS.find((m) => m.id === input.shippingMethod) ?? SHIPPING_METHODS[0]);
+  const shipping = euSales
+    ? euSalesShippingMethods(chosenCountry).find((m) => m.id === input.shippingMethod)
+    : international
+      ? shippingMethodsFor(chosenCountry).find((m) => m.id === input.shippingMethod)
+      : (SHIPPING_METHODS.find((m) => m.id === input.shippingMethod) ?? SHIPPING_METHODS[0]);
   if (!shipping) {
     return { error: intl.method, fieldErrors: { shippingMethod: intl.method } };
   }
@@ -236,7 +286,7 @@ export async function placeOrder(
    * showed is not an input. Greece is the original call, unchanged.
    */
   const quote =
-    shipping.expressMultiplier > 0
+    shipping.expressMultiplier > 0 && !euAbroad
       ? abroad
         ? await quoteDestination({
             country,
@@ -269,6 +319,27 @@ export async function placeOrder(
   }
 
   /*
+   * EU sales abroad: DHL, re-quoted HERE through HDCtool (B2 `quoteDhl`),
+   * which also judges the postcode. No price → no order, with the spec's
+   * sentence; a refusal about the place goes on the Τ.Κ. field.
+   */
+  let dhlQuote: Extract<DhlQuoteResult, { ok: true }> | null = null;
+  if (euAbroad && shipping.expressMultiplier > 0) {
+    const answer = await quoteDhl({
+      country,
+      postcode: address.shipPostcode,
+      city: address.shipCity,
+      weightKg: chargeableWeight(parcel).chargeableKg,
+    });
+    if (!answer.ok) {
+      if (answer.reason === "unavailable") return { error: eu.noDhl };
+      const message = intl.refused[answer.reason];
+      return { error: message, fieldErrors: { shipPostcode: message } };
+    }
+    dhlQuote = answer;
+  }
+
+  /*
    * One query for the whole basket. `products.mtrl` is the ERP id; a line whose
    * product has since been removed simply keeps null, which is honest — better
    * an unmapped line the push can report than a wrong id it cannot.
@@ -288,13 +359,17 @@ export async function placeOrder(
     firstName: input.firstName,
     lastName: input.lastName,
     ...address,
-    ...(abroad ? { shipCountry: country } : {}),
+    ...(euSales
+      ? { shipCountry: country, billCountry: country, customerType }
+      : abroad
+        ? { shipCountry: country }
+        : {}),
     wantsInvoice,
     companyName: wantsInvoice ? input.companyName || null : null,
-    vatNumber: wantsInvoice ? input.vatNumber || null : null,
-    taxOffice: wantsInvoice ? input.taxOffice || null : null,
-    companyTrade: wantsInvoice ? input.companyTrade || null : null,
-    erpTrdr: wantsInvoice && typeof input.erpTrdr === "number" ? input.erpTrdr : null,
+    vatNumber: wantsInvoice ? (euVat ?? (input.vatNumber || null)) : null,
+    taxOffice: wantsInvoice && !euAbroad ? input.taxOffice || null : null,
+    companyTrade: wantsInvoice && !euAbroad ? input.companyTrade || null : null,
+    erpTrdr: wantsInvoice && !euAbroad && typeof input.erpTrdr === "number" ? input.erpTrdr : null,
     shippingMethod: shipping.id,
     notes: input.notes || null,
   };
@@ -333,12 +408,47 @@ export async function placeOrder(
    * The form is the last word and the ids above are already validated against
    * the offered list, so the totals are recomputed from them.
    */
+  /*
+   * VIES, asked again HERE for a foreign company — whatever the form showed
+   * (Review Focus 2 and 3). HDCtool's 400/401 throw: that is ours to fix, and
+   * the order goes on with VAT rather than failing. Exempt only with a valid
+   * answer of today, for this country (`resolveVatMode`).
+   */
+  let vies: EuVatCheck | null = null;
+  if (euAbroad && customerType === "company" && euVat) {
+    try {
+      vies = await checkEuVat(euVat, country);
+    } catch (error) {
+      console.error("[checkout] VIES check failed, charging VAT", error);
+      vies = { status: "unavailable", name: null, consultationNumber: null, checkedAt: null, message: eu.unavailable };
+    }
+    if (vies.status === "invalid_format") {
+      const message = eu.vatFormat.replace("{example}", vatExample(vatPrefixFor(country)));
+      return { error: message, fieldErrors: { vatNumber: message } };
+    }
+  }
+  const vatMode = euAbroad
+    ? resolveVatMode({
+        country,
+        customerType,
+        vies: vies ? { status: vies.status, checkedAt: vies.checkedAt, country } : null,
+      })
+    : "standard";
+
   const totals = await computeTotals(
     payLines,
     shipping.id,
     payment.id,
     address.shipPostcode,
     abroad ? { country, city: address.shipCity } : undefined,
+    ...(euSales
+      ? [
+          {
+            vatMode,
+            shipping: dhlQuote ? { net: dhlQuote.netAmount, vatRate: vatRateForDestination(country) } : null,
+          },
+        ]
+      : []),
   );
   /* The totals re-quote too; if that answer differs in kind, no order. */
   if (abroad && shipping.expressMultiplier > 0 && (totals.quoteUnavailable || totals.unserviceable)) {
@@ -365,14 +475,37 @@ export async function placeOrder(
 
       // The shop's own address for a pickup order — see `deliveryAddress`.
       ...address,
-      ...(abroad ? { shipCountry: country } : {}),
+      /*
+       * EU sales: the country is always written, delivery and billing, with
+       * who bought and how VAT was charged — and, for a foreign company, the
+       * VIES answer this action got (the proof behind an exemption).
+       */
+      ...(euSales
+        ? {
+            shipCountry: country,
+            billCountry: country,
+            customerType,
+            vatMode,
+            ...(vies
+              ? {
+                  viesValid: vies.status === "valid",
+                  viesName: viesText(vies.name),
+                  viesAddress: null,
+                  viesConsultationNumber: viesText(vies.consultationNumber),
+                  viesCheckedAt: vies.checkedAt ? new Date(vies.checkedAt) : null,
+                }
+              : {}),
+          }
+        : abroad
+          ? { shipCountry: country }
+          : {}),
 
       wantsInvoice,
       companyName: wantsInvoice ? input.companyName || null : null,
-      vatNumber: wantsInvoice ? input.vatNumber || null : null,
-      taxOffice: wantsInvoice ? input.taxOffice || null : null,
-      companyTrade: wantsInvoice ? input.companyTrade || null : null,
-      erpTrdr: wantsInvoice && typeof input.erpTrdr === "number" ? input.erpTrdr : null,
+      vatNumber: wantsInvoice ? (euVat ?? (input.vatNumber || null)) : null,
+      taxOffice: wantsInvoice && !euAbroad ? input.taxOffice || null : null,
+      companyTrade: wantsInvoice && !euAbroad ? input.companyTrade || null : null,
+      erpTrdr: wantsInvoice && !euAbroad && typeof input.erpTrdr === "number" ? input.erpTrdr : null,
 
       shippingMethod: shipping.id,
       paymentMethod: payment.id,
@@ -393,7 +526,9 @@ export async function placeOrder(
       /* The customer's language rides on the frozen checkout snapshot, so every
          later email (payment, shipping, status) is written in it. A column
          would need a migration on the live database (lib/mail/hdc/order-view). */
-      shippingQuote: quote
+      shippingQuote: dhlQuote
+        ? JSON.parse(JSON.stringify(dhlShippingQuote(dhlQuote, country, address.shipPostcode, locale)))
+        : quote
         ? JSON.parse(JSON.stringify({ ...quote, locale }))
         : locale === "el"
           ? undefined
@@ -620,6 +755,41 @@ export async function placeOrder(
   // Outside the try: `redirect` throws by design, and catching it here would
   // turn a successful checkout into an error message.
   redirect(checkoutUrl);
+}
+
+/** VIES writes «---» for what it will not disclose: that is not a value. */
+function viesText(value: string | null | undefined): string | null {
+  const text = (value ?? "").trim();
+  return text && text !== "---" ? text : null;
+}
+
+/**
+ * The DHL quote as `orders.shippingQuote` keeps it — the shape the intake
+ * `shipping` block (`lib/shipping/intake`) and the order screens read:
+ * carrier, productCode, netAmount, vatRate, quotedAt.
+ */
+function dhlShippingQuote(
+  quote: Extract<DhlQuoteResult, { ok: true }>,
+  country: string,
+  postcode: string,
+  locale: string,
+) {
+  return {
+    source: "dhl",
+    carrier: "DHL",
+    productCode: quote.productCode,
+    productName: quote.productName,
+    netAmount: quote.netAmount,
+    totalNet: quote.netAmount,
+    vatRate: vatRateForDestination(country),
+    grossAmount: quote.grossAmount,
+    currency: "EUR",
+    estimatedDeliveryDate: quote.estimatedDeliveryDate ?? null,
+    quotedAt: quote.quotedAt,
+    country,
+    postcode,
+    locale,
+  };
 }
 
 /*

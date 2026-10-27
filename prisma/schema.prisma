@@ -773,6 +773,23 @@ model Order {
   billLine1    String? @db.VarChar(255)
   billCity     String? @db.VarChar(120)
   billPostcode String? @db.VarChar(16)
+  /// Billing country, ISO-2 — the delivery country (no separate billing
+  /// address yet). Written by checkout with EU_SALES_ENABLED.
+  billCountry  String  @default("GR") @db.VarChar(2)
+
+  // ── EU sales: who pays VAT (spec 2026-10-23 §3.3) ──
+  /// "individual" | "company". Null on orders placed before EU sales.
+  customerType           String?   @db.VarChar(16)
+  /// "standard" | "intra_eu_exempt". Exempt only with a valid VIES answer of
+  /// the same Athens day, re-checked by `placeOrder` — never a browser flag.
+  vatMode                String    @default("standard") @db.VarChar(24)
+  /// The VIES answer `placeOrder` got for `vatNumber` (foreign companies only).
+  viesValid              Boolean?
+  viesName               String?   @db.VarChar(255)
+  viesAddress            String?   @db.Text
+  /// The VIES consultation number — the proof of the check.
+  viesConsultationNumber String?   @db.VarChar(64)
+  viesCheckedAt          DateTime?
 
   // ── Fulfilment choices ──
   shippingMethod String  @db.VarChar(32)

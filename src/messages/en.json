@@ -804,7 +804,30 @@
       "pay_now_button": "Pay {amount}",
       "order_now_button": "Place order · {amount}",
       "payable_now": "Payable now",
-      "ship_in_offer": "In the offer"
+      "ship_in_offer": "In the offer",
+      "eu_ship_zone": "We ship within Greece and, with DHL Express, to EU countries (except Cyprus)",
+      "eu_ship_dhl_until": "delivery by {date}",
+      "eu_ship_dhl_label": "DHL Express · delivery by {date}",
+      "eu_no_dhl": "Shipping to your country is not available right now — please contact us",
+      "eu_buyer": "BUYING AS",
+      "eu_individual": "Individual",
+      "eu_individual_help": "24% VAT included",
+      "eu_company": "Company",
+      "eu_company_help": "With an EU VAT number — no VAT once checked in VIES",
+      "eu_company_name": "COMPANY NAME",
+      "eu_vat": "EU VAT NUMBER",
+      "eu_vat_check": "Check",
+      "eu_vat_retry": "Try again",
+      "eu_vat_help": "With the country prefix, e.g. {example}",
+      "eu_vat_checking": "Checking in VIES…",
+      "eu_vat_valid": "Confirmed in VIES: {name}",
+      "eu_vat_valid_noname": "Confirmed in VIES",
+      "eu_vat_invalid": "This VAT number is not active in VIES — the order will be charged with VAT",
+      "eu_vat_unavailable": "The VAT number could not be checked now — try again shortly or continue with VAT",
+      "eu_vat_format": "This VAT number does not match the country you chose (e.g. {example}).",
+      "eu_vat_rate_limited": "Too many checks in a short time — try again in a few minutes or continue with VAT",
+      "eu_exempt_note": "Intra-community supply — VAT exempt (reverse charge, Article 138 of Directive 2006/112/EC)",
+      "eu_total_net": "Total excl. VAT"
     },
     "HdcSplit": {
       "items_one": "1 item",
@@ -974,7 +997,8 @@
       "tk_format_country": "This postcode does not match the country's format — e.g. {example}",
       "tk_unserviceable_eu": "This postcode is not in an area we deliver to.",
       "tk_hint_abroad": "Outside Greece and Cyprus by DHL Express — priced from the country, postcode and city.",
-      "ship_zone_eu": "We ship to Greece, Cyprus and the EU."
+      "ship_zone_eu": "We ship to Greece, Cyprus and the EU.",
+      "eu_ship_zone": "We ship within Greece and, with DHL Express, to EU countries (except Cyprus)"
     }
   },
   "brands": {

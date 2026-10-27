@@ -19,7 +19,7 @@ import { getViewer } from "@/lib/account/session";
 import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
 import type { Locale } from "@/i18n/routing";
-import { computeTotals, getCart, getDeliveryPostcode } from "@/lib/cart/cart";
+import { computeTotals, getCart, getDeliveryPostcode, type ComputeTotalsOptions } from "@/lib/cart/cart";
 import {
   shippingMethodsFor,
   type AnyShippingMethodId,
@@ -34,6 +34,10 @@ import { splitCart } from "@/lib/requests/model";
 import { countryName } from "@/lib/shipping/countries";
 import { readDestination } from "@/lib/shipping/destination-cookie";
 import { isInternationalShippingEnabled } from "@/lib/shipping/flag";
+import { readEuBuyer } from "@/lib/eu-sales/buyer-cookie";
+import { euSalesShippingMethods } from "@/lib/eu-sales/countries";
+import { isEuSalesEnabled } from "@/lib/eu-sales/flag";
+import { resolveVatMode } from "@/lib/eu-sales/vat-mode";
 
 export const dynamic = "force-dynamic";
 
@@ -121,13 +125,36 @@ export default async function CheckoutPage({
 
   const cart = await getCart(locale, postcode, abroadTo);
 
+  /*
+   * EU sales (EU_SALES_ENABLED): the buyer abroad as the form last told the
+   * server — «Ιδιώτης / Εταιρεία» and what VIES said (`checkVatForCheckout`).
+   * A valid answer of today, for this country, shows every figure without
+   * VAT. Display only: `placeOrder` asks VIES again and decides.
+   */
+  const euSales = isEuSalesEnabled();
+  const buyer = euSales && destination ? await readEuBuyer() : null;
+  const vatMode =
+    euSales && destination && buyer
+      ? resolveVatMode({
+          country: destination.country,
+          customerType: buyer.customerType,
+          vies: buyer.vies
+            ? { status: buyer.vies.status, checkedAt: buyer.vies.checkedAt, country: buyer.country }
+            : null,
+        })
+      : "standard";
+  const exempt = vatMode === "intra_eu_exempt";
+  const totalsOptions: ComputeTotalsOptions = exempt ? { vatMode } : {};
+
   // An empty cart has nothing to check out; bouncing back is kinder than an
   // empty form that fails on submit.
   if (!cart || cart.lines.length === 0) redirect("/kalathi");
   /* One line from the supplier sends the whole order in 3–5 working days. */
   const supplierOrder = orderAvailability(cart.lines.map((l) => l.availability)) === "supplier";
 
-  const totals = cart.totals;
+  const totals = exempt
+    ? await computeTotals(cart.lines, cart.shippingMethod, cart.paymentMethod, postcode, abroadTo, totalsOptions)
+    : cart.totals;
   /* Back-order requests: shapes the form; the action decides again on submit. */
   const split = splitCart(cart.lines);
   const requestKind = split.kind;
@@ -145,6 +172,7 @@ export default async function CheckoutPage({
     paymentMethod: cart.paymentMethod,
     postcode,
     destination: abroadTo,
+    ...(exempt ? { vatMode } : {}),
   });
 
   /*
@@ -156,9 +184,13 @@ export default async function CheckoutPage({
   const totalsFor = async (id: AnyShippingMethodId): Promise<CartTotals> =>
     id === cart.shippingMethod
       ? totals
-      : computeTotals(cart.lines, id, cart.paymentMethod, postcode, abroadTo);
+      : computeTotals(cart.lines, id, cart.paymentMethod, postcode, abroadTo, totalsOptions);
   /* Only the methods the destination offers are priced — no ACS call for Italy. */
-  const offered = destination ? shippingMethodsFor(destination.country) : null;
+  const offered = destination
+    ? euSales
+      ? euSalesShippingMethods(destination.country)
+      : shippingMethodsFor(destination.country)
+    : null;
   const [courier, express, dhl] = await Promise.all([
     !offered || offered.some((m) => m.id === "courier") ? totalsFor("courier") : null,
     !offered ? totalsFor("express") : null,
@@ -166,7 +198,7 @@ export default async function CheckoutPage({
   ]);
   /* «split»: each tile priced for the in-stock lines alone — what ships now. */
   const nowFor = (id: AnyShippingMethodId) =>
-    computeTotals(split.ready, id, cart.paymentMethod, postcode, abroadTo);
+    computeTotals(split.ready, id, cart.paymentMethod, postcode, abroadTo, totalsOptions);
   const [courierNow, expressNow, dhlNow] =
     requestKind === "mixed"
       ? await Promise.all([courier ? nowFor("courier") : null, express ? nowFor("express") : null, dhl ? nowFor("dhl") : null])
@@ -199,6 +231,18 @@ export default async function CheckoutPage({
           ? { price: money(method.shippingGross), free: false }
           : { price: null, free: false };
 
+  /* «30 Οκτωβρίου» — DHL's estimated date in the customer's language. */
+  const dhlUntil = (method: CartTotals): string | null => {
+    const iso = method.postage?.deliveryDate;
+    const date = iso ? new Date(iso) : null;
+    if (!date || Number.isNaN(date.getTime())) return null;
+    return new Intl.DateTimeFormat(locale === "el" ? "el-GR" : locale === "it" ? "it-IT" : "en-GB", {
+      day: "numeric",
+      month: "long",
+      timeZone: "Europe/Athens",
+    }).format(date);
+  };
+
   const tiles = (
     courier: CartTotals | null,
     express: CartTotals | null,
@@ -212,15 +256,24 @@ export default async function CheckoutPage({
       : []),
     ...(dhl
       ? [
-          {
-            id: "dhl",
-            title: "DHL EXPRESS",
-            label: "DHL Express",
-            meta: dhl.postage
-              ? t("ship_dhl_meta", { eta: dhl.postage.etaDays })
-              : t("ship_dhl_meta_plain"),
-            ...tilePrice(dhl),
-          },
+          /* EU sales: «DHL Express · παράδοση έως <date>» when DHL gave a date. */
+          euSales && dhlUntil(dhl)
+            ? {
+                id: "dhl",
+                title: "DHL EXPRESS",
+                label: t("eu_ship_dhl_label", { date: dhlUntil(dhl)! }),
+                meta: t("eu_ship_dhl_label", { date: dhlUntil(dhl)! }),
+                ...tilePrice(dhl),
+              }
+            : {
+                id: "dhl",
+                title: "DHL EXPRESS",
+                label: "DHL Express",
+                meta: dhl.postage
+                  ? t("ship_dhl_meta", { eta: dhl.postage.etaDays })
+                  : t("ship_dhl_meta_plain"),
+                ...tilePrice(dhl),
+              },
         ]
       : []),
     {
@@ -243,9 +296,12 @@ export default async function CheckoutPage({
         : `${cart.shippingMethod === "express" ? "ACS Express" : "ACS Courier"}${postcode ? ` · ${postcode}` : ""}`;
 
   const allAt24 = cart.lines.every((l) => l.vatRate === 24);
-  const vatLine = allAt24
-    ? t("periechei_fpa_24", { amount: money(totals.vatAmount) })
-    : t("periechei_fpa", { amount: money(totals.vatAmount) });
+  /* Exempt: no VAT line — the reverse-charge note, word for word, instead. */
+  const vatLine = exempt
+    ? t("eu_exempt_note")
+    : allAt24
+      ? t("periechei_fpa_24", { amount: money(totals.vatAmount) })
+      : t("periechei_fpa", { amount: money(totals.vatAmount) });
 
   const miniName = (name: string, code2: string) => {
     const model = parseModel(name);
@@ -281,7 +337,7 @@ export default async function CheckoutPage({
             <b>
               {miniName(line.name, line.code2)}
             </b>
-            <span className="p">{money(line.lineGross)}</span>
+            <span className="p">{money(exempt ? line.lineNet : line.lineGross)}</span>
           </li>
         ))}
       </ul>
@@ -318,7 +374,7 @@ export default async function CheckoutPage({
         )}
       </dl>
       <div className="tot">
-        <b>{t("synolo")}</b>
+        <b>{exempt ? t("eu_total_net") : t("synolo")}</b>
         <span>{money(totals.totalGross)}</span>
       </div>
       <p className="vat">{vatLine}</p>
@@ -367,6 +423,21 @@ export default async function CheckoutPage({
               international={international}
               destination={destination}
               quoteStatus={quoteStatus}
+              {...(euSales
+                ? {
+                    euSales: true,
+                    exempt,
+                    buyer: buyer
+                      ? {
+                          country: buyer.country,
+                          customerType: buyer.customerType,
+                          vat: buyer.vat,
+                          status: buyer.vies?.status ?? null,
+                          name: buyer.vies?.name ?? null,
+                        }
+                      : null,
+                  }
+                : {})}
             />
           </div>
 

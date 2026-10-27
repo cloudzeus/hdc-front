@@ -804,7 +804,30 @@
       "pay_now_button": "Paga {amount}",
       "order_now_button": "Conferma ordine · {amount}",
       "payable_now": "Da pagare ora",
-      "ship_in_offer": "Nell'offerta"
+      "ship_in_offer": "Nell'offerta",
+      "eu_ship_zone": "Spediamo in Grecia e, con DHL Express, nei paesi UE (escluso Cipro)",
+      "eu_ship_dhl_until": "consegna entro il {date}",
+      "eu_ship_dhl_label": "DHL Express · consegna entro il {date}",
+      "eu_no_dhl": "La spedizione nel tuo paese non è disponibile al momento — contattaci",
+      "eu_buyer": "ACQUISTI COME",
+      "eu_individual": "Privato",
+      "eu_individual_help": "IVA 24% inclusa",
+      "eu_company": "Azienda",
+      "eu_company_help": "Con partita IVA UE — senza IVA dopo la verifica VIES",
+      "eu_company_name": "RAGIONE SOCIALE",
+      "eu_vat": "PARTITA IVA UE",
+      "eu_vat_check": "Verifica",
+      "eu_vat_retry": "Riprova",
+      "eu_vat_help": "Con il prefisso del paese, ad es. {example}",
+      "eu_vat_checking": "Verifica in VIES…",
+      "eu_vat_valid": "Confermata in VIES: {name}",
+      "eu_vat_valid_noname": "Confermata in VIES",
+      "eu_vat_invalid": "La partita IVA non è attiva in VIES — l'ordine sarà addebitato con IVA",
+      "eu_vat_unavailable": "Non è stato possibile verificare la partita IVA ora — riprova tra poco o continua con IVA",
+      "eu_vat_format": "La partita IVA non corrisponde al paese scelto (ad es. {example}).",
+      "eu_vat_rate_limited": "Troppe verifiche in poco tempo — riprova tra qualche minuto o continua con IVA",
+      "eu_exempt_note": "Cessione intracomunitaria — non imponibile IVA (inversione contabile, art. 138 Direttiva 2006/112/CE)",
+      "eu_total_net": "Totale IVA esclusa"
     },
     "HdcSplit": {
       "items_one": "1 articolo",
@@ -974,7 +997,8 @@
       "tk_format_country": "Il CAP non corrisponde al formato del paese — es. {example}",
       "tk_unserviceable_eu": "Questo CAP non rientra in una zona che serviamo.",
       "tk_hint_abroad": "Fuori da Grecia e Cipro con DHL Express — prezzo in base a paese, CAP e città.",
-      "ship_zone_eu": "Spediamo in Grecia, a Cipro e nei paesi dell'UE."
+      "ship_zone_eu": "Spediamo in Grecia, a Cipro e nei paesi dell'UE.",
+      "eu_ship_zone": "Spediamo in Grecia e, con DHL Express, nei paesi UE (escluso Cipro)"
     }
   },
   "brands": {

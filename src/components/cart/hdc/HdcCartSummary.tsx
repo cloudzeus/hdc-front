@@ -7,6 +7,7 @@ import { useLocale } from "next-intl";
 import { applyCoupon, setDeliveryDestination, setDeliveryPostcode } from "@/lib/cart/actions";
 import { validatePostcode } from "@/lib/shipping/destination";
 import { countryOptions, postcodeExample, validateCountryPostcode } from "@/lib/shipping/countries";
+import { euSalesCountryOptions } from "@/lib/eu-sales/countries";
 import type { CartSplitKind } from "@/lib/requests/model";
 
 /**
@@ -28,6 +29,7 @@ export function HdcCartSummary({
   country: initialCountry = "GR",
   city: initialCity = "",
   quoteUnavailable = false,
+  euSales = false,
 }: {
   /**
    * Back-order requests (docs/backorder-requests.md): «all» — nothing is in
@@ -52,6 +54,8 @@ export function HdcCartSummary({
   city?: string;
   /** Abroad, nobody could price it (HDCtool/DHL down). */
   quoteUnavailable?: boolean;
+  /** EU_SALES_ENABLED: Greece and the DHL countries — no Cyprus. */
+  euSales?: boolean;
 }) {
   const t = useTranslations("cart.Hdc");
   const locale = useLocale();
@@ -124,7 +128,7 @@ export function HdcCartSummary({
               autoComplete="country"
               disabled={pending}
             >
-              {countryOptions(locale).map((option) => (
+              {(euSales ? euSalesCountryOptions(locale) : countryOptions(locale)).map((option) => (
                 <option key={option.code} value={option.code}>
                   {option.name}
                 </option>
@@ -187,7 +191,7 @@ export function HdcCartSummary({
                   : t("tk_unserviceable")
                 : t("tk_hint")}
         </p>
-        <p className="hint">{international ? t("ship_zone_eu") : t("ship_zone")}</p>
+        <p className="hint">{euSales ? t("eu_ship_zone") : international ? t("ship_zone_eu") : t("ship_zone")}</p>
 
         <dl>
           {rows.map((row) => (

@@ -15,6 +15,10 @@ import type { CartSplitKind, RequestMode } from "@/lib/requests/model";
 import { payableNow, useSplitCheckout } from "@/components/checkout/SplitCheckout";
 import { formatMoney } from "@/lib/format";
 import type { Locale } from "@/i18n/routing";
+import { checkVatForCheckout, type CheckoutVatResult } from "@/lib/eu-sales/check-vat-action";
+import { euSalesCountryOptions, euSalesShippingMethods, vatPrefixFor } from "@/lib/eu-sales/countries";
+import { normaliseEuVat } from "@/lib/eu-sales/vat-format";
+import type { CustomerType } from "@/lib/eu-sales/vat-mode";
 
 /**
  * The HDC checkout form (checkout.html, screen 2 and the second phone frame).
@@ -66,6 +70,17 @@ export type DestinationQuoteStatus =
   | "invalid_postcode"
   | "invalid_address";
 
+/** The buyer abroad the server remembers (EU sales, `buyer-cookie`). */
+export type EuBuyerView = {
+  country: string;
+  customerType: CustomerType;
+  vat: string | null;
+  status: string | null;
+  name: string | null;
+};
+
+type VatStatus = CheckoutVatResult["status"];
+
 type Prefill = {
   firstName: string;
   lastName: string;
@@ -94,6 +109,9 @@ export function CheckoutForm({
   international = false,
   destination = null,
   quoteStatus = null,
+  euSales = false,
+  exempt = false,
+  buyer = null,
 }: {
   locale: string;
   /** The postcode the quotes were priced for (cookie or saved address). */
@@ -131,6 +149,16 @@ export function CheckoutForm({
   destination?: { country: string; postcode: string; city: string } | null;
   /** How that price came out. */
   quoteStatus?: DestinationQuoteStatus | null;
+  /**
+   * EU_SALES_ENABLED, read by the page (spec 2026-10-23 §3). Off: the form is
+   * exactly what it was. On: Greece or a DHL country (no Cyprus); abroad no
+   * address suggestions, no collection, and «Ιδιώτης / Εταιρεία» with a VIES
+   * check instead of «Θέλω τιμολόγιο».
+   */
+  euSales?: boolean;
+  /** The page priced everything without VAT (valid VIES today). Display only. */
+  exempt?: boolean;
+  buyer?: EuBuyerView | null;
 }) {
   const t = useTranslations("checkout.Hdc");
   const [state, action, pending] = useActionState<CheckoutState, FormData>(placeOrder, {});
@@ -153,7 +181,11 @@ export function CheckoutForm({
     international && destination ? destination.country : "GR",
   );
   const abroad = international && country !== "GR";
-  const methods = international ? shippingMethodsFor(country) : SHIPPING_METHODS;
+  /* EU sales abroad: DHL only, «Ιδιώτης / Εταιρεία», VIES. */
+  const euAbroad = euSales && abroad;
+  const euMethods = euSales ? euSalesShippingMethods(country) : null;
+  const methods =
+    euMethods && euMethods.length > 0 ? euMethods : international ? shippingMethodsFor(country) : SHIPPING_METHODS;
   /* A choice that does not fit the country (ACS Express to Italy) falls to the first that does. */
   const chosen = methods.some((m) => m.id === shipping) ? shipping : methods[0].id;
   const destinationTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -165,6 +197,40 @@ export function CheckoutForm({
       });
     }, delay);
   };
+
+  /*
+   * The buyer abroad. The VAT field starts with the country's prefix; a check
+   * (blur, «Έλεγχος», the radio, a new country) goes to the server, which
+   * asks VIES and remembers the answer — and that re-renders the summary.
+   */
+  const remembered = buyer && buyer.country === country ? buyer : null;
+  const [customerType, setCustomerType] = useState<CustomerType>(remembered?.customerType ?? "individual");
+  const [vat, setVat] = useState<string>(remembered?.vat ?? (euAbroad ? vatPrefixFor(country) : ""));
+  const [vatStatus, setVatStatus] = useState<VatStatus>(
+    remembered?.vat ? ((remembered.status as VatStatus) ?? null) : null,
+  );
+  const [vatName, setVatName] = useState<string | null>(remembered?.name ?? null);
+  const [vatPending, startVatCheck] = useTransition();
+  const runVatCheck = (next: { country: string; customerType: CustomerType; vat?: string }) => {
+    let send = next;
+    if (next.customerType === "company" && next.vat !== undefined && next.country !== "GR") {
+      const prefix = vatPrefixFor(next.country);
+      const body = next.vat.toUpperCase().replace(/[^A-Z0-9]/g, "").replace(new RegExp(`^(${prefix})+`), "");
+      // Only the prefix typed so far: nothing to check yet.
+      if (!body) send = { ...next, vat: "" };
+      // The format first, here: a wrong one never reaches VIES (the server agrees).
+      setVatStatus(!body ? null : normaliseEuVat(next.vat, next.country).ok ? null : "invalid_format");
+    } else {
+      setVatStatus(null);
+    }
+    setVatName(null);
+    startVatCheck(async () => {
+      const result = await checkVatForCheckout(send);
+      setVatStatus(result.status);
+      setVatName(result.name);
+    });
+  };
+  const checkCompanyVat = () => runVatCheck({ country, customerType: "company", vat });
 
   const pickup = chosen === "pickup";
   const isOnline = payment === "card" || payment === "iris";
@@ -318,7 +384,7 @@ export function CheckoutForm({
     if (!checked.ok && zip.replace(/[\s-]/g, "").length >= example.replace(/[\s-]/g, "").length) {
       addressErrors.shipPostcode = t("postcode_format", { example });
     } else if (priced && quoteStatus === "unavailable") {
-      addressErrors.quote = t("quote_unavailable");
+      addressErrors.quote = euSales ? t("eu_no_dhl") : t("quote_unavailable");
     } else if (priced && quoteStatus && quoteStatus !== "ok" && quoteStatus !== "pending") {
       addressErrors.shipPostcode = t(`refused_${quoteStatus}`);
     }
@@ -376,7 +442,7 @@ export function CheckoutForm({
       .join(" · "),
     address: [
       [values.shipPostcode, values.shipCity].filter(Boolean).join(" "),
-      wantsInvoice ? t("timologio") : null,
+      euAbroad ? (customerType === "company" ? t("eu_company") : t("eu_individual")) : wantsInvoice ? t("timologio") : null,
     ]
       .filter(Boolean)
       .join(" · "),
@@ -402,6 +468,100 @@ export function CheckoutForm({
       {wantsInvoice && (
         <div className="hdc-co-inv">
           <CompanyVatFields variant="hdc" required fieldErrors={state.fieldErrors} />
+        </div>
+      )}
+    </div>
+  );
+
+  const vatExample = `${vatPrefixFor(country)}123456789`;
+  const buyerBlock = (
+    <div className="hdc-co-buyer">
+      <span className="lbl">{t("eu_buyer")}</span>
+      <div className="hdc-ship two" role="radiogroup" aria-label={t("eu_buyer")}>
+        {(["individual", "company"] as const).map((type) => (
+          <label key={type} className={customerType === type ? "on" : undefined}>
+            <input
+              type="radio"
+              name="customerType"
+              value={type}
+              checked={customerType === type}
+              onChange={() => {
+                setCustomerType(type);
+                runVatCheck({ country, customerType: type, ...(type === "company" ? { vat } : {}) });
+              }}
+            />
+            <b>{type === "company" ? t("eu_company") : t("eu_individual")}</b>
+            <span>{type === "company" ? t("eu_company_help") : t("eu_individual_help")}</span>
+          </label>
+        ))}
+      </div>
+      {customerType === "company" && (
+        <div className="hdc-co-inv hdc-vat hdc-eu-vat">
+          <div className="f2">
+            <Field
+              label={t("eu_company_name")}
+              name="companyName"
+              autoComplete="organization"
+              error={state.fieldErrors?.companyName}
+              required
+            />
+            <label className="hdc-fld">
+              <span className="lbl">
+                {t("eu_vat")}
+                <em> *</em>
+              </span>
+              <span className="vatrow">
+                <input
+                  name="vatNumber"
+                  value={vat}
+                  onChange={(e) => {
+                    setVat(e.target.value);
+                    setVatStatus(null);
+                  }}
+                  onBlur={checkCompanyVat}
+                  onKeyDown={(e) => {
+                    // Enter inside a checkout form would submit the order.
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      checkCompanyVat();
+                    }
+                  }}
+                  autoComplete="off"
+                  autoCapitalize="characters"
+                  spellCheck={false}
+                  placeholder={vatExample}
+                  required
+                  aria-invalid={state.fieldErrors?.vatNumber || vatStatus === "invalid_format" ? true : undefined}
+                  aria-describedby="eu-vat-status"
+                  className={state.fieldErrors?.vatNumber || vatStatus === "invalid_format" ? "bad" : undefined}
+                />
+                <button type="button" className="hdc-btn" onClick={checkCompanyVat} disabled={vatPending}>
+                  {vatStatus === "unavailable" || vatStatus === "rate_limited" ? t("eu_vat_retry") : t("eu_vat_check")}
+                </button>
+              </span>
+              {state.fieldErrors?.vatNumber && <span className="err">{state.fieldErrors.vatNumber}</span>}
+            </label>
+          </div>
+          <p id="eu-vat-status" aria-live="polite" className="hint">
+            {vatPending ? (
+              <span>{t("eu_vat_checking")}</span>
+            ) : vatStatus === "valid" ? (
+              <span className="ok">
+                ✓ {vatName ? t("eu_vat_valid", { name: vatName }) : t("eu_vat_valid_noname")}
+              </span>
+            ) : vatStatus === "invalid" ? (
+              <span className="bad">✗ {t("eu_vat_invalid")}</span>
+            ) : vatStatus === "unavailable" ? (
+              <span className="wait">⚠ {t("eu_vat_unavailable")}</span>
+            ) : vatStatus === "rate_limited" ? (
+              <span className="wait">⚠ {t("eu_vat_rate_limited")}</span>
+            ) : vatStatus === "invalid_format" ? (
+              <span className="bad">{t("eu_vat_format", { example: vatExample })}</span>
+            ) : (
+              <span>{t("eu_vat_help", { example: vatExample })}</span>
+            )}
+          </p>
+          {vatStatus === "valid" && exempt && <p className="hint">{t("eu_exempt_note")}</p>}
         </div>
       )}
     </div>
@@ -557,7 +717,13 @@ export function CheckoutForm({
               onChange={(e) => {
                 const next = e.target.value;
                 setCountry(next);
-                const offered = shippingMethodsFor(next);
+                if (euSales) {
+                  // A VAT number belongs to its country: start again with the new prefix,
+                  // and drop any exemption on the server at once (Review Focus 2).
+                  setVat(next === "GR" ? "" : vatPrefixFor(next));
+                  runVatCheck({ country: next, customerType, vat: "" });
+                }
+                const offered = euSales ? euSalesShippingMethods(next) : shippingMethodsFor(next);
                 if (!offered.some((m) => m.id === shipping)) {
                   setShipping(offered[0].id);
                   remember({ shippingMethod: offered[0].id });
@@ -574,7 +740,7 @@ export function CheckoutForm({
               }}
               aria-invalid={state.fieldErrors?.shipCountry ? true : undefined}
             >
-              {countryOptions(locale).map((option) => (
+              {(euSales ? euSalesCountryOptions(locale) : countryOptions(locale)).map((option) => (
                 <option key={option.code} value={option.code}>
                   {option.name}
                 </option>
@@ -630,6 +796,10 @@ export function CheckoutForm({
       >
         <fieldset disabled={pickup}>
           <div className="f21">
+            {/* EU sales abroad: no address suggestions (MapTiler is Greece-only). */}
+            {euAbroad ? (
+              <Field label={t("odos")} name="shipLine1" autoComplete="address-line1" defaultValue={prefill?.shipLine1} error={fieldError("shipLine1")} required />
+            ) : (
             <AddressAutocomplete
               variant="hdc"
               label={t("odos")}
@@ -638,6 +808,7 @@ export function CheckoutForm({
               error={fieldError("shipLine1")}
               required
             />
+            )}
             <Field label={t("orofos")} name="shipLine2" defaultValue={prefill?.shipLine2} autoComplete="address-line2" error={fieldError("shipLine2")} invalid={addressErrors.shipLine2} />
           </div>
           <div className="f4">
@@ -654,12 +825,18 @@ export function CheckoutForm({
               required
             />
             <Field label={t("poli")} name="shipCity" autoComplete="address-level2" placeholder={t("poli_ph")} defaultValue={addressValue("shipCity")} error={fieldError("shipCity")} invalid={addressErrors.shipCity} required />
+            {/* Νομός / Περιφέρεια are Greek: not asked abroad under EU sales. */}
+            {!euAbroad && (
+              <>
             <Field label={t("nomos")} name="shipRegion" autoComplete="address-level1" defaultValue={prefill?.shipRegion} error={fieldError("shipRegion")} invalid={addressErrors.shipRegion} />
             <Field label={t("perifereia")} name="shipAdminRegion" defaultValue={prefill?.shipAdminRegion} error={fieldError("shipAdminRegion")} invalid={addressErrors.shipAdminRegion} />
+              </>
+            )}
           </div>
-          <p className="hdc-info">{international ? t("ship_zone_eu") : t("ship_zone")}</p>
+          <p className="hdc-info">{euSales ? t("eu_ship_zone") : international ? t("ship_zone_eu") : t("ship_zone")}</p>
         </fieldset>
-        {!pickup && invoiceBlock}
+        {/* Greece keeps «Θέλω τιμολόγιο» (ΑΑΔΕ); abroad «Ιδιώτης / Εταιρεία» replaces it. */}
+        {!pickup && (euAbroad ? buyerBlock : invoiceBlock)}
       </Step>
 
       {requestKind === "all" && <p className="hdc-info">{t("request_all_note")}</p>}
@@ -790,7 +967,7 @@ export function CheckoutForm({
       {/* Phones: the total and the next step, always under the thumb. */}
       <div className="hdc-mbar hdc-co-mbar">
         <div className="tt">
-          <span>{nowAmount != null ? t("payable_now") : t("synolo_me_fpa")}</span>
+          <span>{nowAmount != null ? t("payable_now") : exempt ? t("eu_total_net") : t("synolo_me_fpa")}</span>
           <b>{nowAmount != null ? money(nowAmount) : total}</b>
         </div>
         {open === "notes" ? (

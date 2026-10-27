@@ -2,6 +2,8 @@ import "server-only";
 import { cookies } from "next/headers";
 import { SHOP } from "@/config/shop";
 import { isInternationalShippingEnabled } from "@/lib/shipping/flag";
+import { isEuSalesEnabled } from "@/lib/eu-sales/flag";
+import { isDhlDestination } from "@/lib/eu-sales/countries";
 import { normalizeCountry, validateCountryPostcode } from "@/lib/shipping/countries";
 
 /**
@@ -41,7 +43,10 @@ export function parseDestination(value: string | null | undefined): StoredDestin
 export async function readDestination(): Promise<StoredDestination | null> {
   if (!isInternationalShippingEnabled()) return null;
   const store = await cookies();
-  return parseDestination(store.get(DESTINATION_COOKIE)?.value);
+  const destination = parseDestination(store.get(DESTINATION_COOKIE)?.value);
+  // EU sales deliver abroad with DHL only: a Cyprus left over from before is Greece again.
+  if (destination && isEuSalesEnabled() && !isDhlDestination(destination.country)) return null;
+  return destination;
 }
 
 /** Null forgets it — the customer chose Greece again. */

@@ -17,6 +17,8 @@ import {
 import { searchKey } from "@/lib/greek";
 import { isInternationalShippingEnabled } from "@/lib/shipping/flag";
 import { normalizeCountry, validateCountryPostcode } from "@/lib/shipping/countries";
+import { isEuSalesEnabled } from "@/lib/eu-sales/flag";
+import { normalizeEuSalesCountry } from "@/lib/eu-sales/countries";
 import { validatePostcode } from "@/lib/shipping/destination";
 import { writeDestination } from "@/lib/shipping/destination-cookie";
 
@@ -359,7 +361,10 @@ export async function setDeliveryDestination(input: unknown): Promise<CartAction
     .safeParse(input);
   if (!parsed.success) return { ok: false, error: "invalid_input" };
 
-  const country = normalizeCountry(parsed.data.country, true);
+  // EU sales: Greece or a DHL destination — no Cyprus (spec 2026-10-23 §3.1).
+  const country = isEuSalesEnabled()
+    ? normalizeEuSalesCountry(parsed.data.country)
+    : normalizeCountry(parsed.data.country, true);
   if (!country) return { ok: false, error: "unsupported_country" };
 
   if (country === "GR") {

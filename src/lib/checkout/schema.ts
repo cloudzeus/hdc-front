@@ -38,6 +38,12 @@ export const checkoutSchema = z
      */
     shipCountry: optionalText(2),
 
+    /**
+     * EU sales only (EU_SALES_ENABLED), abroad: «Ιδιώτης» or «Εταιρεία», which
+     * replaces «Θέλω τιμολόγιο» there. Ignored in Greece and with the flag off.
+     */
+    customerType: z.enum(["individual", "company"]).optional().or(z.literal("")),
+
     wantsInvoice: z.union([z.literal("on"), z.literal("")]).optional(),
     companyName: optionalText(255),
     vatNumber: optionalText(32),

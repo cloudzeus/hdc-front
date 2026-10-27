@@ -17,6 +17,7 @@ import { freeShippingProgress } from "@/lib/cart/options";
 import { availabilityLabelKey, orderAvailability } from "@/lib/catalog/availability";
 import { isOnRequest, splitCart } from "@/lib/requests/model";
 import { countryName } from "@/lib/shipping/countries";
+import { isEuSalesEnabled } from "@/lib/eu-sales/flag";
 import { readDestination } from "@/lib/shipping/destination-cookie";
 import { isInternationalShippingEnabled } from "@/lib/shipping/flag";
 import {
@@ -298,6 +299,7 @@ export default async function CartPage({
                 postcode={postcode}
                 unserviceable={totals.unserviceable}
                 international={international}
+                {...(isEuSalesEnabled() ? { euSales: true } : {})}
                 country={destination?.country ?? "GR"}
                 city={destination?.city ?? ""}
                 quoteUnavailable={totals.quoteUnavailable === true}
