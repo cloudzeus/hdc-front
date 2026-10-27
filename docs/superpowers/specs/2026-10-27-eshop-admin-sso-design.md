@@ -150,6 +150,7 @@ eshop /admin/login                HDCtool                          eshop
 - Σε `ADMIN_SSO=only`, η Credentials σύνδεση για email εκτός λίστας αποτυγχάνει με το ίδιο γενικό μήνυμα λάθους κωδικού.
 - Κάθε σύνδεση έκτακτης ανάγκης γράφει `emergency_login` στο audit / log.
 - Το reset κωδικού στέλνει email μόνο σε emails της λίστας.
+- Τα emails της λίστας είναι αποκλειστικές διευθύνσεις έκτακτης ανάγκης, **ποτέ** ταυτότητα SSO κανενός. Αν ένα token του HDCtool φέρει email της λίστας, το callback το απορρίπτει με `reason=emergency_account` πριν από κάθε σύνδεση λογαριασμού (μετά τον έλεγχο `jti`). Έτσι ο λογαριασμός έκτακτης ανάγκης δεν συνδέεται ποτέ με το HDCtool, δεν αλλάζει ρόλο από το HDCtool, δεν δημιουργείται ως λογαριασμός χωρίς κωδικό, και κρατά το «Νέος κωδικός» / «Ξέχασα τον κωδικό». Η απόρριψη αυτή δεν μετρά στο rate limit.
 
 ## 5. Ρυθμίσεις
 
@@ -164,6 +165,8 @@ eshop /admin/login                HDCtool                          eshop
 | `ESHOP_SSO_CLIENTS` | JSON: `[{"id":"kolleris","name":"Kolleris","callbackUrl":"https://kolleris.com/api/admin/sso/callback"},{"id":"milwaukee","name":"Milwaukee","callbackUrl":"https://milwaukeetoolshdc.gr/api/admin/sso/callback"}]` |
 
 - Τα `callbackUrl` πρέπει να είναι `https://`. Το `http://localhost:*` γίνεται δεκτό μόνο όταν `NODE_ENV !== "production"`.
+- Το origin κάθε `callbackUrl` πρέπει να είναι **ακριβώς** το origin όπου το προσωπικό ανοίγει το `/admin` του eshop (= το `NEXT_PUBLIC_SITE_URL` του), χωρίς redirect μπροστά του (π.χ. www↔apex 301). Το cookie `sso_state` είναι host-only, άρα σε άλλο host το callback αποτυγχάνει πάντα με `no_state`, και ένα 301 σε POST χάνει το token. (Kolleris: `https://kolleris.com`· το `web.kolleris.com` κάνει 301 προς αυτό.)
+- Το `ESHOP_SSO_ISSUER` πρέπει να είναι ίδιο, χαρακτήρα προς χαρακτήρα, με το `ADMIN_SSO_ISSUER` κάθε eshop (η τελική κάθετος αφαιρείται και στις δύο πλευρές).
 - Αν το `ESHOP_SSO_CLIENTS` είναι άκυρο, ή λείπει το ιδιωτικό κλειδί, το `/sso/eshop` απαντά 503 «Το SSO δεν έχει ρυθμιστεί».
 
 **Eshop (Coolify, και στα δύο):**
@@ -193,6 +196,7 @@ eshop /admin/login                HDCtool                          eshop
 | Token ληγμένο / ξαναχρησιμοποιημένο / λάθος υπογραφή / λάθος `aud` / λάθος ή χαμένο `state` | eshop: «Η σύνδεση δεν ολοκληρώθηκε, ξαναδοκίμασε» | `admin_sso_rejected reason=…` |
 | Email δεμένο σε άλλο id HDCtool | ίδιο γενικό μήνυμα | `reason=email_bound_to_other` |
 | Χρήστης απενεργοποιημένος τοπικά | ίδιο γενικό μήνυμα | `reason=disabled_locally` |
+| Το email είναι στη λίστα έκτακτης ανάγκης (§4.3) | ίδιο γενικό μήνυμα | `reason=emergency_account` |
 | Τα κλειδιά δεν φορτώνουν και δεν υπάρχει αποθηκευμένο | ίδιο γενικό μήνυμα | `reason=jwks_unavailable` |
 
 ## 7. Ασφάλεια (σύνοψη)
@@ -203,7 +207,7 @@ eshop /admin/login                HDCtool                          eshop
 - Το `jti` (unique insert) εμποδίζει την επανάληψη μέσα στα 60″.
 - Η επιστροφή γίνεται μόνο στο καταχωρημένο `callbackUrl` (όχι open redirect). Το return path του eshop είναι μόνο σχετικό, κάτω από `/admin`.
 - Το token δεν μπαίνει ποτέ σε URL (μόνο σε POST body), ούτε σε log. Οι σελίδες έχουν `no-store`.
-- Rate limit στο `/api/admin/sso/callback`: ο υπάρχων μηχανισμός του login, ανά IP.
+- Rate limit στο `/api/admin/sso/callback`: ο πίνακας και τα όρια του login, ανά IP. Μετρούν μόνο οι αποτυχίες που μπορεί να προκαλέσει σκόπιμα ένας επιτιθέμενος (`bad_signature`, `bad_claims`, `bad_role`), και όσο ισχύει το κλείδωμα δεν γράφεται νέα γραμμή, ώστε ένα γραφείο πίσω από κοινή IP να μην κλειδώνεται από συνηθισμένα σφάλματα (`no_state`, `expired`, `replay`, `jwks_unavailable` κ.λπ.).
 - Εναλλαγή κλειδιού:
   1. Το νέο κλειδί μπαίνει ως κύριο και το παλιό ως `PREVIOUS`. Το JWKS δείχνει και τα δύο.
   2. Μετά από 1 ώρα (cache των eshop) το `PREVIOUS` αφαιρείται.
