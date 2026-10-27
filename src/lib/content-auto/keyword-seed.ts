@@ -21,6 +21,46 @@ export type KeywordSeed = {
 
 export const KEYWORD_SEED: readonly KeywordSeed[] = [
   {
+    id: "m12-i-m18",
+    title: "Milwaukee M12 ή M18: ποιο να διαλέξω",
+    keywords: ["Milwaukee M12 ή M18", "διαφορά M12 M18", "milwaukee m12 vs m18", "m12 i m18"],
+    priority: "H",
+    categorySlugs: ["ergaleia-batarias", "drapana-katsavidieres-boulonokleida"],
+    note: "Σύγκριση πλατφορμών — υψηλή ζήτηση· δεν την καλύπτει το auto model/category topic.",
+  },
+  {
+    id: "milwaukee-fuel-ti-einai",
+    title: "Milwaukee FUEL: τι είναι και τι προσφέρει",
+    keywords: ["Milwaukee FUEL τι είναι", "τι σημαίνει FUEL Milwaukee", "milwaukee fuel", "fuel ti einai"],
+    priority: "M",
+    categorySlugs: ["ergaleia-batarias"],
+    note: "Explainer πλατφόρμας/τεχνολογίας — informational, συχνή ερώτηση αγοραστή.",
+  },
+  {
+    id: "milwaukee-one-key",
+    title: "Milwaukee ONE-KEY: τι κάνει και πώς το ρυθμίζω",
+    keywords: ["Milwaukee ONE-KEY", "τι είναι το ONE-KEY", "milwaukee one key", "one-key"],
+    priority: "M",
+    categorySlugs: ["ergaleia-batarias"],
+    note: "Explainer τεχνολογίας — informational.",
+  },
+  {
+    id: "packout-pos-stino",
+    title: "Milwaukee PACKOUT: πώς στήνω το σύστημα αποθήκευσης",
+    keywords: ["Milwaukee PACKOUT", "PACKOUT πώς στήνω", "milwaukee packout σύστημα", "packout"],
+    priority: "H",
+    categorySlugs: ["ergaleiothikes-skafakia-koutia-apothikeysis", "ergaleioforoi-trochilatoi"],
+    note: "Guide για το αρθρωτό σύστημα αποθήκευσης — αγοραστική πρόθεση, niche.",
+  },
+  {
+    id: "milwaukee-redlithium",
+    title: "Milwaukee REDLITHIUM: μπαταρίες και αυτονομία",
+    keywords: ["Milwaukee REDLITHIUM", "μπαταρίες Milwaukee αυτονομία", "milwaukee redlithium", "redlithium"],
+    priority: "M",
+    categorySlugs: ["bataries-2", "ergaleia-batarias"],
+    note: "Explainer μπαταριών — informational, συνδέεται με αγορά μπαταριών.",
+  },
+  {
     id: "pistoli-thermou-aera",
     title: "Πιστόλι θερμού αέρα: πώς διαλέγω",
     keywords: ["πιστόλι θερμού αέρα", "πιστόλι θερμού αέρα μπαταρίας", "πιστολι θερμου αερα", "pistoli thermou aera"],
