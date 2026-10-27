@@ -8,7 +8,9 @@ import { isEuSalesEnabled } from "@/lib/eu-sales/flag";
 import { checkEuVat, type EuVatStatus } from "@/lib/eu-sales/hdctool-eu";
 import { normaliseEuVat } from "@/lib/eu-sales/vat-format";
 import { athensDay } from "@/lib/eu-sales/vat-mode";
-import { vatChecks } from "@/lib/eu-sales/vat-check-limiter-instance";
+import { headers } from "next/headers";
+import { vatChecks, vatChecksByIp } from "@/lib/eu-sales/vat-check-limiter-instance";
+import { clientIp } from "@/lib/security/client-ip";
 
 /**
  * The checkout's «Έλεγχος» (and blur) for a foreign company's VAT number,
@@ -91,8 +93,15 @@ export async function checkVatForCheckout(input: unknown): Promise<CheckoutVatRe
     return { status: "valid", name: stored.vies.name, vat: format.vat };
   }
 
+  /*
+   * Keyed on the cart AND the client address (R11-I3): a new cart cookie does
+   * not buy new checks. `clientIp` is the proxy's peer (Cloudflare-aware,
+   * IPv6 cut to its /64), never what the client wrote; with no address at all
+   * (local runs) only the cart bucket applies.
+   */
   const token = await getCartToken();
-  if (!token || !vatChecks.take(`cart:${token}`)) {
+  const ip = clientIp(await headers());
+  if (!token || !vatChecks.take(`cart:${token}`) || (ip != null && !vatChecksByIp.take(`ip:${ip}`))) {
     await writeEuBuyer({ country, customerType: "company", vat: format.vat, vies: null });
     return { status: "rate_limited", name: null, vat: format.vat };
   }

@@ -43,6 +43,12 @@ export const checkoutSchema = z
      * replaces «Θέλω τιμολόγιο» there. Ignored in Greece and with the flag off.
      */
     customerType: z.enum(["individual", "company"]).optional().or(z.literal("")),
+    /**
+     * EU sales: the VAT mode the page DISPLAYED. An untrusted hint, never an
+     * input to the price: when it says exempt and the server resolves standard,
+     * `placeOrder` stops and asks the customer to look again (R11-I2).
+     */
+    vatModeHint: z.enum(["standard", "intra_eu_exempt"]).optional().or(z.literal("")),
 
     wantsInvoice: z.union([z.literal("on"), z.literal("")]).optional(),
     companyName: optionalText(255),

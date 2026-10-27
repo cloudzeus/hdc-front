@@ -111,6 +111,14 @@ describe("normaliseEuVat (browser format check, before any VIES call)", () => {
     expect(normaliseEuVat("DEABC", "DE")).toEqual({ ok: false });
   });
 
+  it("a French number without its prefix may start with a letter key", () => {
+    expect(normaliseEuVat("AB123456789", "FR")).toEqual({ ok: true, vat: "FRAB123456789" });
+    expect(normaliseEuVat("FR AB 123 456 789", "FR")).toEqual({ ok: true, vat: "FRAB123456789" });
+    expect(normaliseEuVat("12345678901", "FR")).toEqual({ ok: true, vat: "FR12345678901" });
+    // Still not French: a German number typed with France selected.
+    expect(normaliseEuVat("DE123456789", "FR")).toEqual({ ok: false });
+  });
+
   it("keeps letters inside the number (AT U…, NL …B01, FR XX…)", () => {
     expect(normaliseEuVat("atu12345678", "AT")).toEqual({ ok: true, vat: "ATU12345678" });
     expect(normaliseEuVat("NL123456789B01", "NL")).toEqual({ ok: true, vat: "NL123456789B01" });

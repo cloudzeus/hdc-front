@@ -12,6 +12,7 @@ const mocks = vi.hoisted(() => ({
   jar: new Map<string, string>(),
   checkEuVat: vi.fn(),
   token: vi.fn(async (): Promise<string | null> => "cart-1"),
+  headers: new Headers({ "x-real-ip": "203.0.113.7" }),
 }));
 
 vi.mock("next/headers", () => ({
@@ -20,6 +21,7 @@ vi.mock("next/headers", () => ({
     set: (name: string, value: string) => mocks.jar.set(name, value),
     delete: (name: string) => mocks.jar.delete(name),
   }),
+  headers: async () => mocks.headers,
 }));
 vi.mock("@/lib/prisma", () => ({ prisma: {} }));
 vi.mock("@/lib/cart/cart", () => ({ getCartToken: mocks.token }));
@@ -99,7 +101,26 @@ describe("checkVatForCheckout", () => {
     expect(result.status).toBe("unavailable");
   });
 
+  it("a new cart cookie does not buy new checks: 20 per client IP in 10 minutes (R11-I3)", async () => {
+    mocks.headers = new Headers({ "x-real-ip": "198.51.100.9" });
+    mocks.checkEuVat.mockImplementation(async () => ({ ...valid(), status: "invalid" }));
+    for (let i = 0; i < 20; i++) {
+      mocks.token.mockResolvedValueOnce(`rotated-${i}`);
+      const r = await checkVatForCheckout({ country: "DE", customerType: "company", vat: `DE1234567${String(i).padStart(2, "0")}` });
+      expect(r.status).toBe("invalid");
+    }
+    mocks.token.mockResolvedValueOnce("rotated-new");
+    const over = await checkVatForCheckout({ country: "DE", customerType: "company", vat: "DE999999999" });
+    expect(over.status).toBe("rate_limited");
+    expect(mocks.checkEuVat).toHaveBeenCalledTimes(20);
+    // Another address is not affected.
+    mocks.headers = new Headers({ "x-real-ip": "198.51.100.10" });
+    mocks.token.mockResolvedValueOnce("other");
+    expect((await checkVatForCheckout({ country: "DE", customerType: "company", vat: "DE888888888" })).status).toBe("invalid");
+  });
+
   it("at most 10 VIES calls per cart in 10 minutes", async () => {
+    mocks.headers = new Headers({ "x-real-ip": "192.0.2.44" });
     mocks.token.mockResolvedValue("cart-limit");
     mocks.checkEuVat.mockImplementation(async () => ({ ...valid(), status: "invalid" }));
     for (let i = 0; i < 10; i++) {

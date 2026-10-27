@@ -432,8 +432,11 @@ export default async function CheckoutPage({
                           country: buyer.country,
                           customerType: buyer.customerType,
                           vat: buyer.vat,
-                          status: buyer.vies?.status ?? null,
-                          name: buyer.vies?.name ?? null,
+                          /* A ✓ only when it still counts — today, this country (`exempt`).
+                             A valid answer from another day shows no status. */
+                          status:
+                            buyer.vies?.status === "valid" && !exempt ? null : (buyer.vies?.status ?? null),
+                          name: buyer.vies?.status === "valid" && !exempt ? null : (buyer.vies?.name ?? null),
                         }
                       : null,
                   }

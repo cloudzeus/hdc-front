@@ -30,6 +30,7 @@ import { euSalesShippingMethods, normalizeEuSalesCountry, vatPrefixFor } from "@
 import { euSalesCopy, vatExample } from "@/lib/eu-sales/copy";
 import { normaliseEuVat } from "@/lib/eu-sales/vat-format";
 import { resolveVatMode, type CustomerType } from "@/lib/eu-sales/vat-mode";
+import { writeEuBuyer } from "@/lib/eu-sales/buyer-cookie";
 import { checkEuVat, quoteDhl, type DhlQuoteResult, type EuVatCheck } from "@/lib/eu-sales/hdctool-eu";
 import { routing, type Locale } from "@/i18n/routing";
 import { getCurrentUser } from "@/lib/account/session";
@@ -434,6 +435,36 @@ export async function placeOrder(
         vies: vies ? { status: vies.status, checkedAt: vies.checkedAt, country } : null,
       })
     : "standard";
+  const exempt = vatMode === "intra_eu_exempt";
+
+  /*
+   * The form showed the totals WITHOUT VAT (its untrusted hint), but VIES now
+   * says otherwise — unavailable, invalid, or the earlier answer was from
+   * another day. Charging more than was on screen without a word is not an
+   * option: no order, the spec's «δοκιμάστε ξανά» sentence, and the fresh
+   * answer goes into the buyer cookie so the page re-renders WITH VAT and the
+   * customer continues knowingly (R11-I2).
+   */
+  if (euAbroad && input.vatModeHint === "intra_eu_exempt" && !exempt) {
+    try {
+      await writeEuBuyer({
+        country,
+        customerType,
+        vat: euVat,
+        vies: vies
+          ? {
+              status: vies.status,
+              name: viesText(vies.name),
+              consultationNumber: viesText(vies.consultationNumber),
+              checkedAt: vies.checkedAt,
+            }
+          : null,
+      });
+    } catch (error) {
+      console.error("[checkout] buyer cookie not refreshed", error);
+    }
+    return { error: eu.unavailable, fieldErrors: { vatNumber: eu.unavailable } };
+  }
 
   const totals = await computeTotals(
     payLines,
@@ -527,7 +558,7 @@ export async function placeOrder(
          later email (payment, shipping, status) is written in it. A column
          would need a migration on the live database (lib/mail/hdc/order-view). */
       shippingQuote: dhlQuote
-        ? JSON.parse(JSON.stringify(dhlShippingQuote(dhlQuote, country, address.shipPostcode, locale)))
+        ? JSON.parse(JSON.stringify(dhlShippingQuote(dhlQuote, country, address.shipPostcode, locale, exempt)))
         : quote
         ? JSON.parse(JSON.stringify({ ...quote, locale }))
         : locale === "el"
@@ -564,10 +595,12 @@ export async function placeOrder(
           unitNet: line.unitNet,
           discountPercent: line.discountPercent,
           offerTitle: line.offerTitle,
-          unitGross: line.lineGross / line.quantity,
-          vatRate: line.vatRate,
+          /* Exempt (intra-EU, valid VIES): the line is frozen as charged — no
+             VAT, gross = net — so the row never contradicts its totals. */
+          unitGross: (exempt ? line.lineNet : line.lineGross) / line.quantity,
+          vatRate: exempt ? 0 : line.vatRate,
           lineNet: line.lineNet,
-          lineGross: line.lineGross,
+          lineGross: exempt ? line.lineNet : line.lineGross,
           weightKg: line.weight,
         })),
       },
@@ -773,6 +806,8 @@ function dhlShippingQuote(
   country: string,
   postcode: string,
   locale: string,
+  /** Intra-EU exempt: postage carried no VAT, and the stored quote says so. */
+  exempt: boolean,
 ) {
   return {
     source: "dhl",
@@ -781,8 +816,8 @@ function dhlShippingQuote(
     productName: quote.productName,
     netAmount: quote.netAmount,
     totalNet: quote.netAmount,
-    vatRate: vatRateForDestination(country),
-    grossAmount: quote.grossAmount,
+    vatRate: exempt ? 0 : vatRateForDestination(country),
+    grossAmount: exempt ? quote.netAmount : quote.grossAmount,
     currency: "EUR",
     estimatedDeliveryDate: quote.estimatedDeliveryDate ?? null,
     quotedAt: quote.quotedAt,

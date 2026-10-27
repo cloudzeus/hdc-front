@@ -210,6 +210,22 @@ export function CheckoutForm({
     remembered?.vat ? ((remembered.status as VatStatus) ?? null) : null,
   );
   const [vatName, setVatName] = useState<string | null>(remembered?.name ?? null);
+  /*
+   * The server's answer moves on without the form asking — `placeOrder`
+   * re-checked VIES and refreshed the cookie (R11-I2), or a check returned.
+   * Follow the page's buyer whenever it changes, so a ✓ never outlives it.
+   */
+  const buyerKey = remembered
+    ? `${remembered.country}|${remembered.vat ?? ""}|${remembered.status ?? ""}|${remembered.name ?? ""}`
+    : "";
+  const [seenBuyerKey, setSeenBuyerKey] = useState(buyerKey);
+  if (buyerKey !== seenBuyerKey) {
+    setSeenBuyerKey(buyerKey);
+    setVatStatus(remembered?.vat ? ((remembered.status as VatStatus) ?? null) : null);
+    setVatName(remembered?.name ?? null);
+  }
+  /* The number last sent for a check: a blur right after it asks nothing. */
+  const lastChecked = useRef<string | null>(null);
   const [vatPending, startVatCheck] = useTransition();
   const runVatCheck = (next: { country: string; customerType: CustomerType; vat?: string }) => {
     let send = next;
@@ -224,6 +240,8 @@ export function CheckoutForm({
       setVatStatus(null);
     }
     setVatName(null);
+    lastChecked.current =
+      send.customerType === "company" && send.vat ? `${send.country}|${send.vat}` : null;
     startVatCheck(async () => {
       const result = await checkVatForCheckout(send);
       setVatStatus(result.status);
@@ -518,7 +536,13 @@ export function CheckoutForm({
                     setVat(e.target.value);
                     setVatStatus(null);
                   }}
-                  onBlur={checkCompanyVat}
+                  onBlur={(e) => {
+                    // «Έλεγχος» was clicked: its own click checks, once (not blur + click).
+                    if ((e.relatedTarget as HTMLElement | null)?.dataset?.vatCheck != null) return;
+                    // This very number was just sent: nothing new to ask.
+                    if (lastChecked.current === `${country}|${vat}`) return;
+                    checkCompanyVat();
+                  }}
                   onKeyDown={(e) => {
                     // Enter inside a checkout form would submit the order.
                     if (e.key === "Enter") {
@@ -535,7 +559,7 @@ export function CheckoutForm({
                   aria-describedby="eu-vat-status"
                   className={state.fieldErrors?.vatNumber || vatStatus === "invalid_format" ? "bad" : undefined}
                 />
-                <button type="button" className="hdc-btn" onClick={checkCompanyVat} disabled={vatPending}>
+                <button type="button" className="hdc-btn" data-vat-check="" onClick={checkCompanyVat} disabled={vatPending}>
                   {vatStatus === "unavailable" || vatStatus === "rate_limited" ? t("eu_vat_retry") : t("eu_vat_check")}
                 </button>
               </span>
@@ -599,6 +623,8 @@ export function CheckoutForm({
       }}
     >
       <input type="hidden" name="locale" value={locale} />
+      {/* EU sales: what the page DISPLAYED — a hint the server checks, never trusts (R11-I2). */}
+      {euSales && <input type="hidden" name="vatModeHint" value={exempt ? "intra_eu_exempt" : "standard"} />}
 
       {state.error && (
         <p role="alert" className="hdc-co-error">
