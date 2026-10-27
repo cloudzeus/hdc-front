@@ -53,8 +53,16 @@ export async function loadOrder(ref: OrderRef): Promise<OrderWithLines | null> {
  * Kept inside `shippingQuote` (the order's frozen checkout snapshot) because a
  * column would need a migration on the live database; `Order.locale` is the
  * clean home for it once one is approved. Older orders have none: Greek.
+ *
+ * An order shipped ABROAD (`shipCountry` other than GR) is always English, in
+ * every email the customer gets about it, whatever language the site was in:
+ * the shop writes to a buyer in Germany or Italy in the one language it can
+ * promise to keep complete. The shop's own internal emails stay Greek (they
+ * pass «el» themselves).
  */
-export function orderLocale(order: { shippingQuote: unknown }): Locale {
+export function orderLocale(order: { shippingQuote: unknown; shipCountry?: string | null }): Locale {
+  const country = order.shipCountry?.trim().toUpperCase();
+  if (country && country !== "GR") return "en";
   const value = (order.shippingQuote as { locale?: unknown } | null)?.locale;
   return routing.locales.includes(value as Locale) ? (value as Locale) : "el";
 }

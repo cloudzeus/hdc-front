@@ -10,6 +10,13 @@ process.env.AUTH_SECRET = "test-only-secret-for-image-signatures";
 const { buildOrderView } = await import("@/lib/mail/hdc/order-view");
 const { buildInternalOrderEmail } = await import("@/lib/mail/order-internal-email");
 const { buildOrderEmail } = await import("@/lib/mail/order-email");
+const { buildOrderStatusEmail } = await import("@/lib/mail/order-status-email");
+const { buildShippedEmail } = await import("@/lib/mail/order-shipped-email");
+const { buildDeliveredEmail } = await import("@/lib/mail/order-delivered-email");
+const { buildPaymentFailedEmail } = await import("@/lib/mail/payment-failed-email");
+const { buildPostageCorrectionEmail } = await import("@/lib/mail/postage-correction-email");
+const { buildReviewRequestEmail } = await import("@/lib/mail/review-request-email");
+const { orderLocale } = await import("@/lib/mail/hdc/order-view");
 
 const NOTE = "Ενδοκοινοτική παράδοση — απαλλαγή ΦΠΑ (αντίστροφη επιβάρυνση, άρθρο 138 Οδηγίας 2006/112/ΕΚ)";
 
@@ -59,7 +66,7 @@ const order = {
   createdAt: new Date("2026-10-27T09:31:00Z"),
   lines: [
     {
-      productId: null, sku: "4933479860", name: "M18 FPD3", brand: null, imageUrl: null, quantity: 2,
+      productId: "p1", sku: "4933479860", name: "M18 FPD3", brand: null, imageUrl: null, quantity: 2,
       unitNet: 100, unitGross: 124, discountPercent: 0, offerTitle: null, vatRate: 24, lineNet: 200, lineGross: 248, weightKg: null,
     },
   ],
@@ -121,7 +128,8 @@ describe("order view — intra-EU exempt", () => {
 
 describe("the emails", () => {
   it("the customer's confirmation carries the note and the VIES number, no «Περιλαμβάνεται ΦΠΑ»", async () => {
-    const built = await buildOrderEmail(asRef());
+    /* Greek explicitly (the admin preview's choice): a DE order is English by default, below. */
+    const built = await buildOrderEmail(asRef(), { locale: "el" });
     const text = plain(built!.email.text);
     expect(text).toContain(NOTE);
     expect(text).toContain("DE123456789");
@@ -165,5 +173,55 @@ describe("the emails", () => {
       }),
     );
     expect(plain(built!.email.text)).not.toContain("ΕΕ —");
+  });
+});
+
+/*
+ * Abroad, every customer email is in English — whatever language the site was
+ * in when the order was placed (the order froze «el» in `shippingQuote`).
+ */
+describe("customer emails for an order shipped abroad are English", () => {
+  const builders: Array<[string, (ref: Parameters<typeof buildOrderView>[0]) => Promise<{ email: { html: string; subject: string } } | null>]> = [
+    ["order confirmation", (o) => buildOrderEmail(o)],
+    ["payment received", (o) => buildOrderEmail(o, { trigger: "payment" })],
+    ["status", (o) => buildOrderStatusEmail(o, "Preparing")],
+    ["shipped", (o) => buildShippedEmail(o, "JD0123456789")],
+    ["delivered", (o) => buildDeliveredEmail(o)],
+    ["payment failed", (o) => buildPaymentFailedEmail(o, { statusId: "E" })],
+    ["postage correction", (o) => buildPostageCorrectionEmail(o, { previousShippingGross: 40, previousTotalGross: 240 })],
+    ["review request", (o) => buildReviewRequestEmail(o, { preview: true })],
+  ];
+
+  it.each(builders)("%s: a DE order placed from the Greek site", async (_name, build) => {
+    const built = await build(asRef());
+    expect(built).not.toBeNull();
+    expect(built!.email.html).toContain('lang="en"');
+    expect(built!.email.html).not.toContain('lang="el"');
+  });
+
+  it.each(builders)("%s: a Greek order keeps its language", async (_name, build) => {
+    const built = await build(asRef({ shipCountry: "GR", billCountry: "GR", shippingMethod: "courier", vatMode: "standard" }));
+    expect(built!.email.html).toContain('lang="el"');
+  });
+
+  it("the exemption note is in English in the confirmation", async () => {
+    const built = await buildOrderEmail(asRef());
+    expect(plain(built!.email.text)).toContain(
+      "Intra-Community supply — VAT exempt (reverse charge, Article 138 of Directive 2006/112/EC)",
+    );
+    expect(plain(built!.email.text)).not.toContain("Ενδοκοινοτική");
+  });
+
+  it("a Greek order whose customer chose English stays English; an Italian one abroad is English", () => {
+    expect(orderLocale({ shippingQuote: { locale: "en" }, shipCountry: "GR" })).toBe("en");
+    expect(orderLocale({ shippingQuote: { locale: "it" }, shipCountry: "IT" })).toBe("en");
+    expect(orderLocale({ shippingQuote: { locale: "it" }, shipCountry: "GR" })).toBe("it");
+    expect(orderLocale({ shippingQuote: null, shipCountry: "GR" })).toBe("el");
+    expect(orderLocale({ shippingQuote: null })).toBe("el");
+  });
+
+  it("the internal email stays Greek", async () => {
+    const built = await buildInternalOrderEmail(asRef());
+    expect(built!.email.html).toContain('lang="el"');
   });
 });

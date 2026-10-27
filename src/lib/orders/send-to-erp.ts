@@ -191,8 +191,10 @@ export function buildIntakeBody(order: OrderWithLines) {
     ...(order.requestStatus ? { request: buildRequestBlock(order) } : {}),
 
     /*
-     * DHL Express abroad (docs/dhl-express.md §2). Absent for ACS — every
-     * Greek and Cypriot order posts exactly the body it always did.
+     * DHL Express abroad (docs/dhl-express.md §2). Absent for ACS, so a Greek
+     * order posts exactly the body it always did. A Cypriot order has no
+     * `shipping` block either (ACS), but it is billed abroad: it does carry
+     * `billCountry`, `vatMode` and `customerType` (see `withEuBlock`).
      */
     ...withShippingBlock(order),
 

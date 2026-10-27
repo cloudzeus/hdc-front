@@ -57,6 +57,9 @@ export type RequestMailOutcome = { ok: true; id: string } | { ok: false; error: 
 /** The request's language: frozen in the snapshot at submission. */
 function requestLocale(order: OrderWithLines, fallback?: Locale): Locale {
   if (fallback) return fallback;
+  // Shipped abroad: English, like every other customer email about the order.
+  const country = order.shipCountry?.trim().toUpperCase();
+  if (country && country !== "GR") return "en";
   const value = readSnapshot(order.requestLines)?.locale;
   return routing.locales.includes(value as Locale) ? (value as Locale) : "el";
 }
