@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { upGreek } from "@/lib/greek";
 import { HdcAdminMark } from "@/components/admin/HdcAdminMark";
 import { checkAdminResetToken, completeAdminPasswordReset } from "@/lib/admin/password-reset";
+import { adminSsoConfig, ssoReady } from "@/lib/admin/sso/config";
 import { PASSWORD_MIN } from "@/lib/admin/users-types";
 
 export const metadata: Metadata = {
@@ -39,7 +40,12 @@ export default async function AdminResetPasswordPage({
       String(formData.get("password") ?? ""),
       String(formData.get("confirm") ?? ""),
     );
-    if (result.ok) redirect("/admin/login?reset=1");
+    if (result.ok) {
+      // With ADMIN_SSO=only the sign-in page has no password form: the
+      // (emergency) account signs in on the emergency page.
+      const cfg = adminSsoConfig();
+      redirect(ssoReady(cfg) && cfg.mode === "only" ? "/admin/login/emergency?reset=1" : "/admin/login?reset=1");
+    }
     redirect(
       result.error === "invalid"
         ? "/admin/reset-password?error=invalid"

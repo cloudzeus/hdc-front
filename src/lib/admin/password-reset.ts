@@ -12,11 +12,13 @@ import {
   hashResetToken,
   isResetRateLimited,
   isWellFormedResetToken,
+  passwordResetAllowed,
   rateLimitWindowStart,
   resetExpiresAt,
   resetLinkOrigin,
   resetTokenState,
 } from "@/lib/admin/password-reset-core";
+import { adminSsoConfig } from "@/lib/admin/sso/config";
 import { mailConfigured } from "@/lib/mail/client";
 import { buildAdminResetEmail } from "@/lib/mail/account-emails";
 import { deliver } from "@/lib/mail/hdc/deliver";
@@ -87,9 +89,13 @@ export async function requestAdminPasswordReset(rawEmail: string): Promise<Forgo
 
   const user = await prisma.adminUser.findUnique({
     where: { email },
-    select: { id: true, email: true, name: true, isActive: true },
+    select: { id: true, email: true, name: true, isActive: true, hdctoolUserId: true },
   });
   if (!user || !user.isActive) return { ok: true };
+  // HDCtool SSO: an account managed by HDCtool has no password, and with
+  // ADMIN_SSO=only nobody off the emergency list may use one. Same answer as
+  // an unknown address, and no mail.
+  if (user.hdctoolUserId != null || !passwordResetAllowed(email, adminSsoConfig())) return { ok: true };
 
   const origin = resetLinkOrigin(
     { forwardedProto: h.get("x-forwarded-proto"), forwardedHost: h.get("x-forwarded-host"), host: h.get("host") },
@@ -148,10 +154,12 @@ async function resolveToken(token: string, now: Date): Promise<ResolvedToken> {
       id: true,
       expiresAt: true,
       usedAt: true,
-      adminUser: { select: { id: true, email: true, isActive: true } },
+      adminUser: { select: { id: true, email: true, isActive: true, hdctoolUserId: true } },
     },
   });
   if (resetTokenState(row, now) !== "valid" || !row?.adminUser.isActive) return { ok: false };
+  // The password does not apply to HDCtool users: their link is dead.
+  if (row.adminUser.hdctoolUserId != null) return { ok: false };
   return { ok: true, id: row.id, user: { id: row.adminUser.id, email: row.adminUser.email } };
 }
 
@@ -189,10 +197,13 @@ export async function completeAdminPasswordReset(
     });
     if (claimed.count !== 1) return false;
 
-    await tx.adminUser.update({
-      where: { id: resolved.user.id },
+    // Conditional: an SSO sign-in may have linked the account to HDCtool
+    // since the link was checked. Then the claimed token is simply spent.
+    const updated = await tx.adminUser.updateMany({
+      where: { id: resolved.user.id, hdctoolUserId: null },
       data: { passwordHash, sessionsValidFrom: now },
     });
+    if (updated.count !== 1) return false;
     await tx.adminPasswordReset.deleteMany({ where: { adminUserId: resolved.user.id, usedAt: null } });
     // A new password is also the answer to a lockout.
     await tx.loginAttempt.deleteMany({
