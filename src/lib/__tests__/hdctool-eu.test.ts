@@ -40,6 +40,7 @@ describe("checkEuVat", () => {
     expect(result).toEqual({
       status: "valid",
       name: "ACME GMBH",
+      address: "Berlin",
       consultationNumber: "WAPIAAAA123",
       checkedAt: "2026-10-27T08:00:00.000Z",
       message: "",
