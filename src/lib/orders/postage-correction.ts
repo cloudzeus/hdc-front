@@ -110,7 +110,10 @@ async function recompute(order: LoadedOrder) {
   if (isUnserviceable(quote)) return null;
 
   const subtotalNet = Number(order.subtotalNet);
-  const freeShipping = method.freeOverThreshold && subtotalNet >= FREE_SHIPPING_THRESHOLD_NET;
+  /* Free over the threshold is a Greek promise; `refusal` already keeps other countries out, this keeps the rule in one reading. */
+  const inGreece = (order.shipCountry ?? "GR").toUpperCase() === "GR";
+  const freeShipping =
+    inGreece && method.freeOverThreshold && subtotalNet >= FREE_SHIPPING_THRESHOLD_NET;
   const shippingNet = freeShipping ? 0 : round(quote.totalNet * method.expressMultiplier);
   const shippingGross = grossAmount(shippingNet, { vatRate: vatRateForDestination(order.shipCountry) });
   const totalGross = round(Number(order.subtotalGross) + shippingGross + Number(order.paymentFeeGross));

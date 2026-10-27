@@ -85,7 +85,8 @@ export async function quoteOfferShipping(
   }
 
   const subtotalNet = subtotal.subtotalNet;
-  if (method.freeOverThreshold && subtotalNet >= FREE_SHIPPING_THRESHOLD_NET) {
+  // Free over the threshold is a Greek promise: Cyprus (ACS) and the rest pay.
+  if (country === "GR" && method.freeOverThreshold && subtotalNet >= FREE_SHIPPING_THRESHOLD_NET) {
     return { ok: true, shippingNet: 0 };
   }
   const quoted = Math.round(live.totalNet * method.expressMultiplier * 100) / 100;

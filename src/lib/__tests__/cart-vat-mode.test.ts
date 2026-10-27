@@ -64,7 +64,7 @@ describe("computeTotals vat mode", () => {
       shippingNet: 3,
       shippingGross: 3.72,
       paymentFeeNet: 0,
-      vatAmount: 12.72 - 0,
+      vatAmount: 12.72,
       totalGross: 65.72,
     });
     expect(await computeTotals(small, "courier", "card", "18545", undefined, {})).toEqual(bare);
@@ -146,6 +146,8 @@ describe("computeTotals vat mode", () => {
       shipping: { net: 40, vatRate: 19 },
     });
     expect(request).not.toHaveBeenCalled();
+    // The given price replaces the courier's quote, so there is no postage detail.
+    expect(standard.postage).toBeNull();
     expect(standard.shippingNet).toBe(40);
     expect(standard.shippingGross).toBe(47.6);
     const exempt = await computeTotals(mixed, "dhl", "card", "10115", to, {
@@ -156,8 +158,7 @@ describe("computeTotals vat mode", () => {
     expect(exempt.vatAmount).toBe(0);
   });
 
-  it("shipping given without a rate-less VAT falls back to 24 only via the default path", async () => {
-    // Pickup stays free whatever is passed.
+  it("collection stays free whatever shipping is given", async () => {
     const totals = await computeTotals(
       mixed,
       "pickup",

@@ -363,6 +363,8 @@ export async function computeTotals(
   //
   // Outside Greece (INTERNATIONAL_SHIPPING_ENABLED only) the destination
   // module decides: ACS for Cyprus, DHL for the rest of the EU, and no table.
+  // With `options.shipping` no courier is asked, so `quote` is null and the
+  // returned `totals.postage` (zone, ETA, chargeable kg) is null too.
   const given = options.shipping ?? null;
   const live: DestinationQuote | null =
     shipping.expressMultiplier > 0 && !given

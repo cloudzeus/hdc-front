@@ -38,6 +38,11 @@ const dhlAnswer = {
   source: "dhl-mock",
 };
 
+const acsAnswer = {
+  success: true,
+  quote: { stationId: "Π", area: "", remote: false, basicNet: 3, extrasNet: 0, totalNet: 3, vatAmount: 0.72, totalGross: 3.72, weightKg: 2.4 },
+};
+
 beforeEach(() => {
   request.mockReset();
   clearDhlQuoteCache();
@@ -79,5 +84,20 @@ describe("quoteOfferShipping abroad", () => {
     ]);
     expect(quoted).toEqual({ ok: true, shippingNet: 3 });
     expect(request).toHaveBeenCalledWith(ENDPOINT, { postcode: "18545", weightKg: 1.2 });
+  });
+
+  it("Greece over the threshold stays free, as before", async () => {
+    request.mockResolvedValue(acsAnswer);
+    const quoted = await quoteOfferShipping({ shippingMethod: "courier", shipPostcode: "18545" }, lines);
+    expect(quoted).toEqual({ ok: true, shippingNet: 0 });
+  });
+
+  it("Cyprus pays ACS postage even at 200 € net — free shipping is Greece only", async () => {
+    request.mockResolvedValue(acsAnswer);
+    const quoted = await quoteOfferShipping(
+      { shippingMethod: "courier", shipPostcode: "1010", shipCountry: "CY", shipCity: "Λευκωσία" },
+      lines,
+    );
+    expect(quoted).toEqual({ ok: true, shippingNet: 3 });
   });
 });
