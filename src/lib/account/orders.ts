@@ -67,6 +67,10 @@ export type AccountOrderDetail = {
   vatNumber: string | null;
   /** The document number SoftOne gave it — «ΠΑΡΚ000123» — once issued. */
   documentNo: string | null;
+  /** "intra_eu_exempt": prices are net, no VAT line (EU sales). Absent on a Greek order. */
+  vatMode?: string | null;
+  /** VIES's consultation number — the proof of that exemption. */
+  viesConsultationNumber?: string | null;
   subtotalGross: number;
   shippingGross: number;
   paymentFeeGross: number;
@@ -85,6 +89,8 @@ export type AccountOrderDetail = {
     sku: string;
     quantity: number;
     lineGross: number;
+    /** Shown instead of `lineGross` on an exempt order. */
+    lineNet?: number;
     imageUrl: string | null;
     vatRate: number;
   }>;
@@ -132,6 +138,8 @@ export async function getCustomerOrder(
     companyName: order.companyName,
     vatNumber: order.vatNumber,
     documentNo: order.erpFincode,
+    vatMode: order.vatMode,
+    viesConsultationNumber: order.viesConsultationNumber,
     subtotalGross: Number(order.subtotalGross),
     shippingGross: Number(order.shippingGross),
     paymentFeeGross: Number(order.paymentFeeGross),
@@ -148,6 +156,7 @@ export async function getCustomerOrder(
       sku: line.sku,
       quantity: line.quantity,
       lineGross: Number(line.lineGross),
+      lineNet: Number(line.lineNet),
       imageUrl: line.imageUrl,
       vatRate: Number(line.vatRate),
     })),

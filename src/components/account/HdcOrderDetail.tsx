@@ -11,6 +11,7 @@ import { formatMoney } from "@/lib/format";
 import { displayName } from "@/lib/milwaukee/display";
 import { parseModel } from "@/lib/milwaukee/model";
 import { localityLine } from "@/lib/shipping/countries";
+import { isIntraEuExempt } from "@/lib/orders/eu-vat";
 
 /**
  * One order — account.html, screen 3: everything a question or a return
@@ -64,6 +65,8 @@ export async function HdcOrderDetail({ order, locale }: { order: AccountOrderDet
     return model ? (model.content === "kit" ? t("kit") : t("sketo")) : null;
   };
   const allAt24 = order.lines.every((l) => l.vatRate === 24);
+  /* Intra-EU exempt: net prices, the exemption note instead of a VAT row. */
+  const exempt = isIntraEuExempt(order);
 
   return (
     <>
@@ -114,7 +117,7 @@ export async function HdcOrderDetail({ order, locale }: { order: AccountOrderDet
                 </span>
               </div>
               <div className="q">× {line.quantity}</div>
-              <div className="p">{money(line.lineGross)}</div>
+              <div className="p">{money(exempt ? (line.lineNet ?? line.lineGross) : line.lineGross)}</div>
             </div>
           );
         })}
@@ -159,6 +162,12 @@ export async function HdcOrderDetail({ order, locale }: { order: AccountOrderDet
                 <span className="cond">{t("afm", { afm: order.vatNumber })}</span>
               </>
             )}
+            {exempt && order.viesConsultationNumber && (
+              <>
+                <br />
+                <span className="cond">{t("vies_number", { number: order.viesConsultationNumber })}</span>
+              </>
+            )}
             {order.documentNo && (
               <>
                 <br />
@@ -180,11 +189,16 @@ export async function HdcOrderDetail({ order, locale }: { order: AccountOrderDet
                   <dd>{money(order.paymentFeeGross)}</dd>
                 </>
               )}
-              <dt>{allAt24 ? t("fpa_24") : t("fpa")}</dt>
-              <dd>{money(order.vatAmount)}</dd>
+              {!exempt && (
+                <>
+                  <dt>{allAt24 ? t("fpa_24") : t("fpa")}</dt>
+                  <dd>{money(order.vatAmount)}</dd>
+                </>
+              )}
               <dt className="tot">{t("synolo")}</dt>
               <dd className="tot">{money(order.totalGross)}</dd>
             </dl>
+            {exempt && <p className="cond vat-note">{t("fpa_apallagi")}</p>}
           </div>
         </div>
       </article>

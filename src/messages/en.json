@@ -1183,6 +1183,8 @@
       "epivarynsi": "Payment fee",
       "fpa_24": "VAT 24%",
       "fpa": "VAT",
+      "fpa_apallagi": "Intra-Community supply — VAT exempt (reverse charge, Article 138 of Directive 2006/112/EC)",
+      "vies_number": "VIES consultation number: {number}",
       "synolo": "TOTAL",
       "oi_paraggelies_mou": "MY ORDERS",
       "tools_lead": "From the orders you received: your tools and batteries by platform. An M18 battery runs every M18 tool — and the same goes for M12.",

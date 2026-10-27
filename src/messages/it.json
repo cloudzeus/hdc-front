@@ -1183,6 +1183,8 @@
       "epivarynsi": "Commissione di pagamento",
       "fpa_24": "IVA 24%",
       "fpa": "IVA",
+      "fpa_apallagi": "Cessione intracomunitaria — operazione esente da IVA (inversione contabile, articolo 138 della Direttiva 2006/112/CE)",
+      "vies_number": "Numero di consultazione VIES: {number}",
       "synolo": "TOTALE",
       "oi_paraggelies_mou": "I MIEI ORDINI",
       "tools_lead": "Dagli ordini ricevuti: i tuoi utensili e le tue batterie per piattaforma. Una batteria M18 alimenta ogni utensile M18 — lo stesso vale per M12.",

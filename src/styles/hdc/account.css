@@ -958,6 +958,9 @@
     font-stretch: 87.5%;
     color: var(--hdc-g5);
   }
+  .hdc-od .ft .vat-note {
+    margin: 10px 0 0;
+  }
   .hdc-od .ft .cond.r {
     color: var(--hdc-red);
   }
