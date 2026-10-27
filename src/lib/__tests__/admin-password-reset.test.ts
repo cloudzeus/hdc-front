@@ -210,8 +210,9 @@ describe("passwordResetAllowed (HDCtool SSO)", () => {
     expect(passwordResetAllowed("other@x.gr", adminSsoConfig({ ...ready, ADMIN_SSO: "off" }))).toBe(true);
   });
 
-  it("only but half-configured renders as off: everyone", () => {
+  it("only but half-configured: still just the emergency list, as the login gate", () => {
     const cfg = adminSsoConfig({ ...ready, ADMIN_SSO: "only", HDCTOOL_SSO_URL: "" });
-    expect(passwordResetAllowed("other@x.gr", cfg)).toBe(true);
+    expect(passwordResetAllowed("other@x.gr", cfg)).toBe(false);
+    expect(passwordResetAllowed("boss@x.gr", cfg)).toBe(true);
   });
 });

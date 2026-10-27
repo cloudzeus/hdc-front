@@ -98,12 +98,13 @@ describe("requestAdminPasswordReset with HDCtool SSO", () => {
     expect(h.after).toHaveBeenCalledTimes(1);
   });
 
-  it("only but half-configured (renders as off): the link is sent", async () => {
+  it("only but half-configured: no link for a non-emergency address (login would refuse it)", async () => {
     ssoOnly();
     vi.stubEnv("HDCTOOL_SSO_URL", "");
     addUser("a@x.gr");
-    await requestAdminPasswordReset("a@x.gr");
-    expect(h.after).toHaveBeenCalledTimes(1);
+    expect(await requestAdminPasswordReset("a@x.gr")).toEqual({ ok: true });
+    expect(h.resetCreate).not.toHaveBeenCalled();
+    expect(h.after).not.toHaveBeenCalled();
   });
 
   it("both: an unlisted password operator still gets the link", async () => {
