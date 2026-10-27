@@ -1,4 +1,5 @@
 import "server-only";
+import { isDhlShipment } from "@/lib/shipping/tracking";
 import { paymentPageUrl } from "@/lib/payment/viva";
 import { formatMoney } from "@/lib/format";
 import type { Locale } from "@/i18n/routing";
@@ -139,7 +140,9 @@ export async function buildOrderEmail(
   const leadKey = view.paid
     ? order.shippingMethod === "pickup"
       ? "confirm.lead_paid_pickup"
-      : "confirm.lead_paid"
+      : isDhlShipment(order)
+        ? "confirm.lead_paid_dhl"
+        : "confirm.lead_paid"
     : useBank
       ? "confirm.lead_bank"
       : "confirm.lead_pending";

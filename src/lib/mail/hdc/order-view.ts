@@ -57,12 +57,19 @@ export async function loadOrder(ref: OrderRef): Promise<OrderWithLines | null> {
  * An order shipped ABROAD (`shipCountry` other than GR) is always English, in
  * every email the customer gets about it, whatever language the site was in:
  * the shop writes to a buyer in Germany or Italy in the one language it can
- * promise to keep complete. The shop's own internal emails stay Greek (they
- * pass «el» themselves).
+ * promise to keep complete. Cyprus is the exception (ruling R-EMAIL-CY):
+ * Cypriot customers are Greek-speaking, so GR and CY keep the order's own
+ * language. The shop's own internal emails stay Greek (they pass «el»
+ * themselves).
  */
+/** Shipped abroad, outside the Greek-speaking GR and CY: every customer email in English. */
+export function englishAbroad(shipCountry: string | null | undefined): boolean {
+  const country = shipCountry?.trim().toUpperCase();
+  return !!country && country !== "GR" && country !== "CY";
+}
+
 export function orderLocale(order: { shippingQuote: unknown; shipCountry?: string | null }): Locale {
-  const country = order.shipCountry?.trim().toUpperCase();
-  if (country && country !== "GR") return "en";
+  if (englishAbroad(order.shipCountry)) return "en";
   const value = (order.shippingQuote as { locale?: unknown } | null)?.locale;
   return routing.locales.includes(value as Locale) ? (value as Locale) : "el";
 }

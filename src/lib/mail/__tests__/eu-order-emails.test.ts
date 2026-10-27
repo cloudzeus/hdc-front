@@ -16,7 +16,8 @@ const { buildDeliveredEmail } = await import("@/lib/mail/order-delivered-email")
 const { buildPaymentFailedEmail } = await import("@/lib/mail/payment-failed-email");
 const { buildPostageCorrectionEmail } = await import("@/lib/mail/postage-correction-email");
 const { buildReviewRequestEmail } = await import("@/lib/mail/review-request-email");
-const { orderLocale } = await import("@/lib/mail/hdc/order-view");
+const { orderLocale, englishAbroad } = await import("@/lib/mail/hdc/order-view");
+const { buildRequestEmail } = await import("@/lib/mail/request-emails");
 
 const NOTE = "Ενδοκοινοτική παράδοση — απαλλαγή ΦΠΑ (αντίστροφη επιβάρυνση, άρθρο 138 Οδηγίας 2006/112/ΕΚ)";
 
@@ -218,6 +219,49 @@ describe("customer emails for an order shipped abroad are English", () => {
     expect(orderLocale({ shippingQuote: { locale: "it" }, shipCountry: "GR" })).toBe("it");
     expect(orderLocale({ shippingQuote: null, shipCountry: "GR" })).toBe("el");
     expect(orderLocale({ shippingQuote: null })).toBe("el");
+  });
+
+  it("Cyprus is Greek-speaking: a CY order keeps its own language (R-EMAIL-CY)", async () => {
+    expect(englishAbroad("CY")).toBe(false);
+    expect(englishAbroad("GR")).toBe(false);
+    expect(englishAbroad("DE")).toBe(true);
+    expect(englishAbroad(null)).toBe(false);
+    expect(orderLocale({ shippingQuote: { locale: "el" }, shipCountry: "CY" })).toBe("el");
+    expect(orderLocale({ shippingQuote: { locale: "en" }, shipCountry: "CY" })).toBe("en");
+    const cy = asRef({
+      shipCountry: "CY", billCountry: "CY", shipCity: "Λευκωσία", shipPostcode: "1010",
+      shippingMethod: "courier", vatMode: "standard", shippingQuote: { locale: "el" },
+    });
+    for (const build of [buildOrderEmail(cy), buildShippedEmail(cy, "7400123456")]) {
+      const built = await build;
+      expect(built!.email.html).toContain('lang="el"');
+    }
+  });
+
+  it("back-order request emails: English abroad, Greek for Cyprus (R-EMAIL-CY)", async () => {
+    const de = await buildRequestEmail(asRef({ requestStatus: null }), "received", { preview: true });
+    expect(de!.email.html).toContain('lang="en"');
+    const cy = await buildRequestEmail(
+      asRef({ requestStatus: null, shipCountry: "CY", billCountry: "CY", shippingMethod: "courier", vatMode: "standard" }),
+      "received",
+      { preview: true },
+    );
+    expect(cy!.email.html).toContain('lang="el"');
+  });
+
+  it("the shipped email of a DHL order says DHL Express and links DHL's tracker, never ACS", async () => {
+    const built = await buildShippedEmail(asRef(), "JD0123456789");
+    const html = built!.email.html;
+    expect(built!.email.text).toContain("DHL Express");
+    expect(html).toContain("https://www.dhl.com/gr-el/home/tracking.html?tracking-id&#x3D;JD0123456789");
+    expect(built!.email.text).not.toMatch(/\bACS\b/);
+    expect(html).not.toContain("acscourier");
+  });
+
+  it("the payment email of a DHL order promises a DHL Express tracking number, not ACS", async () => {
+    const built = await buildOrderEmail(asRef(), { trigger: "payment" });
+    expect(built!.email.text).toContain("DHL Express tracking number");
+    expect(built!.email.text).not.toMatch(/\bACS\b/);
   });
 
   it("the internal email stays Greek", async () => {

@@ -102,6 +102,8 @@ const el = {
   "confirm.title": "Ευχαριστούμε για την παραγγελία σας",
   "confirm.lead_paid":
     "Λάβαμε την πληρωμή σας και ετοιμάζουμε την παραγγελία. Μόλις φύγει, θα σας στείλουμε νέο email με τον αριθμό αποστολής της ACS.",
+  "confirm.lead_paid_dhl":
+    "Λάβαμε την πληρωμή σας και ετοιμάζουμε την παραγγελία. Μόλις φύγει, θα σας στείλουμε νέο email με τον αριθμό αποστολής της DHL Express.",
   "confirm.lead_paid_pickup":
     "Λάβαμε την πληρωμή σας και ετοιμάζουμε την παραγγελία. Θα σας ενημερώσουμε μόλις είναι έτοιμη για παραλαβή από το κατάστημα.",
   "confirm.lead_pending":
@@ -474,6 +476,8 @@ const en: Dict = {
   "confirm.title": "Thank you for your order",
   "confirm.lead_paid":
     "We have received your payment and are preparing your order. As soon as it leaves, we will email you the ACS tracking number.",
+  "confirm.lead_paid_dhl":
+    "We have received your payment and are preparing your order. As soon as it leaves, we will email you the DHL Express tracking number.",
   "confirm.lead_paid_pickup":
     "We have received your payment and are preparing your order. We will let you know as soon as it is ready for collection at the store.",
   "confirm.lead_pending": "We have received your order. We will prepare it as soon as the payment is completed.",
@@ -836,6 +840,8 @@ const it: Dict = {
   "confirm.title": "Grazie per il vostro ordine",
   "confirm.lead_paid":
     "Abbiamo ricevuto il pagamento e stiamo preparando l'ordine. Appena partito, vi invieremo una nuova email con il numero di spedizione ACS.",
+  "confirm.lead_paid_dhl":
+    "Abbiamo ricevuto il pagamento e stiamo preparando l'ordine. Appena partito, vi invieremo una nuova email con il numero di spedizione DHL Express.",
   "confirm.lead_paid_pickup":
     "Abbiamo ricevuto il pagamento e stiamo preparando l'ordine. Vi avviseremo appena sarà pronto per il ritiro in negozio.",
   "confirm.lead_pending": "Abbiamo ricevuto il vostro ordine. Lo prepareremo appena il pagamento sarà completato.",
