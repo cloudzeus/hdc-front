@@ -88,7 +88,15 @@ export function siteJsonLd(locale: Locale) {
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": "HardwareStore",
+        /*
+         * `HardwareStore` IS already an `Organization` (Store → LocalBusiness →
+         * Organization), so the brand fields below — name, url, logo, sameAs —
+         * are valid on it. The second type is stated explicitly anyway: GEO/AEO
+         * crawlers string-match `"Organization"` to find the brand entity and do
+         * not follow the schema.org type hierarchy, so without it they report
+         * "no Organization schema" even though every field they want is present.
+         */
+        "@type": ["HardwareStore", "Organization"],
         "@id": `${origin}/#shop`,
         name: SHOP.name,
         legalName: SHOP.legalName,
@@ -97,6 +105,16 @@ export function siteJsonLd(locale: Locale) {
         email: SHOP.email,
         logo: `${origin}/brand/hdc-lockup-440.png`,
         image: `${origin}/brand/hdc-lockup-440.png`,
+        // The same counter, said as an Organization `contactPoint` — what a
+        // model quotes for "how do I reach the Milwaukee HDC store".
+        contactPoint: {
+          "@type": "ContactPoint",
+          telephone: SHOP.phone,
+          email: SHOP.email,
+          contactType: "customer service",
+          areaServed: "GR",
+          availableLanguage: ["el", "en"],
+        },
         hasMap: storeMapUrl(),
         // Collect in Piraeus, or delivered anywhere in Greece.
         areaServed: { "@type": "Country", name: "Greece", identifier: "GR" },

@@ -360,6 +360,10 @@
     }
   },
   "home": {
+    "HomeFaq": {
+      "titlos": "DOMANDE FREQUENTI",
+      "oles": "TUTTE LE DOMANDE"
+    },
     "HdcHero": {
       "titlos": "TRAPANO AVVITATORE A PERCUSSIONE M18 FPD3",
       "keimeno": "Solo corpo o in kit con due batterie REDLITHIUM™ da 5.0Ah, caricabatterie e valigetta.",

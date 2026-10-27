@@ -4,6 +4,7 @@ import { SiteFooter } from "@/components/chrome/SiteFooter";
 import { BestSellers } from "@/components/home/BestSellers";
 import { HdcHero, type HeroSlide } from "@/components/home/HdcHero";
 import { HomeCategories } from "@/components/home/HomeCategories";
+import { HomeFaq } from "@/components/home/HomeFaq";
 import { HomeIntro } from "@/components/home/HomeIntro";
 import { NewArrivalsBand } from "@/components/home/NewArrivalsBand";
 import { NewsletterBand } from "@/components/home/NewsletterBand";
@@ -24,6 +25,8 @@ import {
   getTopBrands,
   type ProductCardData,
 } from "@/lib/catalog/queries";
+import { getEshopContent } from "@/lib/content/eshop-content";
+import { faqView } from "@/lib/content/eshop-content-map";
 import { formatPrice } from "@/lib/format";
 import { drillsHref, resolveHomeCategories } from "@/lib/hdc-home";
 import { discountedNet, offerBadgeFor } from "@/lib/offers/badges";
@@ -81,6 +84,7 @@ export default async function HomePage({
     bestSellers,
     newArrivals,
     categorySources,
+    eshopContent,
   ] = await Promise.all([
     getRootCategories(locale),
     getMenuTree(locale),
@@ -97,9 +101,14 @@ export default async function HomePage({
     getFeaturedProducts(locale, 5, 2, true),
     getHomeNewArrivals(locale, 4),
     getHomeCategorySources(),
+    // The Q&A for the short home FAQ section; the full list is /syxnes-erotiseis.
+    getEshopContent(),
   ]);
 
   const categoryCards = resolveHomeCategories(categorySources);
+
+  /* The first few Q&A for the home FAQ section; the rest live on the FAQ page. */
+  const faqItems = eshopContent ? faqView(eshopContent.qanda, locale).slice(0, 5) : [];
 
   /* The price the cart would charge, VAT included — campaigns applied. */
   const charged = async (product: ProductCardData | undefined) => {
@@ -167,6 +176,7 @@ export default async function HomePage({
         <Zone id="home.band" locale={locale} />
         <NewArrivalsBand products={newArrivals.products} />
         <StoreBand />
+        <HomeFaq items={faqItems} locale={locale} />
         <NewsletterBand />
         <Zone id="home.beforeFooter" locale={locale} />
       </main>
