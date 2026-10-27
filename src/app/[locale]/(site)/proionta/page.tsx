@@ -21,6 +21,7 @@ import {
   getCompareTray,
 } from "@/lib/compare/compare";
 import { getPlpData, parsePlpParams } from "@/lib/catalog/plp";
+import { getPerRow } from "@/lib/catalog/per-row";
 import {
   getCatalogueStats,
   getMenuTree,
@@ -30,6 +31,9 @@ import {
 import { upGreek } from "@/lib/greek";
 import { Zone } from "@/components/zones/Zone";
 import { jsonLdHtml } from "@/lib/seo/json-ld";
+import { filteredListingMeta } from "@/lib/catalog/listing-query";
+import { admitListingRender, listingBusyMeta } from "@/lib/server/render-gate";
+import { ListingBusy } from "@/components/plp/ListingBusy";
 
 /**
  * Every product, in one list.
@@ -59,6 +63,7 @@ type PageProps = {
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "katalogos.page" });
@@ -71,6 +76,11 @@ export async function generateMetadata({
     ...pageMeta({ path: "/proionta", locale, title, description }),
     title,
     description,
+    // Filtered views: noindex, follow — the canonical above is the bare listing.
+    ...filteredListingMeta(await searchParams),
+    // A render the gate turned away (the busy view): noindex too. Same
+    // per-request admission as the body; see render-gate.ts.
+    ...(await listingBusyMeta("products", await searchParams)),
   };
 }
 
@@ -83,6 +93,8 @@ export default async function AllProductsPage({
   setRequestLocale(locale);
 
   const raw = await searchParams;
+  // Costly views queue for one of a few render slots; see render-gate.ts.
+  if (!(await admitListingRender("products", raw))) return <ListingBusy basePath={"/proionta"} />;
   // No `categorySlug`: the scope is the whole catalogue.
   const plpParams = parsePlpParams(raw);
 
@@ -114,7 +126,7 @@ export default async function AllProductsPage({
    */
   if (!data) notFound();
 
-  const perRow = Number(raw.perRow) || 4;
+  const perRow = await getPerRow();
   const gridCols =
     perRow === 2
       ? "sm:grid-cols-2"
@@ -226,7 +238,7 @@ export default async function AllProductsPage({
           <div className="shell-x sticky top-[var(--header-h)] z-30 border-t border-white/10 bg-k-ink-deep/97 backdrop-blur-sm">
             <div className="flex flex-wrap gap-1.5 py-3.5">
               {data.facets.subcategories.map((sub) => (
-                <Link
+                <Link rel="nofollow" prefetch={false}
                   key={sub.slug}
                   href={`/proionta?sub=${sub.slug}`}
                   scroll={false}

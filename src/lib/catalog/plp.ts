@@ -26,6 +26,8 @@ import {
   type Series,
 } from "@/lib/catalog/hdc-filters";
 import type { ProductCardData } from "@/lib/catalog/queries";
+import { LISTING_LIMITS, capFacetValues } from "@/lib/catalog/listing-query";
+import { listingCache, type CachedListing } from "@/lib/catalog/listing-cache";
 import {
   PER_PAGE_OPTIONS,
   SORT_OPTIONS,
@@ -102,9 +104,14 @@ export function parsePlpParams(
     : "relevance";
 
   const perPageRaw = num(raw.perPage);
-  const perPage = PER_PAGE_OPTIONS.includes(perPageRaw as (typeof PER_PAGE_OPTIONS)[number])
-    ? (perPageRaw as number)
-    : 24;
+  /* Load-more draws pages 1..N at once, so its page size stays at 24: a
+     `perPage=96` there would make one request draw four times as many cards,
+     and the HDC listing offers no page-size control anyway. */
+  const perPage =
+    !scope.cumulative &&
+    PER_PAGE_OPTIONS.includes(perPageRaw as (typeof PER_PAGE_OPTIONS)[number])
+      ? (perPageRaw as number)
+      : 24;
 
   const price = (v: number | undefined) =>
     v == null ? undefined : scope.grossPrices ? grossToNet(v, DEFAULT_VAT_RATE) : v;
@@ -112,8 +119,10 @@ export function parsePlpParams(
   return {
     categorySlug: scope.categorySlug,
     brandScopeSlug: scope.brandScopeSlug,
-    sub: list(raw.sub),
-    brand: list(raw.brand),
+    /* Capped here as well as in the proxy: the proxy is the gate, this is the
+       guarantee that no path into the page can ask for an unbounded IN list. */
+    sub: capFacetValues(list(raw.sub)),
+    brand: capFacetValues(list(raw.brand)),
     min: price(num(raw.min)),
     max: price(num(raw.max)),
     avail: parseAvail(raw.avail),
@@ -508,20 +517,43 @@ export type PlpResult = {
   facets: PlpFacets;
 };
 
-export async function getPlpData(
+/**
+ * The listing cache key: the normalised facet key plus what selects the page.
+ * Exported for the test — two spellings of one listing must be one key.
+ */
+export function listingKeyOf(
   params: PlpParams,
   locale: Locale,
-  /** See `buildWhere`: the campaign scope, when this listing has one. */
   extraWhere?: Prisma.ProductWhereInput | null,
-): Promise<PlpResult | null> {
+  /** The live campaigns' clause, when the listing is `?sale=1`. */
+  campaigns?: Prisma.ProductWhereInput | null,
+): string {
+  return JSON.stringify([
+    facetKeyOf(params),
+    params.page ?? 1,
+    params.perPage ?? 24,
+    params.sort ?? "relevance",
+    Boolean(params.cumulative),
+    locale,
+    extraWhere ?? null,
+    campaigns ?? null,
+  ]);
+}
+
+/** The grid itself: products and total. Read through `listingCache` (listing-cache.ts). */
+async function loadListing(
+  params: PlpParams,
+  locale: Locale,
+  extraWhere: Prisma.ProductWhereInput | null | undefined,
+  page: number,
+  perPage: number,
+): Promise<CachedListing> {
   const filters = await resolveFilters(params);
-  if (filters === null) return null; // unknown category slug → 404
+  // `getPlpData` has already 404'd an unknown category; this only guards one
+  // deleted in between.
+  if (filters === null) return { products: [], total: 0 };
 
   const where = buildWhere(params, filters, undefined, extraWhere);
-  const perPage = params.perPage ?? 24;
-  // Load-more renders pages 1..N at once; 60 pages (1.440 cards) is the most
-  // one request will draw, whatever the URL says.
-  const page = params.cumulative ? Math.min(params.page ?? 1, 60) : (params.page ?? 1);
 
   const [rows, total, linkedBrands] = await Promise.all([
     prisma.product.findMany({
@@ -566,6 +598,37 @@ export async function getPlpData(
     };
   });
   const products = await withFamilies(cards, (i) => rows[i].variantGroup);
+
+  return { products, total };
+}
+
+export async function getPlpData(
+  params: PlpParams,
+  locale: Locale,
+  /** See `buildWhere`: the campaign scope, when this listing has one. */
+  extraWhere?: Prisma.ProductWhereInput | null,
+): Promise<PlpResult | null> {
+  // Outside the cache: an unknown category must stay a 404, not a cached
+  // empty grid. One `findUnique`, memoised for the render.
+  if ((await resolveCategoryScope(params.categorySlug)) === null) return null;
+
+  const perPage = params.perPage ?? 24;
+  // Load-more renders pages 1..N at once; 60 pages (1.440 cards) is the most
+  // one request will draw, whatever the URL says.
+  const page = params.cumulative
+    ? Math.min(params.page ?? 1, LISTING_LIMITS.maxCumulativePage)
+    : (params.page ?? 1);
+
+  /* `?sale=1` selects the LIVE campaigns, which start and stop on their own
+     schedule: their clause is part of the key, so a campaign that starts or
+     ends changes the key instead of waiting out the TTL. The same per-render
+     memo `resolveFilters` reads, so it costs no extra query. */
+  const campaigns = params.sale ? await activeCampaignsWhere() : null;
+
+  const { products, total } = await listingCache().getOrLoad(
+    listingKeyOf(params, locale, extraWhere, campaigns),
+    () => loadListing(params, locale, extraWhere, page, perPage),
+  );
 
   const facets = await getFacets(facetKeyOf(params), locale, extraWhere ?? null);
 
@@ -673,7 +736,8 @@ const NO_FACETS: PlpFacets = {
  *
  * Counts may trail the catalogue by up to five minutes after a sync, and the
  * "με προσφορά" count by as long after a campaign starts or stops. The grid
- * itself is never cached, so the products shown are always current.
+ * has its own in-process cache, cleared by every catalogue write
+ * (listing-cache.ts).
  */
 const getFacets = sharedCatalogue(
   "plp-facets",

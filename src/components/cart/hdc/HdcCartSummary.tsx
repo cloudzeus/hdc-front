@@ -4,6 +4,8 @@ import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { Link } from "@/i18n/navigation";
 import { applyCoupon, setDeliveryPostcode } from "@/lib/cart/actions";
+import { validatePostcode } from "@/lib/shipping/destination";
+import type { CartSplitKind } from "@/lib/requests/model";
 
 /**
  * «ΣΥΝΟΨΗ» beside the cart (checkout.html, screen 1 `.sum`).
@@ -14,12 +16,22 @@ import { applyCoupon, setDeliveryPostcode } from "@/lib/cart/actions";
  * here is the one checkout opens with.
  */
 export function HdcCartSummary({
+  requestKind = "none",
   postcode,
+  unserviceable = false,
   rows,
   total,
   vatLine,
 }: {
+  /**
+   * Back-order requests (docs/backorder-requests.md): «all» — nothing is in
+   * stock, checkout sends a request; «mixed» — checkout asks. From the server's
+   * cart; checkout decides again on submit.
+   */
+  requestKind?: CartSplitKind;
   postcode: string | null;
+  /** ACS has no station for `postcode`: we do not deliver there. */
+  unserviceable?: boolean;
   /** «Προϊόντα (2)», «Μεταφορικά ACS» … — `free` paints the amount green. */
   rows: Array<{ label: string; value: string; free?: boolean }>;
   total: string;
@@ -28,20 +40,25 @@ export function HdcCartSummary({
   const t = useTranslations("cart.Hdc");
   const [pending, startTransition] = useTransition();
   const [zip, setZip] = useState(postcode ?? "");
-  const [zipError, setZipError] = useState(false);
+  const [zipError, setZipError] = useState<"format" | "range" | null>(null);
   const [coupon, setCoupon] = useState("");
   const [couponError, setCouponError] = useState<string | null>(null);
 
+  // The server's verdict holds for the postcode it was given, until another is typed.
+  const showUnserviceable =
+    unserviceable && zipError == null && zip.replace(/\s/g, "") === (postcode ?? "");
+
   const quote = (e: React.FormEvent) => {
     e.preventDefault();
-    const clean = zip.replace(/\s/g, "");
-    if (!/^\d{5}$/.test(clean)) {
-      setZipError(true);
+    // Greek postcodes only: five digits, 10xxx–85xxx (see lib/shipping/destination).
+    const checked = validatePostcode(zip);
+    if (!checked.ok) {
+      setZipError(checked.reason === "range" ? "range" : "format");
       return;
     }
-    setZipError(false);
+    setZipError(null);
     startTransition(async () => {
-      await setDeliveryPostcode({ postcode: clean });
+      await setDeliveryPostcode({ postcode: checked.postcode });
     });
   };
 
@@ -59,17 +76,27 @@ export function HdcCartSummary({
             onChange={(e) => setZip(e.target.value)}
             inputMode="numeric"
             autoComplete="postal-code"
-            maxLength={5}
+            maxLength={6}
             placeholder={t("tk")}
-            aria-invalid={zipError || undefined}
+            aria-invalid={zipError != null || showUnserviceable || undefined}
+            aria-describedby="cart-zip-hint"
           />
           <button type="submit" disabled={pending}>
             {t("ypologismos")}
           </button>
         </form>
-        <p className={zipError ? "hint err" : "hint"}>
-          {zipError ? t("tk_5_psifia") : t("tk_hint")}
+        <p
+          id="cart-zip-hint"
+          className={zipError || showUnserviceable ? "hint err" : "hint"}
+          role={zipError || showUnserviceable ? "alert" : undefined}
+        >
+          {zipError === "format"
+            ? t("tk_5_psifia")
+            : zipError === "range" || showUnserviceable
+              ? t("tk_unserviceable")
+              : t("tk_hint")}
         </p>
+        <p className="hint">{t("ship_zone")}</p>
 
         <dl>
           {rows.map((row) => (
@@ -116,8 +143,14 @@ export function HdcCartSummary({
           </p>
         )}
 
+        {requestKind !== "none" && (
+          <p className="hdc-info" role="status">
+            {requestKind === "all" ? t("request_all") : t("request_mixed")}
+          </p>
+        )}
+
         <Link href="/checkout" className="hdc-btn hdc-btn-red hdc-btn-lg go">
-          {t("oloklirosi")} →
+          {requestKind === "all" ? t("synecheia_aitima") : t("oloklirosi")} →
         </Link>
         <div className="pay" aria-label={t("tropoi_pliromis")}>
           <span>VISA</span>

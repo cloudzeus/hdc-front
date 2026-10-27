@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { assertCan } from "@/lib/rbac";
 import { listMissing, setTranslation, translateMissing, type TargetLocale } from "@/lib/i18n/coverage";
 import type { TranslatableSource } from "@/lib/i18n/coverage-types";
+import { clearListingCache } from "@/lib/catalog/listing-cache";
 
 /**
  * Translation management.
@@ -25,6 +26,8 @@ export async function actionTranslateMissing(
 ) {
   await requireEditor();
   const result = await translateMissing(source, locale, { limit });
+  // The in-process listing grids carry translated product names too.
+  clearListingCache();
   revalidatePath("/", "layout");
   revalidatePath("/admin/translations");
   return result;
@@ -43,6 +46,9 @@ export async function actionSetTranslation(
 ) {
   await requireEditor();
   const result = await setTranslation(source, locale, id, value);
-  if (result.ok) revalidatePath("/", "layout");
+  if (result.ok) {
+    clearListingCache();
+    revalidatePath("/", "layout");
+  }
   return result;
 }

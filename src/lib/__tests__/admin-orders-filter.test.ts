@@ -12,6 +12,7 @@ describe("orders filter «Από προμηθευτή»", () => {
       "unpaid",
       "to-ship",
       "shipped",
+      "requests",
     ]);
     expect(FILTERS.find((f) => f.id === "supplier")?.label).toBe("Από προμηθευτή");
     expect(FILTERS.find((f) => f.id === "supplier-open")?.label).toBe("Από προμηθευτή · ανοιχτές");
@@ -25,5 +26,16 @@ describe("orders filter «Από προμηθευτή»", () => {
   });
   it("leaves the other filters unchanged", () => {
     expect(whereFor("erp-pending", "")).toMatchObject({ paymentStatus: "PAID", erpPushedAt: null });
+  });
+});
+
+describe("orders filter «Αιτήματα» (back-order requests)", () => {
+  it("lists every request, and «Απλήρωτες» leaves out requests nobody owes money for yet", () => {
+    expect(FILTERS.find((f) => f.id === "requests")?.label).toBe("Αιτήματα");
+    expect(whereFor("requests", "")).toEqual({ requestStatus: { not: null } });
+    expect(whereFor("unpaid", "")).toEqual({
+      paymentStatus: { in: ["PENDING", "FAILED"] },
+      AND: [{ OR: [{ requestStatus: null }, { requestStatus: "ACCEPTED" }] }],
+    });
   });
 });

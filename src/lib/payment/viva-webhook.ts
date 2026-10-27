@@ -6,6 +6,7 @@ import { sendOrderEmail } from "@/lib/mail/order-email";
 import { sendInternalOrderEmail } from "@/lib/mail/order-internal-email";
 import { sendPaymentFailedEmail } from "@/lib/mail/payment-failed-email";
 import { sendOrderToErp, syncPaymentToErp } from "@/lib/orders/send-to-erp";
+import { requestBlocksPayment } from "@/lib/requests/model";
 
 /**
  * The one implementation behind every Viva webhook route.
@@ -165,9 +166,19 @@ async function handleTransaction(payload: Body, event: VivaEventName) {
 
   const order = await prisma.order.findUnique({
     where: { orderNumber },
-    select: { id: true, paymentStatus: true, totalGross: true },
+    select: { id: true, paymentStatus: true, totalGross: true, requestStatus: true },
   });
   if (!order) return NextResponse.json({ ok: true, ignored: "unknown_order" });
+
+  /*
+   * A back-order request is payable only once the customer accepted an offer
+   * (docs/backorder-requests.md): before that no Viva order exists for it, so a
+   * transaction naming it is an anomaly to look at, not a sale to book.
+   */
+  if (requestBlocksPayment(order.requestStatus)) {
+    console.error(`[viva] ${orderNumber}: transaction ${transactionId} for a request in ${order.requestStatus} — not applied`);
+    return NextResponse.json({ ok: true, flagged: "request_not_accepted" });
+  }
 
   // Idempotent: Viva retries, and a second delivery must not double-confirm.
   if (order.paymentStatus === "PAID") {

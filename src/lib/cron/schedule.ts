@@ -11,7 +11,7 @@
  * interval. The routes under /api/cron stay, for running a job by hand.
  */
 
-export type CronJobName = "catalog" | "orders" | "content";
+export type CronJobName = "catalog" | "orders" | "content" | "requests";
 
 type CronJob = {
   name: CronJobName;
@@ -68,6 +68,20 @@ const JOBS: readonly CronJob[] = [
     run: async () => {
       const { contentTick } = await import("@/lib/content-auto/cron");
       return contentTick();
+    },
+  },
+  {
+    // Back-order requests (docs/backorder-requests.md §6): one reminder 24h
+    // into an unanswered offer, EXPIRED once its expiry passes.
+    name: "requests",
+    everyMs: 15 * 60_000,
+    run: async () => {
+      const { sweepRequests, requestSweepLogLine } = await import("@/lib/requests/request-sweep");
+      const report = await sweepRequests();
+      if (report.errors.length > 0) {
+        console.error(`[cron:requests] ${report.errors.length} σφάλματα`, report.errors);
+      }
+      return requestSweepLogLine(report);
     },
   },
 ];

@@ -29,6 +29,7 @@ import {
   platformLabel,
   type Platform,
 } from "@/lib/catalog/hdc-filters";
+import { LISTING_LIMITS, isFilteredListing, listingLinkRel } from "@/lib/catalog/listing-query";
 import type { PlpResult } from "@/lib/catalog/plp";
 import { SORT_OPTIONS, type PlpFacets, type SortValue } from "@/lib/catalog/plp-options";
 import { DEFAULT_VAT_RATE } from "@/lib/format";
@@ -232,7 +233,8 @@ export async function HdcListing({
                       }}
                     />
                   </div>
-                  {shown < data.total && (
+                  {/* Load-more stops where one request stops drawing (60 pages). */}
+                  {shown < data.total && data.page < LISTING_LIMITS.maxCumulativePage && (
                     <Link
                       href={setParamKeepingPage(
                         basePath,
@@ -242,7 +244,7 @@ export async function HdcListing({
                       )}
                       scroll={false}
                       prefetch={false}
-                      rel="next"
+                      rel={isFilteredListing(params) ? "next nofollow" : "next"}
                       className="hdc-more-btn"
                     >
                       {upGreek(t("perissotera"))}
@@ -358,6 +360,7 @@ function PlatformControl({
               href={item.href}
               scroll={false}
               prefetch={false}
+              rel={listingLinkRel(item.href)}
               className={item.on ? "is-on" : undefined}
               aria-current={item.on ? "true" : undefined}
             >
@@ -381,6 +384,7 @@ function PlatformControl({
               href={item.href}
               scroll={false}
               prefetch={false}
+              rel={listingLinkRel(item.href)}
               className={item.on ? "is-on" : undefined}
               aria-current={item.on ? "true" : undefined}
             >
@@ -485,6 +489,7 @@ function CategoryNav({
                     href={setParamHref(basePath, params, "sub", g.slug)}
                     scroll={false}
                     prefetch={false}
+                    rel={listingLinkRel(setParamHref(basePath, params, "sub", g.slug))}
                     className={g.active ? "is-on" : undefined}
                     aria-current={g.active ? "page" : undefined}
                   >
@@ -690,6 +695,7 @@ function FilterOption({
       href={href}
       scroll={false}
       prefetch={false}
+      rel={listingLinkRel(href)}
       className="hdc-fopt"
       role="checkbox"
       aria-checked={active}
@@ -776,6 +782,7 @@ function Toolbar({
             href={chip.href}
             scroll={false}
             prefetch={false}
+            rel={listingLinkRel(chip.href)}
             className="hdc-chip"
             aria-label={t("afairesi", { label: chip.label })}
           >
@@ -787,6 +794,7 @@ function Toolbar({
             href={chip.href}
             scroll={false}
             prefetch={false}
+            rel={listingLinkRel(chip.href)}
             className="hdc-chip"
             aria-label={t("afairesi", { label: chip.label })}
           >

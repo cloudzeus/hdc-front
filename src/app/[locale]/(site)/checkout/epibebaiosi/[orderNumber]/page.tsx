@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { SiteChrome } from "@/components/chrome/SiteChrome";
 import { SiteFooter } from "@/components/chrome/SiteFooter";
@@ -20,6 +20,7 @@ import { isValidGtin } from "@/lib/feeds/google-merchant";
 import { GoogleReviewsOptIn } from "@/components/seo/GoogleReviewsOptIn";
 import { estimatedDeliveryDate, orderedProductsWhere } from "@/lib/seo/google-reviews";
 import { prisma } from "@/lib/prisma";
+import { requestPath } from "@/lib/requests/model";
 
 export const dynamic = "force-dynamic";
 
@@ -71,6 +72,21 @@ export default async function ConfirmationPage({ params, searchParams }: PagePro
    * name, address and phone.
    */
   if (!order || !guestToken || guestToken !== order.guestToken) notFound();
+
+  /*
+   * A back-order request that is not yet an accepted, payable order has its
+   * own page (offer, accept, decline). Viva's return lands here after an
+   * ACCEPTED request is paid, and that one is an ordinary order from then on.
+   */
+  if (order.requestStatus && order.requestStatus !== "ACCEPTED" && order.requestToken) {
+    redirect(requestPath(locale, order.requestToken));
+  }
+
+  /* The other half of a split cart: the lines that went as a request. */
+  const childRequest = await prisma.order.findFirst({
+    where: { parentOrderNumber: order.orderNumber, requestStatus: { not: null } },
+    select: { orderNumber: true, requestToken: true },
+  });
 
   const quote = order.shippingQuote as { etaDays?: string } | null;
   const awaitingPayment = order.paymentStatus === "PENDING";
@@ -137,6 +153,11 @@ export default async function ConfirmationPage({ params, searchParams }: PagePro
       <main id="main" className="hdc-co-page">
         <HdcOrderConfirmation
           locale={locale}
+          childRequest={
+            childRequest?.requestToken
+              ? { orderNumber: childRequest.orderNumber, href: requestPath(locale, childRequest.requestToken) }
+              : null
+          }
           order={{
             orderNumber: order.orderNumber,
             status: order.status,

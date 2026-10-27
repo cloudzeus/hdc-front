@@ -13,7 +13,7 @@ export type DeliverOutcome = { ok: true; id: string } | { ok: false; error: stri
  */
 export async function deliver(
   email: RenderedEmail,
-  envelope: { to: string; replyTo?: string; cc?: string; bcc?: string },
+  envelope: { to: string; replyTo?: string; cc?: string; bcc?: string; tracking?: boolean },
   context: string,
 ): Promise<DeliverOutcome> {
   if (!mailConfigured()) return { ok: false, error: "Το Mailgun δεν είναι ρυθμισμένο." };
@@ -26,6 +26,7 @@ export async function deliver(
       replyTo: envelope.replyTo ?? process.env.MAIL_REPLY_TO,
       cc: envelope.cc,
       bcc: envelope.bcc,
+      tracking: envelope.tracking,
     });
     if (!result.ok) {
       console.error(`[mail] ${context}: ${result.error}`);
@@ -41,7 +42,15 @@ export async function deliver(
 
 /** Render, then deliver; a template error is caught like a delivery error. */
 export async function renderAndDeliver(
-  build: () => Promise<{ to: string; email: RenderedEmail; replyTo?: string; cc?: string; bcc?: string } | null>,
+  build: () => Promise<{
+    to: string;
+    email: RenderedEmail;
+    replyTo?: string;
+    cc?: string;
+    bcc?: string;
+    /** `false` for emails whose links carry a secret (Mailgun tracking off). */
+    tracking?: boolean;
+  } | null>,
   context: string,
   missing = "Δεν βρέθηκε.",
 ): Promise<DeliverOutcome> {

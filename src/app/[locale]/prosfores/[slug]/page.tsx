@@ -21,6 +21,7 @@ import {
   getCompareTray,
 } from "@/lib/compare/compare";
 import { getPlpData, parsePlpParams } from "@/lib/catalog/plp";
+import { getPerRow } from "@/lib/catalog/per-row";
 import {
   getCatalogueStats,
   getMenuTree,
@@ -32,6 +33,9 @@ import { offerDescription, offerTitle } from "@/lib/offers/offers";
 import { prisma } from "@/lib/prisma";
 import { upGreek } from "@/lib/greek";
 import { Zone } from "@/components/zones/Zone";
+import { filteredListingMeta } from "@/lib/catalog/listing-query";
+import { admitListingRender, listingBusyMeta } from "@/lib/server/render-gate";
+import { ListingBusy } from "@/components/plp/ListingBusy";
 
 /**
  * One campaign, and the products in it.
@@ -85,6 +89,7 @@ const getOffer = cache(async (slug: string) =>
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: PageProps): Promise<Metadata> {
   const { slug, locale } = await params;
   const offer = await getOffer(slug);
@@ -97,6 +102,11 @@ export async function generateMetadata({
     ...pageMeta({ path: `/prosfores/${slug}`, locale, title, description }),
     title,
     description: description || undefined,
+    // Filtered views: noindex, follow — the canonical above is the bare listing.
+    ...filteredListingMeta(await searchParams),
+    // A render the gate turned away (the busy view): noindex too. Same
+    // per-request admission as the body; see render-gate.ts.
+    ...(await listingBusyMeta("offers", await searchParams)),
   };
 }
 
@@ -129,6 +139,8 @@ async function OfferBody({ params, searchParams }: PageProps) {
   if (!offer || !offer.isActive) notFound();
 
   const raw = await searchParams;
+  // Costly views queue for one of a few render slots; see render-gate.ts.
+  if (!(await admitListingRender("offers", raw))) return <ListingBusy basePath={`/prosfores/${slug}`} />;
   const plpParams = parsePlpParams(raw);
   const where = await campaignWhere(offer);
 
@@ -164,7 +176,7 @@ async function OfferBody({ params, searchParams }: PageProps) {
   const title = offerTitle(offer, locale);
   const description = offerDescription(offer, locale);
 
-  const perRow = Number(raw.perRow) || 4;
+  const perRow = await getPerRow();
   const gridCols =
     perRow === 2
       ? "sm:grid-cols-2"

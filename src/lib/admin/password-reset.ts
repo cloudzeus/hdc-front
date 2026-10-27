@@ -21,6 +21,7 @@ import { mailConfigured } from "@/lib/mail/client";
 import { buildAdminResetEmail } from "@/lib/mail/account-emails";
 import { deliver } from "@/lib/mail/hdc/deliver";
 import { requestFingerprint, stampNow } from "@/lib/mail/request-context";
+import { clientAddress } from "@/lib/security/client-ip";
 import { siteOrigin, siteOriginConfigured } from "@/lib/seo/urls";
 
 /**
@@ -45,11 +46,14 @@ const REQUEST_LOG_RETENTION_MS = 24 * 3600_000;
 
 const emailSchema = z.email().max(320);
 
-/** First hop of `x-forwarded-for`, as `request-context.ts` reads it. */
+/**
+ * The requester as `security/client-ip.ts` resolves it: `cf-connecting-ip`
+ * only from a Cloudflare edge, otherwise Traefik's peer. Not the first
+ * `x-forwarded-for` hop, which the client writes itself and which made the
+ * per-IP reset limit below trivially evadable.
+ */
 function clientIp(h: Headers): string | null {
-  const first = (h.get("x-forwarded-for") ?? "").split(",")[0]?.trim();
-  const ip = first || h.get("x-real-ip")?.trim() || "";
-  return ip ? ip.slice(0, 64) : null;
+  return clientAddress(h)?.slice(0, 64) ?? null;
 }
 
 export type ForgotOutcome = { ok: true } | { ok: false; error: string };

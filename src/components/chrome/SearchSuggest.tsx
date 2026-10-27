@@ -27,6 +27,7 @@ import {
 import { formatPrice } from "@/lib/format";
 import { upGreek } from "@/lib/greek";
 import { displayName } from "@/lib/milwaukee/display";
+import { LISTING_LIMITS } from "@/lib/catalog/listing-query";
 
 /**
  * Search-as-you-type (search.html §1 and the phone frames).
@@ -132,8 +133,15 @@ export function SearchSuggest({
         .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
         .then((result: SuggestResult) => setEntry({ q: trimmed, result }))
         .catch((error) => {
-          // An empty result for this query beats spinning forever.
-          if (error.name !== "AbortError") setEntry({ q: trimmed, result: EMPTY_SUGGEST(trimmed) });
+          if (error.name === "AbortError") return;
+          /* Typing faster than the rate limit (429): the last answer stays on
+             screen rather than a "nothing found" that is not true. Otherwise
+             an empty result for this query beats spinning forever. */
+          setEntry((previous) =>
+            error.message === "429" && previous
+              ? { q: trimmed, result: previous.result }
+              : { q: trimmed, result: EMPTY_SUGGEST(trimmed) },
+          );
         });
     }, SUGGEST_DEBOUNCE_MS);
     return () => {
@@ -279,6 +287,7 @@ export function SearchSuggest({
         id={`q-${variant}`}
         name="q"
         type="search"
+        maxLength={LISTING_LIMITS.maxQueryLength}
         enterKeyHint="search"
         data-search-input
         role="combobox"
@@ -697,7 +706,7 @@ function Panel({
       <h4 className="hdc-sg-h">{upGreek(t("katigories"))}</h4>
       <div>
         {data.categories.map((c) => (
-          <Link
+          <Link prefetch={false}
             key={c.slug}
             href={`/katalogos/${c.slug}`}
             className="hdc-sg-row"
