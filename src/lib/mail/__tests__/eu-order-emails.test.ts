@@ -269,3 +269,38 @@ describe("customer emails for an order shipped abroad are English", () => {
     expect(built!.email.html).toContain('lang="el"');
   });
 });
+
+/*
+ * HDCtool sends the SoftOne state's own (Greek) name. An English email must
+ * not carry it: known names are translated, unknown ones become a generic line.
+ */
+describe("status email abroad has no Greek status name", () => {
+  const hasGreek = (s: string) => /[Ͱ-Ͽἀ-῿]/.test(s);
+
+  it.each([
+    ["Παράδωση σε Courier", "Handed to courier"],
+    ["Παραδόθηκε", "Delivered"],
+    ["Σε αναμονή", "On hold"],
+  ])("translates the known name %s", async (greek, english) => {
+    const built = await buildOrderStatusEmail(asRef(), greek);
+    expect(built!.email.subject).toContain(english);
+    expect(hasGreek(built!.email.subject)).toBe(false);
+    expect(plain(built!.email.text)).not.toContain(greek);
+  });
+
+  it("falls back to a generic English line for an unknown name, with no Greek in subject or body", async () => {
+    const built = await buildOrderStatusEmail(asRef(), "Σε έλεγχο ποιότητας");
+    expect(built!.email.subject).toBe("Order HDC-20261027-0001: Your order status has changed");
+    expect(hasGreek(built!.email.subject)).toBe(false);
+    const body = plain(built!.email.text).replace(/ΕΕ — /g, "");
+    expect(body).not.toContain("Σε έλεγχο ποιότητας");
+  });
+
+  it("a Greek order keeps the ERP's name as it is", async () => {
+    const built = await buildOrderStatusEmail(
+      asRef({ shipCountry: "GR", billCountry: "GR", shippingMethod: "courier", vatMode: "standard" }),
+      "Σε προετοιμασία",
+    );
+    expect(built!.email.subject).toBe("Παραγγελία HDC-20261027-0001: Σε προετοιμασία");
+  });
+});

@@ -5,6 +5,7 @@ import { deliver, renderAndDeliver } from "@/lib/mail/hdc/deliver";
 import { buildOrderView, loadOrder, orderLocale, type OrderRef } from "@/lib/mail/hdc/order-view";
 import { buildInternalStatusEmail } from "@/lib/mail/order-internal-email";
 import type { MailOptions } from "@/lib/mail/order-email";
+import { statusNameFor } from "@/lib/mail/hdc/status-names";
 import { trackingFor } from "@/lib/shipping/tracking";
 
 /**
@@ -28,19 +29,21 @@ export async function buildOrderStatusEmail(orderNumber: OrderRef, statusName: s
   if (!order) return null;
   const locale = options.locale ?? orderLocale(order);
   const view = await buildOrderView(order, locale);
+  /* The ERP's Greek name only reaches a Greek email (see status-names.ts). */
+  const shownStatus = statusNameFor(locale, statusName);
 
   const email = renderEmail({
     template: "order-status",
     locale,
     kind: "order",
-    subject: t(locale, "status.subject", { number: order.orderNumber, status: statusName }),
-    preheader: t(locale, "status.pre", { number: order.orderNumber, status: statusName }),
+    subject: t(locale, "status.subject", { number: order.orderNumber, status: shownStatus }),
+    preheader: t(locale, "status.pre", { number: order.orderNumber, status: shownStatus }),
     topline: { left: t(locale, "status.topline"), right: order.orderNumber },
     assetOrigin: options.assetOrigin,
     data: {
       order: view,
       status: {
-        name: statusName,
+        name: shownStatus,
         tracking: order.acsVoucherNo ?? "",
         // ACS, or DHL Express for a parcel that went abroad (docs/dhl-express.md §3).
         tracking_url: order.acsVoucherNo ? trackingFor(order, order.acsVoucherNo).url : "",
