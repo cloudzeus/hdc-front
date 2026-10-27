@@ -16,7 +16,7 @@ import { getCartLineExtras, getHdcCrossSell } from "@/lib/cart/hdc-cart";
 import { freeShippingProgress } from "@/lib/cart/options";
 import { availabilityLabelKey, orderAvailability } from "@/lib/catalog/availability";
 import { isOnRequest, splitCart } from "@/lib/requests/model";
-import { countryName, isDhlCountry } from "@/lib/shipping/countries";
+import { countryName } from "@/lib/shipping/countries";
 import { readDestination } from "@/lib/shipping/destination-cookie";
 import { isInternationalShippingEnabled } from "@/lib/shipping/flag";
 import {
@@ -78,8 +78,11 @@ export default async function CartPage({
     postcode,
     destination ? { country: destination.country, city: destination.city } : undefined,
   );
-  /* DHL is never free: no free-shipping bar for a DHL destination. */
-  const dhlDestination = isDhlCountry(destination?.country);
+  /*
+   * Free shipping is a Greek promise: no free-shipping bar for any destination
+   * abroad (DHL, and Cyprus too), so nothing here can promise what is charged.
+   */
+  const abroadDestination = destination != null && destination.country !== "GR";
   const lines = cart?.lines ?? [];
   const isEmpty = lines.length === 0;
 
@@ -239,7 +242,7 @@ export default async function CartPage({
                   <small>{t("n_proionta", { count: totals.itemCount })}</small>
                 </h1>
 
-                {!dhlDestination && (
+                {!abroadDestination && (
                 <div className="hdc-free" data-reached={progress.reached || undefined}>
                   <div className="row">
                     {progress.reached ? (

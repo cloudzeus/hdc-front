@@ -191,6 +191,7 @@ export function MiniCart({
                   </span>
                 </div>
 
+                {cart.freeShippingApplies !== false && (
                 <div className="relative mt-2.5 h-1.5 overflow-hidden bg-k-line">
                   <span
                     className={`absolute inset-y-0 left-0 transition-all duration-500 ${
@@ -199,14 +200,18 @@ export function MiniCart({
                     style={{ width: `${progress}%` }}
                   />
                 </div>
+                )}
                 <p className="mt-1.5 text-[10.5px] text-k-text-5">
                   {t("choris_metaforika_ypologizontai_sto_kalathi")}
                 </p>
+                {/* Free shipping is a Greek promise: nothing about it abroad. */}
+                {cart.freeShippingApplies !== false && (
                 <p className="mt-2 text-[11px] leading-[1.5] text-k-text-3">
                   {cart.freeShippingReached
                     ? t("dorean_metaforika_energa")
                     : t("akomi_gia_dorean_metaforika", { n: formatMoney(cart.freeShippingRemaining, locale) })}
                 </p>
+                )}
               </div>
 
               <div className="flex gap-2.5 px-[18px] py-3.5">

@@ -20,6 +20,7 @@ import {
   type DestinationQuote,
 } from "@/lib/shipping/courier-quote";
 import { vatRateForDestination } from "@/lib/shipping/vat";
+import { readDestination } from "@/lib/shipping/destination-cookie";
 import {
   FREE_SHIPPING_THRESHOLD_NET,
   PAYMENT_METHODS,
@@ -341,7 +342,12 @@ export async function computeTotals(
           ? "courier"
           : shippingMethodId,
     ) ?? SHIPPING_METHODS[0];
-  const freeShippingReached = subtotalNet >= FREE_SHIPPING_THRESHOLD_NET;
+  /*
+   * Free shipping over the net threshold is a promise about Greece. Abroad it
+   * is never reached, so no bar, banner or «ΔΩΡΕΑΝ» can promise it there
+   * (MiniCart, the cart page, `thresholdLost` in requests/breakdown).
+   */
+  const freeShippingReached = home && subtotalNet >= FREE_SHIPPING_THRESHOLD_NET;
   const payment = PAYMENT_METHODS.find((m) => m.id === paymentMethodId)!;
 
   /*
@@ -395,8 +401,7 @@ export async function computeTotals(
    * Free shipping over the net threshold is a promise about Greece. Abroad
    * postage is charged at any basket value, whatever the method says.
    */
-  const shippingNet =
-    home && shipping.freeOverThreshold && freeShippingReached ? 0 : quotedNet;
+  const shippingNet = shipping.freeOverThreshold && freeShippingReached ? 0 : quotedNet;
 
   // No payment method carries a fee today — cash on delivery, the only one that
   // ever did, is not accepted. Kept as a field because the column exists and a
@@ -540,6 +545,9 @@ export const getMiniCart = cache(
   async (locale: Locale): Promise<MiniCartSummary | null> => {
     const cart = await getCart(locale);
     if (!cart || cart.lines.length === 0) return null;
+    /* Priced for Greece (no courier round-trip on every page), but a basket
+       headed abroad is never promised free shipping. */
+    const abroad = (await readDestination()) != null;
 
     return {
       lines: cart.lines.slice(0, 8).map((line) => ({
@@ -557,7 +565,8 @@ export const getMiniCart = cache(
       subtotalNet: cart.totals.subtotalNet,
       subtotalGross: cart.totals.subtotalGross,
       freeShippingRemaining: cart.totals.freeShippingRemaining,
-      freeShippingReached: cart.totals.freeShippingReached,
+      freeShippingReached: !abroad && cart.totals.freeShippingReached,
+      freeShippingApplies: !abroad,
     };
   },
 );

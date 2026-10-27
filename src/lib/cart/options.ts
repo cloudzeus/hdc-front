@@ -258,6 +258,11 @@ export type MiniCartSummary = {
   subtotalGross: number;
   freeShippingRemaining: number;
   freeShippingReached: boolean;
+  /**
+   * False when the remembered destination is abroad: free shipping is a Greek
+   * promise, so the mini cart shows no free-shipping bar or text at all.
+   */
+  freeShippingApplies: boolean;
 };
 
 /**

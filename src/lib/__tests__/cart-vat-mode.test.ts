@@ -140,6 +140,19 @@ describe("computeTotals vat mode", () => {
     expect(totals.shippingNet).toBe(3);
   });
 
+  it("never reports free shipping as reached abroad (CY, DE) — only in Greece", async () => {
+    request.mockResolvedValue(acsAnswer);
+    const cy = await computeTotals(mixed, "courier", "card", "1010", { country: "CY", city: "Λευκωσία" });
+    expect(cy.subtotalNet).toBeGreaterThanOrEqual(150);
+    expect(cy.freeShippingReached).toBe(false);
+    request.mockResolvedValue(dhlAnswer);
+    const de = await computeTotals(mixed, "dhl", "card", "10115", { country: "DE", city: "Berlin" });
+    expect(de.freeShippingReached).toBe(false);
+    request.mockResolvedValue(acsAnswer);
+    const gr = await computeTotals(mixed, "courier", "card", "18545");
+    expect(gr.freeShippingReached).toBe(true);
+  });
+
   it("uses the given shipping quote and its VAT rate instead of quoting", async () => {
     const to = { country: "DE", city: "Berlin" };
     const standard = await computeTotals(mixed, "dhl", "card", "10115", to, {
