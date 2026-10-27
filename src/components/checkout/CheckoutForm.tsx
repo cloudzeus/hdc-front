@@ -235,7 +235,13 @@ export function CheckoutForm({
       // Only the prefix typed so far: nothing to check yet.
       if (!body) send = { ...next, vat: "" };
       // The format first, here: a wrong one never reaches VIES (the server agrees).
-      setVatStatus(!body ? null : normaliseEuVat(next.vat, next.country).ok ? null : "invalid_format");
+      const format = normaliseEuVat(next.vat, next.country);
+      setVatStatus(!body ? null : format.ok ? null : "invalid_format");
+      // The field shows what is asked and stored: «DEDE143…» or «de 143 …» → «DE143…».
+      if (body && format.ok) {
+        send = { ...next, vat: format.vat };
+        if (format.vat !== next.vat) setVat(format.vat);
+      }
     } else {
       setVatStatus(null);
     }
@@ -673,14 +679,14 @@ export function CheckoutForm({
                     </span>
                     {splitNow.thresholdLost && <span className="bd">{t("split_threshold_lost")}</span>}
                     <span className="bd">
-                      {t("split_request", { items: items(splitRequest.itemCount), value: money(splitRequest.subtotalGross) })}
+                      {t("split_request", { items: items(splitRequest.itemCount), value: money(exempt ? splitRequest.subtotalNet : splitRequest.subtotalGross) })}
                     </span>
                     <strong>{t("now_short", { amount: money(splitNow.totalGross) })}</strong>
                   </>
                 ) : mode === "together" && together ? (
                   <>
                     <span className="bd now">
-                      {t("together_line", { items: items(together.itemCount), value: money(together.subtotalGross) })}
+                      {t("together_line", { items: items(together.itemCount), value: money(exempt ? together.subtotalNet : together.subtotalGross) })}
                     </span>
                     <strong>{t("now_short", { amount: money(0) })}</strong>
                   </>

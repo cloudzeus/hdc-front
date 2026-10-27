@@ -318,10 +318,11 @@ export default async function CheckoutPage({
         name: miniName(line.name, line.code2),
         image: line.image,
         quantity: line.quantity,
-        lineGross: line.lineGross,
+        lineGross: exempt ? line.lineNet : line.lineGross,
       }))}
       shippingRowLabel={shippingRowLabel}
       nowAllAt24={split.ready.every((l) => l.vatRate === 24)}
+      exemptNote={exempt ? t("eu_exempt_note") : null}
     />
   ) : null;
 

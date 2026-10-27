@@ -79,6 +79,7 @@ export function SplitSummaryBody({
   lines,
   shippingRowLabel,
   nowAllAt24,
+  exemptNote = null,
 }: {
   locale: string;
   lines: SummaryLine[];
@@ -86,6 +87,8 @@ export function SplitSummaryBody({
   shippingRowLabel: string;
   /** Every in-stock line at 24% — the VAT line may name the rate. */
   nowAllAt24: boolean;
+  /** Intra-EU exempt buyer: the reverse-charge note in place of the VAT line, and the request shown net. */
+  exemptNote?: string | null;
 }) {
   const t = useTranslations("checkout.HdcSplit");
   const split = useSplitCheckout();
@@ -171,7 +174,9 @@ export function SplitSummaryBody({
           </div>
           <p className="vat">
             {now
-              ? nowAllAt24
+              ? exemptNote
+                ? exemptNote
+                : nowAllAt24
                 ? t("vat_24", { amount: money(now.vatAmount) })
                 : t("vat", { amount: money(now.vatAmount) })
               : t("nothing_now")}
@@ -181,7 +186,7 @@ export function SplitSummaryBody({
             <div className="hdc-split-req">
               <div>
                 <b>{t("on_request")}</b>
-                <span>{money(request.subtotalGross)}</span>
+                <span>{money(exemptNote ? request.subtotalNet : request.subtotalGross)}</span>
               </div>
               <small>
                 {items(request.itemCount)} ·{" "}
