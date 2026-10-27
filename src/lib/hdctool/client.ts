@@ -128,6 +128,39 @@ async function request<T>(
   return (await response.json()) as T;
 }
 
+/**
+ * Like `request`, but a non-2xx answer is RETURNED, not thrown: the caller
+ * needs the status and the JSON body (a 429 or a 422 carries a typed answer,
+ * not just an error). A network failure or timeout still throws. A 401 is
+ * retried once with a fresh token, as in `request`.
+ */
+export async function hdctoolRequestRaw<T = unknown>(
+  endpoint: string,
+  body?: unknown,
+  { timeoutMs = REQUEST_TIMEOUT_MS, retryOn401 = true }: { timeoutMs?: number; retryOn401?: boolean } = {},
+): Promise<{ status: number; body: T | null }> {
+  const token = await getToken();
+
+  const response = await fetch(`${BASE_URL}${endpoint}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(body ?? {}),
+    cache: "no-store",
+    signal: AbortSignal.timeout(timeoutMs),
+  });
+
+  if (response.status === 401 && retryOn401) {
+    cachedToken = null;
+    return hdctoolRequestRaw<T>(endpoint, body, { timeoutMs, retryOn401: false });
+  }
+
+  const parsed = (await response.json().catch(() => null)) as T | null;
+  return { status: response.status, body: parsed };
+}
+
 // ── Response shapes (verified against the live API, 2026-07-26) ─────────────
 
 export type HdctoolCursor = { name: string; mtrl: number };
