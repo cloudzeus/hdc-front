@@ -1,3 +1,5 @@
+import { isEuSalesEnabled } from "@/lib/eu-sales/flag";
+
 /**
  * INTERNATIONAL_SHIPPING_ENABLED — the switch for the country selector and DHL
  * Express to the rest of the EU (docs/dhl-express.md §4).
@@ -13,6 +15,10 @@
 export function isInternationalShippingEnabled(
   env: Record<string, string | undefined> = process.env,
 ): boolean {
+  // EU sales (EU_SALES_ENABLED, `lib/eu-sales/flag`) deliver abroad too: the
+  // country selector and the destination cookie come with them. Both unset
+  // is exactly the Greek-only shop.
+  if (isEuSalesEnabled(env)) return true;
   const raw = (env.INTERNATIONAL_SHIPPING_ENABLED ?? "").trim().toLowerCase();
   return raw === "on" || raw === "true" || raw === "1" || raw === "yes";
 }

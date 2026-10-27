@@ -75,6 +75,15 @@ export const PAYMENT_METHODS = [
    */
 ] as const;
 
+/**
+ * How VAT is charged. "standard" is every cart there has ever been.
+ * "intra_eu_exempt" is a company in another EU country with a valid VIES
+ * result: no VAT on the lines, the postage or any fee (reverse charge,
+ * art. 138 of Directive 2006/112/EC). The caller decides which — the server
+ * re-checks VIES in `placeOrder`; nothing here trusts a client flag.
+ */
+export type VatMode = "standard" | "intra_eu_exempt";
+
 export type ShippingMethodId = (typeof SHIPPING_METHODS)[number]["id"];
 export type PaymentMethodId = (typeof PAYMENT_METHODS)[number]["id"];
 
@@ -178,6 +187,8 @@ export type CartTotals = {
     chargeableKg: number;
     estimated: boolean;
     carrier: string | null;
+    /** DHL's estimated delivery date (ISO), when it gave one. */
+    deliveryDate?: string | null;
   } | null;
   /**
    * ACS has no station for the postcode: we do not deliver there. The courier

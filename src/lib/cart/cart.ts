@@ -33,6 +33,7 @@ import {
   type PaymentMethodId,
   type MiniCartSummary,
   type ShippingMethodId,
+  type VatMode,
 } from "@/lib/cart/options";
 
 export * from "@/lib/cart/options";
@@ -44,14 +45,6 @@ export * from "@/lib/cart/options";
  */
 export type CartDestination = { country?: string | null; city?: string | null };
 
-/**
- * How VAT is charged. "standard" is every cart there has ever been.
- * "intra_eu_exempt" is a company in another EU country with a valid VIES
- * result: no VAT on the lines, the postage or any fee (reverse charge,
- * art. 138 of Directive 2006/112/EC). The caller decides which — the server
- * re-checks VIES in `placeOrder`; nothing here trusts a client flag.
- */
-export type VatMode = "standard" | "intra_eu_exempt";
 
 export type ComputeTotalsOptions = {
   /** Default "standard". */
@@ -428,6 +421,9 @@ export async function computeTotals(
           chargeableKg: quote.chargeableKg,
           estimated: quote.estimated,
           carrier: shipping.carrier,
+          ...(isDhlQuote(quote) && quote.estimatedDeliveryDate
+            ? { deliveryDate: quote.estimatedDeliveryDate }
+            : {}),
         }
       : null,
     unserviceable,
