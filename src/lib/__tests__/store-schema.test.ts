@@ -20,7 +20,9 @@ describe("store structured data", () => {
 
   it("describes the store with its logo, map and the area it serves", () => {
     const store = (siteJsonLd("el")["@graph"] as Array<Record<string, unknown>>)[0];
-    expect(store["@type"]).toBe("HardwareStore");
+    // Dual-typed so GEO crawlers that string-match "Organization" find the brand.
+    expect(store["@type"]).toEqual(["HardwareStore", "Organization"]);
+    expect(store.contactPoint).toMatchObject({ "@type": "ContactPoint", contactType: "customer service" });
     expect(store.logo).toMatch(/\/brand\/hdc-lockup-440\.png$/);
     expect(store.hasMap).toMatch(/^https:\/\//);
     expect(store.areaServed).toMatchObject({ "@type": "Country", identifier: "GR" });

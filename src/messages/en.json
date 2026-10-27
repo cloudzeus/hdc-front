@@ -353,6 +353,10 @@
     }
   },
   "home": {
+    "HomeFaq": {
+      "titlos": "FAQ",
+      "oles": "ALL QUESTIONS"
+    },
     "HdcHero": {
       "titlos": "M18 FPD3 PERCUSSION DRILL",
       "keimeno": "Bare tool, or as a kit with two 5.0Ah REDLITHIUM™ batteries, charger and case.",
