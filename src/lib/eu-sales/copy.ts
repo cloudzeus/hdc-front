@@ -17,6 +17,8 @@ export type EuSalesCopy = {
   vatRequired: string;
   companyRequired: string;
   customerType: string;
+  /** The totals the form showed no longer hold (hint guard, no VIES verdict to blame). */
+  totalsChanged: string;
 };
 
 export const EU_SALES_COPY: Record<"el" | "en", EuSalesCopy> = {
@@ -30,6 +32,7 @@ export const EU_SALES_COPY: Record<"el" | "en", EuSalesCopy> = {
     vatRequired: "Για εταιρεία χρειάζονται επωνυμία και ΑΦΜ.",
     companyRequired: "Απαιτείται",
     customerType: "Επιλέξτε «Ιδιώτης» ή «Εταιρεία».",
+    totalsChanged: "Τα σύνολα άλλαξαν — ελέγξτε τα και πατήστε ξανά.",
   },
   en: {
     noDhl: "Shipping to your country is not available right now — please contact us",
@@ -41,6 +44,7 @@ export const EU_SALES_COPY: Record<"el" | "en", EuSalesCopy> = {
     vatRequired: "A company needs its name and VAT number.",
     companyRequired: "Required",
     customerType: "Choose «Individual» or «Company».",
+    totalsChanged: "The totals changed — please check them and press again.",
   },
 };
 

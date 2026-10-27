@@ -167,8 +167,8 @@ export async function placeOrder(
     return {
       error: euAbroad ? eu.vatRequired : "Για τιμολόγιο χρειάζονται επωνυμία και ΑΦΜ.",
       fieldErrors: {
-        ...(input.companyName ? {} : { companyName: "Απαιτείται" }),
-        ...(input.vatNumber ? {} : { vatNumber: "Απαιτείται" }),
+        ...(input.companyName ? {} : { companyName: euAbroad ? eu.companyRequired : "Απαιτείται" }),
+        ...(input.vatNumber ? {} : { vatNumber: euAbroad ? eu.companyRequired : "Απαιτείται" }),
       },
     };
   }
@@ -463,7 +463,12 @@ export async function placeOrder(
     } catch (error) {
       console.error("[checkout] buyer cookie not refreshed", error);
     }
-    return { error: eu.unavailable, fieldErrors: { vatNumber: eu.unavailable } };
+    /* Say what is true now: VIES refused it, it could not be asked, or the buyer is no longer a company. */
+    const reason =
+      customerType !== "company" ? eu.totalsChanged : vies?.status === "invalid" ? eu.invalid : eu.unavailable;
+    return customerType !== "company"
+      ? { error: reason }
+      : { error: reason, fieldErrors: { vatNumber: reason } };
   }
 
   const totals = await computeTotals(
@@ -520,9 +525,9 @@ export async function placeOrder(
             ...(vies
               ? {
                   viesValid: vies.status === "valid",
-                  viesName: viesText(vies.name),
-                  viesAddress: null,
-                  viesConsultationNumber: viesText(vies.consultationNumber),
+                  viesName: viesText(vies.name, 255),
+                  viesAddress: viesText(vies.address, 1000),
+                  viesConsultationNumber: viesText(vies.consultationNumber, 64),
                   viesCheckedAt: vies.checkedAt ? new Date(vies.checkedAt) : null,
                 }
               : {}),
@@ -791,9 +796,11 @@ export async function placeOrder(
 }
 
 /** VIES writes «---» for what it will not disclose: that is not a value. */
-function viesText(value: string | null | undefined): string | null {
+function viesText(value: string | null | undefined, max?: number): string | null {
   const text = (value ?? "").trim();
-  return text && text !== "---" ? text : null;
+  if (!text || text === "---") return null;
+  /* Cut to the column: a long registered name must not turn into a 500. */
+  return max ? text.slice(0, max) : text;
 }
 
 /**

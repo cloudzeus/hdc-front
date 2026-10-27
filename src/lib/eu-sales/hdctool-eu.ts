@@ -26,6 +26,8 @@ export type EuVatStatus = "valid" | "invalid" | "unavailable" | "invalid_format"
 export type EuVatCheck = {
   status: EuVatStatus;
   name: string | null;
+  /** The registered address VIES returned, when it discloses one. */
+  address?: string | null;
   consultationNumber: string | null;
   checkedAt: string | null;
   message: string;
@@ -36,6 +38,7 @@ const VAT_STATUSES: readonly EuVatStatus[] = ["valid", "invalid", "unavailable",
 type VatBody = {
   status?: unknown;
   name?: unknown;
+  address?: unknown;
   consultationNumber?: unknown;
   checkedAt?: unknown;
   message?: unknown;
@@ -97,6 +100,7 @@ export async function checkEuVat(vat: string, country: string): Promise<EuVatChe
   return {
     status: answered,
     name: text(body?.name),
+    address: text(body?.address),
     consultationNumber: text(body?.consultationNumber),
     checkedAt: text(body?.checkedAt),
     message: text(body?.message) ?? "",

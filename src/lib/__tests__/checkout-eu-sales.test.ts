@@ -333,7 +333,7 @@ describe("EU_SALES_ENABLED on", () => {
       {},
       form({ ...berlin, customerType: "company", companyName: "Schmidt GmbH", vatNumber: "DE123456789", vatModeHint: "intra_eu_exempt" }),
     );
-    expect(invalid.error).toMatch(/δοκιμάστε ξανά/);
+    expect(invalid.error).toMatch(/δεν είναι ενεργός/);
     expect(mocks.orderCreate).not.toHaveBeenCalled();
   });
 
@@ -398,6 +398,62 @@ describe("EU_SALES_ENABLED on", () => {
     expect(result.fieldErrors).toHaveProperty("vatNumber");
     expect(mocks.checkEuVat).not.toHaveBeenCalled();
     expect(mocks.orderCreate).not.toHaveBeenCalled();
+  });
+
+  it("a VIES name longer than its column is cut to 255 before the order is created (M1)", async () => {
+    mocks.checkEuVat.mockResolvedValue({
+      status: "valid",
+      name: "S".repeat(400),
+      address: "Hauptstr. 1\n10115 Berlin",
+      consultationNumber: "W".repeat(100),
+      checkedAt: new Date().toISOString(),
+      message: "",
+    });
+    await expect(
+      placeOrder({}, form({ ...berlin, customerType: "company", companyName: "Schmidt GmbH", vatNumber: "DE123456789" })),
+    ).rejects.toThrow("REDIRECT");
+    const data = createdData();
+    expect((data.viesName as string).length).toBe(255);
+    expect((data.viesConsultationNumber as string).length).toBe(64);
+    // M7: the address VIES gave is kept as proof.
+    expect(data.viesAddress).toBe("Hauptstr. 1\n10115 Berlin");
+  });
+
+  it("no VIES address ('---' or missing) stores null (M7)", async () => {
+    mocks.checkEuVat.mockResolvedValue({
+      status: "valid", name: "X", address: "---", consultationNumber: "Y", checkedAt: new Date().toISOString(), message: "",
+    });
+    await expect(
+      placeOrder({}, form({ ...berlin, customerType: "company", companyName: "Schmidt GmbH", vatNumber: "DE123456789" })),
+    ).rejects.toThrow("REDIRECT");
+    expect(createdData().viesAddress).toBeNull();
+  });
+
+  it("the hint guard says what VIES now says: invalid → the invalid sentence, not «try again» (M2)", async () => {
+    mocks.checkEuVat.mockResolvedValue({ status: "invalid", name: null, consultationNumber: null, checkedAt: new Date().toISOString(), message: "" });
+    const result = await placeOrder(
+      {},
+      form({ ...berlin, customerType: "company", companyName: "Schmidt GmbH", vatNumber: "DE123456789", vatModeHint: "intra_eu_exempt" }),
+    );
+    expect(result.error).toBe("Ο ΑΦΜ δεν είναι ενεργός στο VIES — η παραγγελία θα χρεωθεί με ΦΠΑ");
+    expect(mocks.orderCreate).not.toHaveBeenCalled();
+  });
+
+  it("the hint guard after switching to «Ιδιώτης» is neutral, not «VAT could not be checked» (M2)", async () => {
+    const result = await placeOrder({}, form({ ...berlin, customerType: "individual", vatModeHint: "intra_eu_exempt" }));
+    expect(result.error).toBe("Τα σύνολα άλλαξαν — ελέγξτε τα και πατήστε ξανά.");
+    expect(mocks.checkEuVat).not.toHaveBeenCalled();
+    expect(mocks.orderCreate).not.toHaveBeenCalled();
+  });
+
+  it("a company without name or VAT number abroad gets the English field error in an English checkout (M5)", async () => {
+    const result = await placeOrder({}, form({ ...berlin, locale: "en", customerType: "company" }));
+    expect(result.fieldErrors).toMatchObject({ companyName: "Required", vatNumber: "Required" });
+  });
+
+  it("the same in Greek stays «Απαιτείται» (M5)", async () => {
+    const result = await placeOrder({}, form({ ...berlin, locale: "el", customerType: "company" }));
+    expect(result.fieldErrors).toMatchObject({ companyName: "Απαιτείται", vatNumber: "Απαιτείται" });
   });
 
   it("an invalid VAT number may go on with VAT", async () => {
