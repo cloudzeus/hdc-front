@@ -44,6 +44,26 @@ export * from "@/lib/cart/options";
 export type CartDestination = { country?: string | null; city?: string | null };
 
 /**
+ * How VAT is charged. "standard" is every cart there has ever been.
+ * "intra_eu_exempt" is a company in another EU country with a valid VIES
+ * result: no VAT on the lines, the postage or any fee (reverse charge,
+ * art. 138 of Directive 2006/112/EC). The caller decides which — the server
+ * re-checks VIES in `placeOrder`; nothing here trusts a client flag.
+ */
+export type VatMode = "standard" | "intra_eu_exempt";
+
+export type ComputeTotalsOptions = {
+  /** Default "standard". */
+  vatMode?: VatMode;
+  /**
+   * Postage already priced (a DHL quote re-fetched by the server). Used in
+   * place of asking the courier again; its `vatRate` is the VAT on postage
+   * (24 when this is absent, as before). Collection stays free.
+   */
+  shipping?: { net: number; vatRate: number } | null;
+};
+
+/**
  * Cart reads.
  *
  * Every amount here is computed from the CURRENT product row, never from
@@ -292,14 +312,19 @@ export async function computeTotals(
   paymentMethodId: PaymentMethodId,
   postcode?: string | null,
   destination?: CartDestination,
+  options: ComputeTotalsOptions = {},
 ): Promise<CartTotals> {
+  const exempt = options.vatMode === "intra_eu_exempt";
   const subtotalNet = lines.reduce((sum, l) => sum + l.lineNet, 0);
-  const subtotalGross = lines.reduce((sum, l) => sum + l.lineGross, 0);
+  // Exempt: the line is charged at its net, whatever rate its gross carries.
+  const subtotalGross = exempt ? subtotalNet : lines.reduce((sum, l) => sum + l.lineGross, 0);
 
   const savingsGross = lines.reduce((sum, l) => {
     if (l.unitListNet == null) return sum;
-    const was = grossAmount(l.unitListNet * l.quantity, { vatRate: l.vatRate });
-    return sum + Math.max(0, was - l.lineGross);
+    const was = exempt
+      ? netAmount(l.unitListNet * l.quantity)
+      : grossAmount(l.unitListNet * l.quantity, { vatRate: l.vatRate });
+    return sum + Math.max(0, was - (exempt ? l.lineNet : l.lineGross));
   }, 0);
 
   const country = (destination?.country ?? "GR").toUpperCase();
@@ -338,8 +363,9 @@ export async function computeTotals(
   //
   // Outside Greece (INTERNATIONAL_SHIPPING_ENABLED only) the destination
   // module decides: ACS for Cyprus, DHL for the rest of the EU, and no table.
+  const given = options.shipping ?? null;
   const live: DestinationQuote | null =
-    shipping.expressMultiplier > 0
+    shipping.expressMultiplier > 0 && !given
       ? home
         ? await quoteLivePostage({ items: parcel, postcode })
         : await quoteDestination({
@@ -357,9 +383,18 @@ export async function computeTotals(
   const quote =
     live && !isUnserviceable(live) && !isRefused(live) && !isQuoteUnavailable(live) ? live : null;
 
-  const quotedNet = quote ? round(quote.totalNet * shipping.expressMultiplier) : 0;
+  const quotedNet =
+    given && shipping.expressMultiplier > 0
+      ? round(given.net)
+      : quote
+        ? round(quote.totalNet * shipping.expressMultiplier)
+        : 0;
+  /*
+   * Free shipping over the net threshold is a promise about Greece. Abroad
+   * postage is charged at any basket value, whatever the method says.
+   */
   const shippingNet =
-    shipping.freeOverThreshold && freeShippingReached ? 0 : quotedNet;
+    home && shipping.freeOverThreshold && freeShippingReached ? 0 : quotedNet;
 
   // No payment method carries a fee today — cash on delivery, the only one that
   // ever did, is not accepted. Kept as a field because the column exists and a
@@ -369,8 +404,11 @@ export async function computeTotals(
   // Shipping and fees are charged at the standard rate regardless of basket
   // mix — Greek 24% for every destination for now (`vatRateForDestination`).
   const destinationVat = vatRateForDestination(country);
-  const shippingGross = grossAmount(shippingNet, { vatRate: destinationVat });
-  const paymentFeeGross = grossAmount(paymentFeeNet, { vatRate: destinationVat });
+  const shippingVat = given?.vatRate ?? destinationVat;
+  const shippingGross = exempt ? shippingNet : grossAmount(shippingNet, { vatRate: shippingVat });
+  const paymentFeeGross = exempt
+    ? paymentFeeNet
+    : grossAmount(paymentFeeNet, { vatRate: destinationVat });
 
   const totalGross = round(subtotalGross + shippingGross + paymentFeeGross);
   const totalNet = round(subtotalNet + shippingNet + paymentFeeNet);
