@@ -5,6 +5,7 @@ import { hdctoolRequest } from "@/lib/hdctool/client";
 import { resolvePaymentMethod } from "@/lib/orders/viva-payment-method";
 import { readSnapshot, requestBlocksErp } from "@/lib/requests/model";
 import { shippingIntakeBlock } from "@/lib/shipping/intake";
+import { isForeignBilling, isIntraEuExempt } from "@/lib/orders/eu-vat";
 import { SHOP } from "@/config/shop";
 
 /**
@@ -79,6 +80,13 @@ type OrderWithLines = Prisma.OrderGetPayload<{ include: { lines: true } }>;
  * the payment sync exists.
  */
 export function buildIntakeBody(order: OrderWithLines) {
+  /*
+   * An intra-EU exempt order carries no VAT anywhere: HDCtool holds one whose
+   * lines or postage are not ALL at 0%, so each line says 0.00 and its gross is
+   * its net. The stored line still has the 24% it was priced at (the catalogue
+   * is VAT-inclusive); the totals above are already the exempt ones.
+   */
+  const exempt = isIntraEuExempt(order);
   return {
     orderNumber: order.orderNumber,
     orderId: order.id,
@@ -167,10 +175,10 @@ export function buildIntakeBody(order: OrderWithLines) {
       unitNet: money(line.unitNet),
       discountPercent: money(line.discountPercent),
       offerTitle: line.offerTitle,
-      unitGross: money(line.unitGross),
-      vatRate: money(line.vatRate),
+      unitGross: exempt ? exemptUnitGross(line) : money(line.unitGross),
+      vatRate: exempt ? "0.00" : money(line.vatRate),
       lineNet: money(line.lineNet),
-      lineGross: money(line.lineGross),
+      lineGross: exempt ? money(line.lineNet) : money(line.lineGross),
       weightKg: line.weightKg == null ? null : line.weightKg.toFixed(3),
     })),
 
@@ -187,12 +195,35 @@ export function buildIntakeBody(order: OrderWithLines) {
      * Greek and Cypriot order posts exactly the body it always did.
      */
     ...withShippingBlock(order),
+
+    /*
+     * Who bought and how VAT was charged — only for an order billed abroad
+     * (or exempt), so a Greek order posts exactly the body it always did.
+     * `vatNumber` above already carries its country prefix for a foreign one.
+     */
+    ...withEuBlock(order),
   };
 }
 
 function withShippingBlock(order: OrderWithLines) {
   const shipping = shippingIntakeBlock(order);
   return shipping ? { shipping } : {};
+}
+
+function withEuBlock(order: OrderWithLines) {
+  if (!isForeignBilling(order) && !isIntraEuExempt(order)) return {};
+  return {
+    billCountry: order.billCountry,
+    ...(order.customerType ? { customerType: order.customerType } : {}),
+    vatMode: order.vatMode,
+    ...(order.viesConsultationNumber ? { viesConsultationNumber: order.viesConsultationNumber } : {}),
+    ...(order.viesCheckedAt ? { viesCheckedAt: order.viesCheckedAt.toISOString() } : {}),
+  };
+}
+
+/** An exempt line's unit gross is its net: the discounted line total over the quantity. */
+function exemptUnitGross(line: OrderWithLines["lines"][number]): string {
+  return (Number(line.lineNet) / line.quantity).toFixed(2);
 }
 
 function buildRequestBlock(order: OrderWithLines) {

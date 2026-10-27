@@ -1526,6 +1526,8 @@
       "synolo": "TOTALE",
       "periechei_fpa_24": "IVA 24% inclusa {amount}",
       "periechei_fpa": "IVA inclusa {amount}",
+      "fpa_apallagi": "Cessione intracomunitaria — operazione esente da IVA (inversione contabile, articolo 138 della Direttiva 2006/112/CE)",
+      "vies_number": "Numero di consultazione VIES: {number}",
       "olokliri_3_5": "L'ordine parte in 3–5 giorni lavorativi: uno o più articoli arrivano dal fornitore.",
       "child_request": "I prodotti su ordinazione sono stati inviati come richiesta {number}. Riceverai un'offerta via email entro 24 ore.",
       "child_request_link": "Vedi la richiesta",

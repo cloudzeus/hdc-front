@@ -1,6 +1,6 @@
 {{> heading eyebrow=(T "paid.eyebrow") title=(T "paid.title") lead=(t "paid.lead" number=order.number)}}
 {{> facts rows=payment.rows}}
-{{> order-items aside=(t "order.prices_gross")}}
+{{> order-items aside=order.prices_label}}
 {{> order-totals}}
 {{#if split}}{{> split-section}}{{/if}}
 {{> cta label=(T "order.view") href=order.url}}

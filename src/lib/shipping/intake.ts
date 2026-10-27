@@ -1,5 +1,6 @@
 import { isDhlCountry } from "@/lib/shipping/countries";
 import { vatRateForDestination } from "@/lib/shipping/vat";
+import { isIntraEuExempt } from "@/lib/orders/eu-vat";
 
 /**
  * The `shipping` block of HDCtool's order intake (docs/dhl-express.md §2).
@@ -28,6 +29,8 @@ export function shippingIntakeBlock(order: {
   /** A Prisma Decimal on the order row, a number in the tests. */
   shippingNet: number | { toFixed(digits: number): string };
   shippingQuote: unknown;
+  /** "intra_eu_exempt": the postage carries no VAT either, and says so (0). */
+  vatMode?: string | null;
 }): ShippingIntakeBlock | null {
   if (order.shippingMethod === "pickup" || !isDhlCountry(order.shipCountry)) return null;
   const stored = (order.shippingQuote ?? null) as {
@@ -43,7 +46,7 @@ export function shippingIntakeBlock(order: {
       typeof order.shippingNet === "number"
         ? Math.round(order.shippingNet * 100) / 100
         : Number(order.shippingNet.toFixed(2)),
-    vatRate: vatRateForDestination(order.shipCountry),
+    vatRate: isIntraEuExempt(order) ? 0 : vatRateForDestination(order.shipCountry),
     quotedAt: typeof quote?.quotedAt === "string" ? quote.quotedAt : null,
   };
 }

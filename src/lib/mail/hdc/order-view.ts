@@ -9,6 +9,7 @@ import { displayName } from "@/lib/milwaukee/display";
 import { t } from "@/lib/mail/hdc/strings";
 import { localeUrl } from "@/lib/mail/hdc/render";
 import { localityLine } from "@/lib/shipping/countries";
+import { isForeignBilling, isIntraEuExempt } from "@/lib/orders/eu-vat";
 
 /**
  * An order, as every HDC order email shows it.
@@ -152,15 +153,21 @@ export async function buildOrderView(
   const money = (n: unknown) => formatMoney(Number(n), locale);
   const facts = await lineFacts(order);
   const paid = order.paymentStatus === "PAID";
+  /*
+   * Intra-EU exempt: the customer was charged the NET, so every line shows its
+   * net (the stored gross still carries the 24% it was priced at) and the VAT
+   * line is the exemption note instead of «Περιλαμβάνεται ΦΠΑ».
+   */
+  const exempt = isIntraEuExempt(order);
 
   const priced = order.lines.map((line) => {
     const d = Number(line.discountPercent) || 0;
-    const vatRate = Number(line.vatRate);
+    const vatRate = exempt ? 0 : Number(line.vatRate);
     // The stored gross when there is no offer — exactly what the cart charged.
     const lineBefore =
       d > 0
         ? grossAmount(round2(Number(line.unitNet) / (1 - d / 100)) * line.quantity, { vatRate })
-        : round2(Number(line.lineGross));
+        : round2(Number(exempt ? line.lineNet : line.lineGross));
     return { line, unitBefore: round2(lineBefore / line.quantity), lineBefore };
   });
 
@@ -192,6 +199,7 @@ export async function buildOrderView(
   const totals = grossTotals(order, priced.map((p) => ({ lineBefore: p.lineBefore, discounted: Number(p.line.discountPercent) > 0 })));
   const method = shippingLabel(locale, order.shippingMethod);
   const rates = [...new Set(order.lines.map((l) => Number(l.vatRate)))];
+  const foreign = isForeignBilling(order);
 
   const totalRows = [
     { label: t(locale, "order.subtotal"), value: money(totals.subtotal) },
@@ -204,8 +212,9 @@ export async function buildOrderView(
     },
   ];
   // The rate only when there is one: a mixed basket has no single «24%».
-  const vatLine =
-    rates.length === 1
+  const vatLine = exempt
+    ? t(locale, "order.vat_exempt_note")
+    : rates.length === 1
       ? t(locale, "order.vat_included", { rate: `${rates[0]}%`, amount: money(order.vatAmount) })
       : t(locale, "order.vat_included_plain", { amount: money(order.vatAmount) });
 
@@ -220,8 +229,17 @@ export async function buildOrderView(
         order.companyName ?? fullName,
         order.billLine1 ?? shipAddress,
         `${order.billPostcode ?? order.shipPostcode} ${order.billCity ?? order.shipCity}`,
+        /* Abroad there is no ΔΟΥ: the number as the customer typed it, with its prefix. */
         ...(order.vatNumber
-          ? [t(locale, "order.vat_number", { vat: order.vatNumber, doy: order.taxOffice || "—" })]
+          ? [
+              foreign
+                ? t(locale, "order.vat_number_eu", { vat: order.vatNumber })
+                : t(locale, "order.vat_number", { vat: order.vatNumber, doy: order.taxOffice || "—" }),
+            ]
+          : []),
+        /* The proof of the exemption: VIES's consultation number. */
+        ...(exempt && order.viesConsultationNumber
+          ? [t(locale, "order.vies_number", { number: order.viesConsultationNumber })]
           : []),
       ]
     : [fullName, shipAddress, shipCity];
@@ -261,6 +279,9 @@ export async function buildOrderView(
     totals: totalRows,
     total: money(order.totalGross),
     vat_line: vatLine,
+    exempt,
+    /* The label above the lines: an exempt order's prices are net. */
+    prices_label: t(locale, exempt ? "order.prices_net" : "order.prices_gross"),
     cols,
   };
 }

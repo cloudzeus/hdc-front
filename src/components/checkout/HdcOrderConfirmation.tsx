@@ -9,6 +9,7 @@ import { parseModel } from "@/lib/milwaukee/model";
 import { holdHours } from "@/lib/orders/hold";
 import { orderTimeline } from "@/lib/orders/timeline";
 import { localityLine } from "@/lib/shipping/countries";
+import { isIntraEuExempt } from "@/lib/orders/eu-vat";
 
 /**
  * The order confirmation — checkout.html, screen 3.
@@ -43,6 +44,14 @@ export type ConfirmationOrder = {
   companyName: string | null;
   vatNumber: string | null;
   acsVoucherNo: string | null;
+  /**
+   * EU sales. "intra_eu_exempt": a company in another EU country, VAT-exempt on
+   * a valid VIES answer — prices and totals are net and the page says why.
+   * Absent on a Greek order.
+   */
+  vatMode?: string | null;
+  /** VIES's consultation number: the proof of that exemption. */
+  viesConsultationNumber?: string | null;
   subtotalGross: number;
   shippingGross: number;
   paymentFeeGross: number;
@@ -59,6 +68,8 @@ export type ConfirmationOrder = {
     name: string;
     quantity: number;
     lineGross: number;
+    /** Shown instead of `lineGross` on an exempt order, whose lines carry no VAT. */
+    lineNet?: number;
     imageUrl: string | null;
     vatRate: number;
   }>;
@@ -162,6 +173,7 @@ export async function HdcOrderConfirmation({
   const shipCost = order.shippingGross === 0 ? t("dorean_mikra") : money(order.shippingGross);
   const items = (count: number) => (count === 1 ? t("items_one") : t("items_other", { count }));
   const allAt24 = order.lines.every((l) => l.vatRate === 24);
+  const exempt = isIntraEuExempt(order);
 
   return (
     <div className="hdc-wrap hdc-ok">
@@ -285,6 +297,12 @@ export async function HdcOrderConfirmation({
                       {t("afm", { afm: order.vatNumber })}
                     </>
                   )}
+                  {exempt && order.viesConsultationNumber && (
+                    <>
+                      <br />
+                      {t("vies_number", { number: order.viesConsultationNumber })}
+                    </>
+                  )}
                 </>
               ) : (
                 t("apodeixi")
@@ -353,7 +371,7 @@ export async function HdcOrderConfirmation({
                   <em>{line.quantity}</em>
                 </span>
                 <b>{miniName(line.name)}</b>
-                <span className="p">{money(line.lineGross)}</span>
+                <span className="p">{money(exempt ? (line.lineNet ?? line.lineGross) : line.lineGross)}</span>
               </li>
             ))}
           </ul>
@@ -380,9 +398,11 @@ export async function HdcOrderConfirmation({
             <span>{money(order.totalGross)}</span>
           </div>
           <p className="vat">
-            {allAt24
-              ? t("periechei_fpa_24", { amount: money(order.vatAmount) })
-              : t("periechei_fpa", { amount: money(order.vatAmount) })}
+            {exempt
+              ? t("fpa_apallagi")
+              : allAt24
+                ? t("periechei_fpa_24", { amount: money(order.vatAmount) })
+                : t("periechei_fpa", { amount: money(order.vatAmount) })}
           </p>
           {extra}
         </div>

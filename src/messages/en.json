@@ -1526,6 +1526,8 @@
       "synolo": "TOTAL",
       "periechei_fpa_24": "Includes 24% VAT {amount}",
       "periechei_fpa": "Includes VAT {amount}",
+      "fpa_apallagi": "Intra-Community supply — VAT exempt (reverse charge, Article 138 of Directive 2006/112/EC)",
+      "vies_number": "VIES consultation number: {number}",
       "olokliri_3_5": "Your order ships in 3–5 working days: one or more items come from our supplier.",
       "child_request": "The made-to-order items were sent as request {number}. You will receive an offer by email within 24 hours.",
       "child_request_link": "View the request",

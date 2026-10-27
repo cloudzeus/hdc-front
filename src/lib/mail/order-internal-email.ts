@@ -13,6 +13,8 @@ import {
   shippingLabel,
   type OrderRef,
 } from "@/lib/mail/hdc/order-view";
+import { isForeignBilling, isIntraEuExempt } from "@/lib/orders/eu-vat";
+import { localityLine } from "@/lib/shipping/countries";
 
 /**
  * The shop's own emails about an order: a new order, and a status change.
@@ -54,14 +56,27 @@ export async function buildInternalOrderEmail(orderNumber: OrderRef, options: { 
     total,
   });
 
+  /* EU sales: who the buyer is and how VAT was charged, at a glance. */
+  const foreign = isForeignBilling(order);
+  const euWho = !foreign
+    ? null
+    : order.customerType === "company"
+      ? isIntraEuExempt(order)
+        ? order.viesConsultationNumber
+          ? t("el", "internal.eu_company_vies", { number: order.viesConsultationNumber })
+          : t("el", "internal.eu_company_vies_nonumber")
+        : t("el", "internal.eu_company_vat")
+      : t("el", "internal.eu_individual");
+
   const rows = [
     { label: t("el", "internal.customer"), value: name, strong: true },
     { label: t("el", "internal.email"), value: order.email },
     { label: t("el", "internal.phone"), value: order.phone },
     {
       label: t("el", "internal.address"),
-      value: `${order.shipLine1}${order.shipLine2 ? `, ${order.shipLine2}` : ""}, ${order.shipPostcode} ${order.shipCity}`,
+      value: `${order.shipLine1}${order.shipLine2 ? `, ${order.shipLine2}` : ""}, ${localityLine(order.shipPostcode, order.shipCity, order.shipCountry, "el")}`,
     },
+    ...(euWho ? [{ label: t("el", "internal.eu"), value: euWho, strong: true }] : []),
     {
       label: t("el", "internal.payment"),
       value: `${paymentLabel("el", order.paymentMethod)} · ${t("el", paid ? "internal.paid" : "internal.unpaid")}`,
@@ -72,7 +87,10 @@ export async function buildInternalOrderEmail(orderNumber: OrderRef, options: { 
     ...(order.wantsInvoice
       ? [
           { label: t("el", "internal.company"), value: order.companyName || "—" },
-          { label: t("el", "internal.vat"), value: `${order.vatNumber || "—"} · ${order.taxOffice || "—"}` },
+          {
+            label: t("el", "internal.vat"),
+            value: foreign ? order.vatNumber || "—" : `${order.vatNumber || "—"} · ${order.taxOffice || "—"}`,
+          },
         ]
       : []),
   ];

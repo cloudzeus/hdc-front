@@ -195,6 +195,12 @@ describe("the intake's shipping block", () => {
     });
   });
 
+  it("says 0 when the order is intra-EU exempt, 24 otherwise", () => {
+    const order = { shipCountry: "DE", shippingMethod: "dhl", shippingNet: 31.4, shippingQuote: dhlQuote };
+    expect(shippingIntakeBlock({ ...order, vatMode: "intra_eu_exempt" })?.vatRate).toBe(0);
+    expect(shippingIntakeBlock({ ...order, vatMode: "standard" })?.vatRate).toBe(24);
+  });
+
   it("is absent for Greece, Cyprus and collection", () => {
     const base = { shippingNet: 3.1, shippingQuote: { source: "acs" } };
     expect(shippingIntakeBlock({ ...base, shipCountry: "GR", shippingMethod: "courier" })).toBeNull();
