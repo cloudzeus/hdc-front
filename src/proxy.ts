@@ -3,6 +3,7 @@ import createIntlMiddleware from "next-intl/middleware";
 import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
 import { authConfig } from "@/auth.config";
 import { routing } from "@/i18n/routing";
+import { adminGate } from "@/lib/admin/gate";
 import {
   PER_ROW_COOKIE,
   canonicalizeListingQuery,
@@ -357,18 +358,11 @@ async function route(request: NextRequest & { auth: { user?: unknown } | null })
   if (pathname.endsWith(".html")) return NextResponse.next();
 
   if (pathname.startsWith("/admin")) {
-    const isLoginPage = pathname === "/admin/login";
-    const isAuthed = !!request.auth?.user;
-    // «Ξέχασα τον κωδικό» is for people who cannot sign in, so it is public.
-    const isRecoveryPage = pathname === "/admin/forgot-password" || pathname === "/admin/reset-password";
-
-    if (!isAuthed && !isLoginPage && !isRecoveryPage) {
-      const url = new URL("/admin/login", request.nextUrl);
-      url.searchParams.set("redirect", pathname);
+    const decision = adminGate(pathname, !!request.auth?.user);
+    if (decision.action === "redirect") {
+      const url = new URL(decision.to, request.nextUrl);
+      if (decision.redirect) url.searchParams.set("redirect", decision.redirect);
       return NextResponse.redirect(url);
-    }
-    if (isAuthed && isLoginPage) {
-      return NextResponse.redirect(new URL("/admin", request.nextUrl));
     }
     return NextResponse.next();
   }

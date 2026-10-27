@@ -1,4 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
+import type { AdminSsoConfig } from "@/lib/admin/sso/config";
 
 /**
  * The pure half of the admin «Ξέχασα τον κωδικό» flow: tokens, expiry, the
@@ -109,4 +110,16 @@ export function resetLinkOrigin(
     if (match) return match;
   }
   return allowlist[0] ?? null;
+}
+
+/**
+ * Whether «Ξέχασα τον κωδικό» may mail a link to this address. With
+ * ADMIN_SSO=only a password works only for the emergency list (auth.ts gates
+ * on the env mode alone, even when SSO is half-configured), so nobody else
+ * gets a link for a password that login would refuse; the caller answers
+ * exactly as for an unknown address.
+ */
+export function passwordResetAllowed(email: string, cfg: AdminSsoConfig): boolean {
+  if (cfg.mode !== "only") return true;
+  return cfg.emergencyEmails.includes(email.trim().toLowerCase());
 }

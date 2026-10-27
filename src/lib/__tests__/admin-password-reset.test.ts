@@ -9,11 +9,13 @@ import {
   hashResetToken,
   isResetRateLimited,
   isWellFormedResetToken,
+  passwordResetAllowed,
   rateLimitWindowStart,
   resetExpiresAt,
   resetLinkOrigin,
   resetTokenState,
 } from "@/lib/admin/password-reset-core";
+import { adminSsoConfig } from "@/lib/admin/sso/config";
 
 const NOW = new Date("2026-09-30T12:00:00Z");
 
@@ -185,5 +187,32 @@ describe("resetLinkOrigin", () => {
 
   it("is null when nothing is allowlisted", () => {
     expect(resetLinkOrigin({ forwardedProto: "https", forwardedHost: "kolleris.com" }, [])).toBeNull();
+  });
+});
+
+describe("passwordResetAllowed (HDCtool SSO)", () => {
+  const ready = {
+    ADMIN_SSO_CLIENT_ID: "milwaukee",
+    ADMIN_SSO_ISSUER: "hdctool",
+    HDCTOOL_SSO_URL: "https://h.example",
+    ADMIN_EMERGENCY_EMAILS: "Boss@x.gr",
+  };
+
+  it("only + ready: just the emergency list (case-insensitive)", () => {
+    const cfg = adminSsoConfig({ ...ready, ADMIN_SSO: "only" });
+    expect(passwordResetAllowed("boss@x.gr", cfg)).toBe(true);
+    expect(passwordResetAllowed(" BOSS@X.GR ", cfg)).toBe(true);
+    expect(passwordResetAllowed("other@x.gr", cfg)).toBe(false);
+  });
+
+  it("both or off: everyone", () => {
+    expect(passwordResetAllowed("other@x.gr", adminSsoConfig({ ...ready, ADMIN_SSO: "both" }))).toBe(true);
+    expect(passwordResetAllowed("other@x.gr", adminSsoConfig({ ...ready, ADMIN_SSO: "off" }))).toBe(true);
+  });
+
+  it("only but half-configured: still just the emergency list, as the login gate", () => {
+    const cfg = adminSsoConfig({ ...ready, ADMIN_SSO: "only", HDCTOOL_SSO_URL: "" });
+    expect(passwordResetAllowed("other@x.gr", cfg)).toBe(false);
+    expect(passwordResetAllowed("boss@x.gr", cfg)).toBe(true);
   });
 });
