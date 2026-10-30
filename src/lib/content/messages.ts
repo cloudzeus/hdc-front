@@ -1,6 +1,6 @@
 import "server-only";
 import { cache } from "react";
-import { parse } from "@formatjs/icu-messageformat-parser";
+import { parse, TYPE } from "@formatjs/icu-messageformat-parser";
 import { prisma } from "@/lib/prisma";
 import { sanitizeHtml } from "@/lib/content/sanitize-html";
 import { INTL_PAGES, type IntlPage } from "@/lib/content/pages-intl";
@@ -111,10 +111,16 @@ export function icuArgNames(value: string): Set<string> {
  * safe.
  *
  * The final check parses the value with the same ICU grammar next-intl renders
- * with, so a structurally broken form (a plural missing its `other` clause, a
- * bad argument type) is rejected here rather than degrading to a raw key on the
- * page. A value the parser rejects can only be more exotic ICU than shop copy
- * uses, so erring strict costs at most a save error, never a broken page.
+ * with and then requires that every element be plain text or a simple `{name}`
+ * interpolation. The editable copy here is plain text (titles, leads, hour
+ * labels) rendered with a bare `t("…", { name })`, so a format type an edit
+ * might attach — `{time, time, short}`, `{amount, number}`, a plural/select —
+ * parses cleanly yet throws (or renders garbage) at render against the string
+ * the call site passes: `DateTimeFormat.format(new Date("18:00"))` throws, and
+ * next-intl then degrades the whole string to its raw key on a live page.
+ * Forbidding complex forms outright keeps that out: none of the editable
+ * strings use one, so the rule costs nothing and never lets a saved edit break
+ * a page.
  */
 export function isPlaceholderSafe(base: string, value: string): boolean {
   const opens = (value.match(/\{/g) ?? []).length;
@@ -123,7 +129,10 @@ export function isPlaceholderSafe(base: string, value: string): boolean {
   const allowed = icuArgNames(base);
   for (const name of icuArgNames(value)) if (!allowed.has(name)) return false;
   try {
-    parse(value, { requiresOtherClause: true });
+    const ast = parse(value, { requiresOtherClause: true });
+    for (const el of ast) {
+      if (el.type !== TYPE.literal && el.type !== TYPE.argument) return false;
+    }
   } catch {
     return false;
   }

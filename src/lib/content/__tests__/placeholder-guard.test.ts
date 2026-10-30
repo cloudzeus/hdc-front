@@ -53,7 +53,28 @@ describe("isPlaceholderSafe", () => {
     expect(isPlaceholderSafe(base, "Διαθέσιμα {amount, 2000}")).toBe(false);
   });
 
-  it("allows a well-formed plural over an existing argument", () => {
-    expect(isPlaceholderSafe("{count} προϊόντα", "{count, plural, one {ένα} other {# προϊόντα}}")).toBe(true);
+  // These are plain-text messages the call site renders with simple {name}
+  // interpolation. A FORMAT TYPE on an existing arg parses fine but can throw at
+  // render on the string the call site passes — e.g. a time/date formatter over
+  // "18:00" → next-intl degrades to the raw key on a live page. So any complex
+  // ICU form is rejected, even over an argument the base already provides.
+  it("rejects a time formatter attached to a string argument (would throw at render)", () => {
+    expect(isPlaceholderSafe("Ανοιχτά τώρα · έως {time}", "Ανοιχτά τώρα · έως {time, time, short}")).toBe(false);
+  });
+
+  it("rejects a date formatter attached to a string argument", () => {
+    expect(isPlaceholderSafe("έως {time}", "έως {time, date, ::Hm}")).toBe(false);
+  });
+
+  it("rejects a number formatter over an existing argument", () => {
+    expect(isPlaceholderSafe("άνω των {amount} €", "άνω των {amount, number, ::.00} €")).toBe(false);
+  });
+
+  it("rejects a plural form (a complex ICU form, not plain interpolation)", () => {
+    expect(isPlaceholderSafe("{count} προϊόντα", "{count, plural, one {ένα} other {# προϊόντα}}")).toBe(false);
+  });
+
+  it("still allows a plain reorder of simple placeholders", () => {
+    expect(isPlaceholderSafe("Δευ {open}–{close}", "{open} ως {close}")).toBe(true);
   });
 });
