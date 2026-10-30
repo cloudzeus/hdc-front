@@ -1420,6 +1420,33 @@ model ContentBlock {
   @@map("content_blocks")
 }
 
+/// An edit that shadows one next-intl message string, per locale.
+///
+/// The storefront's copy lives in `src/messages/<locale>.json` and renders
+/// through next-intl (`t("…")`). This table lets the admin override any of
+/// those strings without touching the catalogue or the pages: the rows are
+/// merged over the compiled messages once, in `src/i18n/request.ts`, so every
+/// `t()` in the app sees the edit.
+///
+/// Same safety property as ContentBlock: a missing row means the catalogue
+/// value stands, and an edit cleared or set back to the catalogue deletes its
+/// row — so "showing the original" is never a lie. `path` is the dotted message
+/// key, e.g. `content.t_oroi`.
+model MessageOverride {
+  locale String @db.VarChar(5)
+  path   String @db.VarChar(191)
+
+  value String @db.Text
+
+  updatedBy String?  @db.VarChar(120)
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@id([locale, path])
+  @@index([locale])
+  @@map("message_overrides")
+}
+
 /// A widget placed in a zone on a page.
 ///
 /// Zones are declared in code (`src/lib/zones/registry.ts`) because a zone is a
