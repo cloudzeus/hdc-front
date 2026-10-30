@@ -1,8 +1,10 @@
 import { auth } from "@/auth";
 import { assertCan } from "@/lib/rbac";
 import { listForAdmin } from "@/lib/content/content";
+import { listEditableIntlPages } from "@/lib/content/messages";
 import { routing, type Locale } from "@/i18n/routing";
 import { ContentEditor } from "./ContentEditor";
+import { MessagePagesEditor } from "./MessagePagesEditor";
 import { PageShell } from "@/components/admin/PageShell";
 
 export const dynamic = "force-dynamic";
@@ -27,7 +29,10 @@ export default async function ContentPage({
     routing.locales.includes(requested as Locale) ? requested : routing.defaultLocale
   ) as Locale;
 
-  const values = await listForAdmin(locale);
+  const [values, intlPages] = await Promise.all([
+    listForAdmin(locale),
+    listEditableIntlPages(locale),
+  ]);
   const untouched = values.filter((v) => v.isFallback).length;
 
   return (
@@ -43,6 +48,16 @@ export default async function ContentPage({
         </p>
       )}
       <ContentEditor locale={locale} locales={routing.locales} values={values} />
+
+      <div className="mt-12 border-t border-k-line pt-8">
+        <h2 className="text-[17px] font-semibold tracking-tight text-k-ink">Σελίδες ιστότοπου</h2>
+        <p className="mt-1 mb-5 max-w-[46rem] text-[12.5px] leading-[1.6] text-k-text-3">
+          Τίτλοι, εισαγωγές και κοινά κείμενα των σελίδων. Κάθε σελίδα ανοίγει ξεχωριστά. Οι
+          νομικές σελίδες (όροι, απόρρητο, επιστροφές) και οι συχνές ερωτήσεις αντλούν το κυρίως
+          κείμενο από το HDCtool.
+        </p>
+        <MessagePagesEditor locale={locale} pages={intlPages} />
+      </div>
     </PageShell>
   );
 }
