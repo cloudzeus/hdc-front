@@ -7,12 +7,17 @@ import { sendInternalOrderEmail } from "@/lib/mail/order-internal-email";
 import { randomBytes } from "node:crypto";
 import { checkoutSchema, deliveryAddress } from "@/lib/checkout/schema";
 import { orderLineIds } from "@/lib/checkout/line-ids";
+import { parseRequestMode, planCheckout, requestPath } from "@/lib/requests/model";
+import { createRequestOrder, type OrderBase } from "@/lib/requests/create";
+import { announceNewRequest } from "@/lib/requests/service";
+import type { CartLineView } from "@/lib/cart/options";
 import { prisma } from "@/lib/prisma";
 import { STOCK_HOLD_HOURS, holdExpiry } from "@/lib/orders/hold";
 import { computeTotals, getCart, getCartToken } from "@/lib/cart/cart";
 import { PAYMENT_METHODS, SHIPPING_METHODS } from "@/lib/cart/options";
 import { orderAvailability } from "@/lib/catalog/availability";
-import { quoteLivePostage } from "@/lib/shipping/acs-live";
+import { isUnserviceable, quoteLivePostage } from "@/lib/shipping/acs-live";
+import { checkDestination, destinationMessage, shippingCopy } from "@/lib/shipping/destination";
 import { createPaymentOrder, isVivaConfigured } from "@/lib/payment/viva";
 import { routing, type Locale } from "@/i18n/routing";
 import { getCurrentUser } from "@/lib/account/session";
@@ -107,6 +112,20 @@ export async function placeOrder(
     ? input.locale
     : routing.defaultLocale) as Locale;
 
+  /*
+   * Greece only (see `lib/shipping/destination`). There is no country field,
+   * so an address abroad arrives looking domestic; its postcode and its words
+   * are what give it away. Checked before anything is priced or written — a
+   * pickup order carries the shop's own address and passes.
+   */
+  if (input.shippingMethod !== "pickup") {
+    const destination = checkDestination(address);
+    if (!destination.ok) {
+      const message = destinationMessage(destination, locale);
+      return { error: message, fieldErrors: { [destination.field]: message } };
+    }
+  }
+
   const cartToken = await getCartToken();
   if (!cartToken) return { error: "Το καλάθι σας είναι άδειο." };
 
@@ -124,6 +143,23 @@ export async function placeOrder(
   const cart = await getCart(locale, address.shipPostcode);
   if (!cart || cart.lines.length === 0) return { error: "Το καλάθι σας είναι άδειο." };
 
+  /*
+   * Back-order requests (docs/backorder-requests.md). Which lines can be paid
+   * now and which become a request is decided HERE, from the stock `getCart`
+   * has just read — never from what the form believed when it was rendered.
+   * The customer's choice only matters for a mixed cart. Supplier lines are
+   * ordinary paid lines (3–5 working days), never a request.
+   */
+  const plan = planCheckout(cart.lines, parseRequestMode(input.requestMode));
+  if (!plan.ok) {
+    return {
+      error: "Επιλέξτε πώς θα προχωρήσει η παραγγελία: τα διαθέσιμα τώρα και τα υπόλοιπα ως αίτημα, ή όλα μαζί ως αίτημα.",
+      fieldErrors: { requestMode: "Απαιτείται" },
+    };
+  }
+  const payLines: CartLineView[] = plan.pay;
+  const requestLines: CartLineView[] = plan.request;
+
   const shipping =
     SHIPPING_METHODS.find((m) => m.id === input.shippingMethod) ?? SHIPPING_METHODS[0];
   const payment =
@@ -136,6 +172,85 @@ export async function placeOrder(
    */
   if (payment.partnerOnly) {
     return { error: "Ο τρόπος πληρωμής δεν είναι διαθέσιμος για τον λογαριασμό σας." };
+  }
+
+
+  const quote =
+    shipping.expressMultiplier > 0
+      ? await quoteLivePostage({
+          // The lines being shipped now; for a request-only cart, the
+          // requested ones — the address is checked either way.
+          items: (payLines.length ? payLines : requestLines).map((l) => ({
+            quantity: l.quantity,
+            weight: l.weight,
+            width: l.width,
+            length: l.length,
+            height: l.height,
+          })),
+          postcode: address.shipPostcode,
+        })
+      : null;
+
+  /*
+   * ACS has no station for this postcode — a foreign postcode that happens to
+   * look Greek (Verona's 37015 did). There is no price to charge and nowhere
+   * to deliver, so no order. An ACS OUTAGE is different: it still prices from
+   * the table and the order goes through.
+   */
+  if (isUnserviceable(quote)) {
+    const message = shippingCopy(locale).unserviceable;
+    return { error: message, fieldErrors: { shipPostcode: message } };
+  }
+
+  /*
+   * One query for the whole basket. `products.mtrl` is the ERP id; a line whose
+   * product has since been removed simply keeps null, which is honest — better
+   * an unmapped line the push can report than a wrong id it cannot.
+   */
+  const mtrlRows = await prisma.product.findMany({
+    where: { id: { in: cart.lines.map((line) => line.productId) } },
+    select: { id: true, mtrl: true, xmlCode: true },
+  });
+  const idsByProductId = new Map(
+    mtrlRows.map((row) => [row.id, { mtrl: row.mtrl, xmlCode: row.xmlCode }]),
+  );
+
+  /* What a request shares with the order being placed: who, where, invoice. */
+  const base: OrderBase = {
+    email: input.email,
+    phone: input.phone,
+    firstName: input.firstName,
+    lastName: input.lastName,
+    ...address,
+    wantsInvoice,
+    companyName: wantsInvoice ? input.companyName || null : null,
+    vatNumber: wantsInvoice ? input.vatNumber || null : null,
+    taxOffice: wantsInvoice ? input.taxOffice || null : null,
+    companyTrade: wantsInvoice ? input.companyTrade || null : null,
+    erpTrdr: wantsInvoice && typeof input.erpTrdr === "number" ? input.erpTrdr : null,
+    shippingMethod: shipping.id,
+    notes: input.notes || null,
+  };
+
+  /*
+   * Nothing to pay now: the whole cart is a request. No Viva order, no stock
+   * hold — the customer gets a link and an answer within 24 hours.
+   */
+  if (payLines.length === 0) {
+    const request = await createRequestOrder({
+      orderNumber: await nextOrderNumber(),
+      guestToken: randomBytes(24).toString("base64url"),
+      customerId: customer?.id ?? null,
+      locale,
+      base,
+      lines: requestLines,
+      idsByProductId,
+      parentOrderNumber: null,
+    });
+    await prisma.cartLine.deleteMany({ where: { cart: { token: cartToken } } });
+    await maybeCreateAccount(input, request.orderNumber);
+    await announceNewRequest(request.orderNumber);
+    redirect(requestPath(locale, request.requestToken));
   }
 
   /*
@@ -151,37 +266,10 @@ export async function placeOrder(
    * The form is the last word and the ids above are already validated against
    * the offered list, so the totals are recomputed from them.
    */
-  const totals = await computeTotals(cart.lines, shipping.id, payment.id, address.shipPostcode);
-
-  const quote =
-    shipping.expressMultiplier > 0
-      ? await quoteLivePostage({
-          items: cart.lines.map((l) => ({
-            quantity: l.quantity,
-            weight: l.weight,
-            width: l.width,
-            length: l.length,
-            height: l.height,
-          })),
-          postcode: address.shipPostcode,
-        })
-      : null;
+  const totals = await computeTotals(payLines, shipping.id, payment.id, address.shipPostcode);
 
   const orderNumber = await nextOrderNumber();
   const guestToken = randomBytes(24).toString("base64url");
-
-  /*
-   * One query for the whole basket. `products.mtrl` is the ERP id; a line whose
-   * product has since been removed simply keeps null, which is honest — better
-   * an unmapped line the push can report than a wrong id it cannot.
-   */
-  const mtrlRows = await prisma.product.findMany({
-    where: { id: { in: cart.lines.map((line) => line.productId) } },
-    select: { id: true, mtrl: true, xmlCode: true },
-  });
-  const idsByProductId = new Map(
-    mtrlRows.map((row) => [row.id, { mtrl: row.mtrl, xmlCode: row.xmlCode }]),
-  );
 
   const order = await prisma.order.create({
     data: {
@@ -213,7 +301,7 @@ export async function placeOrder(
       notes: input.notes || null,
       /* One line from the supplier sends the whole order in 3–5 working days;
          frozen here so the confirmation and the email keep saying so. */
-      supplierOrder: orderAvailability(cart.lines.map((l) => l.availability)) === "supplier",
+      supplierOrder: orderAvailability(payLines.map((l) => l.availability)) === "supplier",
 
       subtotalNet: totals.subtotalNet,
       subtotalGross: totals.subtotalGross,
@@ -234,7 +322,7 @@ export async function placeOrder(
           : { locale },
 
       lines: {
-        create: cart.lines.map((line) => ({
+        create: payLines.map((line) => ({
           productId: line.productId,
           /*
            * The ERP's own product id, resolved here and frozen with the line.
@@ -282,56 +370,30 @@ export async function placeOrder(
   await prisma.cartLine.deleteMany({ where: { cart: { token: cartToken } } });
 
   /*
-   * An account, when the customer asked for one by typing a password.
-   *
-   * Created outright rather than by emailing a link: the person is here, they
-   * chose the password themselves, and everything a registration needs — name,
-   * phone, email — they have just typed. Making them confirm by email what
-   * they did thirty seconds ago on the same screen is ceremony.
-   *
-   * The order is attached, and so is every earlier guest order sharing the
-   * address, so their history is complete from the first visit rather than
-   * starting at this purchase.
-   *
-   * Deliberately NOT fatal and deliberately last. The order exists and is paid
-   * for; an account is a convenience layered on top, and a duplicate email or a
-   * hashing hiccup must never cost somebody the thing they actually came for.
+   * Split cart: the lines that were not in stock become a request of their
+   * own, pointing at this order. Written after the paid order exists (so it
+   * has a number to point at) and before the customer leaves for Viva.
    */
-  if (input.password) {
+  if (requestLines.length > 0) {
     try {
-      const email = input.email.trim().toLowerCase();
-      const taken = await prisma.customer.findUnique({ where: { email }, select: { id: true } });
-      if (!taken) {
-        const created = await prisma.customer.create({
-          data: {
-            email,
-            passwordHash: await hashPassword(input.password),
-            firstName: input.firstName,
-            lastName: input.lastName,
-            phone: input.phone,
-            /*
-             * Retail, always — even when this order carried a ΑΦΜ.
-             *
-             * A company account grants partner pricing and credit and exists
-             * only once somebody has approved it. Nobody gets one by ticking
-             * "invoice" at checkout; that route is /b2b, and it goes through
-             * a person.
-             */
-            accountType: "individual",
-            status: "active",
-          },
-          select: { id: true },
-        });
-
-        await prisma.order.updateMany({
-          where: { email: { equals: email, mode: "insensitive" }, customerId: null },
-          data: { customerId: created.id },
-        });
-      }
+      const request = await createRequestOrder({
+        orderNumber: await nextOrderNumber(),
+        guestToken: randomBytes(24).toString("base64url"),
+        customerId: customer?.id ?? null,
+        locale,
+        base,
+        lines: requestLines,
+        idsByProductId,
+        parentOrderNumber: order.orderNumber,
+      });
+      await announceNewRequest(request.orderNumber);
     } catch (error) {
-      console.error(`[checkout] ${order.orderNumber}: account not created`, error);
+      // The paid half stands on its own; the customer is told on the page.
+      console.error(`[checkout] ${order.orderNumber}: back-order request not created`, error);
     }
   }
+
+  await maybeCreateAccount(input, order.orderNumber);
 
   /*
    * Bank transfer: accepted now, reconciled later, and it needs a reference.
@@ -480,4 +542,65 @@ export async function placeOrder(
   // Outside the try: `redirect` throws by design, and catching it here would
   // turn a successful checkout into an error message.
   redirect(checkoutUrl);
+}
+
+/*
+ * Shared by the ordinary order and the request-only checkout: both have a
+ * customer who may have typed a password.
+ */
+async function maybeCreateAccount(
+  input: { password?: string; email: string; firstName: string; lastName: string; phone: string },
+  orderNumber: string,
+): Promise<void> {
+  /*
+   * An account, when the customer asked for one by typing a password.
+   *
+   * Created outright rather than by emailing a link: the person is here, they
+   * chose the password themselves, and everything a registration needs — name,
+   * phone, email — they have just typed. Making them confirm by email what
+   * they did thirty seconds ago on the same screen is ceremony.
+   *
+   * The order is attached, and so is every earlier guest order sharing the
+   * address, so their history is complete from the first visit rather than
+   * starting at this purchase.
+   *
+   * Deliberately NOT fatal and deliberately last. The order exists and is paid
+   * for; an account is a convenience layered on top, and a duplicate email or a
+   * hashing hiccup must never cost somebody the thing they actually came for.
+   */
+  if (input.password) {
+    try {
+      const email = input.email.trim().toLowerCase();
+      const taken = await prisma.customer.findUnique({ where: { email }, select: { id: true } });
+      if (!taken) {
+        const created = await prisma.customer.create({
+          data: {
+            email,
+            passwordHash: await hashPassword(input.password),
+            firstName: input.firstName,
+            lastName: input.lastName,
+            phone: input.phone,
+            /*
+             * Retail, always — even when this order carried a ΑΦΜ.
+             *
+             * A company account grants partner pricing and credit and exists
+             * only once somebody has approved it. Nobody gets one by ticking
+             * "invoice" at checkout; that route is /b2b, and it goes through
+             * a person.
+             */
+            accountType: "individual",
+            status: "active",
+          },
+          select: { id: true },
+        });
+
+        await prisma.order.updateMany({
+          where: { email: { equals: email, mode: "insensitive" }, customerId: null },
+          data: { customerId: created.id },
+        });
+      }
+    } catch (error) {
+      console.error(`[checkout] ${orderNumber}: account not created`, error);
+    }
+  }
 }

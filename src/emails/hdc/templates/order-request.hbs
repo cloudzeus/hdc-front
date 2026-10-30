@@ -1,0 +1,8 @@
+{{> heading eyebrow=(upper req.eyebrow) title=(upper req.title) lead=req.lead}}
+{{#each req.paragraphs}}{{> paragraph text=this}}{{/each}}
+{{#if req.note}}{{> note tone=req.note_tone title=(upper req.note_title) text=req.note}}{{/if}}
+{{#if req.facts}}{{> facts rows=req.facts}}{{/if}}
+{{#if req.items}}{{> request-items title=(upper req.items_title) aside=req.items_aside items=req.items}}{{/if}}
+{{#if req.total}}{{> request-totals rows=req.totals label=req.total.label value=req.total.value vat_line=req.total.vat_line}}{{/if}}
+{{#if req.cta}}{{> cta label=(upper req.cta.label) href=req.cta.href note=req.cta.note}}{{/if}}
+{{> help lead=(t "help.order") reply=true}}

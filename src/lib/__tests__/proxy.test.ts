@@ -137,3 +137,178 @@ describe("proxy: Greek-only indexing once live", () => {
     }
   });
 });
+
+describe("proxy: listing query strings", () => {
+  const location = (res: Response) => {
+    const to = new URL(res.headers.get("location")!);
+    return `${to.pathname}${to.search}`;
+  };
+
+  it("leaves a canonical listing to the page, attribution and router params included", async () => {
+    for (const path of [
+      "/katalogos/drapana",
+      "/katalogos/drapana?page=3",
+      "/katalogos/drapana?platform=M18&series=fuel,onekey&utm_source=x",
+      "/katalogos/drapana?sub=x&_rsc=abc",
+      "/anazitisi?q=m18&platform=all",
+    ]) {
+      const res = await get(path);
+      expect(res.headers.get("location"), path).toBeNull();
+      expect(res.status, path).toBe(200);
+    }
+  });
+
+  it("301s a non-canonical spelling to the canonical one, on the same host", async () => {
+    const res = await get("/katalogos/drapana?series=onekey,fuel&platform=m18&min=137&max=1234&foo=1");
+    expect(res.status).toBe(301);
+    expect(location(res)).toBe("/katalogos/drapana?series=fuel,onekey&platform=M18&min=100&max=1300");
+    expect(new URL(res.headers.get("location")!).host).toBe("milwaukeetoolshdc.gr");
+    // Short-lived when cached: the rules may still change.
+    expect(res.headers.get("cache-control")).toBe("public, max-age=600");
+  });
+
+  it("goes straight to the canonical host from www., in one hop", async () => {
+    const res = await get("/katalogos/drapana?sub=b,a", "www.milwaukeetoolshdc.gr");
+    expect(res.status).toBe(301);
+    expect(res.headers.get("location")).toBe("https://milwaukeetoolshdc.gr/katalogos/drapana?sub=a,b");
+  });
+
+  it("keeps the locale prefix", async () => {
+    const res = await get("/en/brands/dewalt?sort=relevance&sub=b,a");
+    expect(res.status).toBe(301);
+    expect(location(res)).toBe("/en/brands/dewalt?sub=a,b");
+  });
+
+  it("on www., sends perRow to the apex first, where the cookie can be set for the right host", async () => {
+    const res = await get("/proionta?perRow=3&sub=b,a", "www.milwaukeetoolshdc.gr");
+    expect(res.status).toBe(301);
+    expect(res.headers.get("location")).toBe("https://milwaukeetoolshdc.gr/proionta?perRow=3&sub=b,a");
+    expect(res.headers.get("set-cookie")).toBeNull();
+  });
+
+  it("moves perRow into a cookie with an uncached 307", async () => {
+    const res = await get("/proionta?perRow=3&sub=a");
+    expect(res.status).toBe(307);
+    expect(location(res)).toBe("/proionta?sub=a");
+    expect(res.headers.get("cache-control")).toBe("no-store");
+    expect(res.headers.get("set-cookie")).toMatch(/^HDC_PER_ROW=3;/);
+  });
+
+  it("never refuses: an over-long search is cut and a silly page clamped, through a 301", async () => {
+    const long = await get(`/anazitisi?q=${"a".repeat(300)}&platform=M18`);
+    expect(long.status).toBe(301);
+    expect(location(long)).toBe(`/anazitisi?q=${"a".repeat(200)}&platform=M18`);
+
+    const deep = await get("/katalogos/drapana?page=99999");
+    expect(deep.status).toBe(301);
+    expect(location(deep)).toBe("/katalogos/drapana?page=60");
+
+    const all = await get(
+      "/anazitisi?q=m18&platform=M18&avail=in-stock&content=bare&series=fuel,onekey&sub=a,b,c&min=100",
+    );
+    expect(all.status).toBe(200);
+    expect(all.headers.get("location")).toBeNull();
+  });
+
+  it("never touches a POST (Server Actions) or a non-listing page", async () => {
+    const post = await proxy(
+      new NextRequest("https://milwaukeetoolshdc.gr/katalogos/drapana?sub=b,a&foo=1", {
+        method: "POST",
+        headers: { host: "milwaukeetoolshdc.gr" },
+      }),
+    );
+    expect(post.headers.get("location")).toBeNull();
+    const pdp = await get("/proion/x?foo=1&sub=b,a");
+    expect(pdp.headers.get("location")).toBeNull();
+  });
+});
+
+describe("proxy: per-IP rate limit", () => {
+  const CF_EDGE = "173.245.48.1";
+  const from = (ip: string, path: string, method = "GET") =>
+    proxy(
+      new NextRequest(`https://milwaukeetoolshdc.gr${path}`, {
+        method,
+        // As production sees it: Traefik's peer is a Cloudflare edge, which names the visitor.
+        headers: { host: "milwaukeetoolshdc.gr", "x-real-ip": CF_EDGE, "cf-connecting-ip": ip },
+      }),
+    );
+
+  it("lets a burst of filtered views through, then answers 429 with Retry-After", async () => {
+    for (let i = 0; i < 10; i++) {
+      expect((await from("203.0.113.10", "/katalogos/drapana?platform=M18&avail=in-stock")).status).toBe(200);
+    }
+    const refused = await from("203.0.113.10", "/katalogos/drapana?platform=M12&avail=in-stock");
+    expect(refused.status).toBe(429);
+    expect(refused.headers.get("retry-after")).toBe("3");
+    expect(await refused.text()).toContain('name="robots" content="noindex"');
+    // Another client is not affected, and neither is the same client's bare listing.
+    expect((await from("203.0.113.11", "/katalogos/drapana?platform=M18&avail=in-stock")).status).toBe(200);
+    expect((await from("203.0.113.10", "/katalogos/drapana")).status).toBe(200);
+  });
+
+  it("limits the suggest API with a JSON 429 after its own burst, without localising it", async () => {
+    for (let i = 0; i < 60; i++) {
+      const ok = await from("203.0.113.20", "/api/suggest?q=m18");
+      expect(ok.status).toBe(200);
+      expect(ok.headers.get("x-middleware-next")).toBe("1");
+      expect(ok.headers.get("x-middleware-rewrite")).toBeNull();
+    }
+    const refused = await from("203.0.113.20", "/api/suggest?q=m18");
+    expect(refused.status).toBe(429);
+    expect(await refused.json()).toMatchObject({ error: "rate_limited" });
+    // A separate bucket: the same client's agent-API and listing calls are untouched.
+    expect((await from("203.0.113.20", "/api/acp/products?q=x")).status).toBe(200);
+  });
+
+  it("leaves a keyed agent call to the route, and limits keyless ones on their own", async () => {
+    const keyed = (ip: string) =>
+      proxy(
+        new NextRequest("https://milwaukeetoolshdc.gr/api/acp/products?q=x", {
+          headers: { host: "milwaukeetoolshdc.gr", "x-real-ip": CF_EDGE, "cf-connecting-ip": ip, authorization: "Bearer k" },
+        }),
+      );
+    for (let i = 0; i < 150; i++) expect((await keyed("203.0.113.50")).status).toBe(200);
+    for (let i = 0; i < 30; i++) expect((await from("203.0.113.51", "/api/acp/products?q=x")).status).toBe(200);
+    expect((await from("203.0.113.51", "/api/acp/products?q=x")).status).toBe(429);
+  });
+
+  it("limits the database check at 30 a minute", async () => {
+    for (let i = 0; i < 10; i++) expect((await from("203.0.113.52", "/api/ready")).status).toBe(200);
+    expect((await from("203.0.113.52", "/api/ready")).status).toBe(429);
+  });
+
+  it("never answers 429 to deep load-more on a bare category", async () => {
+    for (let i = 0; i < 30; i++) {
+      expect((await from("203.0.113.53", `/katalogos/drapana?page=${5 + (i % 40)}`)).status).toBe(200);
+    }
+  });
+
+  it("gives a bare search its own, wider bucket", async () => {
+    for (let i = 0; i < 20; i++) expect((await from("203.0.113.54", "/anazitisi?q=m18")).status).toBe(200);
+    expect((await from("203.0.113.54", "/anazitisi?q=m18")).status).toBe(429);
+  });
+
+  it("counts a platform landing as an unfiltered listing, not a filtered view", async () => {
+    for (let i = 0; i < 15; i++) {
+      expect((await from("203.0.113.40", "/katalogos/drapana?platform=M18")).status).toBe(200);
+    }
+  });
+
+  it("never limits a POST (Server Actions, the cart)", async () => {
+    for (let i = 0; i < 15; i++) {
+      expect((await from("203.0.113.30", "/katalogos/drapana?platform=M18&avail=in-stock", "POST")).status).not.toBe(429);
+    }
+  });
+
+  it("buckets a direct-to-origin client by its peer, whatever cf-connecting-ip it claims", async () => {
+    const direct = (claimed: string) =>
+      proxy(
+        new NextRequest("https://milwaukeetoolshdc.gr/api/ready", {
+          headers: { host: "milwaukeetoolshdc.gr", "x-real-ip": "198.51.100.66", "cf-connecting-ip": claimed },
+        }),
+      );
+    for (let i = 0; i < 10; i++) expect((await direct(`43.0.0.${i}`)).status).toBe(200);
+    expect((await direct("43.0.0.99")).status).toBe(429);
+  });
+});

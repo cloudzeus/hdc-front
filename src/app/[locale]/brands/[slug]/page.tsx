@@ -30,6 +30,7 @@ import {
 } from "@/lib/compare/compare";
 import { getBrandBySlug } from "@/lib/catalog/brands";
 import { getPlpData, parsePlpParams } from "@/lib/catalog/plp";
+import { getPerRow } from "@/lib/catalog/per-row";
 import {
   getCatalogueStats,
   getMenuTree,
@@ -39,6 +40,9 @@ import {
 import { upGreek } from "@/lib/greek";
 import { Zone } from "@/components/zones/Zone";
 import { jsonLdHtml } from "@/lib/seo/json-ld";
+import { filteredListingMeta } from "@/lib/catalog/listing-query";
+import { admitListingRender, listingBusyMeta } from "@/lib/server/render-gate";
+import { ListingBusy } from "@/components/plp/ListingBusy";
 
 type PageProps = {
   params: Promise<{ locale: Locale; slug: string }>;
@@ -47,6 +51,7 @@ type PageProps = {
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: PageProps): Promise<Metadata> {
   const { slug, locale } = await params;
   // Explicit locale: `setRequestLocale` belongs to the render pass, and metadata
@@ -66,6 +71,11 @@ export async function generateMetadata({
     ...pageMeta({ path: `/brands/${slug}`, locale, title, description }),
     title,
     description,
+    // Filtered views: noindex, follow — the canonical above is the bare listing.
+    ...filteredListingMeta(await searchParams),
+    // A render the gate turned away (the busy view): noindex too. Same
+    // per-request admission as the body; see render-gate.ts.
+    ...(await listingBusyMeta("brand", await searchParams)),
   };
 }
 
@@ -94,6 +104,8 @@ async function BrandBody({ params, searchParams }: PageProps) {
   setRequestLocale(locale);
 
   const raw = await searchParams;
+  // Costly views queue for one of a few render slots; see render-gate.ts.
+  if (!(await admitListingRender("brand", raw))) return <ListingBusy basePath={`/brands/${slug}`} />;
   const plpParams = parsePlpParams(raw, { brandScopeSlug: slug });
 
   const [
@@ -120,7 +132,7 @@ async function BrandBody({ params, searchParams }: PageProps) {
 
   if (!brand || !data) notFound();
 
-  const perRow = Number(raw.perRow) || 4;
+  const perRow = await getPerRow();
   const gridCols =
     perRow === 2
       ? "sm:grid-cols-2"
@@ -296,7 +308,7 @@ async function BrandBody({ params, searchParams }: PageProps) {
           {data.facets.subcategories.length > 0 && (
             <div className="flex flex-wrap gap-1.5 border-t border-white/10 py-5">
               {data.facets.subcategories.map((sub) => (
-                <Link
+                <Link rel="nofollow" prefetch={false}
                   key={sub.slug}
                   href={`/brands/${slug}?sub=${sub.slug}`}
                   scroll={false}

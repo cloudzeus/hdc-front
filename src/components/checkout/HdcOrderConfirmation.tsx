@@ -65,9 +65,12 @@ export async function HdcOrderConfirmation({
   order,
   locale,
   extra,
+  childRequest,
 }: {
   order: ConfirmationOrder;
   locale: Locale;
+  /** The other half of a split cart: its back-order request and the page for it. */
+  childRequest?: { orderNumber: string; href: string } | null;
   /** Rendered under the summary (the reorder button on the real page). */
   extra?: React.ReactNode;
 }) {
@@ -176,6 +179,12 @@ export async function HdcOrderConfirmation({
                 : t("text_courier", { email: order.email })}
           </p>
           {order.supplierOrder && <p className="hdc-notice">{t("olokliri_3_5")}</p>}
+          {childRequest && (
+            <p className="hdc-notice">
+              {t("child_request", { number: childRequest.orderNumber })}{" "}
+              <a href={childRequest.href}>{t("child_request_link")} →</a>
+            </p>
+          )}
           <span className="num">{order.orderNumber}</span>
         </div>
 

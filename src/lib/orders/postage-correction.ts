@@ -2,7 +2,7 @@ import "server-only";
 import { prisma } from "@/lib/prisma";
 import { grossAmount } from "@/lib/format";
 import { FREE_SHIPPING_THRESHOLD_NET, SHIPPING_METHODS } from "@/lib/cart/options";
-import { quoteLivePostage } from "@/lib/shipping/acs-live";
+import { isUnserviceable, quoteLivePostage } from "@/lib/shipping/acs-live";
 import { sendPostageCorrectionEmail } from "@/lib/mail/postage-correction-email";
 
 /**
@@ -22,6 +22,9 @@ import { sendPostageCorrectionEmail } from "@/lib/mail/postage-correction-email"
  * amount: the preview and the apply both recompute from scratch, so what is
  * sent is what the rules say, not what a stale screen showed.
  */
+
+const UNSERVICEABLE =
+  "Η ACS δεν εξυπηρετεί τον Τ.Κ. της παραγγελίας — δεν υπάρχει σωστό κόστος μεταφορικών για επανυπολογισμό.";
 
 const round = (v: number) => Math.round((v + Number.EPSILON) * 100) / 100;
 
@@ -65,6 +68,10 @@ function refusal(order: LoadedOrder | null): string | null {
   if (order.status !== "PENDING_PAYMENT" && order.status !== "FAILED") {
     return "Διορθώνεται μόνο παραγγελία που περιμένει πληρωμή.";
   }
+  /* A request's price and postage come from the HDCtool offer, not from here. */
+  if (order.requestStatus) {
+    return "Αίτημα κατόπιν παραγγελίας — η τιμή και τα μεταφορικά ορίζονται με την πρόταση στο HDCtool.";
+  }
   const method = SHIPPING_METHODS.find((m) => m.id === order.shippingMethod);
   if (!method || method.expressMultiplier <= 0) return "Η παραγγελία δεν έχει μεταφορικά courier.";
   return null;
@@ -94,6 +101,8 @@ async function recompute(order: LoadedOrder) {
     }),
     postcode: order.shipPostcode,
   });
+  // ACS does not deliver there: there is no correct postage to re-price to.
+  if (isUnserviceable(quote)) return null;
 
   const subtotalNet = Number(order.subtotalNet);
   const freeShipping = method.freeOverThreshold && subtotalNet >= FREE_SHIPPING_THRESHOLD_NET;
@@ -114,7 +123,9 @@ export async function previewPostageCorrection(orderNumber: string): Promise<Pre
   const refused = refusal(order);
   if (refused || !order) return { ok: false, error: refused ?? "Η παραγγελία δεν βρέθηκε." };
 
-  const { quote, freeShipping, amounts } = await recompute(order);
+  const recomputed = await recompute(order);
+  if (!recomputed) return { ok: false, error: UNSERVICEABLE };
+  const { quote, freeShipping, amounts } = recomputed;
   const stored = (order.shippingQuote ?? {}) as { chargeableKg?: number };
 
   return {
@@ -155,7 +166,9 @@ export async function applyPostageCorrection(
   const refused = refusal(order);
   if (refused || !order) return { ok: false, error: refused ?? "Η παραγγελία δεν βρέθηκε." };
 
-  const { quote, amounts } = await recompute(order);
+  const recomputed = await recompute(order);
+  if (!recomputed) return { ok: false, error: UNSERVICEABLE };
+  const { quote, amounts } = recomputed;
   const before = {
     shippingGross: Number(order.shippingGross),
     totalGross: Number(order.totalGross),

@@ -105,6 +105,10 @@ vi.mock("@/lib/prisma", () => {
 
 vi.mock("@/lib/catalog/variant-lead", () => ({ refreshVariantLeads: async () => undefined }));
 
+/* The in-process listing grids: every catalogue write must clear them. */
+const listingCache = vi.hoisted(() => ({ clear: vi.fn() }));
+vi.mock("@/lib/catalog/listing-cache", () => ({ clearListingCache: listingCache.clear }));
+
 const hdc = vi.hoisted(() => ({ products: vi.fn(), catalogDelta: vi.fn() }));
 vi.mock("@/lib/hdctool/client", () => ({ hdctool: hdc, HDCTOOL_MAX_LIMIT: 200 }));
 
@@ -334,5 +338,52 @@ describe("reconcileCatalog with XML-only ids", () => {
     const result = await reconcileCatalog();
     expect(result.removed).toBe(0);
     expect(db.rows.map((r) => [r.mtrl, r.isActive])).toEqual([[812, true], [-4, true], [-3, true]]);
+  });
+});
+
+describe("the listing cache follows the catalogue", () => {
+  beforeEach(() => listingCache.clear.mockClear());
+
+  it("is cleared when a webhook delivery writes products", async () => {
+    serve([product(812)]);
+    await syncProductsByMtrl([812]);
+    expect(listingCache.clear).toHaveBeenCalled();
+  });
+
+  it("is cleared when a delivery de-lists a product", async () => {
+    db.rows.push(row("row1", -3, "P1", "slug"));
+    serve([]);
+    await syncProductsByMtrl([-3]);
+    expect(listingCache.clear).toHaveBeenCalled();
+  });
+
+  it("is cleared even when a later chunk fails after an earlier one was written", async () => {
+    const ids = Array.from({ length: 201 }, (_, i) => 1000 + i);
+    let call = 0;
+    hdc.products.mockImplementation(async (params: { mtrl?: number[] }) => {
+      call += 1;
+      if (call === 2) throw new Error("HDCtool timeout");
+      return page((params.mtrl ?? []).map((m) => product(m)));
+    });
+    await expect(syncProductsByMtrl(ids)).rejects.toThrow(/timeout/);
+    expect(db.rows.length).toBeGreaterThan(0);
+    expect(listingCache.clear).toHaveBeenCalled();
+  });
+
+  it("is left alone when the first fetch fails before anything was written", async () => {
+    hdc.products.mockRejectedValue(new Error("HDCtool down"));
+    await expect(syncProductsByMtrl([812])).rejects.toThrow(/down/);
+    expect(listingCache.clear).not.toHaveBeenCalled();
+  });
+
+  it("is left alone when a delivery names nothing", async () => {
+    await syncProductsByMtrl([]);
+    expect(listingCache.clear).not.toHaveBeenCalled();
+  });
+
+  it("is cleared by a full sync run", async () => {
+    hdc.products.mockImplementation(async () => page([product(812)]));
+    await syncProducts({ maxPages: 1 });
+    expect(listingCache.clear).toHaveBeenCalled();
   });
 });

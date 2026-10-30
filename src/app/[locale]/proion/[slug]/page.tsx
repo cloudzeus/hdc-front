@@ -568,7 +568,7 @@ async function ProductBody({ params }: PageProps) {
           {product.categoryChain.map((c) => (
             <span key={c.slug}>
               <i aria-hidden>/</i>
-              <Link href={`/katalogos/${c.slug}`}>{c.name}</Link>
+              <Link prefetch={false} href={`/katalogos/${c.slug}`}>{c.name}</Link>
             </span>
           ))}
           <i aria-hidden>/</i>

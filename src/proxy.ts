@@ -1,8 +1,16 @@
 import NextAuth from "next-auth";
 import createIntlMiddleware from "next-intl/middleware";
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse, type NextFetchEvent, type NextRequest } from "next/server";
 import { authConfig } from "@/auth.config";
 import { routing } from "@/i18n/routing";
+import {
+  PER_ROW_COOKIE,
+  canonicalizeListingQuery,
+  listingKindOf,
+} from "@/lib/catalog/listing-query";
+import { clientIp } from "@/lib/security/client-ip";
+import { POLICIES, TokenBucketLimiter, policyFor } from "@/lib/security/rate-limit";
+import { tinyPage } from "@/lib/security/tiny-response";
 import { indexingAllowed, NOINDEX_HEADER } from "@/lib/seo/indexing";
 import { isAliasHost } from "@/lib/seo/canonical-host";
 import {
@@ -153,12 +161,160 @@ async function magentoRedirect(request: NextRequest): Promise<NextResponse | nul
 }
 
 /**
+ * One spelling per listing URL — before auth, i18n and any render.
+ *
+ * The facet space used to be infinite: every random `sub`/`brand`/`min`/`max`/
+ * `perPage`/`series`/`content` combination was a cache miss and a full render
+ * (the Kolleris shop this one was copied from was taken down that way on
+ * 1/10/2026). `canonicalizeListingQuery` reduces the query to the parameters
+ * the page reads, with their values in one order and within limits (the
+ * parameters' own order is left alone); here the answer is turned into
+ * a 301 to the canonical URL that costs nothing (307 when it carries a
+ * `perRow` preference — that one sets a cookie and must not be cached). There
+ * is no refusal: over-cap filters are trimmed, a page past the end is clamped,
+ * an over-long search is cut; the page renders the nearest real listing.
+ *
+ * GET and HEAD only: a Server Action is a POST to the page's own URL, and
+ * redirecting it would turn the action into a page load.
+ *
+ * The target is built on `request.nextUrl`, so it is same-origin by
+ * construction; Next writes a same-origin redirect out as a relative Location,
+ * so the host the platform hands the server never leaks into it. (A raw
+ * relative `Location` header is rejected by the proxy adapter: it parses it
+ * with `new URL()`.) A canonical query that equals the request's is never
+ * redirected, so no listing URL can redirect to itself.
+ */
+function listingCanonicalRedirect(request: NextRequest): NextResponse | null {
+  if (request.method !== "GET" && request.method !== "HEAD") return null;
+  const { pathname, search } = request.nextUrl;
+  if (!search) return null;
+  const kind = listingKindOf(pathname);
+  if (!kind) return null;
+
+  const result = canonicalizeListingQuery(kind, request.nextUrl.searchParams);
+  if (result.action === "ok") return null;
+
+  /* A density preference on www.: the apex first, query untouched, so the
+     cookie is set on the host the visitor will actually stay on. */
+  if (result.perRow != null) {
+    const toApex = canonicalHostRedirect(request);
+    if (toApex) return toApex;
+  }
+
+  const target = new URL(request.nextUrl);
+  target.search = result.search;
+  if (target.search === request.nextUrl.search && result.perRow == null) return null;
+  // On `www.` straight to the canonical host: one hop, not two.
+  onCanonicalHost(target, request);
+
+  if (result.perRow != null) {
+    const response = NextResponse.redirect(target, 307);
+    response.headers.set("Cache-Control", "no-store");
+    response.cookies.set(PER_ROW_COOKIE, String(result.perRow), {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: "lax",
+    });
+    return response;
+  }
+  const response = NextResponse.redirect(target, 301);
+  // Cacheable, briefly: the rules are new and may still be tuned.
+  response.headers.set("Cache-Control", "public, max-age=600");
+  return response;
+}
+
+/**
+ * Per-IP rate limit on the routes that cost a render (see `rate-limit.ts` for
+ * the policies). One limiter per process: the proxy runs in the server's Node
+ * runtime and its module lives as long as the server does.
+ */
+const limiter = new TokenBucketLimiter();
+
+/*
+ * What was refused, summarised once a minute. Logging every 429 during an
+ * attack would be its own load; a count and the top offenders is what someone
+ * reading the log needs.
+ */
+const refused = new Map<string, number>();
+let refusedSince = Date.now();
+
+function noteRefused(ip: string): void {
+  refused.set(ip, (refused.get(ip) ?? 0) + 1);
+  const now = Date.now();
+  if (now - refusedSince < 60_000) return;
+  const total = [...refused.values()].reduce((a, b) => a + b, 0);
+  const top = [...refused]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([who, n]) => `${who}=${n}`)
+    .join(" ");
+  console.warn(
+    `[rate-limit] refused ${total} requests from ${refused.size} clients in ${Math.round((now - refusedSince) / 1000)}s; top: ${top}`,
+  );
+  refused.clear();
+  refusedSince = now;
+}
+
+/**
+ * Over the limit: 429 with `Retry-After` and a few hundred static bytes
+ * (`noindex`), before auth, i18n, the redirect tables or any render. Requests
+ * that carry no client address (the container's own health check) and
+ * anything but GET/HEAD (Server Actions, the cart) are never limited.
+ */
+function rateLimit(request: NextRequest): NextResponse | null {
+  const policy = policyFor({
+    method: request.method,
+    pathname: request.nextUrl.pathname,
+    searchParams: request.nextUrl.searchParams,
+    headers: request.headers,
+  });
+  if (!policy) return null;
+  const ip = clientIp(request.headers);
+  if (!ip) return null;
+
+  const verdict = limiter.take(`${policy}:${ip}`, POLICIES[policy]);
+  if (verdict.ok) return null;
+
+  noteRefused(ip);
+  const headers = { "Retry-After": String(verdict.retryAfterSeconds) };
+  if (request.nextUrl.pathname.startsWith("/api/")) {
+    return NextResponse.json(
+      { error: "rate_limited", retry_after_seconds: verdict.retryAfterSeconds },
+      { status: 429, headers: { ...headers, "Cache-Control": "no-store" } },
+    );
+  }
+  return tinyPage(429, {
+    title: "Too many requests",
+    message:
+      "Πάρα πολλά αιτήματα σε λίγο χρόνο — δοκιμάστε ξανά σε λίγα δευτερόλεπτα. / Too many requests — please try again in a few seconds.",
+    headers,
+  });
+}
+
+/**
+ * The cheap checks first, on their own: a refused request costs a Map lookup,
+ * not a session decode, a redirect-table lookup or a locale negotiation, and a
+ * listing canonicalisation is answered without the session's cookies (a 301
+ * that may be cached must not carry a Set-Cookie). The two product APIs are
+ * matched only for the rate limit (and /api/ready); they are not localised
+ * and carry their own auth.
+ */
+export default async function proxy(request: NextRequest, event: NextFetchEvent) {
+  const limited = rateLimit(request);
+  if (limited) return limited;
+  if (request.nextUrl.pathname.startsWith("/api/")) return NextResponse.next();
+  const listing = listingCanonicalRedirect(request);
+  if (listing) return listing;
+  return authProxy(request, event as never);
+}
+
+/**
  * Two middlewares, one matcher.
  *
  * /admin is NOT localised (staff UI is Greek only) and is gated on a valid JWT.
  * Everything else goes through next-intl locale negotiation.
  */
-export default auth(async (request) => {
+const authProxy = auth(async (request) => {
   const response = await route(request);
   /*
    * Not on the final domain yet: every page says so in a header as well as in
@@ -226,5 +382,9 @@ export const config = {
     "/((?!api|_next|_vercel|.*\\..*).*)",
     // …except the old Magento `*.html` pages, which get a 301 (see magentoRedirect).
     "/((?!api|_next|_vercel).*\\.html)",
+    // The product listing APIs and the database check, for the rate limit only.
+    "/api/suggest",
+    "/api/acp/products",
+    "/api/ready",
   ],
 };

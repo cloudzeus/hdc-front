@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { siteOrigin } from "@/lib/seo/urls";
 import { AI_CRAWLERS, indexingAllowed } from "@/lib/seo/indexing";
+import { facetRules, privateRules } from "@/lib/seo/robots-rules";
 
 /*
  * Built per request, not at build time: the switch below is a runtime variable,
@@ -27,14 +28,27 @@ export const dynamic = "force-dynamic";
  *   /checkout     the same, plus it would index a form
  *   /logariasmos  somebody's orders and addresses
  *
+ * Each of them under /en and /it as well: a basket one prefix away is still a
+ * basket (`privateRules`).
+ *
  * The confirmation page is excluded through /checkout. It carries a guest token
  * in the query string, so an indexed copy would be a stranger's order with the
  * key attached.
  *
- * Search parameters are not blocked here. Facet combinations are handled with
- * canonicals on the pages themselves, which is the tool that can tell a useful
- * filter from an infinite one; a `Disallow: /*?` would also hide the ones worth
- * ranking.
+ * ── Filtered listings ──────────────────────────────────────────────────────
+ *
+ * A category, a brand, "all products" and an offer are crawlable, and so is
+ * their `?page=`, and so is a category's platform landing (`?platform=M18`,
+ * with or without `page`) — the «M18 …» pages the hubs and product pages link
+ * to, indexable as they always were. Every OTHER query on them — facet
+ * combinations, price, sort, density — is disallowed, in every locale prefix. They used to be left to
+ * canonicals alone, on the theory that a canonical can tell a useful filter
+ * from an infinite one; but every combination is a full server render, and a
+ * crawler that respects robots.txt has no business walking them (the Kolleris
+ * shop this one was copied from was taken down by a facet walk). The pages
+ * still say `noindex, follow` with a canonical to the unfiltered listing, for
+ * the crawler that arrives anyway through a link. Longest match wins: see
+ * `facetRules` (src/lib/seo/robots-rules.ts).
  */
 export default function robots(): MetadataRoute.Robots {
   if (!indexingAllowed()) {
@@ -46,12 +60,13 @@ export default function robots(): MetadataRoute.Robots {
     };
   }
 
+  const facets = facetRules();
   return {
     rules: [
       {
         userAgent: "*",
-        allow: "/",
-        disallow: ["/admin", "/api", "/kalathi", "/checkout", "/logariasmos", "/eisodos", "/eggrafi"],
+        allow: ["/", ...facets.allow],
+        disallow: [...privateRules().disallow, ...facets.disallow],
       },
     ],
     sitemap: `${siteOrigin()}/sitemap.xml`,

@@ -25,6 +25,7 @@ import { formatMoney } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { SupplierOrderBadge } from "@/components/admin/OrderBadges";
+import { REQUEST_STATUS_LABEL_EL, type RequestStatusName } from "@/lib/requests/model";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
@@ -354,6 +355,14 @@ export function OrdersTable({
                     <div className="flex flex-wrap items-center gap-1">
                       <Badge className={s.className}>{s.label}</Badge>
                       {o.supplierOrder && <SupplierOrderBadge />}
+                      {o.requestStatus && (
+                        <span
+                          className="inline-block border border-k-amber/40 bg-k-amber/10 px-1.5 py-px text-[10.5px] font-medium text-k-amber"
+                          title={REQUEST_STATUS_LABEL_EL[o.requestStatus as RequestStatusName] ?? o.requestStatus}
+                        >
+                          Αίτημα · {REQUEST_STATUS_LABEL_EL[o.requestStatus as RequestStatusName] ?? o.requestStatus}
+                        </span>
+                      )}
                     </div>
                   </td>
                   <td className="numeral px-3 py-2.5 text-right text-[12.5px] text-k-ink">

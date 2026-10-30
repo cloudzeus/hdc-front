@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/prisma";
 import { refreshVariantLeads } from "@/lib/catalog/variant-lead";
+import { clearListingCache } from "@/lib/catalog/listing-cache";
 import {
   changedChildTables,
   pickFreeSlug,
@@ -69,6 +70,10 @@ async function withRun<T extends SyncResult>(
 
   try {
     const result = await work();
+    // The listing grids this process cached describe the catalogue before the
+    // run (listing-cache.ts). Cleared on success here, and on failure below: a
+    // run that failed midway may still have written.
+    clearListingCache();
     const status = result.failed > 0 ? "PARTIAL" : "SUCCESS";
     await prisma.$transaction([
       prisma.syncRun.update({
@@ -93,6 +98,7 @@ async function withRun<T extends SyncResult>(
     ]);
     return result;
   } catch (error) {
+    clearListingCache();
     const message = error instanceof Error ? error.message : String(error);
     await prisma.$transaction([
       prisma.syncRun.update({
@@ -1303,78 +1309,86 @@ export async function syncProductsByMtrl(mtrls: number[]): Promise<TargetedSyncR
   const failedMtrl: number[] = [];
   const seen = new Set<number>();
 
-  for (let i = 0; i < wanted.length; i += HDCTOOL_MAX_LIMIT) {
-    const chunk = wanted.slice(i, i + HDCTOOL_MAX_LIMIT);
-    const response = await hdctool.products({ mtrl: chunk, limit: HDCTOOL_MAX_LIMIT });
+  let removed = 0;
+  try {
+    for (let i = 0; i < wanted.length; i += HDCTOOL_MAX_LIMIT) {
+      const chunk = wanted.slice(i, i + HDCTOOL_MAX_LIMIT);
+      const response = await hdctool.products({ mtrl: chunk, limit: HDCTOOL_MAX_LIMIT });
+
+      /*
+       * Did HDCtool actually honour the filter?
+       *
+       * An older build ignores an unknown `mtrl` parameter and answers with the
+       * first page of the catalogue instead. Every id we asked for would then be
+       * "missing", and the de-listing step below would switch off exactly the
+       * products this call was meant to refresh — from a deploy landing in the
+       * wrong order. A stranger in the response is the tell, and it is cheap to
+       * look for.
+       */
+      const asked = new Set(chunk);
+      const stranger = response.products.find((p) => !asked.has(p.mtrl));
+      if (stranger) {
+        throw new Error(
+          `HDCtool ignored the mtrl filter (asked for ${chunk.length}, got mtrl ${stranger.mtrl} back). ` +
+            `Refusing to de-list — deploy the catalog/delta build on HDCtool first.`,
+        );
+      }
+
+      // Only Milwaukee is written. A requested id that HDCtool still returns but
+      // that is not Milwaukee (a wrong id, or a brand this shop never sells)
+      // then simply never lands in `seen` below — it is treated exactly like a
+      // ghost id: de-listed if it exists here, otherwise nothing happens.
+      const written = await writeProductChunk(response.products.filter(isShopProduct), taken);
+      processed += written.processed;
+      created += written.created;
+      updated += written.updated;
+      errors.push(...written.errors);
+      failedMtrl.push(...written.failedMtrl);
+      for (const mtrl of written.written) seen.add(mtrl);
+    }
 
     /*
-     * Did HDCtool actually honour the filter?
+     * Only ids we asked about and did not get back — never a blanket "anything
+     * not seen", which is what the full walk did and what would empty the
+     * catalogue the first time a delivery covered three products.
      *
-     * An older build ignores an unknown `mtrl` parameter and answers with the
-     * first page of the catalogue instead. Every id we asked for would then be
-     * "missing", and the de-listing step below would switch off exactly the
-     * products this call was meant to refresh — from a deploy landing in the
-     * wrong order. A stranger in the response is the tell, and it is cheap to
-     * look for.
+     * Skipped when a fetch failed, because a timeout looks exactly like an empty
+     * answer from here and must not be read as "these products are gone".
      */
-    const asked = new Set(chunk);
-    const stranger = response.products.find((p) => !asked.has(p.mtrl));
-    if (stranger) {
-      throw new Error(
-        `HDCtool ignored the mtrl filter (asked for ${chunk.length}, got mtrl ${stranger.mtrl} back). ` +
-          `Refusing to de-list — deploy the catalog/delta build on HDCtool first.`,
-      );
+    if (errors.length === 0) {
+      const missing = wanted.filter((m) => !seen.has(m));
+      if (missing.length > 0) {
+        const result = await prisma.product.updateMany({
+          where: { mtrl: { in: missing }, isActive: true },
+          data: { isActive: false, inStock: false, supplierAvailable: false },
+        });
+        removed = result.count;
+      }
     }
 
-    // Only Milwaukee is written. A requested id that HDCtool still returns but
-    // that is not Milwaukee (a wrong id, or a brand this shop never sells)
-    // then simply never lands in `seen` below — it is treated exactly like a
-    // ghost id: de-listed if it exists here, otherwise nothing happens.
-    const written = await writeProductChunk(response.products.filter(isShopProduct), taken);
-    processed += written.processed;
-    created += written.created;
-    updated += written.updated;
-    errors.push(...written.errors);
-    failedMtrl.push(...written.failedMtrl);
-    for (const mtrl of written.written) seen.add(mtrl);
-  }
-
-  /*
-   * Only ids we asked about and did not get back — never a blanket "anything
-   * not seen", which is what the full walk did and what would empty the
-   * catalogue the first time a delivery covered three products.
-   *
-   * Skipped when a fetch failed, because a timeout looks exactly like an empty
-   * answer from here and must not be read as "these products are gone".
-   */
-  let removed = 0;
-  if (errors.length === 0) {
-    const missing = wanted.filter((m) => !seen.has(m));
-    if (missing.length > 0) {
-      const result = await prisma.product.updateMany({
-        where: { mtrl: { in: missing }, isActive: true },
-        data: { isActive: false, inStock: false, supplierAvailable: false },
-      });
-      removed = result.count;
+    /*
+     * Families and leads after every delta, not just nightly.
+     *
+     * Writing a product resets its `variantGroup` to what HDCtool sent, which for
+     * most gloves is nothing; a new size arrives as a lead of its own; a lead that
+     * is de-listed takes its whole family out of the listings. Left to the nightly
+     * reconcile, each of those shows as duplicate or missing cards for a day. The
+     * pass is two reads and a handful of writes, and a failure here must not fail
+     * the delivery that has already been written.
+     */
+    if (processed > 0 || removed > 0) {
+      try {
+        await refreshVariantLeads();
+      } catch (error) {
+        console.error("[catalog-sync] variant leads refresh failed", error);
+      }
     }
-  }
-
-  /*
-   * Families and leads after every delta, not just nightly.
-   *
-   * Writing a product resets its `variantGroup` to what HDCtool sent, which for
-   * most gloves is nothing; a new size arrives as a lead of its own; a lead that
-   * is de-listed takes its whole family out of the listings. Left to the nightly
-   * reconcile, each of those shows as duplicate or missing cards for a day. The
-   * pass is two reads and a handful of writes, and a failure here must not fail
-   * the delivery that has already been written.
-   */
-  if (processed > 0 || removed > 0) {
-    try {
-      await refreshVariantLeads();
-    } catch (error) {
-      console.error("[catalog-sync] variant leads refresh failed", error);
-    }
+  } finally {
+    /* Prices, stock and listings changed: the next listing view in this
+       process reads them fresh instead of from the five-minute grid cache.
+       In a `finally`, because a later chunk can fail after an earlier one
+       was already written. */
+    if (processed > 0 || removed > 0) clearListingCache();
   }
 
   return {

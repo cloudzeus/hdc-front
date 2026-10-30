@@ -162,6 +162,11 @@
       "apotelesmata": "Risultati della ricerca",
       "montela": "{count, plural, one {# modello} other {# modelli}}",
       "kai": "e"
+    },
+    "ListingBusy": {
+      "titlos": "Molto traffico in questo momento",
+      "minima": "Questo elenco non è stato caricato perché il server è occupato. La pagina riproverà tra qualche secondo.",
+      "choris_filtra": "Vedi l'elenco senza filtri"
     }
   },
   "pdp": {
@@ -754,7 +759,23 @@
       "synecheia": "CONTINUA",
       "ship_courier_meta_3_5": "In tutta la Grecia · 3–5 giorni lavorativi",
       "ship_pickup_meta_3_5": "Heavy Duty Centre · pronto in 3–5 giorni lavorativi",
-      "ship_express_meta_3_5": "Spedito all'arrivo dal fornitore · 3–5 giorni lavorativi"
+      "ship_express_meta_3_5": "Spedito all'arrivo dal fornitore · 3–5 giorni lavorativi",
+      "ship_zone": "Spediamo solo in Grecia.",
+      "tk_unserviceable": "Questo CAP non rientra in una zona che serviamo. Spediamo solo in Grecia.",
+      "address_foreign": "L'indirizzo è fuori dalla Grecia. Spediamo solo in Grecia.",
+      "ship_unserviceable": "Non spedibile",
+      "s_request": "Prodotti su ordinazione",
+      "request_mode_intro": "Alcuni prodotti del carrello non sono disponibili ora. Come vuoi procedere?",
+      "request_mode_split": "Ora ciò che è disponibile",
+      "request_mode_split_help": "Spedisci ora ciò che è disponibile, richiedi il resto. Paghi ora i prodotti disponibili; offerta per il resto entro 24 ore.",
+      "request_mode_together": "Tutto come richiesta",
+      "request_mode_together_help": "Nulla viene pagato ora. Un'offerta per tutto il carrello entro 24 ore, e spediamo tutto insieme.",
+      "request_mode_price": "Offerta entro 24 ore",
+      "request_mode_required": "Scegli come procedere con l'ordine.",
+      "request_all_note": "I prodotti del carrello sono su ordinazione: non paghi ora. Ti invieremo un'offerta con prezzo finale, spedizione e tempi entro 24 ore, e paghi solo se la accetti.",
+      "apostoli_aitimatos": "Invia richiesta",
+      "katopin_badge": "Su ordinazione",
+      "request_totals_note": "I prodotti su ordinazione sono prezzati nell'offerta che riceverai entro 24 ore; gli importi qui sono indicativi."
     }
   },
   "catalogue": {
@@ -885,7 +906,15 @@
       "teleftaio": "Ultimo pezzo",
       "paradosi_1_3": "Consegna in 1–3 giorni lavorativi",
       "olokliri_3_5": "L'ordine parte in 3–5 giorni lavorativi: uno o più articoli arrivano dal fornitore.",
-      "overstock_3_5": "Parte della quantità arriva dal fornitore · 3–5 giorni lavorativi"
+      "overstock_3_5": "Parte della quantità arriva dal fornitore · 3–5 giorni lavorativi",
+      "ship_zone": "Spediamo solo in Grecia.",
+      "tk_unserviceable": "Questo CAP non rientra in una zona che serviamo. Spediamo solo in Grecia.",
+      "ship_unserviceable": "Non spedibile",
+      "katopin_24h": "Su ordinazione · conferma entro 24 ore",
+      "overstock_request": "Parte della quantità non è disponibile · la riga diventa una richiesta, conferma entro 24 ore",
+      "request_all": "Nessun prodotto del carrello è disponibile ora. Invierai una richiesta senza pagare; rispondiamo entro 24 ore con prezzo finale, spedizione e tempi, e paghi solo se accetti.",
+      "request_mixed": "Alcuni prodotti sono su ordinazione. Al checkout scegli: spedire ora ciò che è disponibile e richiedere il resto, oppure richiedere tutto insieme. Rispondiamo entro 24 ore.",
+      "synecheia_aitima": "Continua con la richiesta"
     }
   },
   "brands": {
@@ -1409,7 +1438,9 @@
       "synolo": "TOTALE",
       "periechei_fpa_24": "IVA 24% inclusa {amount}",
       "periechei_fpa": "IVA inclusa {amount}",
-      "olokliri_3_5": "L'ordine parte in 3–5 giorni lavorativi: uno o più articoli arrivano dal fornitore."
+      "olokliri_3_5": "L'ordine parte in 3–5 giorni lavorativi: uno o più articoli arrivano dal fornitore.",
+      "child_request": "I prodotti su ordinazione sono stati inviati come richiesta {number}. Riceverai un'offerta via email entro 24 ore.",
+      "child_request_link": "Vedi la richiesta"
     }
   },
   "anazitisi": {
@@ -1660,5 +1691,70 @@
     "diafimisi_keimeno": "Google Ads: misurazione dei nostri annunci e annunci pertinenti su altri siti (remarketing).",
     "apothikeusi": "Salva le scelte",
     "kleisimo": "Chiudi"
+  },
+  "aitima": {
+    "Hdc": {
+      "titlos": "Richiesta su ordinazione",
+      "eyebrow": "Su ordinazione",
+      "arithmos": "Richiesta",
+      "headline_REQUESTED": "Abbiamo ricevuto la tua richiesta",
+      "headline_OFFERED": "La nostra offerta è pronta",
+      "headline_ACCEPTED": "Hai accettato l'offerta",
+      "headline_PAID": "Pagamento completato",
+      "headline_DECLINED": "Hai rifiutato l'offerta",
+      "headline_EXPIRED": "L'offerta è scaduta",
+      "headline_REJECTED": "Non possiamo soddisfare questa richiesta",
+      "intro_REQUESTED": "Risponderemo entro 24 ore con prezzo finale, disponibilità e tempi di consegna. Nessun addebito — paghi solo se accetti l'offerta.",
+      "intro_OFFERED": "Controlla prodotti, prezzi e tempi di consegna. Se ti vanno bene, completa con pagamento con carta o IRIS.",
+      "intro_ACCEPTED": "La tua accettazione è registrata. Completa il pagamento per procedere con l'ordine.",
+      "intro_PAID": "La richiesta è diventata un ordine e procede regolarmente. Riceverai aggiornamenti via email.",
+      "intro_DECLINED": "Nessun addebito. Se cambi idea, contattaci.",
+      "intro_EXPIRED": "L'offerta è scaduta — contattaci e ti aggiorneremo su disponibilità e prezzo.",
+      "intro_REJECTED": "Nessun addebito. Per alternative, contattaci.",
+      "parent_note": "I prodotti disponibili del carrello procedono con l'ordine {number}.",
+      "requested_title": "Cosa hai richiesto",
+      "offer_title": "L'offerta",
+      "tag_same": "Come richiesto",
+      "tag_modified": "Modificato",
+      "tag_alternative": "Alternativa",
+      "tag_added": "Aggiunta",
+      "tag_removed": "Non disponibile",
+      "instead_of": "al posto di {name}",
+      "requested_qty": "Hai chiesto {qty} pz",
+      "requested_price": "prezzo indicativo {price}",
+      "tem": "pz",
+      "lead_time": "Tempi di consegna",
+      "note_title": "Nota dal negozio",
+      "reason_title": "Motivo",
+      "kathari_axia": "Valore netto",
+      "metaforika": "Spedizione",
+      "fpa": "IVA",
+      "synolo": "Totale",
+      "dorean": "Gratis",
+      "endeiktiki_axia": "Valore indicativo",
+      "shipping_with_offer": "Con l'offerta",
+      "expires_at": "L'offerta è valida fino al {date}",
+      "remaining": "Tempo rimanente",
+      "accept": "Accetta e paga",
+      "decline": "Rifiuta",
+      "decline_confirm": "Sei sicuro di voler rifiutare l'offerta?",
+      "pending": "Un momento…",
+      "pay_again": "Completa il pagamento",
+      "view_order": "Vedi l'ordine",
+      "contact": "Contattaci",
+      "pay_hint": "Verrai indirizzato alla pagina di pagamento sicura di Viva Wallet (carta o IRIS).",
+      "private_link": "Il link di questa pagina è personale — non condividerlo.",
+      "error_not_found": "Richiesta non trovata.",
+      "error_not_offered": "Non c'è un'offerta attiva per questa richiesta.",
+      "error_stale_offer": "L'offerta è cambiata nel frattempo — ricarica la pagina per vedere l'ultima.",
+      "error_expired": "L'offerta è scaduta — contattaci.",
+      "error_already_paid": "Questa richiesta è già stata pagata.",
+      "error_conflict": "L'offerta è cambiata nel frattempo — ricarica la pagina.",
+      "error_unserviceable": "Non possiamo calcolare la spedizione al tuo indirizzo — contattaci.",
+      "error_payment_unavailable": "Il pagamento con carta non è disponibile ora — la tua accettazione è registrata, riprova a breve.",
+      "error_payment_failed": "Collegamento con la banca non riuscito — la tua accettazione è registrata, riprova.",
+      "declined_done": "La tua decisione è registrata. Grazie.",
+      "validity": "Validità dell'offerta"
+    }
   }
 }
