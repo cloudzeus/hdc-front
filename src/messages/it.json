@@ -1864,7 +1864,10 @@
       "parent_note_amount": "I prodotti disponibili del carrello sono l'ordine {number}: {total}, spedizione {shipping}.",
       "parent_note_paid": "I prodotti disponibili del carrello sono stati pagati con l'ordine {number}: {total}, spedizione {shipping}.",
       "parent_link": "L'ordine",
-      "second_shipment": "Seconda consegna: questi prodotti vengono spediti separatamente dall'ordine {number}, con la propria spedizione — quella indicata nell'offerta."
+      "second_shipment": "Seconda consegna: questi prodotti vengono spediti separatamente dall'ordine {number}, con la propria spedizione — quella indicata nell'offerta.",
+      "accept_bank": "Accetta e paga con bonifico",
+      "pay_bank_again": "Paga con bonifico",
+      "pay_bank_hint": "Riceverete via email l'IBAN e la causale. L'ordine procede appena il bonifico viene accreditato."
     }
   }
 }

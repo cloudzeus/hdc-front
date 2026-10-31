@@ -97,3 +97,9 @@ Not part of the contract; where to look in this repo.
 - **Emails**: `src/lib/mail/request-emails.ts`, templates `src/emails/hdc/templates/order-request.hbs` (el/en/it, variants received / offer / reminder / rejected / expired) and `internal-request.hbs` (Greek, to `MAIL_ORDER_NOTIFY`); both in the admin «Πρότυπα email» list. Mailgun tracking off on every customer email that carries the token.
 - **Timer**: the «requests» job of the in-process cron (`src/lib/cron/schedule.ts`, every 15 min, `claimSlot` per interval; `CRON_DISABLED=requests` turns it off).
 - **Admin**: request chip/status on `/admin/orders` and the order page (read-only), «Αιτήματα» filter; open requests are not counted as sales on the dashboard.
+
+## Πληρωμή με κατάθεση και ιστορικό προτάσεων (2026-10-31)
+
+- Η σελίδα `/aitima/{token}` δίνει δύο δρόμους μετά την αποδοχή: κάρτα/IRIS (Viva) ή **τραπεζική κατάθεση**. Η κατάθεση παίρνει κωδικό αιτιολογίας Viva που ισχύει `BANK_PAYMENT_CODE_DAYS` (7 ημέρες), email με τα στοιχεία κατάθεσης και τη σελίδα επιβεβαίωσης — ίδια με την κατάθεση του checkout.
+- Κατάθεση που η Viva δεν ταυτίζει (λάθος αιτιολογία, ληγμένος κωδικός) καταχωρείται από τη διαχείριση: σελίδα παραγγελίας → «Καταχώρηση πληρωμής κατάθεσης». Ακολουθούν τα ίδια βήματα με μια πληρωμή Viva (`afterPaymentCaptured`): απόδειξη, HDCtool, παραστατικό SoftOne.
+- Κάθε νέα πρόταση του HDCtool κρατά τις προηγούμενες στο `offerJson.history` (παλαιότερη πρώτη). Η σελίδα παραγγελίας στη διαχείριση τις δείχνει όλες στο «Ιστορικό προτάσεων».

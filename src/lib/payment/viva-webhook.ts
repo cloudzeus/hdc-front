@@ -2,10 +2,8 @@ import "server-only";
 import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { VIVA_STATUS_PAID, getTransaction } from "@/lib/payment/viva";
-import { sendOrderEmail } from "@/lib/mail/order-email";
-import { sendInternalOrderEmail } from "@/lib/mail/order-internal-email";
 import { sendPaymentFailedEmail } from "@/lib/mail/payment-failed-email";
-import { sendOrderToErp, syncPaymentToErp } from "@/lib/orders/send-to-erp";
+import { afterPaymentCaptured } from "@/lib/orders/record-payment";
 import { requestBlocksPayment } from "@/lib/requests/model";
 
 /**
@@ -233,66 +231,17 @@ async function handleTransaction(payload: Body, event: VivaEventName) {
     );
 
     /*
-     * The receipt goes out from HERE, not from the return URL.
+     * Απόδειξη, email καταστήματος, HDCtool και παραστατικό — όλα από ΕΔΩ, όχι
+     * από το return URL: αυτό τρέχει αφού η συναλλαγή διαβάστηκε από το API
+     * της Viva. Κοινά με την χειροκίνητη καταχώρηση κατάθεσης
+     * (`recordBankPayment`), ώστε καμία από τις δύο να μην ξεχάσει βήμα.
      *
-     * The browser coming back proves only that a browser came back; this runs
-     * after the transaction has been read from Viva's API. And it is awaited
-     * but never allowed to fail the response: the money has moved, and telling
-     * Viva the webhook failed — which makes it retry — because a mail server
-     * was slow would turn a sent receipt into a duplicate one.
+     * Αναμένονται αλλά δεν ρίχνουν ποτέ την απάντηση: τα χρήματα έχουν ήδη
+     * κινηθεί, και ένα webhook που δηλώνεται αποτυχημένο ξαναστέλνεται — μια
+     * αργή αποστολή email θα γινόταν διπλή απόδειξη. Ό,τι δεν περάσει στο
+     * SoftOne το πιάνει η σάρωση (`sweepErpPushes`).
      */
-    // «payment»: an order already confirmed by email (bank transfer, postage
-    // correction) gets the payment receipt instead of the whole order again.
-    const mail = await sendOrderEmail(orderNumber, { trigger: "payment" });
-    if (!mail.ok) console.error(`[viva] ${orderNumber} receipt not sent: ${mail.error}`);
-
-    /* Και στο κατάστημα. Ίδιος κανόνας με την απόδειξη: περιμένουμε, γράφουμε
-       το σφάλμα, δεν αφήνουμε ποτέ να αποτύχει η απάντηση — τα χρήματα έχουν
-       ήδη κινηθεί, και ένα webhook που δηλώνεται αποτυχημένο ξαναστέλνεται. */
-    const internal = await sendInternalOrderEmail(orderNumber);
-    if (!internal.ok) console.error(`[viva] ${orderNumber} internal email not sent: ${internal.error}`);
-
-    /*
-     * And tell HDCtool, if the order ever got there.
-     *
-     * The copy in HDCtool was written at checkout, when this order was
-     * PENDING with no `paidAt` — a bank transfer lands hours later, and
-     * nothing was updating it. Anybody reconciling from that screen was
-     * reading a snapshot taken before the customer paid.
-     *
-     * Same rule as the receipt: awaited, logged, never allowed to fail the
-     * response. Reporting a failed webhook to Viva makes it retry, and the
-     * money has already moved.
-     */
-    const synced = await syncPaymentToErp(orderNumber);
-    if (!synced.ok) console.error(`[viva] ${orderNumber} payment not synced to HDCtool: ${synced.error}`);
-
-    /*
-     * Και το παραστατικό, εδώ.
-     * ─────────────────────────────────────────────────────────────────────────
-     * Μέχρι τώρα το πατούσε άνθρωπος από τη διαχείριση. Αυτό σημαίνει ότι κάθε
-     * παραγγελία περίμενε κάποιον να ανοίξει την οθόνη — και η KOL-20260907-0001
-     * περίμενε από τις 02:32 ως τις 17:48.
-     *
-     * ΕΔΩ και όχι στο checkout: αυτή είναι η στιγμή που τα χρήματα κινήθηκαν.
-     * Το `sendOrderToErp` αρνείται απλήρωτη παραγγελία — παραστατικό για
-     * εμπόρευμα που δεν πληρώθηκε είναι λογιστικό λάθος, όχι ταχύτητα.
-     *
-     * Ίδιος κανόνας με την απόδειξη: αναμένεται, καταγράφεται, ποτέ δεν ρίχνει
-     * την απάντηση. Το να δηλωθεί αποτυχία στη Viva την κάνει να ξαναστείλει το
-     * webhook, και τα χρήματα έχουν ήδη κινηθεί. Ό,τι δεν περάσει εδώ το πιάνει
-     * η σάρωση — βλ. `sweepErpPushes`.
-     */
-    const issued = await sendOrderToErp(orderNumber);
-    if (issued.ok) {
-      console.log(
-        `[viva] ${orderNumber} → SoftOne ${issued.fincode ?? issued.findoc ?? "—"}${
-          issued.alreadySent ? " (υπήρχε ήδη)" : ""
-        }`,
-      );
-    } else {
-      console.error(`[viva] ${orderNumber} document not issued (${issued.stage}): ${issued.error}`);
-    }
+    await afterPaymentCaptured(orderNumber, "viva");
 
     return NextResponse.json({ ok: true, paid: true });
   }

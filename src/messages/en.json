@@ -1864,7 +1864,10 @@
       "parent_note_amount": "The in-stock items of your basket are order {number}: {total}, shipping {shipping}.",
       "parent_note_paid": "The in-stock items of your basket were paid with order {number}: {total}, shipping {shipping}.",
       "parent_link": "The order",
-      "second_shipment": "Second delivery: these items ship separately from order {number}, with their own shipping — as shown in the offer."
+      "second_shipment": "Second delivery: these items ship separately from order {number}, with their own shipping — as shown in the offer.",
+      "accept_bank": "Accept & pay by bank transfer",
+      "pay_bank_again": "Pay by bank transfer",
+      "pay_bank_hint": "You will receive the IBAN and a payment reference by email. The order proceeds once the transfer is credited."
     }
   }
 }
