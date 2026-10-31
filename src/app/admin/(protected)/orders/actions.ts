@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { sendOrderToErp, type SendToErpResult } from "@/lib/orders/send-to-erp";
 import { createVoucherForOrder, type VoucherResult } from "@/lib/courier/create-for-order";
 import { sendOrderEmail } from "@/lib/mail/order-email";
+import { recordBankPayment, type BankPaymentResult } from "@/lib/orders/record-payment";
 import { auth } from "@/auth";
 import { assertCan } from "@/lib/rbac";
 import {
@@ -28,8 +29,35 @@ export async function pushOrderToErp(orderNumber: string): Promise<SendToErpResu
   // Refreshed on failure too: `erpError` is now on the order and the row shows
   // it, which is the difference between a lost click and a legible problem.
   revalidatePath("/admin/orders");
+  revalidatePath(`/admin/orders/${orderNumber}`);
   revalidatePath("/admin");
 
+  return result;
+}
+
+/**
+ * «Καταχώρηση πληρωμής κατάθεσης» — τα χρήματα ήρθαν, η Viva δεν τα ταύτισε.
+ *
+ * Μετά την καταχώρηση τρέχουν τα ίδια βήματα με μια πληρωμή Viva: απόδειξη,
+ * HDCtool, παραστατικό SoftOne (`afterPaymentCaptured`).
+ */
+export async function recordOrderBankPayment(
+  orderNumber: string,
+  input: { paidAt: string; reference: string; note?: string; amountConfirmed: boolean },
+): Promise<BankPaymentResult> {
+  const actor = await requireOrders();
+  const result = await recordBankPayment({
+    orderNumber,
+    // «2026-10-30» από το date input: μεσημέρι ώρας Ελλάδας, για να μη γλιστρά μέρα.
+    paidAt: new Date(/^\d{4}-\d{2}-\d{2}$/.test(input.paidAt) ? `${input.paidAt}T12:00:00+02:00` : input.paidAt),
+    reference: String(input.reference ?? "").slice(0, 120),
+    note: String(input.note ?? "").slice(0, 500),
+    amountConfirmed: input.amountConfirmed === true,
+    actor: `admin:${actor.email}`,
+  });
+  revalidatePath(`/admin/orders/${orderNumber}`);
+  revalidatePath("/admin/orders");
+  revalidatePath("/admin");
   return result;
 }
 

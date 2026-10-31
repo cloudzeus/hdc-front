@@ -63,11 +63,16 @@ export function RequestActions({
       <form action={accept}>
         <input type="hidden" name="token" value={token} />
         <input type="hidden" name="offerVersion" value={offerVersion ?? ""} />
-        <button type="submit" disabled={busy} className="hdc-btn hdc-btn-red hdc-btn-lg">
+        <button type="submit" name="method" value="card" disabled={busy} className="hdc-btn hdc-btn-red hdc-btn-lg">
           {accepting ? t("pending") : `${mode === "pay" ? t("pay_again") : t("accept")} →`}
         </button>
+        <p className="hint">{t("pay_hint")}</p>
+        {/* Το ίδιο, με κατάθεση: ο πελάτης παίρνει IBAN και κωδικό αιτιολογίας. */}
+        <button type="submit" name="method" value="bank" disabled={busy} className="hdc-btn hdc-btn-line hdc-btn-lg">
+          {mode === "pay" ? t("pay_bank_again") : t("accept_bank")}
+        </button>
+        <p className="hint">{t("pay_bank_hint")}</p>
       </form>
-      <p className="hint">{t("pay_hint")}</p>
 
       {mode === "offer" && (
         <form
