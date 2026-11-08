@@ -131,6 +131,12 @@ export function sizeTitleEl(input: {
   return { title: `${cutAtWord(input.name, max - tail.length)}${tail}`, absolute: true };
 }
 
+/** The size title as metadata; `resolved` differs from it only when an override exists, and an override is shown as written. */
+export function sizeMetaTitle(el: { title: string; absolute: boolean }, resolved: string): string | { absolute: string } {
+  if (resolved !== el.title) return { absolute: resolved };
+  return el.absolute ? { absolute: el.title } : el.title;
+}
+
 export function cutAtWord(text: string, max: number): string {
   if (text.length <= max) return text;
   const cut = text.slice(0, max + 1);

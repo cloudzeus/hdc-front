@@ -62,7 +62,7 @@ import { productBreadcrumb, productJsonLd } from "@/lib/seo/product-schema";
 import { faqJsonLd, productFaq } from "@/lib/seo/product-faq";
 import { quotePostage } from "@/lib/shipping/acs-tariff";
 import { absoluteUrl, pageMeta, siteOrigin } from "@/lib/seo/urls";
-import { clampDescription, sizeFamilyLd, sizedText, sizeTitleEl } from "@/lib/seo/size-variant";
+import { clampDescription, sizeFamilyLd, sizedText, sizeMetaTitle, sizeTitleEl } from "@/lib/seo/size-variant";
 import { SHOP } from "@/config/shop";
 import { jsonLdHtml } from "@/lib/seo/json-ld";
 import {
@@ -102,14 +102,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
        fit ~60 characters with size and code intact; description ≤ 155 and
        led by size and code rather than the whole title again. */
     const el = sizeTitleEl({ name: baseTitle, size: currentSize.label, code: currentSize.code, siteName: SHOP.name });
-    title = el.absolute ? { absolute: el.title } : el.title;
-    shareTitle = el.title;
     const lead = t("megethos_kodikos", { size: currentSize.label, code: currentSize.code });
-    description = clampDescription(
-      product.shortDescription
-        ? `${lead}. ${product.shortDescription}`
-        : t("meta_description_megethos", { name: baseTitle, size: currentSize.label, code: currentSize.code }),
-    );
+    const seo = await seoFor("PRODUCT", product.slug, locale, {
+      h1: "",
+      title: el.title,
+      description: clampDescription(
+        product.shortDescription
+          ? `${lead}. ${product.shortDescription}`
+          : t("meta_description_megethos", { name: baseTitle, size: currentSize.label, code: currentSize.code }),
+      ),
+    });
+    title = sizeMetaTitle(el, seo.title);
+    shareTitle = seo.title;
+    description = seo.description;
   } else if (currentSize) {
     const sizeCode = (size: string, c: string) => t("megethos_kodikos", { size, code: c });
     title = shareTitle = sizedText(baseTitle, sizes, sizeCode);
