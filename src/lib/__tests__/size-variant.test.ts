@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { clampDescription, sizeFamilyLd, sizedText, sizeTitleEl } from "@/lib/seo/size-variant";
+import { clampDescription, sizeFamilyLd, sizedText, sizeMetaTitle, sizeTitleEl } from "@/lib/seo/size-variant";
 
 /**
  * A boot, a glove, a jacket: one product in several sizes, each size its own
@@ -132,4 +132,13 @@ describe("clampDescription", () => {
     expect(out.endsWith("…")).toBe(true);
     expect(out).not.toMatch(/\s…$/);
   });
+});
+
+describe("sizeMetaTitle", () => {
+  it("an override wins over the computed size title, as written", () =>
+    expect(sizeMetaTitle({ title: "Boot Νο 43", absolute: false }, "Δικός μας τίτλος")).toEqual({ absolute: "Δικός μας τίτλος" }));
+  it("without one, the computed title keeps the site template", () =>
+    expect(sizeMetaTitle({ title: "Boot Νο 43", absolute: false }, "Boot Νο 43")).toBe("Boot Νο 43"));
+  it("without one, a title too long for the template stays absolute", () =>
+    expect(sizeMetaTitle({ title: "Boot Νο 43", absolute: true }, "Boot Νο 43")).toEqual({ absolute: "Boot Νο 43" }));
 });

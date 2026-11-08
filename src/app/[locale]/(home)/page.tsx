@@ -1,4 +1,6 @@
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { FaqSection } from "@/components/blog/ArticleView";
 import { SiteChrome } from "@/components/chrome/SiteChrome";
 import { SiteFooter } from "@/components/chrome/SiteFooter";
 import { BestSellers } from "@/components/home/BestSellers";
@@ -30,6 +32,9 @@ import { faqView } from "@/lib/content/eshop-content-map";
 import { formatPrice } from "@/lib/format";
 import { drillsHref, resolveHomeCategories } from "@/lib/hdc-home";
 import { discountedNet, offerBadgeFor } from "@/lib/offers/badges";
+import { jsonLdHtml } from "@/lib/seo/json-ld";
+import { faqJsonLd } from "@/lib/seo/product-faq";
+import { seoFor } from "@/lib/seo/seo-for";
 
 /**
  * The HDC home page — docs/design/mockups/home.html, section by section:
@@ -65,14 +70,21 @@ const HERO = {
   height: 667,
 };
 
-export default async function HomePage({
-  params,
-}: {
-  params: Promise<{ locale: Locale }>;
-}) {
+type PageProps = { params: Promise<{ locale: Locale }> };
+
+/* Empty automatic text: with no override, the layout's metadata and HomeFaq stay. */
+const homeSeo = (locale: Locale) => seoFor("PAGE", "/", locale, { h1: "", title: "", description: "" });
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { title, description } = await homeSeo((await params).locale);
+  return { ...(title && { title: { absolute: title } }), ...(description && { description }) };
+}
+
+export default async function HomePage({ params }: PageProps) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("home.HdcHero");
+  const tFaq = await getTranslations("home.HomeFaq");
 
   const [
     rootCategories,
@@ -85,6 +97,7 @@ export default async function HomePage({
     newArrivals,
     categorySources,
     eshopContent,
+    seo,
   ] = await Promise.all([
     getRootCategories(locale),
     getMenuTree(locale),
@@ -103,6 +116,7 @@ export default async function HomePage({
     getHomeCategorySources(),
     // The Q&A for the short home FAQ section; the full list is /syxnes-erotiseis.
     getEshopContent(),
+    homeSeo(locale),
   ]);
 
   const categoryCards = resolveHomeCategories(categorySources);
@@ -176,7 +190,17 @@ export default async function HomePage({
         <Zone id="home.band" locale={locale} />
         <NewArrivalsBand products={newArrivals.products} />
         <StoreBand />
-        <HomeFaq items={faqItems} locale={locale} />
+        {seo.faq.length > 0 ? (
+          /* Instead of HomeFaq, never beside it: two FAQPage blocks on one page are an error. */
+          <section className="hdc-sec">
+            <div className="hdc-wrap">
+              <FaqSection title={tFaq("titlos")} faq={seo.faq} />
+              <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdHtml(faqJsonLd(seo.faq)) }} />
+            </div>
+          </section>
+        ) : (
+          <HomeFaq items={faqItems} locale={locale} />
+        )}
         <NewsletterBand />
         <Zone id="home.beforeFooter" locale={locale} />
       </main>
