@@ -72,7 +72,12 @@ export async function generateMetadata(): Promise<Metadata> {
      * fallback token, because the one that used to be here verified the
      * Kolleris property. Unset means no tag. See src/lib/seo/site-ids.ts.
      */
-    ...(gscToken ? { verification: { google: gscToken } } : {}),
+    verification: {
+      ...(gscToken ? { google: gscToken } : {}),
+      // Meta Business domain verification for milwaukeetoolshdc.gr (domain id
+      // 1605174784125698). Public by nature: it is printed in the tag itself.
+      other: { "facebook-domain-verification": "ttndr917cayzyb6ak85gd4144rpkek" },
+    },
     /*
      * Not on the final domain yet: `noindex, nofollow` on every page that does
      * not set its own. The proxy sends the same as an `X-Robots-Tag` header,
