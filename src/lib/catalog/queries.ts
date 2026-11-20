@@ -225,6 +225,8 @@ export type ProductCardData = {
   offerSlug?: string | null;
   offerBadge?: string | null;
   offerEndsAt?: Date | null;
+  /** Το sticker της προσφοράς, κάτω δεξιά στη φωτογραφία. */
+  sticker?: { url: string; alt: string | null; key: string | null } | null;
   vatRate: number;
   qty: number;
   inStock: boolean;
@@ -266,6 +268,9 @@ const PRODUCT_CARD_SELECT = {
   offerSlug: true,
   offerBadge: true,
   offerEndsAt: true,
+  offerSticker: true,
+  offerStickerUrl: true,
+  offerStickerAlt: true,
   vatRate: true,
   qty: true,
   inStock: true,
@@ -299,6 +304,9 @@ type ProductRow = {
   offerSlug: string | null;
   offerBadge: string | null;
   offerEndsAt: Date | null;
+  offerSticker: string | null;
+  offerStickerUrl: string | null;
+  offerStickerAlt: string | null;
   vatRate: unknown;
   qty: unknown;
   inStock: boolean;
@@ -309,6 +317,17 @@ type ProductRow = {
   impaCode: string | null;
   sizes: Array<{ label: string }>;
 };
+
+/** Το sticker υπάρχει μόνο μαζί με προσφορά ΚΑΙ εικόνα. */
+export function stickerOf(row: {
+  offerSlug: string | null;
+  offerSticker: string | null;
+  offerStickerUrl: string | null;
+  offerStickerAlt: string | null;
+}): ProductCardData["sticker"] {
+  if (!row.offerSlug || !row.offerStickerUrl) return null;
+  return { url: row.offerStickerUrl, alt: row.offerStickerAlt, key: row.offerSticker };
+}
 
 /** Prisma returns Decimal; the UI wants plain numbers. */
 function num(value: unknown): number | null {
@@ -345,6 +364,7 @@ function toCard(
     offerSlug: row.offerSlug,
     offerBadge: row.offerBadge,
     offerEndsAt: row.offerEndsAt,
+    sticker: stickerOf(row),
     vatRate: num(row.vatRate) ?? 24,
     qty: num(row.qty) ?? 0,
     inStock: row.inStock,

@@ -4,6 +4,7 @@ import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { BuyNowButton } from "@/components/cart/BuyNowButton";
 import { CardHoverShell } from "@/components/product/CardHoverShell";
 import { CompareCheckbox } from "@/components/product/CompareCheckbox";
+import { OfferSticker } from "@/components/product/OfferSticker";
 import { QuickViewTrigger } from "@/components/product/QuickViewTrigger";
 import { Link } from "@/i18n/navigation";
 import type { ProductCardData } from "@/lib/catalog/queries";
@@ -162,6 +163,11 @@ export async function ProductCard({
             </span>
           )}
         </Link>
+
+        <OfferSticker
+          sticker={product.sticker}
+          className="pointer-events-none absolute right-2 bottom-2 z-[5] size-11 object-contain drop-shadow-[0_1px_2px_rgb(0_0_0/0.18)] lg:size-16"
+        />
 
         <QuickViewTrigger slug={product.slug} />
       </div>
