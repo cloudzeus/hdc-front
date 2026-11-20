@@ -82,11 +82,29 @@ export async function syncOffersFromHdctool(): Promise<OffersSyncResult> {
   const offers = (response.offers ?? []).filter((o) => o.slug?.trim());
 
   for (const offer of offers) {
+    const slug = offer.slug.trim();
     const data = offerUpsertData(offer);
+
+    /*
+     * ΜΙΑ ΠΡΟΣΦΟΡΑ ΧΩΡΙΣ ΠΡΟΪΟΝΤΑ ΕΔΩ ΔΕΝ ΕΜΦΑΝΙΖΕΤΑΙ.
+     *
+     * Το HDCtool σερβίρει δύο καταστήματα με διαφορετικό κατάλογο: το
+     * Milwaukee κρατά μόνο προϊόντα Milwaukee, το Kolleris όλα τα υπόλοιπα.
+     * Μια προσφορά σε εργαλεία GEDORE κατεβαίνει και στα δύο, αλλά στο
+     * Milwaukee δεν αντιστοιχεί σε κανένα είδος — και θα έβγαζε σελίδα
+     * προσφοράς με άδειο πλέγμα, και σήμα σε μπάνερ που δεν πουλά τίποτα.
+     *
+     * Μετριέται ΜΕΤΑ τον συγχρονισμό προϊόντων, που έχει ήδη γράψει το
+     * `offerSlug`. Μια ολοκαίνουργια προσφορά που προηγήθηκε των προϊόντων
+     * της μένει ανενεργή για ένα πέρασμα και ανοίγει στο επόμενο.
+     */
+    const inThisShop = await prisma.product.count({ where: { isActive: true, offerSlug: slug } });
+    const row = { ...data, isActive: inThisShop > 0 };
+
     await prisma.offer.upsert({
-      where: { slug: offer.slug.trim() },
-      create: { slug: offer.slug.trim(), ...data },
-      update: data,
+      where: { slug },
+      create: { slug, ...row },
+      update: row,
     });
   }
 
