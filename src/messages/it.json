@@ -337,7 +337,9 @@
       "kodikoi": "Codici",
       "oles_oi_ekdoseis": "Tutte le versioni di {model}",
       "nav_erotiseis": "Domande",
-      "eikona_alt": "{alt} – immagine {n}"
+      "eikona_alt": "{alt} – immagine {n}",
+      "xamiloteri_timi_30_imeron": "Prezzo più basso in 30 giorni: {price}",
+      "prosfora_ligei": "L'offerta scade il {date}"
     }
   },
   "orders": {

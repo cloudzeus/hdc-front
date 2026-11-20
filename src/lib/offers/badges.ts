@@ -177,15 +177,63 @@ const liveCampaigns = cache(async (locale: string): Promise<Live[]> => {
 });
 
 /**
+ * Ό,τι χρειάζεται μια κάρτα για να απαντήσει «είμαι σε προσφορά;».
+ *
+ * Τα `offer*` έρχονται από το HDCtool με το feed και κάθονται πάνω στο προϊόν
+ * — βλ. `lib/sync/offer-projection.ts`.
+ */
+export type CardLike = {
+  slug: string;
+  brandSlug: string | null;
+  unitNet?: number | null;
+  offerSlug?: string | null;
+  offerBadge?: string | null;
+  offerEndsAt?: Date | string | null;
+};
+
+/**
+ * Το σήμα μιας προσφοράς HDCtool, από τα δικά του δεδομένα του προϊόντος.
+ *
+ * ── ΠΟΣΟΣΤΟ ΜΗΔΕΝ, ΕΠΙΤΗΔΕΣ ────────────────────────────────────────────────
+ *
+ * Η τιμή της προσφοράς είναι ΗΔΗ μέσα στο `priceNet`: ο συγχρονισμός βάζει
+ * εκεί το PRICER04 και την παγωμένη κανονική στο `priceList`. Το
+ * `discountPercent` περνά στο `discountedNet`, που καλούν και η κάρτα και το
+ * καλάθι — ένα ποσοστό εδώ θα έκοβε δεύτερη φορά πάνω σε τιμή που είναι ήδη
+ * κομμένη, και τα 149 € θα γινόταν 117 € στη βιτρίνα ΚΑΙ στη χρέωση.
+ *
+ * Το ποσοστό φαίνεται κανονικά στον πελάτη: βγαίνει από τη διαγραμμένη τιμή,
+ * στο δεύτερο σήμα της κάρτας (`savingsOf`).
+ */
+function hdctoolBadge(product: CardLike): OfferBadge | null {
+  const slug = product.offerSlug?.trim();
+  if (!slug) return null;
+  const ends = product.offerEndsAt;
+  const label = product.offerBadge?.trim() || GENERIC;
+  return {
+    label,
+    title: label,
+    href: `/prosfores/${slug}`,
+    discountPercent: 0,
+    startsAt: null,
+    endsAt: ends == null ? null : (ends instanceof Date ? ends : new Date(ends)).toISOString(),
+  };
+}
+
+/**
  * Η καμπάνια που καλύπτει αυτό το προϊόν, ή τίποτα.
  *
  * Το `unitNet` είναι προαιρετικό και χρειάζεται μόνο για έκπτωση σε ΠΟΣΟ, που
  * δεν μπορεί να γίνει ποσοστό χωρίς να ξέρουμε την τιμή.
  */
 export async function offerBadgeFor(
-  product: { slug: string; brandSlug: string | null; unitNet?: number | null },
+  product: CardLike,
   locale: string,
 ): Promise<OfferBadge | null> {
+  // Πρώτα το προϊόν: το HDCtool ορίζει τις προσφορές, και η απάντηση είναι
+  // πάνω στη γραμμή — ούτε ένα ερώτημα για καμπάνιες που δεν θα ισχύσουν.
+  const own = hdctoolBadge(product);
+  if (own) return own;
   return matchOffer(await liveCampaigns(locale), product);
 }
 
@@ -196,15 +244,17 @@ export async function offerBadgeFor(
  */
 export async function offerMatcher(
   locale: string,
-): Promise<(product: { slug: string; brandSlug: string | null; unitNet?: number | null }) => OfferBadge | null> {
+): Promise<(product: CardLike) => OfferBadge | null> {
   const campaigns = await liveCampaigns(locale);
   return (product) => matchOffer(campaigns, product);
 }
 
 function matchOffer(
   campaigns: Live[],
-  product: { slug: string; brandSlug: string | null; unitNet?: number | null },
+  product: CardLike,
 ): OfferBadge | null {
+  const own = hdctoolBadge(product);
+  if (own) return own;
   for (const c of campaigns) {
     const hit =
       c.productSlugs?.has(product.slug) ||

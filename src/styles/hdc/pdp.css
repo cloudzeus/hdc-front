@@ -629,6 +629,20 @@
     letter-spacing: 0;
     color: var(--hdc-g5);
   }
+  /*
+    Οδηγία Omnibus — ήσυχη, κάτω από την τιμή.
+    Υποχρεωτική πληροφορία, όχι δεύτερο επιχείρημα πώλησης: γκρι, μικρή, στην
+    ίδια στήλη με την τιμή. Αριθμοί σε tabular ώστε δύο προϊόντα δίπλα-δίπλα
+    να μη χοροπηδούν.
+  */
+  .hdc-pdp-omnibus {
+    margin-top: 8px;
+    font-size: var(--fs-13);
+    font-weight: 500;
+    line-height: 1.45;
+    color: var(--hdc-g5);
+    font-variant-numeric: tabular-nums;
+  }
   .hdc-pdp-avail {
     display: flex;
     flex-direction: column;

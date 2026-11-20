@@ -247,7 +247,14 @@ async function ProductBody({ params }: PageProps) {
     product.modelRoot ? getModelVariants(product.modelRoot) : Promise.resolve([] as ModelVariant[]),
     platform ? getPlatformBatteries(platform) : Promise.resolve([]),
     offerBadgeFor(
-      { slug: product.slug, brandSlug: product.brand?.slug ?? null, unitNet: product.priceNet },
+      {
+        slug: product.slug,
+        brandSlug: product.brand?.slug ?? null,
+        unitNet: product.priceNet,
+        offerSlug: product.offerSlug,
+        offerBadge: product.offerBadge,
+        offerEndsAt: product.offerEndsAt,
+      },
       locale,
     ),
     /* The same product in its other sizes — gloves, clothing, boots. */
@@ -271,7 +278,24 @@ async function ProductBody({ params }: PageProps) {
   /* The price the cart charges: the campaign discount, when one covers it. */
   const finalNet =
     product.priceNet == null ? null : discountedNet(product.priceNet, offer?.discountPercent ?? 0);
-  const discounted = product.priceNet != null && (offer?.discountPercent ?? 0) > 0;
+  /*
+   * Η τιμή «πριν» — δύο μηχανισμοί, ένα νούμερο.
+   * ─────────────────────────────────────────────────────────────────────────
+   * Προσφορά HDCtool: η τιμή της είναι ΗΔΗ το `priceNet`, και το «πριν» είναι
+   * η παγωμένη κανονική στο `priceListNet`. Τοπική καμπάνια: το `priceNet`
+   * είναι η κανονική και το ποσοστό κόβει από πάνω, οπότε το «πριν» είναι το
+   * `priceNet`. Ποτέ και τα δύο μαζί — βλ. `lib/offers/badges.ts`.
+   */
+  const wasNet =
+    product.offerSlug &&
+    product.priceListNet != null &&
+    product.priceNet != null &&
+    product.priceListNet > product.priceNet
+      ? product.priceListNet
+      : (offer?.discountPercent ?? 0) > 0 && product.priceNet != null
+        ? product.priceNet
+        : null;
+  const discounted = wasNet != null;
   const gross = finalNet == null ? null : grossAmount(finalNet, ctx);
   const price = gross == null ? "—" : formatMoney(gross, locale);
 
@@ -282,7 +306,7 @@ async function ProductBody({ params }: PageProps) {
         if (v.id === product.id) return [v.id, gross];
         if (v.priceNet == null) return [v.id, null];
         const o = await offerBadgeFor(
-          { slug: v.slug, brandSlug: product.brand?.slug ?? null, unitNet: v.priceNet },
+          { slug: v.slug, brandSlug: product.brand?.slug ?? null, unitNet: v.priceNet, offerSlug: v.offerSlug },
           locale,
         );
         return [v.id, grossAmount(discountedNet(v.priceNet, o?.discountPercent ?? 0), { vatRate: v.vatRate })];
@@ -521,7 +545,7 @@ async function ProductBody({ params }: PageProps) {
     category: product.categoryChain.at(-1)?.name ?? null,
     availability,
     priceGross: gross,
-    listPriceGross: discounted && product.priceNet != null ? grossAmount(product.priceNet, ctx) : null,
+    listPriceGross: wasNet == null ? null : grossAmount(wasNet, ctx),
     offerEndsAt: offer?.endsAt ?? null,
     priceNet: finalNet,
     postageGross: grossAmount(postage.totalNet),
@@ -726,11 +750,33 @@ async function ProductBody({ params }: PageProps) {
             <div className="hdc-pdp-pricebox">
               <p className="hdc-pdp-pr">
                 {price}
-                {discounted && product.priceNet != null && (
-                  <s>{formatMoney(grossAmount(product.priceNet, ctx), locale)}</s>
-                )}
+                {wasNet != null && <s>{formatMoney(grossAmount(wasNet, ctx), locale)}</s>}
                 <small>{t("me_fpa")}</small>
               </p>
+              {/*
+                Οδηγία Omnibus: όταν ανακοινώνεται μείωση, φαίνεται και το
+                χαμηλότερο των 30 ημερών. Μπαίνει κάτω από την τιμή, ήσυχα —
+                είναι υποχρεωτική πληροφορία, όχι δεύτερο επιχείρημα πώλησης.
+              */}
+              {product.offerSlug && product.price30dLowNet != null && (
+                <p className="hdc-pdp-omnibus">
+                  {t("xamiloteri_timi_30_imeron", {
+                    price: formatMoney(grossAmount(product.price30dLowNet, ctx), locale),
+                  })}
+                  {product.offerEndsAt && (
+                    <>
+                      {" · "}
+                      {t("prosfora_ligei", {
+                        date: product.offerEndsAt.toLocaleDateString(locale, {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                        }),
+                      })}
+                    </>
+                  )}
+                </p>
+              )}
               <div className="hdc-pdp-avail">
                 <div className={availability === "stock" ? "ok" : "wait"}>
                   <span className="dot" aria-hidden />

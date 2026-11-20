@@ -2,6 +2,7 @@ import "server-only";
 import { prisma } from "@/lib/prisma";
 import { hdctool } from "@/lib/hdctool/client";
 import { syncProductsByMtrl } from "@/lib/sync/catalog-sync";
+import { syncOffersFromHdctool } from "@/lib/sync/offers-sync";
 
 /**
  * Pull what changed in HDCtool since the last pass.
@@ -30,6 +31,8 @@ export type DeltaPollResult = {
   written: number;
   /** False when MAX_PAGES ran out before HDCtool ran out of pages — the cursor was not advanced. */
   complete: boolean;
+  /** Οι προσφορές που ευθυγραμμίστηκαν, ή το μήνυμα αν απέτυχε η κλήση. */
+  offers: { upserted: number; retired: number } | { error: string };
 };
 
 export async function pollCatalogDelta(): Promise<DeltaPollResult> {
@@ -57,6 +60,26 @@ export async function pollCatalogDelta(): Promise<DeltaPollResult> {
 
   const result = ids.size > 0 ? await syncProductsByMtrl([...ids]) : null;
 
+  /*
+   * Οι προσφορές, σε κάθε πέρασμα.
+   *
+   * Δεν κρεμιέται από το `ids`: μια προσφορά που μόλις ξεκίνησε ή έληξε δεν
+   * αλλάζει κανένα προϊόν στο delta — αλλάζει το παράθυρό της. Αν περίμενε
+   * αλλαγή προϊόντος, μια προσφορά που έληξε θα κρατούσε τη σελίδα της ζωντανή
+   * ως το επόμενο συγχρονισμό καταλόγου.
+   *
+   * Το σφάλμα δεν ρίχνει το πέρασμα: οι τιμές των προσφορών είναι ΗΔΗ μέσα στα
+   * προϊόντα που γράφτηκαν πιο πάνω, και μια αποτυχία εδώ αφορά μόνο τα
+   * κείμενα. Ρίχνοντας, θα χανόταν και ο δρομέας του καταλόγου.
+   */
+  let offers: DeltaPollResult["offers"];
+  try {
+    offers = await syncOffersFromHdctool();
+  } catch (error) {
+    offers = { error: error instanceof Error ? error.message : String(error) };
+    console.error("[sync:offers] αποτυχία συγχρονισμού προσφορών", error);
+  }
+
   // The cursor advances only for a pass that actually finished. MAX_PAGES
   // exhausted with more pages still pending means this pass saw only part of
   // "changed since `since`" — moving the cursor to `upTo` would silently drop
@@ -76,5 +99,5 @@ export async function pollCatalogDelta(): Promise<DeltaPollResult> {
     });
   }
 
-  return { since, upTo, changed: ids.size, written: result?.processed ?? 0, complete };
+  return { since, upTo, changed: ids.size, written: result?.processed ?? 0, complete, offers };
 }

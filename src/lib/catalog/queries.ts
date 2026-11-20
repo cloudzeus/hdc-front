@@ -215,6 +215,16 @@ export type ProductCardData = {
   image: string | null;
   priceNet: number | null;
   priceListNet: number | null;
+  /**
+   * Προσφορά HDCtool, όπου τρέχει — βλ. `lib/sync/offer-projection.ts`.
+   *
+   * Η ΤΙΜΗ της δεν είναι εδώ: είναι ήδη το `priceNet`, και η παγωμένη κανονική
+   * το `priceListNet`. Εδώ μένει ό,τι δεν είναι τιμή — το σήμα, η σελίδα στην
+   * οποία οδηγεί και πότε λήγει.
+   */
+  offerSlug?: string | null;
+  offerBadge?: string | null;
+  offerEndsAt?: Date | null;
   vatRate: number;
   qty: number;
   inStock: boolean;
@@ -253,6 +263,9 @@ const PRODUCT_CARD_SELECT = {
   mtrcategory: true,
   priceNet: true,
   priceList: true,
+  offerSlug: true,
+  offerBadge: true,
+  offerEndsAt: true,
   vatRate: true,
   qty: true,
   inStock: true,
@@ -283,6 +296,9 @@ type ProductRow = {
   mtrcategory: number | null;
   priceNet: unknown;
   priceList: unknown;
+  offerSlug: string | null;
+  offerBadge: string | null;
+  offerEndsAt: Date | null;
   vatRate: unknown;
   qty: unknown;
   inStock: boolean;
@@ -326,6 +342,9 @@ function toCard(
     image: row.images[0]?.url ?? null,
     priceNet: num(row.priceNet),
     priceListNet: num(row.priceList),
+    offerSlug: row.offerSlug,
+    offerBadge: row.offerBadge,
+    offerEndsAt: row.offerEndsAt,
     vatRate: num(row.vatRate) ?? 24,
     qty: num(row.qty) ?? 0,
     inStock: row.inStock,
