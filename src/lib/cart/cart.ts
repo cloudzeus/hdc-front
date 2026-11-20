@@ -204,6 +204,14 @@ export const getCart = cache(async (
         slug: p.slug,
         brandSlug: p.mtrmark != null ? (brandSlugs.get(p.mtrmark) ?? null) : null,
         unitNet,
+        /*
+         * Η προσφορά του HDCtool περνά ΟΛΟΚΛΗΡΗ, αλλιώς το καλάθι θα έβρισκε
+         * μια τοπική καμπάνια πάνω στην ίδια μάρκα και θα έκοβε δεύτερη φορά:
+         * το `priceNet` εδώ ΕΙΝΑΙ ήδη η τιμή της προσφοράς.
+         */
+        offerSlug: p.offerSlug,
+        offerBadge: p.offerBadge,
+        offerEndsAt: p.offerEndsAt,
       },
       locale,
     );
@@ -243,8 +251,12 @@ export const getCart = cache(async (
       unitNet,
       discountPercent,
       unitNetFinal,
-      offerTitle: discountPercent > 0 ? (offer?.title ?? null) : null,
-      offerHref: discountPercent > 0 ? (offer?.href ?? null) : null,
+      /* Το όνομα και ο σύνδεσμος ακολουθούν την ΥΠΑΡΞΗ της προσφοράς, όχι το
+         ποσοστό: μια προσφορά HDCtool κατεβαίνει με ποσοστό μηδέν επειδή η
+         μείωση είναι μέσα στην τιμή, και το όνομά της πρέπει να φτάσει στο
+         παραστατικό και στο email. */
+      offerTitle: offer?.title ?? null,
+      offerHref: offer?.href ?? null,
       unitListNet: listNet > unitNet ? listNet : null,
       vatRate,
       lineNet: netAmount(unitNetFinal * line.quantity),

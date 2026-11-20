@@ -337,7 +337,9 @@
       "kodikoi": "Κωδικοί",
       "oles_oi_ekdoseis": "Όλες οι εκδόσεις του {model}",
       "nav_erotiseis": "Ερωτήσεις",
-      "eikona_alt": "{alt} – εικόνα {n}"
+      "eikona_alt": "{alt} – εικόνα {n}",
+      "xamiloteri_timi_30_imeron": "Χαμηλότερη τιμή 30 ημερών: {price}",
+      "prosfora_ligei": "Η προσφορά λήγει {date}"
     }
   },
   "orders": {

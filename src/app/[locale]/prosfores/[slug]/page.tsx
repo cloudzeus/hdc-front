@@ -77,6 +77,7 @@ const getOffer = cache(async (slug: string) =>
       descriptionEn: true,
       descriptionIt: true,
       badge: true,
+      fromHdctool: true,
       scope: true,
       productSlugs: true,
       brandSlug: true,

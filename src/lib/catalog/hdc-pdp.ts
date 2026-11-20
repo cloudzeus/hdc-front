@@ -18,6 +18,8 @@ export type ModelVariant = {
   code2: string;
   content: "bare" | "kit" | null;
   priceNet: number | null;
+  /** Τρέχει προσφορά HDCtool; Τότε το `priceNet` είναι ΗΔΗ η τιμή της. */
+  offerSlug: string | null;
   vatRate: number;
   qty: number;
   inStock: boolean;
@@ -44,6 +46,7 @@ export const getModelVariants = cache(async (modelRoot: string): Promise<ModelVa
       code2: true,
       modelContent: true,
       priceNet: true,
+      offerSlug: true,
       vatRate: true,
       qty: true,
       inStock: true,
@@ -61,6 +64,7 @@ export const getModelVariants = cache(async (modelRoot: string): Promise<ModelVa
       content:
         row.modelContent === "bare" || row.modelContent === "kit" ? row.modelContent : null,
       priceNet: num(row.priceNet),
+      offerSlug: row.offerSlug,
       vatRate: num(row.vatRate) ?? 24,
       qty: num(row.qty) ?? 0,
       inStock: row.inStock,
