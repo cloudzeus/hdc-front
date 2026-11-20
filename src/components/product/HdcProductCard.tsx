@@ -4,6 +4,7 @@ import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { FavouriteButton } from "@/components/product/FavouriteButton";
 import { HdcCompareCheckbox } from "@/components/product/HdcCompareCheckbox";
 import { HdcQuickViewButton } from "@/components/product/HdcQuickViewButton";
+import { OfferSticker } from "@/components/product/OfferSticker";
 import { Link } from "@/i18n/navigation";
 import { favouriteIds } from "@/lib/account/favourite-ids";
 import { availabilityLabelKey, availabilityOf } from "@/lib/catalog/availability";
@@ -134,6 +135,7 @@ export async function HdcProductCard({
             <span className="hdc-card-noimg">{t("choris_eikona")}</span>
           )}
         </Link>
+        <OfferSticker sticker={product.sticker} className="hdc-card-sticker" />
       </div>
 
       <div className="hdc-card-body">

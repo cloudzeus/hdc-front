@@ -64,6 +64,25 @@
     z-index: 1;
   }
 
+  /* The offer's sticker (HDCtool «Sticker στη βιτρίνα»): bottom right of the photo. */
+  .hdc-card-sticker {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    z-index: 1;
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    pointer-events: none;
+    filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.18));
+  }
+  @media (min-width: 768px) {
+    .hdc-card-sticker {
+      width: 64px;
+      height: 64px;
+    }
+  }
+
   /* ONE-KEY: a white slant under the platform tag (plp.html `.k1`). */
   .hdc-card-tag--k1 {
     top: 40px;

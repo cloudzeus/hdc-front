@@ -2,7 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import type { Locale } from "@/i18n/routing";
-import type { ProductCardData } from "@/lib/catalog/queries";
+import { stickerOf, type ProductCardData } from "@/lib/catalog/queries";
 import { nameWithoutSize } from "@/lib/catalog/variant-name";
 import { withFamilies } from "@/lib/catalog/variants";
 import { scopeKeyOf } from "@/lib/compare/options";
@@ -34,6 +34,9 @@ const CARD = {
   offerSlug: true,
   offerBadge: true,
   offerEndsAt: true,
+  offerSticker: true,
+  offerStickerUrl: true,
+  offerStickerAlt: true,
   vatRate: true,
   qty: true,
   inStock: true,
@@ -87,6 +90,7 @@ function toCard(
     image: row.images[0]?.url ?? null,
     priceNet: num(row.priceNet),
     priceListNet: num(row.priceList),
+    sticker: stickerOf(row),
     vatRate: num(row.vatRate) ?? 24,
     qty: num(row.qty) ?? 0,
     inStock: row.inStock,

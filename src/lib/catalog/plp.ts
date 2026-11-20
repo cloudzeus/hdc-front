@@ -25,7 +25,7 @@ import {
   type Platform,
   type Series,
 } from "@/lib/catalog/hdc-filters";
-import type { ProductCardData } from "@/lib/catalog/queries";
+import { stickerOf, type ProductCardData } from "@/lib/catalog/queries";
 import { LISTING_LIMITS, capFacetValues } from "@/lib/catalog/listing-query";
 import { listingCache, type CachedListing } from "@/lib/catalog/listing-cache";
 import {
@@ -458,7 +458,12 @@ function buildWhere(
   return { AND: and };
 }
 
-function orderBy(sort: SortValue): Prisma.ProductOrderByWithRelationInput[] {
+function orderBy(sort: SortValue, offerOrder = false): Prisma.ProductOrderByWithRelationInput[] {
+  // Σελίδα προσφοράς HDCtool: «Σχετικότητα» είναι η σειρά που έσυρε ο χρήστης.
+  if (offerOrder && sort === "relevance") {
+    // Χωρίς θέσεις ακόμη (πριν φτάσει το feed): η συνηθισμένη σειρά.
+    return [{ offerPosition: { sort: "asc", nulls: "last" } }, ...orderBy(sort)];
+  }
   switch (sort) {
     case "price-asc":
       return [{ priceNet: "asc" }, { mtrl: "asc" }];
@@ -491,6 +496,9 @@ const CARD_SELECT = {
   offerSlug: true,
   offerBadge: true,
   offerEndsAt: true,
+  offerSticker: true,
+  offerStickerUrl: true,
+  offerStickerAlt: true,
   vatRate: true,
   qty: true,
   inStock: true,
@@ -561,7 +569,7 @@ async function loadListing(
   const [rows, total, linkedBrands] = await Promise.all([
     prisma.product.findMany({
       where,
-      orderBy: orderBy(params.sort ?? "relevance"),
+      orderBy: orderBy(params.sort ?? "relevance", typeof extraWhere?.offerSlug === "string"),
       skip: params.cumulative ? 0 : (page - 1) * perPage,
       take: params.cumulative ? page * perPage : perPage,
       select: CARD_SELECT,
@@ -592,6 +600,7 @@ async function loadListing(
       image: row.images[0]?.url ?? null,
       priceNet: num(row.priceNet),
       priceListNet: num(row.priceList),
+      sticker: stickerOf(row),
       vatRate: num(row.vatRate) ?? 24,
       qty: num(row.qty) ?? 0,
       inStock: row.inStock,
