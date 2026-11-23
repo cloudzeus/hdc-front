@@ -181,19 +181,28 @@ function useDemo(): ResolvedCell {
  * κάθεται το κείμενο που έχει ψηθεί μέσα στο βίντεο.
  */
 function useNaturalRatio(kind: string, url: string): number | null {
-  const [ratio, setRatio] = useState<number | null>(null);
+  // The measurement remembers what it measured, so a changed source reads as
+  // unmeasured straight away instead of showing the previous file's ratio.
+  const [measured, setMeasured] = useState<{
+    kind: string;
+    url: string;
+    ratio: number | null;
+  } | null>(null);
 
   useEffect(() => {
-    setRatio(null);
     if (kind !== "video" && kind !== "image") return;
     let alive = true;
-    void measureMedia(kind, url).then((r) => alive && setRatio(r));
+    void measureMedia(kind, url).then(
+      (ratio) => alive && setMeasured({ kind, url, ratio }),
+    );
     return () => {
       alive = false;
     };
   }, [kind, url]);
 
-  return ratio;
+  return measured?.kind === kind && measured.url === url
+    ? measured.ratio
+    : null;
 }
 
 export function CellEditor({
@@ -221,7 +230,10 @@ export function CellEditor({
     initialResolved,
   );
   const [selected, setSelected] = useState<string | null>(null);
-  const [gallery, setGallery] = useState(false);
+  // An empty cell opens straight onto the shelf — that is the first decision.
+  const [gallery, setGallery] = useState(
+    cell !== null && (!initial || initial.layers.length === 0),
+  );
   const [uploading, setUploading] = useState(false);
   const [motionKey, setMotionKey] = useState(0);
 
@@ -243,14 +255,18 @@ export function CellEditor({
   }, [cell, draft.binding, draft.href]);
 
   // A different cell means a different composition; the modal is one instance.
-  useEffect(() => {
-    if (!cell) return;
-    setDraft(initial ?? emptyComposition());
-    setResolved(initialResolved);
-    setSelected(null);
-    // An empty cell opens straight onto the shelf — that is the first decision.
-    setGallery(!initial || initial.layers.length === 0);
-  }, [cell, initial]);
+  // Reset while rendering, when the props change, so the modal never paints
+  // the previous cell's draft first.
+  const [shown, setShown] = useState({ cell, initial });
+  if (shown.cell !== cell || shown.initial !== initial) {
+    setShown({ cell, initial });
+    if (cell) {
+      setDraft(initial ?? emptyComposition());
+      setResolved(initialResolved);
+      setSelected(null);
+      setGallery(!initial || initial.layers.length === 0);
+    }
+  }
 
   const layer = draft.layers.find((l) => l.id === selected) ?? null;
 
@@ -685,13 +701,21 @@ function SourceRail({
       ? binding.slug
       : "";
   const setSize = binding.source === "products" ? binding.slugs.length : 0;
+  const bound = binding.source === "product" && slug !== "";
 
-  useEffect(() => {
-    if (binding.source !== "product" || !slug) {
+  // Unbinding empties the rail at once. Switching to another product keeps the
+  // previous photographs until the new ones arrive.
+  const [wasBound, setWasBound] = useState(bound);
+  if (bound !== wasBound) {
+    setWasBound(bound);
+    if (!bound) {
       setImages([]);
       setName("");
-      return;
     }
+  }
+
+  useEffect(() => {
+    if (!bound) return;
     let cancelled = false;
     void actionProductAssets(slug, "el").then((assets) => {
       if (cancelled || !assets) return;
@@ -701,7 +725,7 @@ function SourceRail({
     return () => {
       cancelled = true;
     };
-  }, [binding.source, slug]);
+  }, [bound, slug]);
 
   // An offer lends its two crops rather than a gallery.
   const offerImages =

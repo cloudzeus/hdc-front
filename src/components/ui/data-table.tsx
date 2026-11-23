@@ -263,8 +263,8 @@ export function DataTable<TData, TValue>({
                 <DropdownMenuContent align="end">
                   {table
                     .getAllColumns()
-                    .filter((column: any) => column.getCanHide())
-                    .map((column: any) => {
+                    .filter((column) => column.getCanHide())
+                    .map((column) => {
                       return (
                         <DropdownMenuCheckboxItem
                           key={column.id}
@@ -301,7 +301,7 @@ export function DataTable<TData, TValue>({
         <div className="rounded-md border overflow-x-auto">
           <Table>
             <TableHeader>
-              {table.getHeaderGroups().map((headerGroup: any) => (
+              {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id} className="border-b hover:bg-transparent data-[state=selected]:bg-transparent">
                   {onRowSelectionChange && (
                     <TableHead className="w-12">
@@ -318,7 +318,7 @@ export function DataTable<TData, TValue>({
                   {expandableContent && (
                     <TableHead className="w-12"></TableHead>
                   )}
-                  {headerGroup.headers.map((header: any) => {
+                  {headerGroup.headers.map((header) => {
                     const canSort = header.column.getCanSort();
                     const sorted = header.column.getIsSorted();
                     return (
@@ -370,7 +370,7 @@ export function DataTable<TData, TValue>({
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows.map((row: any) => (
+              {table.getRowModel().rows.map((row) => (
                 <React.Fragment key={row.id}>
                   <TableRow
                     data-state={row.getIsSelected() && "selected"}
@@ -401,7 +401,7 @@ export function DataTable<TData, TValue>({
                         </Button>
                       </TableCell>
                     )}
-                    {row.getVisibleCells().map((cell: any) => (
+                    {row.getVisibleCells().map((cell) => (
                       <TableCell
                         key={cell.id}
                         className="text-xs"
